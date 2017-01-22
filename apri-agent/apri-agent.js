@@ -188,5 +188,5 @@ var startConnection	= function() {
 	} else {
 		console.log('Socket is NOT connected');
 	}
-	socket.emit('apriAgentBoot', {"action":"boot", "macAddress": macAddress } );
+	socket.emit('apriAgentBoot', {"action":"boot", "macAddress": macAddress, "usbPorts": usbPorts } );
 }

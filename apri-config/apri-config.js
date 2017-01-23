@@ -32,11 +32,11 @@ module.exports = {
 
 		var systemHostName			= this.os.hostname();
 		var systemFolder 			= __dirname;
-		this.systemFolderParent		= this.path.resolve(__dirname,'..');
+		this.systemFolderParent		= this.path.resolve(__dirname,'../..');
 		this.systemMainModuleName 	= systemMainModuleName;
 		this.systemBaseCode 		= this.path.basename(this.systemFolderParent);
 
-		var systemConfigLocalPath 	= this.systemFolderParent +'/../config/';
+		var systemConfigLocalPath 	= this.systemFolderParent +'/config/';
 		var systemConfigStr 		= this.fs.readFileSync(systemConfigLocalPath + "apri-system.json");
 		var systemConfig 			= JSON.parse(systemConfigStr);
 

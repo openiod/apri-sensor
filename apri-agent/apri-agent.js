@@ -64,7 +64,7 @@ var macAddress			= {};
 var usbPorts			= [];
 
 
-
+/*
 var serialPortPath		= "/dev/cu.usbmodem1411";
 //var serialPortPath		= "/dev/cu.usbmodem1421";
 //var serialPortPath		= "/dev/cu.wchusbserial1440";
@@ -95,7 +95,7 @@ serialport.on('error', function(err) {
   console.log('Error: ', err.message);
 });
 
-
+*/
 
 // send data to SOS service via OpenIoD REST service
 var sendData = function(data) {

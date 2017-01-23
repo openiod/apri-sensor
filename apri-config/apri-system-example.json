@@ -1,0 +1,35 @@
+{
+    "system": {
+        "systemName": "apri",
+        "systemCode": "SCAPE604",
+		"systemEnv": "alfa",
+        "systemListenPort": "3000",
+        "serviceType": "node-apri", 
+        "versionStr": "",
+        "version": {
+            "l1": 0,
+            "l2": 0,
+            "l3": 1
+        }
+    },
+	"parameter" : {
+        "databaseType": "postgres",
+        "databaseServer": "ipaddressserver",
+        "databaseName": "db",
+        "databaseAccount": "postgres",
+        "databasePassword": "postgres"
+	},
+	"apps" : {
+		"apri-sensor": {
+        	"appName": "apri-sensor",
+        	"appLocation": "apri-sensor",
+            "version": {
+                "l1": 0,
+                "l2": 0,
+                "l3": 1
+            }
+		}	
+	},
+	"modules":[
+	]
+}

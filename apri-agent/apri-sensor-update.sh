@@ -11,4 +11,4 @@ git pull >> ../log/apri-agent-update.log
 sudo systemctl stop SCAPE604-apri-sensor-dylos.service
 sudo systemctl start SCAPE604-apri-sensor-dylos.service
 
-exit -1
+exit 0

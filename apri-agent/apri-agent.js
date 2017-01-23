@@ -11,7 +11,7 @@
 var path = require('path');
 var startFolder 			= __dirname;
 var startFolderParent		= path.resolve(__dirname,'../..');
-var configServerModulePath	= startFolderParent + '/apri-server-config/apri-server-config';
+var configServerModulePath	= startFolderParent + '/apri-config/apri-config';
 console.log("Start of Config Main ", configServerModulePath);
 var apriConfig = require(configServerModulePath)
 
@@ -138,7 +138,7 @@ var getMacAddress	= function(networkInterface) {
 			macAddress[networkInterface]	= null;
 			console.log('Error reading file for macaddress network interface: ' + networkInterface);
 		};
-        macAddress[networkInterface]	= data;
+        macAddress[networkInterface]	= data.substr(0,17);
 		console.log('MAC-Address network interface: ' + networkInterface + '  ' + data);
 	});
 }

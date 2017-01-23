@@ -207,6 +207,7 @@ getUsbPorts();
 updateSoftware();
 
 
+
 var startConnection	= function() {
 	// start communication with Apri Agent Manager
 	console.log('Boot Apri Agent');

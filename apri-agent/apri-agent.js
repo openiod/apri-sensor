@@ -33,6 +33,7 @@ const SerialPort 			= require('serialport');
 const fs 					= require('fs');
 const io	 				= require('socket.io-client');
 const exec 				= require('child_process').exec;
+const execFile			= require('child_process').execFile;
 
 
 //var app = express();
@@ -159,17 +160,14 @@ var getIpAddress	= function() {
 };
 
 var updateSoftware	= function() {
-	//hostname --all-ip-address
-	exec('hostname --all-ip-address', (error, stdout, stderr) => {
+	const child = execFile(startFolder+apri-sensor-update.sh, [], (error, stdout, stderr) => {
 		if (error) {
-			console.error(`exec error: ${error}`);
-			return;
+			throw error;
 		}
-		var stdoutArray	= stdout.split('\n');
-		ipAddress = stdoutArray[0];
-//		console.log(`stderr: ${stderr}`);	
+		console.log(stdout);
 	});
 };
+
 
 
 var socket = io(socketUrl, {path:socketPath}); 
@@ -206,6 +204,7 @@ getMacAddress('eth0');
 getMacAddress('wlan0');
 getIpAddress();
 getUsbPorts();
+updateSoftware();
 
 
 var startConnection	= function() {

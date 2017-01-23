@@ -158,6 +158,20 @@ var getIpAddress	= function() {
 	});
 };
 
+var updateSoftware	= function() {
+	//hostname --all-ip-address
+	exec('hostname --all-ip-address', (error, stdout, stderr) => {
+		if (error) {
+			console.error(`exec error: ${error}`);
+			return;
+		}
+		var stdoutArray	= stdout.split('\n');
+		ipAddress = stdoutArray[0];
+//		console.log(`stderr: ${stderr}`);	
+	});
+};
+
+
 var socket = io(socketUrl, {path:socketPath}); 
 
 socket.on('connect', function (socket) {

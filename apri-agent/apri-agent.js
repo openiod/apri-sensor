@@ -160,7 +160,7 @@ var getIpAddress	= function() {
 };
 
 var updateSoftware	= function() {
-	const child = execFile(startFolder+apri-sensor-update.sh, [], (error, stdout, stderr) => {
+	const child = execFile(startFolder+'/apri-sensor-update.sh', [], (error, stdout, stderr) => {
 		if (error) {
 			throw error;
 		}

@@ -27,11 +27,13 @@ var initResult = apriConfig.init(systemModuleFolderName+"/"+systemModuleName);
 // **********************************************************************************
 
 // add module specific requires
-var request 			= require('request');
+const request 			= require('request');
 //var express 			= require('express');
-var SerialPort 			= require('serialport');
-var fs 					= require('fs');
-var io	 				= require('socket.io-client');
+const SerialPort 			= require('serialport');
+const fs 					= require('fs');
+const io	 				= require('socket.io-client');
+const exec 				= require('child_process').exec;
+
 
 //var app = express();
 
@@ -62,7 +64,7 @@ var openiodUrl			= siteProtocol + 'openiod.org/' + apriConfig.systemCode; //SCAP
 var macAddress			= {};
 // USB ports
 var usbPorts			= [];
-
+var ipAddress			= '';
 
 /*
 var serialPortPath		= "/dev/cu.usbmodem1411";
@@ -143,6 +145,17 @@ var getMacAddress	= function(networkInterface) {
 	});
 }
 
+var getIpAddress	= function() {
+	//hostname --all-ip-address
+	exec('hostname --all-ip-address', (error, stdout, stderr) => {
+		if (error) {
+			console.error(`exec error: ${error}`);
+			return;
+		}
+		ipAddress = stdout;
+//		console.log(`stderr: ${stderr}`);	
+	});
+};
 
 var socket = io(socketUrl, {path:socketPath}); 
 
@@ -176,6 +189,7 @@ socket.on('apriAgentBoot', function(data) {  // pong message from socket.io serv
 
 getMacAddress('eth0');
 getMacAddress('wlan0');
+getIpAddress();
 getUsbPorts();
 
 
@@ -188,5 +202,5 @@ var startConnection	= function() {
 	} else {
 		console.log('Socket is NOT connected');
 	}
-	socket.emit('apriAgentBoot', {"action":"boot", "macAddress": macAddress, "usbPorts": usbPorts } );
+	socket.emit('apriAgentBoot', {"action":"boot", "macAddress": macAddress, "usbPorts": usbPorts, "ipAddress": ipAddress } );
 }

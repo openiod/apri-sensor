@@ -152,7 +152,8 @@ var getIpAddress	= function() {
 			console.error(`exec error: ${error}`);
 			return;
 		}
-		ipAddress = stdout;
+		var stdoutArray	= stdout.split('\n');
+		ipAddress = stdoutArray[0];
 //		console.log(`stderr: ${stderr}`);	
 	});
 };

@@ -124,10 +124,10 @@ var sendData = function(data) {
 var getUsbPorts	= function() {
 	SerialPort.list(function(err, ports) {
 		usbPorts	= ports;
-		console.log('The usb ports of this system are: ');
-		for (var i=0;i<usbPorts.length;i++) {
-			console.log(usbPorts[i]);
-		} 
+		//console.log('The usb ports of this system are: ');
+		//for (var i=0;i<usbPorts.length;i++) {
+		//	console.log(usbPorts[i]);
+		//} 
 	});
 }
 

@@ -61,7 +61,9 @@ var siteProtocol 		= secureSite?'https://':'http://';
 var openiodUrl			= siteProtocol + 'openiod.org/' + apriConfig.systemCode; //SCAPE604';
 var loopTimeMax			= 60000; //ms, 60000=60 sec
 //var serialPortPath		= "/dev/cu.usbmodem1411";
-var serialPortPath		= "/dev/cu.usbserial-A1056661";
+//var serialPortPath		= "/dev/cu.usbserial-A1056661";
+var serialPortPath		= "/dev/ttyUSB0";
+
 var sensorid			= 1;
 
 var loopStart;

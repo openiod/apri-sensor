@@ -203,7 +203,7 @@ var updateSoftware	= function() {
 		if (error) {
 			throw error;
 		}
-		console.log(stdout);
+		console.log(new Date().toISOString() + ': ' + stdout);
 	});
 };
 
@@ -236,6 +236,10 @@ socket.on('disconnect', function() {
 	socket.on('apriAgentBoot', function(data) {  // pong message from socket.io server
 		console.log('Apri Agent Manager pong succeeded, response: ');
 		console.dir(data);
+	});
+	socket.on('apriAgentAction', function(data) {  // pong message from socket.io server
+		console.log('Apri Agent Manager action recieved: ' + data.action);
+		//console.dir(data);
 	});
 	socket.on('apriAgentPing', function(data) {
         console.log('ApriAgent Ping message recieved ');

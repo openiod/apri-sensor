@@ -132,21 +132,21 @@ var getCpuInfo	= function() {
 			console.error(`exec error: ${error}`);
 			return;
 		}
-		unit.id = stdout.substr(0,stdout.length-1);
+		unit.id = stdout.substr(0,stdout.length-2);
 	});
 	exec("cat /proc/cpuinfo | grep Hardware | cut -d ' ' -f 2", (error, stdout, stderr) => {
 		if (error) {
 			console.error(`exec error: ${error}`);
 			return;
 		}
-		unit.hardware = stdout.substr(0,stdout.length-1);
+		unit.hardware = stdout.substr(0,stdout.length-2);
 	});
 	exec("cat /proc/cpuinfo | grep Revision | cut -d ' ' -f 2", (error, stdout, stderr) => {
 		if (error) {
 			console.error(`exec error: ${error}`);
 			return;
 		}
-		unit.revision = stdout.substr(0,stdout.length-1);
+		unit.revision = stdout.substr(0,stdout.length-2);
 	});
 };
 var getUsbPorts	= function() {

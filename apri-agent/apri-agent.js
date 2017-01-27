@@ -62,6 +62,7 @@ var secureSite 			= true;
 var siteProtocol 		= secureSite?'https://':'http://';
 var openiodUrl			= siteProtocol + 'openiod.org/' + apriConfig.systemCode; //SCAPE604';
 
+var unit				= {}; //hardware unit, serial id, etc.
 var macAddress			= {};
 // USB ports
 var usbPorts			= [];
@@ -124,6 +125,30 @@ var sendData = function(data) {
 		
 };
 
+var getCpuInfo	= function() {
+	//hostname --all-ip-address
+	exec("cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2", (error, stdout, stderr) => {
+		if (error) {
+			console.error(`exec error: ${error}`);
+			return;
+		}
+		unit.id = stdout;
+	});
+	exec("cat /proc/cpuinfo | grep Hardware | cut -d ' ' -f 2", (error, stdout, stderr) => {
+		if (error) {
+			console.error(`exec error: ${error}`);
+			return;
+		}
+		unit.hardware = stdout;
+	});
+	exec("cat /proc/cpuinfo | grep Revision | cut -d ' ' -f 2", (error, stdout, stderr) => {
+		if (error) {
+			console.error(`exec error: ${error}`);
+			return;
+		}
+		unit.revision = stdout;
+	});
+};
 var getUsbPorts	= function() {
 	SerialPort.list(function(err, ports) {
 		usbPorts	= ports;
@@ -186,21 +211,28 @@ socket.on('disconnect', function() {
 	console.log('Disconnected from web-socket ');
 });
 
-socket.on('info', function(data) {
-	console.log('websocket info '+ data);
-	//io.sockets.emit('aireassignal', { data: data } );
-	//socket.broadcast.emit('aireassignal', { data: data } );
-});
+	socket.on('info', function(data) {
+		console.log('websocket info '+ data);
+		//io.sockets.emit('aireassignal', { data: data } );
+		//socket.broadcast.emit('aireassignal', { data: data } );
+	});
+	socket.on('apriAgentMsg', function(data) {
+		console.log('Apri Agent message: '+ data);
+	});
+	socket.on('apriAgentBoot', function(data) {  // pong message from socket.io server
+		console.log('Apri Agent Manager pong succeeded, response: ');
+		console.dir(data);
+	});
+	socket.on('apriAgentPing', function(data) {
+        console.log('ApriAgent Ping message recieved ');
+		socket.emit('apriAgentPong', data ); // pong, return message. 
+    });
+	socket.on('apriAgentPong', function(data) {
+        console.log('ApriAgent Pong message recieved ');
+    });
 
-socket.on('apriAgentMsg', function(data) {
-	console.log('Apri Agent message: '+ data);
-});
-socket.on('apriAgentBoot', function(data) {  // pong message from socket.io server
-	console.log('Apri Agent Manager pong succeeded, response: ');
-	console.dir(data);
-});
 
-getMacAddress('eth0');
+getCpuInfo();
 getMacAddress('wlan0');
 getIpAddress();
 getUsbPorts();
@@ -217,5 +249,12 @@ var startConnection	= function() {
 	} else {
 		console.log('Socket is NOT connected');
 	}
-	socket.emit('apriAgentBoot', {"action":"boot", "macAddress": macAddress, "usbPorts": usbPorts, "ipAddress": ipAddress } );
+	socket.emit('apriAgentBoot', 
+		{"action":"boot"
+		, "macAddress": macAddress
+		, "usbPorts": usbPorts
+		, "ipAddress": ipAddress
+		, "unit": unit	
+		}
+	);
 }

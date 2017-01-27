@@ -67,6 +67,7 @@ var macAddress			= {};
 // USB ports
 var usbPorts			= [];
 var ipAddress			= '';
+var wifiScan			= {};
 
 /*
 var serialPortPath		= "/dev/cu.usbmodem1411";
@@ -149,6 +150,7 @@ var getCpuInfo	= function() {
 		unit.revision = stdout.substr(0,stdout.length-1);
 	});
 };
+
 var getUsbPorts	= function() {
 	SerialPort.list(function(err, ports) {
 		usbPorts	= ports;
@@ -168,6 +170,18 @@ var getMacAddress	= function(networkInterface) {
 		};
         macAddress[networkInterface]	= data.substr(0,data.length-1);
 		console.log('MAC-Address network interface: ' + networkInterface + '  ' + data);
+	});
+}
+var getWifiScanInfo	= function(iface) {
+
+	//hostname --all-ip-address
+	exec('iwlist '+iface+' scan', (error, stdout, stderr) => {
+		if (error) {
+			console.error(`exec error: ${error}`);
+			return;
+		}
+		wifiScan[iface]	= "" + stdout;
+//		console.log(`stderr: ${stderr}`);	
 	});
 }
 
@@ -236,6 +250,8 @@ getCpuInfo();
 getMacAddress('wlan0');
 getIpAddress();
 getUsbPorts();
+getWifiScanInfo('wlan0');
+getWifiScanInfo('wlan1');
 updateSoftware();
 
 
@@ -255,6 +271,7 @@ var startConnection	= function() {
 		, "usbPorts": usbPorts
 		, "ipAddress": ipAddress
 		, "unit": unit	
+		, "wifiScan": wifiScan
 		}
 	);
 }

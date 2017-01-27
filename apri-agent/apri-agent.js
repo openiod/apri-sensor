@@ -146,7 +146,7 @@ var getCpuInfo	= function() {
 			console.error(`exec error: ${error}`);
 			return;
 		}
-		unit.revision = stdout.substr(0,stdout.length-1;
+		unit.revision = stdout.substr(0,stdout.length-1);
 	});
 };
 var getUsbPorts	= function() {

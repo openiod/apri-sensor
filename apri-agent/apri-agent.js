@@ -203,7 +203,8 @@ var updateSoftware	= function() {
 		if (error) {
 			throw error;
 		}
-		console.log(new Date().toISOString() + ': ' + stdout);
+		var logDate	= new Date().toISOString();
+		console.log(logDate + ': ' + stdout);
 	});
 };
 

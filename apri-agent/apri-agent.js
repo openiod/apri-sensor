@@ -126,6 +126,16 @@ var sendData = function(data) {
 		
 };
 
+var startActionReboot = function() {
+	exec("reboot", (error, stdout, stderr) => {
+		if (error) {
+			console.error(`exec error: ${error}`);
+			return;
+		}
+		unit.id = stdout.substr(0,stdout.length-1);
+	});
+}
+
 var getCpuInfo	= function() {
 	//hostname --all-ip-address
 	exec("cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2", (error, stdout, stderr) => {
@@ -245,6 +255,9 @@ socket.on('disconnect', function() {
 	socket.on('apriClientAction', function(data) {  // pong message from socket.io server
 		console.log('Apri Agent Manager action recieved: ' + data.action);
 		console.dir(data);
+		if (data.action == 'reboot') {
+			startActionReboot();
+		}
 	});
 	socket.on('apriAgentPing', function(data) {
         console.log('ApriAgent Ping message recieved ');

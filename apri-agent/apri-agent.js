@@ -29,9 +29,9 @@ var initResult = apriConfig.init(systemModuleFolderName+"/"+systemModuleName);
 // add module specific requires
 const request 			= require('request');
 //var express 			= require('express');
-const SerialPort 			= require('serialport');
-const fs 					= require('fs');
-const io	 				= require('socket.io-client');
+const SerialPort 		= require('serialport');
+const fs 				= require('fs');
+const io	 			= require('socket.io-client');
 const exec 				= require('child_process').exec;
 const execFile			= require('child_process').execFile;
 
@@ -203,7 +203,7 @@ var updateSoftware	= function() {
 		if (error) {
 			throw error;
 		}
-		var logDate	= new Date().toISOString();
+		var logDate	= "" + new Date().toISOString();
 		console.log(logDate + ': ' + stdout);
 	});
 };

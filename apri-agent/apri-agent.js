@@ -242,6 +242,10 @@ socket.on('disconnect', function() {
 		console.log('Apri Agent Manager action recieved: ' + data.action);
 		//console.dir(data);
 	});
+	socket.on('apriClientAction', function(data) {  // pong message from socket.io server
+		console.log('Apri Agent Manager action recieved: ' + data.action);
+		console.dir(data);
+	});
 	socket.on('apriAgentPing', function(data) {
         console.log('ApriAgent Ping message recieved ');
 		socket.emit('apriAgentPong', data ); // pong, return message. 

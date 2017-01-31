@@ -257,18 +257,18 @@ var writeResults	= function(measureTime, loopTime) {
 		
 	data.categories			= [];
 	data.observation		= 
-		'apri-sensor_concPM1_0_CF1:'+ concPM1_0_CF1Avg + ',' +
-		'apri-sensor_concPM2_5_CF1:'+concPM2_5_CF1Avg + ',' +
-		'apri-sensor_concPM10_0_CF1:'+concPM10_0_CF1Avg + ',' +
-		'apri-sensor_concPM1_0_amb:'+concPM1_0_ambAvg + ',' +
-		'apri-sensor_concPM2_5_amb:'+concPM2_5_ambAvg + ',' +
-		'apri-sensor_concPM10_0_amb:'+concPM10_0_ambAvg + ',' +
-		'apri-sensor_rawGtPM0_3m:'+rawGtPM0_3mAvg + ',' +
-		'apri-sensor_rawGtPM0_5m:'+rawGtPM0_5mAvg + ',' +
-		'apri-sensor_rawGtPM1_0m:'+rawGtPM1_0mAvg + ',' +
-		'apri-sensor_rawGtPM2_5m:'+rawGtPM2_5mAvg + ',' +
-		'apri-sensor_rawGtPM5_0m:'+rawGtPM5_0mAvg + ',' +
-		'apri-sensor_rawGtPM10_0m:'+rawGtPM10_0mAvg ;
+		'apri-sensor-pms7003-concPM1_0_CF1:'+ concPM1_0_CF1Avg + ',' +
+		'apri-sensor-pms7003-concPM2_5_CF1:'+concPM2_5_CF1Avg + ',' +
+		'apri-sensor-pms7003-concPM10_0_CF1:'+concPM10_0_CF1Avg + ',' +
+		'apri-sensor-pms7003-concPM1_0_amb:'+concPM1_0_ambAvg + ',' +
+		'apri-sensor-pms7003-concPM2_5_amb:'+concPM2_5_ambAvg + ',' +
+		'apri-sensor-pms7003-concPM10_0_amb:'+concPM10_0_ambAvg + ',' +
+		'apri-sensor-pms7003-rawGtPM0_3m:'+rawGtPM0_3mAvg + ',' +
+		'apri-sensor-pms7003-rawGtPM0_5m:'+rawGtPM0_5mAvg + ',' +
+		'apri-sensor-pms7003-rawGtPM1_0m:'+rawGtPM1_0mAvg + ',' +
+		'apri-sensor-pms7003-rawGtPM2_5m:'+rawGtPM2_5mAvg + ',' +
+		'apri-sensor-pms7003-rawGtPM5_0m:'+rawGtPM5_0mAvg + ',' +
+		'apri-sensor-pms7003-rawGtPM10_0m:'+rawGtPM10_0mAvg ;
 
 	//sendData(data);
  

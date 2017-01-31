@@ -31,7 +31,7 @@ var request 			= require('request');
 //var express 			= require('express');
 
 var fs 					= require('fs');
-var SerialPort = require("serialport");
+var SerialPort 			= require("serialport");
 var io	 				= require('socket.io-client');
 
 //var app = express();

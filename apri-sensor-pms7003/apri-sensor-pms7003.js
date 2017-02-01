@@ -69,13 +69,13 @@ var serialPortPath		= "/dev/cu.wchusbserial1420";
 var loopStart;
 var loopTime			= 0; // ms
 
-var concPM1_0_CF1Total, concPM2_5_CF1Total, concPM10_0_CF1Total, concPM1_0_ambTotal, concPM2_5_ambTotal, concPM10_0_ambTotal, rawGtPM0_3mTotal, rawGtPM0_5mTotal, rawGtPM1_0mTotal, rawGtPM2_5mTotal, rawGtPM5_0mTotal, rawGtPM10_0mTotal;
+var concPM1_0_CF1Total, concPM2_5_CF1Total, concPM10_0_CF1Total, concPM1_0_ambTotal, concPM2_5_ambTotal, concPM10_0_ambTotal, rawGt0_3umTotal, rawGt0_5umTotal, rawGt1_0umTotal, rawGt2_5umTotal, rawGt5_0umTotal, rawGt10_0umTotal;
 var measurementCount;
 
 
 // create headers to only use ones in the result files
 var writeHeaders		= true;
-var headerAvg			= 'dateiso;duration;concPM1_0_CF1;concPM2_5_CF1;concPM10_0_CF1;concPM1_0_amb;concPM2_5_amb;concPM10_0_amb;rawGtPM0_3m;rawGtPM0_5m;rawGtPM1_0m;rawGtPM2_5m;rawGtPM5_0m;rawGtPM10_0m;count\n';
+var headerAvg			= 'dateiso;duration;concPM1_0_CF1;concPM2_5_CF1;concPM10_0_CF1;concPM1_0_amb;concPM2_5_amb;concPM10_0_amb;rawGt0_3um;rawGt0_5um;rawGt1_0um;rawGt2_5um;rawGt5_0um;rawGt10_0um;count\n';
 
 var sensorFileName 		= 'sensor-pms7003-result';
 var sensorFileExtension	= '.csv';
@@ -124,12 +124,12 @@ var processMeasurement = function(data) {
 		concPM1_0_ambTotal	= 0;
 		concPM2_5_ambTotal	= 0;
 		concPM10_0_ambTotal	= 0;
-		rawGtPM0_3mTotal	= 0;
-		rawGtPM0_5mTotal	= 0;
-		rawGtPM1_0mTotal	= 0;
-		rawGtPM2_5mTotal	= 0;
-		rawGtPM5_0mTotal	= 0;
-		rawGtPM10_0mTotal	= 0;
+		rawGt0_3umTotal	= 0;
+		rawGt0_5umTotal	= 0;
+		rawGt1_0umTotal	= 0;
+		rawGt2_5umTotal	= 0;
+		rawGt5_0umTotal	= 0;
+		rawGt10_0umTotal	= 0;
 		measurementCount 	= 0;
 //		console.log('first time init');
 	};
@@ -147,12 +147,12 @@ var processMeasurement = function(data) {
 			concPM1_0_ambTotal	= 0;
 			concPM2_5_ambTotal	= 0;
 			concPM10_0_ambTotal	= 0;
-			rawGtPM0_3mTotal	= 0;
-			rawGtPM0_5mTotal	= 0;
-			rawGtPM1_0mTotal	= 0;
-			rawGtPM2_5mTotal	= 0;
-			rawGtPM5_0mTotal	= 0;
-			rawGtPM10_0mTotal	= 0;
+			rawGt0_3umTotal	= 0;
+			rawGt0_5umTotal	= 0;
+			rawGt1_0umTotal	= 0;
+			rawGt2_5umTotal	= 0;
+			rawGt5_0umTotal	= 0;
+			rawGt10_0umTotal	= 0;
 			measurementCount 	= 0;
 //			console.log('first time init');
 			return;
@@ -168,12 +168,12 @@ var processMeasurement = function(data) {
 		concPM1_0_ambTotal	= 0;
 		concPM2_5_ambTotal	= 0;
 		concPM10_0_ambTotal	= 0;
-		rawGtPM0_3mTotal	= 0;
-		rawGtPM0_5mTotal	= 0;
-		rawGtPM1_0mTotal	= 0;
-		rawGtPM2_5mTotal	= 0;
-		rawGtPM5_0mTotal	= 0;
-		rawGtPM10_0mTotal	= 0;
+		rawGt0_3umTotal	= 0;
+		rawGt0_5umTotal	= 0;
+		rawGt1_0umTotal	= 0;
+		rawGt2_5umTotal	= 0;
+		rawGt5_0umTotal	= 0;
+		rawGt10_0umTotal	= 0;
 		measurementCount 	= 0;
 	}
 	
@@ -186,12 +186,12 @@ var processMeasurement = function(data) {
 	concPM1_0_ambTotal	+= parseFloat(data[3]);
 	concPM2_5_ambTotal	+= parseFloat(data[4]);
 	concPM10_0_ambTotal	+= parseFloat(data[5]);
-	rawGtPM0_3mTotal	+= parseFloat(data[6]);
-	rawGtPM0_5mTotal	+= parseFloat(data[7]);
-	rawGtPM1_0mTotal	+= parseFloat(data[8]);
-	rawGtPM2_5mTotal	+= parseFloat(data[9]);
-	rawGtPM5_0mTotal	+= parseFloat(data[10]);
-	rawGtPM10_0mTotal	+= parseFloat(data[11]);
+	rawGt0_3umTotal	+= parseFloat(data[6]);
+	rawGt0_5umTotal	+= parseFloat(data[7]);
+	rawGt1_0umTotal	+= parseFloat(data[8]);
+	rawGt2_5umTotal	+= parseFloat(data[9]);
+	rawGt5_0umTotal	+= parseFloat(data[10]);
+	rawGt10_0umTotal	+= parseFloat(data[11]);
 	measurementCount	++;
 
 }
@@ -215,12 +215,12 @@ var writeResults	= function(measureTime, loopTime) {
 	var	concPM1_0_ambAvg	= Math.round((concPM1_0_ambTotal/measurementCount)	 *100)/100;
 	var	concPM2_5_ambAvg	= Math.round((concPM2_5_ambTotal/measurementCount)	 *100)/100;
 	var	concPM10_0_ambAvg	= Math.round((concPM10_0_ambTotal/measurementCount)	 *100)/100;
-	var	rawGtPM0_3mAvg		= Math.round((rawGtPM0_3mTotal/measurementCount)	 *100)/100;
-	var	rawGtPM0_5mAvg		= Math.round((rawGtPM0_5mTotal/measurementCount)	 *100)/100;
-	var	rawGtPM1_0mAvg		= Math.round((rawGtPM1_0mTotal/measurementCount)	 *100)/100;
-	var	rawGtPM2_5mAvg		= Math.round((rawGtPM2_5mTotal/measurementCount)	 *100)/100;
-	var	rawGtPM5_0mAvg		= Math.round((rawGtPM5_0mTotal/measurementCount)	 *100)/100;
-	var	rawGtPM10_0mAvg		= Math.round((rawGtPM10_0mTotal/measurementCount)	 *100)/100;
+	var	rawGt0_3umAvg		= Math.round((rawGt0_3umTotal/measurementCount)	 *100)/100;
+	var	rawGt0_5umAvg		= Math.round((rawGt0_5umTotal/measurementCount)	 *100)/100;
+	var	rawGt1_0umAvg		= Math.round((rawGt1_0umTotal/measurementCount)	 *100)/100;
+	var	rawGt2_5umAvg		= Math.round((rawGt2_5umTotal/measurementCount)	 *100)/100;
+	var	rawGt5_0umAvg		= Math.round((rawGt5_0umTotal/measurementCount)	 *100)/100;
+	var	rawGt10_0umAvg		= Math.round((rawGt10_0umTotal/measurementCount)	 *100)/100;
 	
 	var recordAvg	= measureTime.toISOString() + ';' + loopTime ;
 		
@@ -231,12 +231,12 @@ var writeResults	= function(measureTime, loopTime) {
 		concPM1_0_ambAvg	+ ';' +
 		concPM2_5_ambAvg	+ ';' +
 		concPM10_0_ambAvg	+ ';' +
-		rawGtPM0_3mAvg	+ ';' +
-		rawGtPM0_5mAvg	+ ';' +
-		rawGtPM1_0mAvg	+ ';' +
-		rawGtPM2_5mAvg	+ ';' +
-		rawGtPM5_0mAvg	+ ';' +
-		rawGtPM10_0mAvg;
+		rawGt0_3umAvg	+ ';' +
+		rawGt0_5umAvg	+ ';' +
+		rawGt1_0umAvg	+ ';' +
+		rawGt2_5umAvg	+ ';' +
+		rawGt5_0umAvg	+ ';' +
+		rawGt10_0umAvg;
 	recordAvg		= recordAvg + ';' + measurementCount; 
 	recordAvg		= recordAvg + '\n';
 	//console.log(record);
@@ -263,14 +263,14 @@ var writeResults	= function(measureTime, loopTime) {
 		'apri-sensor-pms7003-concPM1_0_amb:'+concPM1_0_ambAvg + ',' +
 		'apri-sensor-pms7003-concPM2_5_amb:'+concPM2_5_ambAvg + ',' +
 		'apri-sensor-pms7003-concPM10_0_amb:'+concPM10_0_ambAvg + ',' +
-		'apri-sensor-pms7003-rawGtPM0_3m:'+rawGtPM0_3mAvg + ',' +
-		'apri-sensor-pms7003-rawGtPM0_5m:'+rawGtPM0_5mAvg + ',' +
-		'apri-sensor-pms7003-rawGtPM1_0m:'+rawGtPM1_0mAvg + ',' +
-		'apri-sensor-pms7003-rawGtPM2_5m:'+rawGtPM2_5mAvg + ',' +
-		'apri-sensor-pms7003-rawGtPM5_0m:'+rawGtPM5_0mAvg + ',' +
-		'apri-sensor-pms7003-rawGtPM10_0m:'+rawGtPM10_0mAvg ;
+		'apri-sensor-pms7003-rawGt0_3um:'+rawGt0_3umAvg + ',' +
+		'apri-sensor-pms7003-rawGt0_5um:'+rawGt0_5umAvg + ',' +
+		'apri-sensor-pms7003-rawGt1_0um:'+rawGt1_0umAvg + ',' +
+		'apri-sensor-pms7003-rawGt2_5um:'+rawGt2_5umAvg + ',' +
+		'apri-sensor-pms7003-rawGt5_0um:'+rawGt5_0umAvg + ',' +
+		'apri-sensor-pms7003-rawGt10_0um:'+rawGt10_0umAvg ;
 
-	//sendData(data);
+	sendData(data);
  
 }
 

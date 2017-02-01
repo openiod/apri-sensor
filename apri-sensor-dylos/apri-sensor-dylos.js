@@ -100,17 +100,12 @@ var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today
 var resultsFileName = resultsFolder + sensorFileName + '_' + dateString;
 
 
-var getUsbPorts	= function() {
-	SerialPort.list(function(err, ports) {
-		usbPorts	= ports;
-	});
-}
-
 SerialPort.list(function(err, ports) {
 	console.log(ports);
 
 	console.log('Find usb comport:');
-	getUsbPorts();
+	
+	usbPorts	= ports;
 
 	for (var i=0;i<usbPorts.length;i++) {
 		console.log('searching for usb comport FTDI ' + i + ' '+ usbPorts[i].manufacturer + ' ' +  usbPorts[i].comName);

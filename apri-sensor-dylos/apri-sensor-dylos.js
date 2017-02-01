@@ -60,9 +60,14 @@ var secureSite 			= true;
 var siteProtocol 		= secureSite?'https://':'http://';
 var openiodUrl			= siteProtocol + 'openiod.org/' + apriConfig.systemCode; //SCAPE604';
 var loopTimeMax			= 60000; //ms, 60000=60 sec
+
+var usbPorts			= [];
+
 //var serialPortPath		= "/dev/cu.usbmodem1411";
 //var serialPortPath		= "/dev/cu.usbserial-A1056661";
 var serialPortPath		= "/dev/ttyUSB0";
+
+
 
 var sensorid			= 1;
 
@@ -94,6 +99,21 @@ var today				= new Date();
 var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today.getDate() + "_" + today.getHours(); // + ":" + today.getMinutes();
 var resultsFileName = resultsFolder + sensorFileName + '_' + dateString;
 
+
+var getUsbPorts	= function() {
+	SerialPort.list(function(err, ports) {
+		usbPorts	= ports;
+	});
+}
+
+getUsbPorts();
+
+for (var i=0;i<usbPorts.length;i++) {
+	if (usbPorts[i].manufacturer == 'FTDI') {
+		serialPortPath	= usbPorts[i].comName;
+		break;
+	}
+}
 
 var serialport = new SerialPort(serialPortPath, {parser: SerialPort.parsers.readline('\n')} );
 serialport.on('open', function(){

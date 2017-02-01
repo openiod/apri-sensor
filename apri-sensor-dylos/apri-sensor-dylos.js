@@ -106,6 +106,10 @@ var getUsbPorts	= function() {
 	});
 }
 
+SerialPort.list(function(err, ports) {
+	console.log(ports);
+});
+
 console.log('Find usb comport:');
 getUsbPorts();
 
@@ -137,9 +141,7 @@ serialport.on('open', function(){
 serialport.on('error', function(err) {
   console.log('Error: ', err.message);
 });
-SerialPort.list(function(err, ports) {
-	console.log(ports);
-});
+
 
 function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);

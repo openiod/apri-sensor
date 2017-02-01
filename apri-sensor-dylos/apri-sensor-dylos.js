@@ -106,6 +106,7 @@ var getUsbPorts	= function() {
 	});
 }
 
+console.log('Find usb comport:');
 getUsbPorts();
 
 for (var i=0;i<usbPorts.length;i++) {
@@ -115,6 +116,8 @@ for (var i=0;i<usbPorts.length;i++) {
 		break;
 	}
 }
+
+console.log('Found usb comname: ' + serialPortPath );
 
 var serialport = new SerialPort(serialPortPath, {parser: SerialPort.parsers.readline('\n')} );
 serialport.on('open', function(){

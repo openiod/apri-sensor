@@ -108,40 +108,44 @@ var getUsbPorts	= function() {
 
 SerialPort.list(function(err, ports) {
 	console.log(ports);
-});
 
-console.log('Find usb comport:');
-getUsbPorts();
+	console.log('Find usb comport:');
+	getUsbPorts();
 
-for (var i=0;i<usbPorts.length;i++) {
-	console.log('searching for usb comport FTDI ' + i + ' '+ usbPorts[i].manufacturer + ' ' +  usbPorts[i].comName);
-	if (usbPorts[i].manufacturer == 'FTDI') {
-		serialPortPath	= usbPorts[i].comName;
-		break;
-	}
-}
-
-console.log('Found usb comname: ' + serialPortPath );
-
-var serialport = new SerialPort(serialPortPath, {parser: SerialPort.parsers.readline('\n')} );
-serialport.on('open', function(){
-	console.log('Serial Port connected');
-	if (writeHeaders == true) writeHeaderIntoFile();
-	serialport.on('data', function(data){
-		var _data = data.substr(0,data.length-1);
-		var _dataArray	= _data.split(',');
-		if (_dataArray.length == 2 && isNumeric(_dataArray[0]) && isNumeric(_dataArray[1]) && data[data.length-1] =='\r' ) {
-			console.log('measurement: ' + _data);
-			processMeasurement(_dataArray);
-		} else {
-			console.log('log: ' + data);
+	for (var i=0;i<usbPorts.length;i++) {
+		console.log('searching for usb comport FTDI ' + i + ' '+ usbPorts[i].manufacturer + ' ' +  usbPorts[i].comName);
+		if (usbPorts[i].manufacturer == 'FTDI') {
+			serialPortPath	= usbPorts[i].comName;
+			break;
 		}
-	});
-});
-serialport.on('error', function(err) {
-  console.log('Error: ', err.message);
+	}
+	mainProcess();
 });
 
+
+
+var mainProcess = function() {
+	console.log('Found usb comname: ' + serialPortPath );
+
+	var serialport = new SerialPort(serialPortPath, {parser: SerialPort.parsers.readline('\n')} );
+	serialport.on('open', function(){
+		console.log('Serial Port connected');
+		if (writeHeaders == true) writeHeaderIntoFile();
+		serialport.on('data', function(data){
+			var _data = data.substr(0,data.length-1);
+			var _dataArray	= _data.split(',');
+			if (_dataArray.length == 2 && isNumeric(_dataArray[0]) && isNumeric(_dataArray[1]) && data[data.length-1] =='\r' ) {
+				console.log('measurement: ' + _data);
+				processMeasurement(_dataArray);
+			} else {
+				console.log('log: ' + data);
+			}
+		});
+	});
+	serialport.on('error', function(err) {
+		console.log('Error: ', err.message);
+	});
+};
 
 function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);

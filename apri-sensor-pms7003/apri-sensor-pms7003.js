@@ -88,26 +88,44 @@ var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today
 var resultsFileName = resultsFolder + sensorFileName + '_' + dateString;
 
 
-var serialport = new SerialPort(serialPortPath, {parser: SerialPort.parsers.readline('\n')} );
-serialport.on('open', function(){
-	console.log('Serial Port connected');
-	if (writeHeaders == true) writeHeaderIntoFile();
-	serialport.on('data', function(data){
-		var _dataArray	= data.split(';');		
-		if (_dataArray.length == 14 && isNumeric(_dataArray[0]) && isNumeric(_dataArray[1]) && isNumeric(_dataArray[2]) && isNumeric(_dataArray[3]) && isNumeric(_dataArray[4]) && isNumeric(_dataArray[5]) && isNumeric(_dataArray[6]) && isNumeric(_dataArray[7]) && isNumeric(_dataArray[8]) && isNumeric(_dataArray[9]) && isNumeric(_dataArray[10]) && isNumeric(_dataArray[11]) ) {
-			//console.log('measurement: ' + data);
-			processMeasurement(_dataArray);
-		} else {
-			console.log('log not valid data: ' + data);
-		}
-	});
-});
-serialport.on('error', function(err) {
-  console.log('Error: ', err.message);
-});
 SerialPort.list(function(err, ports) {
 	console.log(ports);
+
+	console.log('Find usb comport:');
+	
+	usbPorts	= ports;
+
+	for (var i=0;i<usbPorts.length;i++) {
+		console.log('searching for usb comport 1a86 ' + i + ' '+ usbPorts[i].manufacturer + ' ' +  usbPorts[i].comName);
+		if (usbPorts[i].manufacturer == '1a86') {
+			serialPortPath	= usbPorts[i].comName;
+			break;
+		}
+	}
+	mainProcess();
 });
+
+
+
+var mainProcess = function() {
+	var serialport = new SerialPort(serialPortPath, {parser: SerialPort.parsers.readline('\n')} );
+	serialport.on('open', function(){
+		console.log('Serial Port connected');
+		if (writeHeaders == true) writeHeaderIntoFile();
+		serialport.on('data', function(data){
+			var _dataArray	= data.split(';');		
+			if (_dataArray.length == 14 && isNumeric(_dataArray[0]) && isNumeric(_dataArray[1]) && isNumeric(_dataArray[2]) && isNumeric(_dataArray[3]) && isNumeric(_dataArray[4]) && isNumeric(_dataArray[5]) && isNumeric(_dataArray[6]) && isNumeric(_dataArray[7]) && isNumeric(_dataArray[8]) && isNumeric(_dataArray[9]) && isNumeric(_dataArray[10]) && isNumeric(_dataArray[11]) ) {
+				//console.log('measurement: ' + data);
+				processMeasurement(_dataArray);
+			} else {
+				console.log('log not valid data: ' + data);
+			}
+		});
+	});
+	serialport.on('error', function(err) {
+  		console.log('Error: ', err.message);
+	});
+}
 
 function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);

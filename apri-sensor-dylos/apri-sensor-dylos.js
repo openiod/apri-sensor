@@ -69,7 +69,7 @@ var serialPortPath		= "/dev/ttyUSB0";
 
 
 
-var sensorid			= 1;
+var unit				= {}1;
 
 var loopStart;
 var loopTime			= 0; // ms
@@ -99,6 +99,8 @@ var today				= new Date();
 var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today.getDate() + "_" + today.getHours(); // + ":" + today.getMinutes();
 var resultsFileName = resultsFolder + sensorFileName + '_' + dateString;
 
+
+getCpuInfo();
 
 SerialPort.list(function(err, ports) {
 	console.log(ports);
@@ -258,7 +260,8 @@ var writeResults	= function(measureTime, dataIn) {
 
 
 	var data			= {};
-	data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;  	
+	data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;  
+	data.foi				= 'SCRP' + unit.id;
 	data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;	
 	data.cityCode			= 'GM0439'; //geoLocation.cityCode;	
 	data.cityName			= '..'; //geoLocation.cityName;
@@ -291,7 +294,7 @@ var sendData = function(data) {
 //https://openiod.org/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=scapeler_dylos&offering=offering_0439_initial&verbose=true&commit=true&observation=scapeler_dylos_raw0:12345,scapeler_dylos_raw1:345&neighborhoodcode=BU04390402
 
 		var _url = openiodUrl + '/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=scapeler_dylos&offering=offering_0439_initial&commit=true';
-		_url = _url + '&region=0439' + '&neighborhoodcode=' + data.neighborhoodCode + '&citycode=' + data.cityCode + '&observation=' + data.observation ;
+		_url = _url + '&region=0439' + '&foi=' + data.foi + '&neighborhoodcode=' + data.neighborhoodCode + '&citycode=' + data.cityCode + '&observation=' + data.observation ;
 		
 		console.log(_url);
 		request.get(_url)
@@ -373,3 +376,28 @@ socket.on('info', function(data) {
 	//socket.broadcast.emit('aireassignal', { data: data } );
 });
 
+
+var getCpuInfo	= function() {
+	//hostname --all-ip-address
+	exec("cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2", (error, stdout, stderr) => {
+		if (error) {
+			console.error(`exec error: ${error}`);
+			return;
+		}
+		unit.id = stdout.substr(0,stdout.length-1);
+	});
+	exec("cat /proc/cpuinfo | grep Hardware | cut -d ' ' -f 2", (error, stdout, stderr) => {
+		if (error) {
+			console.error(`exec error: ${error}`);
+			return;
+		}
+		unit.hardware = stdout.substr(0,stdout.length-1);
+	});
+	exec("cat /proc/cpuinfo | grep Revision | cut -d ' ' -f 2", (error, stdout, stderr) => {
+		if (error) {
+			console.error(`exec error: ${error}`);
+			return;
+		}
+		unit.revision = stdout.substr(0,stdout.length-1);
+	});
+};

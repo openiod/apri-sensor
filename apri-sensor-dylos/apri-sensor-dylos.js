@@ -33,6 +33,8 @@ var request 			= require('request');
 var fs 					= require('fs');
 var SerialPort 			= require("serialport");
 var io	 				= require('socket.io-client');
+const exec 				= require('child_process').exec;
+const execFile			= require('child_process').execFile;
 
 //var app = express();
 
@@ -98,26 +100,6 @@ var resultsFolder 		= sensorLocalPathRoot + fileFolder + "/" + 'results/';
 var today				= new Date();
 var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today.getDate() + "_" + today.getHours(); // + ":" + today.getMinutes();
 var resultsFileName = resultsFolder + sensorFileName + '_' + dateString;
-
-
-getCpuInfo();
-
-SerialPort.list(function(err, ports) {
-	console.log(ports);
-
-	console.log('Find usb comport:');
-	
-	usbPorts	= ports;
-
-	for (var i=0;i<usbPorts.length;i++) {
-		console.log('searching for usb comport FTDI ' + i + ' '+ usbPorts[i].manufacturer + ' ' +  usbPorts[i].comName);
-		if (usbPorts[i].manufacturer == 'FTDI') {
-			serialPortPath	= usbPorts[i].comName;
-			break;
-		}
-	}
-	mainProcess();
-});
 
 
 
@@ -357,26 +339,6 @@ var io = require('socket.io').listen(app.listen(apriConfig.systemListenPort),{
 });
 */
 
-
-var socket = io(socketUrl, {path:socketPath}); 
-
-socket.on('connection', function (socket) {
-	var currTime = new Date();
-	console.log(currTime +': connect from '+ socket.request.connection.remoteAddress + ' / '+ socket.handshake.headers['x-forwarded-for'] || socket.handshake.address.address);
-	
-});
-
-socket.on('disconnect', function() {
-	console.log('Disconnected from web-socket ');
-});
-
-socket.on('info', function(data) {
-	console.log('websocket info '+ data);
-	//io.sockets.emit('aireassignal', { data: data } );
-	//socket.broadcast.emit('aireassignal', { data: data } );
-});
-
-
 var getCpuInfo	= function() {
 	//hostname --all-ip-address
 	exec("cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2", (error, stdout, stderr) => {
@@ -401,3 +363,45 @@ var getCpuInfo	= function() {
 		unit.revision = stdout.substr(0,stdout.length-1);
 	});
 };
+
+
+
+getCpuInfo();
+
+SerialPort.list(function(err, ports) {
+	console.log(ports);
+
+	console.log('Find usb comport:');
+	
+	usbPorts	= ports;
+
+	for (var i=0;i<usbPorts.length;i++) {
+		console.log('searching for usb comport FTDI ' + i + ' '+ usbPorts[i].manufacturer + ' ' +  usbPorts[i].comName);
+		if (usbPorts[i].manufacturer == 'FTDI') {
+			serialPortPath	= usbPorts[i].comName;
+			break;
+		}
+	}
+	mainProcess();
+});
+
+
+var socket = io(socketUrl, {path:socketPath}); 
+
+socket.on('connection', function (socket) {
+	var currTime = new Date();
+	console.log(currTime +': connect from '+ socket.request.connection.remoteAddress + ' / '+ socket.handshake.headers['x-forwarded-for'] || socket.handshake.address.address);
+	
+});
+
+socket.on('disconnect', function() {
+	console.log('Disconnected from web-socket ');
+});
+
+socket.on('info', function(data) {
+	console.log('websocket info '+ data);
+	//io.sockets.emit('aireassignal', { data: data } );
+	//socket.broadcast.emit('aireassignal', { data: data } );
+});
+
+

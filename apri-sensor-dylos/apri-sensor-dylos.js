@@ -69,7 +69,7 @@ var serialPortPath		= "/dev/ttyUSB0";
 
 
 
-var unit				= {}1;
+var unit				= {};
 
 var loopStart;
 var loopTime			= 0; // ms

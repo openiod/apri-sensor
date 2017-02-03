@@ -72,7 +72,22 @@ var loopStart;
 var loopTime			= 0; // ms
 
 var concPM1_0_CF1Total, concPM2_5_CF1Total, concPM10_0_CF1Total, concPM1_0_ambTotal, concPM2_5_ambTotal, concPM10_0_ambTotal, rawGt0_3umTotal, rawGt0_5umTotal, rawGt1_0umTotal, rawGt2_5umTotal, rawGt5_0umTotal, rawGt10_0umTotal;
-var measurementCount;
+//var measurementCount;
+//var measurements		= [];
+var concPM1_0_CF1Avg;	
+var concPM2_5_CF1Avg;
+var concPM10_0_CF1Avg;
+var concPM1_0_ambAvg;
+var concPM2_5_ambAvg;
+var concPM10_0_ambAvg;
+var rawGt0_3umAvg;
+var rawGt0_5umAvg;
+var rawGt1_0umAvg;
+var rawGt2_5umAvg;
+var rawGt5_0umAvg;
+var rawGt10_0umAvg;
+
+
 
 
 // create headers to only use ones in the result files
@@ -138,6 +153,21 @@ var processMeasurement = function(data) {
 
 	if (loopStart == undefined) { 
 		loopStart 		= new Date(); 
+		measurements		= [];
+		concPM1_0_CF1_Array	= [];
+		concPM2_5_CF1Total	= [];
+		concPM10_0_CF1Total	= [];
+		concPM1_0_ambTotal	= [];
+		concPM2_5_ambTotal	= [];
+		concPM10_0_ambTotal	= [];
+		rawGt0_3umTotal		= [];
+		rawGt0_5umTotal		= [];
+		rawGt1_0umTotal		= [];
+		rawGt2_5umTotal		= [];
+		rawGt5_0umTotal		= [];
+		rawGt10_0umTotal	= [];
+		
+/*
 		concPM1_0_CF1Total	= 0;
 		concPM2_5_CF1Total	= 0;
 		concPM10_0_CF1Total	= 0;
@@ -151,12 +181,54 @@ var processMeasurement = function(data) {
 		rawGt5_0umTotal	= 0;
 		rawGt10_0umTotal	= 0;
 		measurementCount 	= 0;
+*/
 //		console.log('first time init');
 	};
 	var measureMentTime		= new Date();
 	var loopTime 			= measureMentTime.getTime() - loopStart.getTime();
 
 	if (loopTime >= loopTimeMax) {
+		concPM1_0_CF1_Array.sort();
+		concPM2_5_CF1_Array.sort();
+		concPM10_0_CF1_Array.sort();
+		concPM1_0_amb_Array.sort();
+		concPM2_5_amb_Array.sort();
+		concPM10_0_amb_Array.sort();
+		rawGt0_3um_Array.sort();
+		rawGt0_5um_Array.sort();
+		rawGt1_0um_Array.sort();
+		rawGt2_5um_Array.sort();
+		rawGt5_0um_Array.sort();
+		rawGt10_0um_Array.sort();
+		
+		
+		var j = 0;
+		if (concPM1_0_CF1_Array.length > 3) {
+			j = Math.Ceil(concPM1_0_CF1_Array.length/10);
+		}
+		
+		var cut = function(mArray) { 
+			var total = 0;
+			for (var i=0+j ; i<mArray.length-j;i++) {
+				total += mArray[i];
+			}
+			return Math.round((total/mArray.length-j*2)*100)/100;
+		};	
+
+		
+		concPM1_0_CF1Avg	= cut(concPM1_0_CF1_Array);
+		concPM2_5_CF1Avg	= cut(concPM2_5_CF1_Array);
+		concPM10_0_CF1Avg	= cut(concPM10_0_CF1_Array);
+		concPM1_0_ambAvg	= cut(concPM1_0_amb_Array);
+		concPM2_5_ambAvg	= cut(concPM2_5_amb_Array);
+		concPM10_0_ambAvg	= cut(concPM10_0_amb_Array);
+		rawGt0_3umAvg		= cut(rawGt0_3um_Array);
+		rawGt0_5umAvg		= cut(rawGt0_5um_Array);
+		rawGt1_0umAvg		= cut(rawGt1_0um_Array);
+		rawGt2_5umAvg		= cut(rawGt2_5um_Array);
+		rawGt5_0umAvg		= cut(rawGt5_0um_Array);
+		rawGt10_0umAvg	= cut(rawGt10_0um_Array);
+		
 /*
 		console.log(concPM1_0_CF1Total);
 		if (concPM1_0_CF1Total == undefined) {
@@ -182,6 +254,21 @@ var processMeasurement = function(data) {
 //		console.log(measurementCount);
 		writeResults(measureMentTime, loopTime);
 		loopStart 			= new Date();
+		concPM1_0_CF1_Array	= [];
+		concPM2_5_CF1_Array	= [];
+		concPM10_0_CF1_Array= [];
+		concPM1_0_amb_Array	= [];
+		concPM2_5_amb_Array	= [];
+		concPM10_0_amb_Array= [];
+		rawGt0_3um_Array	= [];
+		rawGt0_5um_Array	= [];
+		rawGt1_0um_Array	= [];
+		rawGt2_5um_Array	= [];
+		rawGt5_0um_Array	= [];
+		rawGt10_0um_Array	= [];
+
+/*
+		measurements		= [];
 		concPM1_0_CF1Total	= 0;
 		concPM2_5_CF1Total	= 0;
 		concPM10_0_CF1Total	= 0;
@@ -194,12 +281,46 @@ var processMeasurement = function(data) {
 		rawGt2_5umTotal	= 0;
 		rawGt5_0umTotal	= 0;
 		rawGt10_0umTotal	= 0;
-		measurementCount 	= 0;
+*/
+		//measurementCount 	= 0;
 	}
 	
-	if (concPM1_0_CF1Total == undefined) {
+/*
+	if (concPM1_0_CF1_Array == undefined) {
 		return;
 	}
+	
+	concPM1_0_CF1_Array.push(parseFloat(data[0]));
+	concPM2_5_CF1_Array.push(parseFloat(data[1]));
+	concPM10_0_CF1_Array.push(parseFloat(data[2]));
+	concPM1_0_amb_Array.push(parseFloat(data[3]));
+	concPM2_5_amb_Array.push(parseFloat(data[4]));
+	concPM10_0_amb_Array.push(parseFloat(data[5]));
+	rawGt0_3um_Array.push(parseFloat(data[6]));
+	rawGt0_5um_Array.push(parseFloat(data[7]));
+	rawGt1_0um_Array.push(parseFloat(data[8]));
+	rawGt2_5um_Array.push(parseFloat(data[9]));
+	rawGt5_0um_Array.push(parseFloat(data[10]));
+	rawGt10_0um_Array.push(parseFloat(data[10]));
+*/
+/*
+	var measurement = {};
+
+	measurement.concPM1_0_CF1	= parseFloat(data[0]);
+	measurement.concPM2_5_CF1	= parseFloat(data[1]);
+	measurement.concPM10_0_CF1	= parseFloat(data[2]);
+	measurement.concPM1_0_amb	= parseFloat(data[3]);
+	measurement.concPM2_5_amb	= parseFloat(data[4]);
+	measurement.concPM10_0_amb	= parseFloat(data[5]);
+	measurement.rawGt0_3um		= parseFloat(data[6]);
+	measurement.rawGt0_5um		= parseFloat(data[7]);
+	measurement.rawGt1_0um		= parseFloat(data[8]);
+	measurement.rawGt2_5um		= parseFloat(data[9]);
+	measurement.rawGt5_0um		= parseFloat(data[10]);
+	measurement.rawGt10_0um		= parseFloat(data[11]);
+	measurements.push(measurement);
+*/
+/*
 	concPM1_0_CF1Total	+= parseFloat(data[0]);
 	concPM2_5_CF1Total	+= parseFloat(data[1]);
 	concPM10_0_CF1Total	+= parseFloat(data[2]);
@@ -212,7 +333,8 @@ var processMeasurement = function(data) {
 	rawGt2_5umTotal	+= parseFloat(data[9]);
 	rawGt5_0umTotal	+= parseFloat(data[10]);
 	rawGt10_0umTotal	+= parseFloat(data[11]);
-	measurementCount	++;
+*/
+//	measurementCount	++;
 
 }
 
@@ -229,6 +351,7 @@ var writeHeaderIntoFile = function() {
 var writeResults	= function(measureTime, loopTime) {
 	console.log('Results: ' + measureTime.toISOString() );
 	
+/*
 	var concPM1_0_CF1Avg	= Math.round((concPM1_0_CF1Total/measurementCount)	 *100)/100;
 	var	concPM2_5_CF1Avg	= Math.round((concPM2_5_CF1Total/measurementCount)	 *100)/100;
 	var	concPM10_0_CF1Avg	= Math.round((concPM10_0_CF1Total/measurementCount)	 *100)/100;
@@ -241,7 +364,7 @@ var writeResults	= function(measureTime, loopTime) {
 	var	rawGt2_5umAvg		= Math.round((rawGt2_5umTotal/measurementCount)	 *100)/100;
 	var	rawGt5_0umAvg		= Math.round((rawGt5_0umTotal/measurementCount)	 *100)/100;
 	var	rawGt10_0umAvg		= Math.round((rawGt10_0umTotal/measurementCount)	 *100)/100;
-	
+*/	
 	var recordAvg	= measureTime.toISOString() + ';' + loopTime ;
 		
 	recordAvg		= recordAvg + ';' +  

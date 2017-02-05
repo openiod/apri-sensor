@@ -153,7 +153,7 @@ var processMeasurement = function(data) {
 
 	if (loopStart == undefined) { 
 		loopStart 		= new Date(); 
-		measurements		= [];
+	//	measurements		= [];
 		concPM1_0_CF1_Array	= [];
 		concPM2_5_CF1Total	= [];
 		concPM10_0_CF1Total	= [];

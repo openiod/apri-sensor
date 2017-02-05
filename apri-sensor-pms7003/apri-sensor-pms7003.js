@@ -243,7 +243,7 @@ var processMeasurement = function(data) {
 		rawGt2_5umAvg		= cut(rawGt2_5um_Array);
 		rawGt5_0umAvg		= cut(rawGt5_0um_Array);
 		rawGt10_0umAvg		= cut(rawGt10_0um_Array);
-		measurementCount	= mArray.length-j*2;
+		measurementCount	= concPM1_0_CF1_Array.length-j*2;
 		
 /*
 		console.log(concPM1_0_CF1Total);

@@ -87,6 +87,21 @@ var rawGt2_5umAvg;
 var rawGt5_0umAvg;
 var rawGt10_0umAvg;
 
+var concPM1_0_CF1_Array;	
+var concPM2_5_CF1_Array;
+var concPM10_0_CF1_Array;
+var concPM1_0_amb_Array;
+var concPM2_5_amb_Array;
+var concPM10_0_amb_Array;
+var rawGt0_3um_Array;
+var rawGt0_5um_Array;
+var rawGt1_0um_Array;
+var rawGt2_5um_Array;
+var rawGt5_0um_Array;
+var rawGt10_0um_Array;
+
+concPM1_0_CF1_Array
+
 
 
 

@@ -72,7 +72,7 @@ var loopStart;
 var loopTime			= 0; // ms
 
 var concPM1_0_CF1Total, concPM2_5_CF1Total, concPM10_0_CF1Total, concPM1_0_ambTotal, concPM2_5_ambTotal, concPM10_0_ambTotal, rawGt0_3umTotal, rawGt0_5umTotal, rawGt1_0umTotal, rawGt2_5umTotal, rawGt5_0umTotal, rawGt10_0umTotal;
-//var measurementCount;
+var measurementCount;
 //var measurements		= [];
 var concPM1_0_CF1Avg;	
 var concPM2_5_CF1Avg;
@@ -242,7 +242,8 @@ var processMeasurement = function(data) {
 		rawGt1_0umAvg		= cut(rawGt1_0um_Array);
 		rawGt2_5umAvg		= cut(rawGt2_5um_Array);
 		rawGt5_0umAvg		= cut(rawGt5_0um_Array);
-		rawGt10_0umAvg	= cut(rawGt10_0um_Array);
+		rawGt10_0umAvg		= cut(rawGt10_0um_Array);
+		measurementCount	= mArray.length-j*2;
 		
 /*
 		console.log(concPM1_0_CF1Total);

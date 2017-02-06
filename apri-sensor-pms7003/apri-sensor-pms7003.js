@@ -164,7 +164,7 @@ function isNumeric(n) {
 }
 
 var processMeasurement = function(data) {
-//	console.log(data);
+	//console.log(data);
 
 	if (loopStart == undefined) { 
 		loopStart 		= new Date(); 
@@ -201,35 +201,42 @@ var processMeasurement = function(data) {
 	};
 	var measureMentTime		= new Date();
 	var loopTime 			= measureMentTime.getTime() - loopStart.getTime();
+	
+	var sortMeasurements = function(numArray) {
+		return numArray.sort(function(a, b) {
+			return a - b;
+		});
+	}
 
-	if (loopTime >= loopTimeMax) {
-		concPM1_0_CF1_Array.sort();
-		concPM2_5_CF1_Array.sort();
-		concPM10_0_CF1_Array.sort();
-		concPM1_0_amb_Array.sort();
-		concPM2_5_amb_Array.sort();
-		concPM10_0_amb_Array.sort();
-		rawGt0_3um_Array.sort();
-		rawGt0_5um_Array.sort();
-		rawGt1_0um_Array.sort();
-		rawGt2_5um_Array.sort();
-		rawGt5_0um_Array.sort();
-		rawGt10_0um_Array.sort();
+	if (loopTime >= loopTimeMax) { //loopTime) { //
+		concPM1_0_CF1_Array 	= sortMeasurements(concPM1_0_CF1_Array);
+		concPM2_5_CF1_Array 	= sortMeasurements(concPM2_5_CF1_Array);
+		concPM10_0_CF1_Array 	= sortMeasurements(concPM10_0_CF1_Array);
+		concPM1_0_amb_Array 	= sortMeasurements(concPM1_0_amb_Array);
+		concPM2_5_amb_Array 	= sortMeasurements(concPM2_5_amb_Array);
+		concPM10_0_amb_Array 	= sortMeasurements(concPM10_0_amb_Array);
+		rawGt0_3um_Array 		= sortMeasurements(rawGt0_3um_Array);
+		rawGt0_5um_Array 		= sortMeasurements(rawGt0_5um_Array);
+		rawGt1_0um_Array 		= sortMeasurements(rawGt1_0um_Array);
+		rawGt2_5um_Array 		= sortMeasurements(rawGt2_5um_Array);
+		rawGt5_0um_Array 		= sortMeasurements(rawGt5_0um_Array);
+		rawGt10_0um_Array 		= sortMeasurements(rawGt10_0um_Array);
 		
 		
 		var j = 0;
 		if (concPM1_0_CF1_Array.length > 3) {
-			j = Math.Ceil(concPM1_0_CF1_Array.length/10);
+			j = Math.ceil(concPM1_0_CF1_Array.length/20);  // x/20=5% boven grens en 5% ondergrensgrens
 		}
+		
+//		console.log('j='+j+ ' van '+ concPM1_0_CF1_Array.length);
 		
 		var cut = function(mArray) { 
 			var total = 0;
 			for (var i=0+j ; i<mArray.length-j;i++) {
 				total += mArray[i];
 			}
-			return Math.round((total/mArray.length-j*2)*100)/100;
+			return Math.round((total / (mArray.length-j*2) )*100)/100;
 		};	
-
 		
 		concPM1_0_CF1Avg	= cut(concPM1_0_CF1_Array);
 		concPM2_5_CF1Avg	= cut(concPM2_5_CF1_Array);
@@ -305,7 +312,7 @@ var processMeasurement = function(data) {
 	if (concPM1_0_CF1_Array == undefined) {
 		return;
 	}
-	
+*/	
 	concPM1_0_CF1_Array.push(parseFloat(data[0]));
 	concPM2_5_CF1_Array.push(parseFloat(data[1]));
 	concPM10_0_CF1_Array.push(parseFloat(data[2]));
@@ -317,8 +324,10 @@ var processMeasurement = function(data) {
 	rawGt1_0um_Array.push(parseFloat(data[8]));
 	rawGt2_5um_Array.push(parseFloat(data[9]));
 	rawGt5_0um_Array.push(parseFloat(data[10]));
-	rawGt10_0um_Array.push(parseFloat(data[10]));
-*/
+	rawGt10_0um_Array.push(parseFloat(data[11]));
+
+ 
+ 
 /*
 	var measurement = {};
 

@@ -268,7 +268,7 @@ socket.on('disconnect', function() {
 	socket.on('apriClientAction', function(data) {  // pong message from socket.io server
 		console.log('Apri Agent Manager action recieved: ' + data.action);
 		console.dir(data);
-		if (data.action == 'getClientWifi') {
+		if (data.action == 'getClientWifiInfo') {
 			getWifiScanInfo('wlan0',sendClientWifiInfo);
 			getWifiScanInfo('wlan1',sendClientWifiInfo);
 		}

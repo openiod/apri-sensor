@@ -182,7 +182,7 @@ var getMacAddress	= function(networkInterface) {
 		console.log('MAC-Address network interface: ' + networkInterface + '  ' + data);
 	});
 }
-var getWifiScanInfo	= function(iface) {
+var getWifiScanInfo	= function(iface, callback) {
 
 	//hostname --all-ip-address
 	exec('iwlist '+iface+' scan', (error, stdout, stderr) => {
@@ -192,6 +192,11 @@ var getWifiScanInfo	= function(iface) {
 		}
 		wifiScan[iface]	= "" + stdout;
 //		console.log(`stderr: ${stderr}`);	
+
+		
+		if (callback != undefined) {
+			callback(iface,stdout);
+		}
 	});
 }
 
@@ -218,7 +223,15 @@ var updateSoftware	= function() {
 	});
 };
 
-
+var sendClientWifiInfo	= function(iface, stdout) {
+	socket.emit('apriClientActionResponse', 
+		{"action":"getClientWifiInfo"
+		, "unit": unit	
+		, "device": iface
+		, "wifiScan": stdout
+		}
+	);
+}
 
 var socket = io(socketUrl, {path:socketPath}); 
 
@@ -255,6 +268,10 @@ socket.on('disconnect', function() {
 	socket.on('apriClientAction', function(data) {  // pong message from socket.io server
 		console.log('Apri Agent Manager action recieved: ' + data.action);
 		console.dir(data);
+		if (data.action == 'getClientWifi') {
+			getWifiScanInfo('wlan0',sendClientWifiInfo);
+			getWifiScanInfo('wlan1',sendClientWifiInfo);
+		}
 		if (data.action == 'reboot') {
 			startActionReboot();
 		}

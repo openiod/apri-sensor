@@ -377,7 +377,7 @@ SerialPort.list(function(err, ports) {
 
 	for (var i=0;i<usbPorts.length;i++) {
 		console.log('searching for usb comport FTDI ' + i + ' '+ usbPorts[i].manufacturer + ' ' +  usbPorts[i].comName);
-		if (usbPorts[i].manufacturer == 'FTDI') {
+		if (usbPorts[i].manufacturer == 'FTDI' || usbPorts[i].manufacturer == 'Prolific_Technology_Inc.') {
 			serialPortPath	= usbPorts[i].comName;
 			break;
 		}

@@ -39,6 +39,9 @@ module.exports = {
 		var systemConfigLocalPath 	= this.systemFolderParent +'/config/';
 		var systemConfigStr 		= this.fs.readFileSync(systemConfigLocalPath + "apri-system.json");
 		var systemConfig 			= JSON.parse(systemConfigStr);
+		
+		var sensorUsbConfigStr 		= this.fs.readFileSync(systemConfigLocalPath + "apri-sensor-usb.json");
+		this.sensorUsbConfig 		= JSON.parse(sensorUsbConfigStr);
 
 		// IMPORTANT: SYSTEM CONFIGURATION VALUES !!!
 		var systemName 				= systemConfig.system.systemName;
@@ -113,6 +116,10 @@ module.exports = {
 
 	getSystemListenPort: function () {
 		return this.systemListenPort;
+	},
+	getSensorUsbComName: function () {
+		console.log()
+		return this.sensorUsbConfig;
 	}
 
 

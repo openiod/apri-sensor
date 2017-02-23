@@ -13,7 +13,7 @@ var startFolder 			= __dirname;
 var startFolderParent		= path.resolve(__dirname,'../..');
 var configServerModulePath	= startFolder + '/../apri-config/apri-config';
 console.log("Start of Config Main ", configServerModulePath);
-var apriConfig = require(configServerModulePath)
+var apriConfig = require(configServerModulePath);
 
 var systemFolder 			= __dirname;
 var systemFolderParent		= path.resolve(__dirname,'../..');
@@ -63,10 +63,13 @@ var siteProtocol 		= secureSite?'https://':'http://';
 var openiodUrl			= siteProtocol + 'openiod.org/' + apriConfig.systemCode; //SCAPE604';
 var loopTimeMax			= 60000; //ms, 60000=60 sec
 
+var usbComNames			= apriConfig.getSensorUsbComName();
+console.log(usbComNames);
 var usbPorts			= [];
 //var serialPortPath		= "/dev/cu.usbmodem1411";
 //var serialPortPath		= "/dev/cu.usbmodem1421";
 var serialPortPath		= "/dev/cu.wchusbserial1420";
+
 
 var unit				= {};
 
@@ -261,11 +264,15 @@ SerialPort.list(function(err, ports) {
 	
 	usbPorts	= ports;
 
-	for (var i=0;i<usbPorts.length;i++) {
-		console.log('searching for usb comport 1a86 ' + i + ' '+ usbPorts[i].manufacturer + ' ' +  usbPorts[i].comName);
-		if (usbPorts[i].manufacturer == '1a86' && usbPorts[i].comName == '/dev/ttyUSB0') {
-			serialPortPath	= usbPorts[i].comName;
-			break;
+	if (usbComNames['apri-sensor-am2320'] != undefined && usbComNames['apri-sensor-am2320'].comName != undefined) {
+		serialPortPath	= usbComNames['apri-sensor-am2320'].comName;
+	} else {
+		for (var i=0;i<usbPorts.length;i++) {
+			console.log('searching for usb comport 1a86 ' + i + ' '+ usbPorts[i].manufacturer + ' ' +  usbPorts[i].comName);
+			if (usbPorts[i].manufacturer == '1a86') { // && usbPorts[i].comName == '/dev/ttyUSB0') {
+				serialPortPath	= usbPorts[i].comName;
+				break;
+			}
 		}
 	}
 	mainProcess();

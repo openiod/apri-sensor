@@ -263,7 +263,7 @@ SerialPort.list(function(err, ports) {
 
 	for (var i=0;i<usbPorts.length;i++) {
 		console.log('searching for usb comport 1a86 ' + i + ' '+ usbPorts[i].manufacturer + ' ' +  usbPorts[i].comName);
-		if (usbPorts[i].manufacturer == '1a86' && usbPorts[i].comName == '/dev/ttyUSB2') {
+		if (usbPorts[i].manufacturer == '1a86' && usbPorts[i].comName == '/dev/ttyUSB1') {
 			serialPortPath	= usbPorts[i].comName;
 			break;
 		}

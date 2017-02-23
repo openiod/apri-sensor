@@ -1,0 +1,5 @@
+{
+    "apri-sensor-am2320": {
+        "comName": "/dev/ttyUSB0"
+    }
+}

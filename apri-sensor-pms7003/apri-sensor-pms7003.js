@@ -61,6 +61,8 @@ var siteProtocol 		= secureSite?'https://':'http://';
 var openiodUrl			= siteProtocol + 'openiod.org/' + apriConfig.systemCode; //SCAPE604';
 var loopTimeMax			= 60000; //ms, 60000=60 sec
 
+var usbComNames			= apriConfig.getSensorUsbComName();
+console.log(usbComNames);
 var usbPorts			= [];
 //var serialPortPath		= "/dev/cu.usbmodem1411";
 //var serialPortPath		= "/dev/cu.usbmodem1421";
@@ -132,6 +134,17 @@ SerialPort.list(function(err, ports) {
 		if (usbPorts[i].manufacturer == '1a86') {
 			serialPortPath	= usbPorts[i].comName;
 			break;
+		}
+	}
+	if (usbComNames['apri-sensor-pms7003'] != undefined && usbComNames['apri-sensor-pms7003'].comName != undefined) {
+		serialPortPath	= usbComNames['apri-sensor-pms7003'].comName;
+	} else {
+		for (var i=0;i<usbPorts.length;i++) {
+			console.log('searching for usb comport 1a86 ' + i + ' '+ usbPorts[i].manufacturer + ' ' +  usbPorts[i].comName);
+			if (usbPorts[i].manufacturer == '1a86') { // && usbPorts[i].comName == '/dev/ttyUSB0') {
+				serialPortPath	= usbPorts[i].comName;
+				break;
+			}
 		}
 	}
 	mainProcess();

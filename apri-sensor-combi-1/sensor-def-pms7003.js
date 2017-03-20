@@ -126,18 +126,18 @@ sensor	: {
 			//console.log(record);
 
 			this.result.observations	= 
-				'apri-sensor-bmp280-concPM1_0_CF1:' + this.result.concPM1_0_CF1 + ',' +
-				'apri-sensor-bmp280-concPM2_5_CF1:' + this.result.concPM2_5_CF1 + ',' +
-				'apri-sensor-bmp280-concPM10_0_CF1:'+ this.result.concPM10_0_CF1 + ',' +
-				'apri-sensor-bmp280-concPM1_0_amb:' + this.result.concPM1_0_amb + ',' +
-				'apri-sensor-bmp280-concPM2_5_amb:' + this.result.concPM2_5_amb + ',' +
-				'apri-sensor-bmp280-concPM10_0_amb:'+ this.result.concPM10_0_amb + ',' +
-				'apri-sensor-bmp280-rawGt0_3um:' 	+ this.result.rawGt0_3um + ',' +
-				'apri-sensor-bmp280-rawGt0_5um:' 	+ this.result.rawGt0_5um + ',' +
-				'apri-sensor-bmp280-rawGt1_0um:' 	+ this.result.rawGt1_0um + ',' +
-				'apri-sensor-bmp280-rawGt2_5um:' 	+ this.result.rawGt2_5um + ',' +
-				'apri-sensor-bmp280-rawGt5_0um:' 	+ this.result.rawGt5_0um + ',' +
-				'apri-sensor-bmp280-rawGt10_0um:' 	+ this.result.rawGt10_0um; 
+				'apri-sensor-pms7003-concPM1_0_CF1:' + this.result.concPM1_0_CF1 + ',' +
+				'apri-sensor-pms7003-concPM2_5_CF1:' + this.result.concPM2_5_CF1 + ',' +
+				'apri-sensor-pms7003-concPM10_0_CF1:'+ this.result.concPM10_0_CF1 + ',' +
+				'apri-sensor-pms7003-concPM1_0_amb:' + this.result.concPM1_0_amb + ',' +
+				'apri-sensor-pms7003-concPM2_5_amb:' + this.result.concPM2_5_amb + ',' +
+				'apri-sensor-pms7003-concPM10_0_amb:'+ this.result.concPM10_0_amb + ',' +
+				'apri-sensor-pms7003-rawGt0_3um:' 	+ this.result.rawGt0_3um + ',' +
+				'apri-sensor-pms7003-rawGt0_5um:' 	+ this.result.rawGt0_5um + ',' +
+				'apri-sensor-pms7003-rawGt1_0um:' 	+ this.result.rawGt1_0um + ',' +
+				'apri-sensor-pms7003-rawGt2_5um:' 	+ this.result.rawGt2_5um + ',' +
+				'apri-sensor-pms7003-rawGt5_0um:' 	+ this.result.rawGt5_0um + ',' +
+				'apri-sensor-pms7003-rawGt10_0um:' 	+ this.result.rawGt10_0um; 
 			this.init();						
 		}
 	}

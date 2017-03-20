@@ -159,7 +159,7 @@ var mainProcess = function() {
 		if (writeHeaders == true) writeHeaderIntoFile();
 		serialport.on('data', function(data){
 			var _dataArray	= data.split(';');		
-			if (_dataArray.length == 14 && isNumeric(_dataArray[0]) && isNumeric(_dataArray[1]) && isNumeric(_dataArray[2]) && isNumeric(_dataArray[3]) && isNumeric(_dataArray[4]) && isNumeric(_dataArray[5]) && isNumeric(_dataArray[6]) && isNumeric(_dataArray[7]) && isNumeric(_dataArray[8]) && isNumeric(_dataArray[9]) && isNumeric(_dataArray[10]) && isNumeric(_dataArray[11]) ) {
+			if (_dataArray.length == 15 && _dataArray[0] == 'PMS7003' && isNumeric(_dataArray[1]) && isNumeric(_dataArray[2]) && isNumeric(_dataArray[3]) && isNumeric(_dataArray[4]) && isNumeric(_dataArray[5]) && isNumeric(_dataArray[6]) && isNumeric(_dataArray[7]) && isNumeric(_dataArray[8]) && isNumeric(_dataArray[9]) && isNumeric(_dataArray[10]) && isNumeric(_dataArray[11] && isNumeric(_dataArray[12]) ) ) {
 				//console.log('measurement: ' + data);
 				processMeasurement(_dataArray);
 			} else {
@@ -326,18 +326,18 @@ var processMeasurement = function(data) {
 		return;
 	}
 */	
-	concPM1_0_CF1_Array.push(parseFloat(data[0]));
-	concPM2_5_CF1_Array.push(parseFloat(data[1]));
-	concPM10_0_CF1_Array.push(parseFloat(data[2]));
-	concPM1_0_amb_Array.push(parseFloat(data[3]));
-	concPM2_5_amb_Array.push(parseFloat(data[4]));
-	concPM10_0_amb_Array.push(parseFloat(data[5]));
-	rawGt0_3um_Array.push(parseFloat(data[6]));
-	rawGt0_5um_Array.push(parseFloat(data[7]));
-	rawGt1_0um_Array.push(parseFloat(data[8]));
-	rawGt2_5um_Array.push(parseFloat(data[9]));
-	rawGt5_0um_Array.push(parseFloat(data[10]));
-	rawGt10_0um_Array.push(parseFloat(data[11]));
+	concPM1_0_CF1_Array.push(parseFloat(data[1]));
+	concPM2_5_CF1_Array.push(parseFloat(data[2]));
+	concPM10_0_CF1_Array.push(parseFloat(data[3]));
+	concPM1_0_amb_Array.push(parseFloat(data[4]));
+	concPM2_5_amb_Array.push(parseFloat(data[5]));
+	concPM10_0_amb_Array.push(parseFloat(data[6]));
+	rawGt0_3um_Array.push(parseFloat(data[7]));
+	rawGt0_5um_Array.push(parseFloat(data[8]));
+	rawGt1_0um_Array.push(parseFloat(data[9]));
+	rawGt2_5um_Array.push(parseFloat(data[10]));
+	rawGt5_0um_Array.push(parseFloat(data[11]));
+	rawGt10_0um_Array.push(parseFloat(data[12]));
 
  
  

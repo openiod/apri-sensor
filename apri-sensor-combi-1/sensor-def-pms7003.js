@@ -16,7 +16,7 @@ module.exports = {
 
 sensor	: {
 	  id		: 'PMS7003'
-  	, sensorSystem: 'apri-sensor-pms7300'
+  	, sensorSystem: 'apri-sensor-pms7003'
 	, cycleFixed: true
 	, cycleTimeMax: 60000
 	, fileName	: 'sensor-PMS7003-result'

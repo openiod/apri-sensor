@@ -122,6 +122,7 @@ var mainProcess = function() {
 				});
 				var data			= {};
 				data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;  
+				data.sensorSystem		= _sensor.sensorSystem;
 				data.foi				= 'SCRP' + unit.id;	
 				data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;	
 				data.cityCode			= 'GM0439'; //geoLocation.cityCode;	
@@ -129,8 +130,9 @@ var mainProcess = function() {
 				data.categories			= [];
 				data.observation		= _sensor.result.observations;
 				
-				var _url = openiodUrl + '/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=apri-sensor-combi-1&offering=offering_0439_initial&commit=true';
-				_url = _url + '&region=0439' + '&foi=' + data.foi + '&neighborhoodcode=' + data.neighborhoodCode + '&citycode=' + data.cityCode + '&observation=' + data.observation ;
+				
+				var _url = openiodUrl + '/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&offering=offering_0439_initial&commit=true';
+				_url = _url + '&sensorsystem=' + data.sensorSystem + '&region=0439' + '&foi=' + data.foi + '&neighborhoodcode=' + data.neighborhoodCode + '&citycode=' + data.cityCode + '&observation=' + data.observation ;
 		
 				console.log(_url);
 				request.get(_url)

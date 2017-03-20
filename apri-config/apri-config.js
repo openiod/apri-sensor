@@ -19,10 +19,12 @@ module.exports = {
 	systemListenPort: null,
 //	systemRepositoryHttpServer: null,
 	apps:null,
+	sensorUsbConfig: null,
 
 
 	init: function (systemMainModuleName) {
 		var _module;
+		var sensorUsbConfigStr;
 
 		console.log (systemMainModuleName);
 		this.systemStart = new Date();
@@ -40,8 +42,13 @@ module.exports = {
 		var systemConfigStr 		= this.fs.readFileSync(systemConfigLocalPath + "apri-system.json");
 		var systemConfig 			= JSON.parse(systemConfigStr);
 		
-		var sensorUsbConfigStr 		= this.fs.readFileSync(systemConfigLocalPath + "apri-sensor-usb.json");
-		this.sensorUsbConfig 		= JSON.parse(sensorUsbConfigStr);
+		try {
+			sensorUsbConfigStr 		= this.fs.readFileSync(systemConfigLocalPath + "apri-sensor-usb.json");
+			this.sensorUsbConfig 		= JSON.parse(sensorUsbConfigStr);
+		} catch (e) {
+			this.sensorUsbConfig	= {};
+		}
+			
 
 		// IMPORTANT: SYSTEM CONFIGURATION VALUES !!!
 		var systemName 				= systemConfig.system.systemName;

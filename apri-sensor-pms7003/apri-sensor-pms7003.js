@@ -159,7 +159,22 @@ var mainProcess = function() {
 		if (writeHeaders == true) writeHeaderIntoFile();
 		serialport.on('data', function(data){
 			var _dataArray	= data.split(';');		
-			if (_dataArray.length == 15 && _dataArray[0] == 'PMS7003' && isNumeric(_dataArray[1]) && isNumeric(_dataArray[2]) && isNumeric(_dataArray[3]) && isNumeric(_dataArray[4]) && isNumeric(_dataArray[5]) && isNumeric(_dataArray[6]) && isNumeric(_dataArray[7]) && isNumeric(_dataArray[8]) && isNumeric(_dataArray[9]) && isNumeric(_dataArray[10]) && isNumeric(_dataArray[11] && isNumeric(_dataArray[12]) ) ) {
+			if (_dataArray.length == 15 && 
+			    _dataArray[0] == 'PMS7003' && 
+				isNumeric(_dataArray[1]) && 
+				isNumeric(_dataArray[2]) && 
+				isNumeric(_dataArray[3]) && 
+				isNumeric(_dataArray[4]) && 
+				isNumeric(_dataArray[5]) && 
+				isNumeric(_dataArray[6]) && 
+				isNumeric(_dataArray[7]) && 
+				isNumeric(_dataArray[8]) && 
+				isNumeric(_dataArray[9]) && 
+				isNumeric(_dataArray[10]) && 
+				isNumeric(_dataArray[11]) && 
+				isNumeric(_dataArray[12]) && 
+				isNumeric(_dataArray[13]) && 
+				isNumeric(_dataArray[14]) )  {
 				//console.log('measurement: ' + data);
 				processMeasurement(_dataArray);
 			} else {

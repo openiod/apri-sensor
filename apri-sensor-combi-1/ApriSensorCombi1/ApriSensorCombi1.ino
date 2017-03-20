@@ -118,10 +118,10 @@ void setup() {
     // Temperature DS18B20 ====
 
 // fine dust PMS7003 =====
- //   Serial1.begin(9600);
- //     while (!Serial1) {
- //   }
- //   while (Serial1.read()!=-1) {};  //clear buffer
+   Serial1.begin(9600);
+      while (!Serial1) {
+    }
+    while (Serial1.read()!=-1) {};  //clear buffer
 // fine dust PMS7003 =====
 
     Serial.println("Sensors ready");  
@@ -149,11 +149,11 @@ void loop() {
 */
 
 
-    BMP280_read();
-    AM2320_read();
-    DS18B20_read();
-    delay(5000);
-return;
+//    BMP280_read();
+//    AM2320_read();
+//    DS18B20_read();
+//    delay(5000);
+//return;
 
 
 // fine dust PMS7003 =====
@@ -171,7 +171,8 @@ bool pms7003ReadData() {
 
     if (Serial1.available() < 32) {
       if (Serial1.available() == 0) {
-        delay(150);
+//        delay(150);
+        delay(600);
         return;
       };
       if (Serial1.available() > 16) {

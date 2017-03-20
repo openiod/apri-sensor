@@ -71,7 +71,7 @@ sensor	: {
 		this.total.rawGt5_0um		+= parseFloat(data[11]);
 		this.total.rawGt10_0um		+= parseFloat(data[12]);
 		this.total.measurementTime	= new Date();
-		if (this.total.measurementTimeStart == undefined) this.total.measureMentTimeStart = this.total.measureMentTime;
+		if (this.total.measurementTimeStart == undefined) this.total.measurementTimeStart = this.total.measurementTime;
 	}
 	, processData: function(data) {
 		this.addMeasurement(data);

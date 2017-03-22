@@ -44,8 +44,8 @@ sensor	: {
 	}	
 	, addMeasurement: function(data) {
 		this.total.measurementCount		++;
-		this.total.pressure				+= parseFloat(data[1]);						
-		this.total.temperature			+= parseFloat(data[2]);
+		this.total.temperature			+= parseFloat(data[1]);
+		this.total.pressure				+= parseFloat(data[2]);						
 		this.total.measurementTime		= new Date();
 		if (this.total.measurementTimeStart == undefined) this.total.measurementTimeStart = this.total.measurementTime;
 	}

@@ -109,6 +109,7 @@ void setup() {
     while (!bmp.begin()) {
       Serial.println("Could not find a valid BMP280 sensor, check wiring!");
     }
+    
 
     Wire.begin();
 
@@ -152,7 +153,7 @@ void loop() {
 //    BMP280_read();
 //    AM2320_read();
 //    DS18B20_read();
-//    delay(5000);
+//    delay(1000);
 //return;
 
 
@@ -320,7 +321,8 @@ bool BMP280_read() {
     float seaLevelHPa = pressureHPa;
 
     Serial.print("BMP280");
-    Serial.print(";");    Serial.print(bmp.readTemperature());
+    Serial.print(";");
+    Serial.print(bmp.readTemperature());
     Serial.print(";");
     Serial.print(pressureHPa);
     Serial.print(";");

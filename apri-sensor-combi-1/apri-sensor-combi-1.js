@@ -358,8 +358,8 @@ SerialPort.list(function(err, ports) {
 	
 	usbPorts	= ports;
 
-	if (usbComNames['apri-sensor-am2320'] != undefined && usbComNames['apri-sensor-am2320'].comName != undefined) {
-		serialPortPath	= usbComNames['apri-sensor-am2320'].comName;
+	if (usbComNames['apri-sensor-combi-1'] != undefined && usbComNames['apri-sensor-combi-1'].comName != undefined) {
+		serialPortPath	= usbComNames['apri-sensor-combi-1'].comName;
 	} else {
 		for (var i=0;i<usbPorts.length;i++) {
 			console.log('searching for usb comport 1a86 ' + i + ' '+ usbPorts[i].manufacturer + ' ' +  usbPorts[i].comName);

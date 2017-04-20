@@ -159,6 +159,13 @@ var getCpuInfo	= function() {
 		}
 		unit.revision = stdout.substr(0,stdout.length-1);
 	});
+	exec("cat /sys/class/thermal/thermal_zone0/temp", (error, stdout, stderr) => {
+		if (error) {
+			console.error(`exec error: ${error}`);
+			return;
+		}
+		unit.cputemperature = stdout.substr(0,stdout.length-1);
+	});
 };
 
 var getUsbPorts	= function() {

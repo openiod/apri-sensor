@@ -27,14 +27,8 @@ limitations under the License.
 
 */
 
-//------------------------------------------------------------------------------
-
-
-//#include <Adafruit_Sensor.h>
-
+//-----------------------------------------------------------------------------
 #include <Wire.h>
-//#include <SPI.h>
-//#include <Adafruit_Sensor.h>
 #include <Adafruit_BMP280.h>
 
 #define BMP_SCK 13
@@ -42,12 +36,7 @@ limitations under the License.
 #define BMP_MOSI 11 
 #define BMP_CS 10
 
-//#include <apri_barometer_bmp280.h>
-
-
 Adafruit_BMP280 bmp; // I2C
-//Adafruit_BMP280 bmp(BMP_CS); // hardware SPI
-//Adafruit_BMP280 bmp(BMP_CS, BMP_MOSI, BMP_MISO,  BMP_SCK);
 
 // AM320 =======
 #include <AM2320.h>
@@ -75,6 +64,7 @@ int inputHigh = 0;
 int inputLow = 0;
 // variable to caclulate checksum input variables
 uint16_t inputChecksum = 0;
+bool pms7003 = false;
 // sensor variables
 uint16_t concPM1_0_CF1;
 uint16_t concPM2_5_CF1;
@@ -93,23 +83,14 @@ uint8_t  errorCode;
 uint16_t checksum;
 // fine dust PMS7003 =====
 
-
 void setup() {
     Serial.begin(9600);
     while (!Serial) {
     }
-//Adafruit_BMP280::Adafruit_BMP280();
-// apri_barometer_bmp280.initSerial(); 
-//Serial.println("test");
-//  if (!bmp.begin()) {  
-//    Serial.println("Could not find a valid BMP280 sensor, check wiring!");
-//    while (1);
-//  }
 
     while (!bmp.begin()) {
       Serial.println("Could not find a valid BMP280 sensor, check wiring!");
-    }
-    
+    }  
 
     Wire.begin();
 
@@ -120,9 +101,8 @@ void setup() {
 
 // fine dust PMS7003 =====
    Serial1.begin(9600);
-      while (!Serial1) {
-    }
-    while (Serial1.read()!=-1) {};  //clear buffer
+   while (!Serial1) {
+   }
 // fine dust PMS7003 =====
 
     Serial.println("Sensors ready");  
@@ -130,39 +110,27 @@ void setup() {
 
 void loop() {
 
-
-/*    
- *     
-    Serial.print(F("Temperature = "));
-    Serial.print(bmp.readTemperature());
-    Serial.println(" *C");
+//  if (pms7003==false) {
+//    Serial.println("Sensor PMS7003 not ready");
+//    if (Serial1) {
+//      while (Serial1.read()!=-1) {};  //clear buffer  
+//      Serial.println("Sensor PMS7003 ready");
+//      pms7003 = true;  
+//    }  
+ 
     
-    Serial.print(F("Pressure = "));
-    Serial.print(pressureHPa);
-    Serial.println(" hPa");
-
-    Serial.print(F("Approx altitude = "));
-//    Serial.print(bmp.readAltitude(1013.25)); // this should be adjusted to your local forcase
-    Serial.print(bmp.readAltitude(seaLevelHPa)); // this should be adjusted to your local forcase
-    Serial.println(" m");
-    
-    Serial.println();
-*/
-
-
 //    BMP280_read();
 //    AM2320_read();
 //    DS18B20_read();
 //    delay(1000);
-//return;
+//    return;
+//  }
 
+//Serial.println("Sensor PMS7003 get sensor data");  
 
 // fine dust PMS7003 =====
     pms7003ReadData();
 // fine dust PMS7003 =====
-
-
-
 }
 
 bool pms7003ReadData() {

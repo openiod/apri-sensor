@@ -164,7 +164,9 @@ var getCpuInfo	= function() {
 			console.error(`exec error: ${error}`);
 			return;
 		}
-		unit.cputemperature = stdout.substr(0,stdout.length-1);
+		var tempStr	= stdout.substr(0,stdout.length-1);
+		var tempValue = parseFloat(tempStr);
+		if (!isNaN(tempValue)) unit.cputemperature = tempvalue / 1000;
 	});
 };
 

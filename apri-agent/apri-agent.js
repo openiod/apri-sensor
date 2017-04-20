@@ -166,7 +166,7 @@ var getCpuInfo	= function() {
 		}
 		var tempStr	= stdout.substr(0,stdout.length-1);
 		var tempValue = parseFloat(tempStr);
-		if (!isNaN(tempValue)) unit.cputemperature = tempvalue / 1000;
+		if (!isNaN(tempValue)) unit.cputemperature = tempValue / 1000;
 	});
 };
 

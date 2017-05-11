@@ -65,6 +65,7 @@ int inputLow = 0;
 // variable to caclulate checksum input variables
 uint16_t inputChecksum = 0;
 bool pms7003 = false;
+char *sensorType[1]; // = "PMSx003"; //Plantower PMS7003 or PMSA003 
 // sensor variables
 uint16_t concPM1_0_CF1;
 uint16_t concPM2_5_CF1;
@@ -102,8 +103,10 @@ void setup() {
 // fine dust PMS7003 =====
    Serial1.begin(9600);
    while (!Serial1) {
+      Serial.println("Could not find a valid PMSx003 sensor, check wiring!");    
    }
-// fine dust PMS7003 =====
+   sensorType[0] = "PMSx003";
+// fine dust PMS7003 PMSA003 =====
 
     Serial.println("Sensors ready");  
 }
@@ -234,7 +237,11 @@ bool pms7003ReadData() {
     inputChecksum += inputLow;
     errorCode = inputLow;
 
-    Serial.print("PMS7003;"); 
+    if (version == 128) sensorType[0] = "PMS7003"; 
+    if (version == 145) sensorType[0] = "PMSA003"; 
+
+    Serial.print(sensorType[0]); 
+    Serial.print(";"); 
     Serial.print(concPM1_0_CF1);
     Serial.print(';'); 
     Serial.print(concPM2_5_CF1);

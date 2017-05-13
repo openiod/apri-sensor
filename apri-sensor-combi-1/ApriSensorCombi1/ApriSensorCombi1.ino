@@ -3,10 +3,11 @@
 
 Application for reading sensor data from multiple sensor
   Sensors: 
-  - Plantower PMS7003 PM sensor (fine dust)
+  - Plantower PMS7003/PMSA003 PM sensor (fine dust)
   - BMP280 air pressure incl. temperature and altitude
   - AM2320 relative humidity incl. temperature
-  - DS18B20 teperature sensor  
+  - DS18B20 teperature sensor 
+  - MQ131 ozone sensor 
 
 */
 /* 
@@ -55,7 +56,7 @@ OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 // Temperature DS18B20 ====
 
-// fine dust PMS7003 =====
+// fine dust PMS7003/PMSA003 =====
 #include <SoftwareSerial.h> 
 SoftwareSerial Serial1(10, 11); // serial ports RX, TX
 
@@ -82,7 +83,12 @@ uint16_t rawGt10_0um;
 uint8_t  version;
 uint8_t  errorCode;
 uint16_t checksum;
-// fine dust PMS7003 =====
+// fine dust PMS7003/PMSA003 =====
+
+// ozone MQ131  ====
+int mq131AnalogPin = 3;     // potentiometer wiper (middle terminal) connected to analog pin 3
+int mq131Val = 0;           // variable to store the value read
+// ozone MQ131  ====
 
 void setup() {
     Serial.begin(9600);
@@ -100,10 +106,10 @@ void setup() {
  //   sensors.begin();
     // Temperature DS18B20 ====
 
-// fine dust PMS7003 =====
+// fine dust PMS7003/A003 =====
    Serial1.begin(9600);
    while (!Serial1) {
-      Serial.println("Could not find a valid PMSx003 sensor, check wiring!");    
+      //Serial.println("Could not find a valid PMSx003 sensor, check wiring!");    
    }
    sensorType[0] = "PMSx003";
 // fine dust PMS7003 PMSA003 =====
@@ -125,18 +131,19 @@ void loop() {
 //    BMP280_read();
 //    AM2320_read();
 //    DS18B20_read();
+//    MQ131_read();
 //    delay(1000);
 //    return;
 //  }
 
 //Serial.println("Sensor PMS7003 get sensor data");  
 
-// fine dust PMS7003 =====
-    pms7003ReadData();
-// fine dust PMS7003 =====
+// fine dust PMS7003/A003 =====
+    pmsx003ReadData();
+// fine dust PMS7003/A003 =====
 }
 
-bool pms7003ReadData() {
+bool pmsx003ReadData() {
 
     
 //    while (Serial1.read()!=-1) {};  //clear buffer
@@ -284,6 +291,7 @@ bool pms7003ReadData() {
     BMP280_read();
     AM2320_read();
     DS18B20_read();
+    MQ131_read();
     
     //delay(700);  // 700 when other sensors not included // higher will get you checksum errors
     delay(50);     // 50  when other sensors are included //higher will get you checksum errors
@@ -341,4 +349,14 @@ bool DS18B20_read() {
   // Temperature DS18B20 ====
   return;
 }
+
+bool MQ131_read() {
+  // Ozone MQ131 ====
+  mq131Val = analogRead(mq131AnalogPin);
+  Serial.print("MQ131;");
+  Serial.println(mq131Val);
+  // Ozone MQ131 ====
+  return;
+}
+
 

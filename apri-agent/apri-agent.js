@@ -28,7 +28,7 @@ var initResult = apriConfig.init(systemModuleFolderName+"/"+systemModuleName);
 
 // add module specific requires
 const request 			= require('request');
-//var express 			= require('express');
+var express 			= require('express');
 const SerialPort 		= require('serialport');
 const fs 				= require('fs');
 const io	 			= require('socket.io-client');
@@ -36,7 +36,7 @@ const exec 				= require('child_process').exec;
 const execFile			= require('child_process').execFile;
 
 
-//var app = express();
+var app = express();
 
 // **********************************************************************************
 		/* web-socket */
@@ -101,6 +101,19 @@ serialport.on('error', function(err) {
 });
 
 */
+
+var menuUrl;
+var localServer = {};
+localServer.ConfigMenu = {};
+
+var initMenu	= function() {
+	console.log('Init menu');
+	localServer.ConfigMenu["main"] = '<http><body><h1>Hoofdmenu</h1><br/><a href="'+menuUrl+'?menu=wifi">WiFi configuratie</a></body></http>';
+	localServer.ConfigMenu["wifi"] = '<http><body><h1>WiFi menu</h1><br/><a href="'+menuUrl+'?menu=wifi">WiFi configuratie</a></body></http>';
+}
+
+
+
 
 // send data to SOS service via OpenIoD REST service
 var sendData = function(data) {
@@ -185,7 +198,8 @@ var getMacAddress	= function(networkInterface) {
 	fs.readFile(fileName, "utf8", function (err, data) {
         if (err) {
 			macAddress[networkInterface]	= null;
-			console.log('Error reading file for macaddress network interface: ' + networkInterface);
+			console.log('Network interface not available: ' + networkInterface);
+			return;
 		};
         macAddress[networkInterface]	= data.substr(0,data.length-1);
 		console.log('MAC-Address network interface: ' + networkInterface + '  ' + data);
@@ -196,7 +210,8 @@ var getWifiScanInfo	= function(iface, callback) {
 	//hostname --all-ip-address
 	exec('iwlist '+iface+' scan', (error, stdout, stderr) => {
 		if (error) {
-			console.error(`exec error: ${error}`);
+			//console.error(`exec error: ${error}`);
+			wifiScan[iface]	= "";
 			return;
 		}
 		wifiScan[iface]	= "" + stdout;
@@ -323,3 +338,60 @@ var startConnection	= function() {
 		}
 	);
 }
+
+console.log('Start web-application handling');
+app.all('/*', function(req, res, next) {
+  console.log("app.all/: " + req.url + " ; systemCode: " + apriConfig.systemCode );
+    console.log('Init menu ?????');
+  	console.log(localServer.ConfigMenu);
+	if (localServer.ConfigMenu.main == undefined ) {
+		menuUrl			= 'http://' +req.headers.host + '/' + apriConfig.systemCode+ '/menu';
+ 		initMenu();
+	    console.log('YES init menu! ');
+	  	console.dir(localServer.ConfigMenu);
+	} else {
+	    console.log('NO init menu! (already done?)');
+	}		
+  
+//  res.header("Access-Control-Allow-Origin", "*");
+//  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  next();
+});
+
+
+// test url for systemcode
+app.get('/'+apriConfig.systemCode+'/', function(req, res) {
+  console.log("Reqparam: " + req.url);
+  res.send("ok");
+});
+
+
+// test url for systemcode
+app.get('/'+apriConfig.systemCode+'/menu', function(req, res) {
+  console.log("Local server config menu: " + req.url);
+  var status = 200;
+  var body = "";
+  if (localServer.ConfigMenu[req.query.menu]==undefined) {
+  	body	= 'sorry, menu not found: ' + req.query.menu;
+	status = 500;
+	console.dir(localServer.ConfigMenu);
+	res.status(status).send(body);
+  } else {
+  	body	= localServer.ConfigMenu[req.query.menu];
+	console.log(body);
+	res.status(status).send(body);
+  }
+});
+
+// url not correct?
+app.get('/*', function(req, res) {
+  console.log("URL not correct, try " + req.url + apriConfig.systemCode);
+  //console.dir(req);
+  res.send("URL niet juist of onvolledig correct, probeer " + '<a href="http://' +req.headers.host + '/' + apriConfig.systemCode+ '/menu?menu=main">' + 'http://' +req.headers.host + '/' + apriConfig.systemCode+ '/menu?menu=main</a>');
+});
+
+
+app.listen(apriConfig.systemListenPort);
+console.log('listening to http://proxyintern: ' + apriConfig.systemListenPort);
+
+

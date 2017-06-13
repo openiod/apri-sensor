@@ -32,6 +32,17 @@ limitations under the License.
 #include <Wire.h>
 #include <Adafruit_BMP280.h>
 
+unsigned long loopStartTime;
+unsigned long loopTime = 0;
+//int analogFanPin = 7; 
+
+// available sensors
+boolean BMP280_available = false;
+boolean AM2320_available = false;
+boolean DS18B20_available = false;
+boolean PMSx003_available = false;
+boolean MQ131_available = false;
+
 #define BMP_SCK 13
 #define BMP_MISO 12
 #define BMP_MOSI 11 
@@ -54,6 +65,9 @@ AM2320 th;
 OneWire oneWire(ONE_WIRE_BUS);
 // Pass our oneWire reference to Dallas Temperature.
 DallasTemperature sensors(&oneWire);
+int numberOfDevices; // Number of temperature devices found
+DeviceAddress tempDeviceAddress; // We'll use this variable to store a found device address
+#define TEMPERATURE_PRECISION 12 // 12=higher resolution
 // Temperature DS18B20 ====
 
 // fine dust PMS7003/PMSA003 =====
@@ -83,41 +97,157 @@ uint16_t rawGt10_0um;
 uint8_t  version;
 uint8_t  errorCode;
 uint16_t checksum;
+uint16_t serial1Available;
+int serial1Byte1;
+int serial1Byte2;
 // fine dust PMS7003/PMSA003 =====
 
 // ozone MQ131  ====
 int mq131AnalogPin = 3;     // potentiometer wiper (middle terminal) connected to analog pin 3
+//int mq131AnalogPin4 = 4;
 int mq131Val = 0;           // variable to store the value read
 // ozone MQ131  ====
 
 void setup() {
+
+    //pinMode(analogFanPin, OUTPUT);
+    //analogWrite(analogFanPin,0);
+    
     Serial.begin(9600);
     while (!Serial) {
     }
-
-    while (!bmp.begin()) {
-      Serial.println("Could not find a valid BMP280 sensor, check wiring!");
-    }  
+    Serial.println("Setup start");
+    
+    bmp.begin();
+//    while (!bmp.begin()) {
+//      Serial.println("Could not find a valid BMP280 sensor, check wiring!");
+//    }  
+//    Serial.println("BMP280 sensor connected");
 
     Wire.begin();
 
     // Temperature DS18B20 ====
     // Start up the library DS18B20
- //   sensors.begin();
+    sensors.begin();
+
+   // Grab a count of devices on the wire
+  numberOfDevices = sensors.getDeviceCount();
+
+  // locate devices on the bus
+  Serial.print("Locating devices...");
+  
+  Serial.print("Found ");
+  Serial.print(numberOfDevices, DEC);
+  Serial.println(" devices.");
+
+  // report parasite power requirements
+  Serial.print("Parasite power is: "); 
+  if (sensors.isParasitePowerMode()) Serial.println("ON");
+  else Serial.println("OFF");
+  //Serial.print("DS18B20_resolution;");
+  //Serial.println(sensors.getResolution());
+  //Serial.print("DS18B20_resolution_global;");
+  //Serial.println(sensors.getResolution());
+  sensors.setResolution(12);
+  Serial.print("DS18B20_powersupply;");
+  Serial.println(sensors.readPowerSupply(0));
+    // Loop through each device, print out address
+  for(int i=0;i<numberOfDevices; i++)
+  {
+    // Search the wire for address
+    if(sensors.getAddress(tempDeviceAddress, i))
+  {
+    Serial.print("Found device ");
+    Serial.print(i, DEC);
+    Serial.print(" with address: ");
+    printAddress(tempDeviceAddress);
+    Serial.println();
+    
+    Serial.print("Setting resolution to ");
+    Serial.println(TEMPERATURE_PRECISION, DEC);
+    
+    // set the resolution to TEMPERATURE_PRECISION bit (Each Dallas/Maxim device is capable of several different resolutions)
+    sensors.setResolution(tempDeviceAddress, TEMPERATURE_PRECISION);
+    
+     Serial.print("Resolution actually set to: ");
+    Serial.print(sensors.getResolution(tempDeviceAddress), DEC); 
+    Serial.println();
+  }else{
+    Serial.print("Found ghost device at ");
+    Serial.print(i, DEC);
+    Serial.print(" but could not detect address. Check power and cabling");
+  }
+  }
+
+  //Serial.print("DS18B20_resolution;");
+  //Serial.println(sensors.getResolution());
+  //Serial.print("DS18B20_resolution_global;");
+  //Serial.println(sensors.getResolution());  
     // Temperature DS18B20 ====
+
 
 // fine dust PMS7003/A003 =====
    Serial1.begin(9600);
-   while (!Serial1) {
-      //Serial.println("Could not find a valid PMSx003 sensor, check wiring!");    
-   }
+//   while (!Serial1) {
+//      Serial.println("Could not find a valid PMSx003 sensor, check wiring!");    
+//   }
    sensorType[0] = "PMSx003";
 // fine dust PMS7003 PMSA003 =====
 
-    Serial.println("Sensors ready");  
+//for (int i = 0 ; i < 200 ; i++)
+//  {
+
+/*    Serial.println ("pin 3") ;
+    pinMode (mq131AnalogPin, INPUT) ;
+    Serial.print (analogRead (mq131AnalogPin) * 5.0 / 1024) ; Serial.println ("V when an input") ;Serial.println (analogRead (mq131AnalogPin) ) ;
+    pinMode (mq131AnalogPin, INPUT_PULLUP) ;
+    delay (300) ;
+    Serial.print (analogRead (mq131AnalogPin) * 5.0 / 1024) ;  Serial.println ("V when an pulled up input") ;Serial.println (analogRead (mq131AnalogPin) ) ;
+    pinMode (mq131AnalogPin, OUTPUT) ;
+    delay (300) ;
+    Serial.print (analogRead (mq131AnalogPin) * 5.0 / 1024) ; Serial.println ("V when an output") ;Serial.println (analogRead (mq131AnalogPin) ) ;
+*/
+/*    
+     
+    Serial.println ("pin 4") ;
+    pinMode (mq131AnalogPin4, INPUT) ;
+    Serial.print (analogRead (mq131AnalogPin4) * 5.0 / 1024) ; Serial.println ("V when an input") ;Serial.println (analogRead (mq131AnalogPin4) ) ;
+    pinMode (mq131AnalogPin4, INPUT_PULLUP) ;
+    delay (300) ;
+    Serial.print (analogRead (mq131AnalogPin4) * 5.0 / 1024) ;  Serial.println ("V when an pulled up input") ;Serial.println (analogRead (mq131AnalogPin4) ) ;
+    pinMode (mq131AnalogPin4, OUTPUT) ;
+    delay (300) ;
+    Serial.print (analogRead (mq131AnalogPin4) * 5.0 / 1024) ; Serial.println ("V when an output") ;Serial.println (analogRead (mq131AnalogPin4) ) ;
+*/
+//delay (3000) ;
+//  }
+
+
+
+   pinMode(mq131AnalogPin, INPUT);
+//   digitalWrite(mq131AnalogPin, INPUT_PULLUP);
+
+    Serial.println("Sensors ready"); 
+     
+    delay(4000); // 5 sec delay for sensors to start / initiate
+   // analogWrite(analogFanPin,255);
+    delay(1000); // 5 sec delay for sensors to start / initiate
+    loopStartTime = millis();
+    delay(1);
 }
 
 void loop() {
+
+    loopTime = millis() - loopStartTime;
+
+    if (loopTime > 1000) 
+    {
+      BMP280_read();
+      AM2320_read();
+      DS18B20_read();
+      MQ131_read();
+      loopStartTime = millis();  //restart measure cycle
+    }
 
 //  if (pms7003==false) {
 //    Serial.println("Sensor PMS7003 not ready");
@@ -139,7 +269,9 @@ void loop() {
 //Serial.println("Sensor PMS7003 get sensor data");  
 
 // fine dust PMS7003/A003 =====
-    pmsx003ReadData();
+    if (Serial1) {
+      pmsx003ReadData();
+    }
 // fine dust PMS7003/A003 =====
 }
 
@@ -147,26 +279,50 @@ bool pmsx003ReadData() {
 
     
 //    while (Serial1.read()!=-1) {};  //clear buffer
+    
+    serial1Available = Serial1.available();
 
-    if (Serial1.available() < 32) {
-      if (Serial1.available() == 0) {
+    if (serial1Available < 32) {
+      return;
+      if (serial1Available < 1) {
 //        delay(150);
-        delay(600);
+//        Serial.println("##############################");
+//        BMP280_read();
+//        AM2320_read();
+//        DS18B20_read();
+//        MQ131_read();
+        //delay(10);
         return;
       };
-      if (Serial1.available() > 16) {
-        delay(10);
+      Serial.println(serial1Available);
+      if (serial1Available > 16) {
+        //delay(30);
         return;
       };
-      if (Serial1.available() > 0) {
-        delay(30);
+      if (serial1Available > 0) {
+        //delay(30);
         return;
       };
-      delay(100);
+      //delay(100);
       return;
     }
-    if (Serial1.read() != 0x42) return;
-    if (Serial1.read() != 0x4D) return;
+    
+//    Serial.print("Serial1 available: ");
+//    Serial.println(serial1Available);
+
+    serial1Byte1 = Serial1.read();
+    if (serial1Byte1 != 0x42) {
+      while (Serial1.read()!=-1) {};  //clear buffer
+      Serial.print("Serial1 msg Byte 1: ");
+      Serial.println(serial1Byte1);
+      return;
+    }
+    serial1Byte2 = Serial1.read();
+    if (serial1Byte2 != 0x4D) {
+      Serial.print("Serial1 msg Byte 2: ");
+      Serial.println(serial1Byte2);
+      return;
+    }
 
     inputChecksum = 0x42 + 0x4D;
 
@@ -250,58 +406,67 @@ bool pmsx003ReadData() {
     Serial.print(sensorType[0]); 
     Serial.print(";"); 
     Serial.print(concPM1_0_CF1);
-    Serial.print(';'); 
+    Serial.print(";"); 
     Serial.print(concPM2_5_CF1);
-    Serial.print(';'); 
+    Serial.print(";"); 
     Serial.print(concPM10_0_CF1);
-    Serial.print(';'); 
+    Serial.print(";"); 
     Serial.print(concPM1_0_amb);
-    Serial.print(';'); 
+    Serial.print(";"); 
     Serial.print(concPM2_5_amb);
-    Serial.print(';');     
+    Serial.print(";"); 
     Serial.print(concPM10_0_amb);
-    Serial.print(';');     
+    Serial.print(";"); 
     Serial.print(rawGt0_3um);
-    Serial.print(';');
+    Serial.print(";"); 
     Serial.print(rawGt0_5um);
-    Serial.print(';'); 
+    Serial.print(";"); 
     Serial.print(rawGt1_0um);
-    Serial.print(';'); 
+    Serial.print(";"); 
     Serial.print(rawGt2_5um);
-    Serial.print(';'); 
+    Serial.print(";"); 
     Serial.print(rawGt5_0um);
-    Serial.print(';'); 
+    Serial.print(";"); 
     Serial.print(rawGt10_0um);
-    Serial.print(';'); 
+    Serial.print(";"); 
     Serial.print(version);
-    Serial.print(';'); 
+    Serial.print(";"); 
     Serial.print(errorCode);
     
     inputHigh = Serial1.read();
     inputLow = Serial1.read();
     checksum = inputLow+(inputHigh<<8);
     if (checksum != inputChecksum) {
-      Serial.print(';'); 
+      Serial.print(";"); 
       Serial.print(checksum); 
-      Serial.print(';'); 
+      Serial.print(";"); 
       Serial.print(inputChecksum); 
     }
-    Serial.print('\n');
+    Serial.print("\n");
 
-    BMP280_read();
-    AM2320_read();
-    DS18B20_read();
-    MQ131_read();
+    while (Serial1.read()!=-1) {};  //clear buffer
+
+//    BMP280_read();
+//    AM2320_read();
+//    DS18B20_read();
+//    MQ131_read();
     
     //delay(700);  // 700 when other sensors not included // higher will get you checksum errors
-    delay(50);     // 50  when other sensors are included //higher will get you checksum errors
+    //delay(1000);     // 50  when other sensors are included //higher will get you checksum errors
       
     return;
 }
 
 bool BMP280_read() {
-    float pressureHPa = bmp.readPressure()/100;
+
+    float pressure = bmp.readPressure();
+    if (pressure == 0) {
+      //Serial.println("No value for BMP280 found");
+      return;
+    }
+    float pressureHPa = pressure/100;
     float seaLevelHPa = pressureHPa;
+    float temperature = bmp.readTemperature();
 
     Serial.print("BMP280");
     Serial.print(";");
@@ -324,9 +489,9 @@ bool AM2320_read() {
       break;
     case 0:
       Serial.print("AM2320");
-      Serial.print(';');
+      Serial.print(";");
       Serial.print(th.h);
-      Serial.print(';');
+      Serial.print(";");
 //      Serial.print("%, temperature: ");
       Serial.println(th.t);
 //      Serial.println("*C");
@@ -343,7 +508,8 @@ bool DS18B20_read() {
   sensors.requestTemperatures(); // Send the command to get temperatures
   //Serial.println("DONE");
   Serial.print("DS18B20;");
-  Serial.println(sensors.getTempCByIndex(0)); // Why "byIndex"? 
+//  Serial.println(sensors.getTempCByIndex(0)); // Why "byIndex"? Index is the i-th sensor on I2C setting.
+  Serial.println(sensors.getTempC(tempDeviceAddress));
     // You can have more than one IC on the same bus. 
     // 0 refers to the first IC on the wire
   // Temperature DS18B20 ====
@@ -353,10 +519,21 @@ bool DS18B20_read() {
 bool MQ131_read() {
   // Ozone MQ131 ====
   mq131Val = analogRead(mq131AnalogPin);
+  if (mq131Val == 0) return;
   Serial.print("MQ131;");
   Serial.println(mq131Val);
   // Ozone MQ131 ====
   return;
+}
+
+// function to print a device address
+void printAddress(DeviceAddress deviceAddress)
+{
+  for (uint8_t i = 0; i < 8; i++)
+  {
+    if (deviceAddress[i] < 16) Serial.print("0");
+    Serial.print(deviceAddress[i], HEX);
+  }
 }
 
 

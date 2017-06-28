@@ -49,6 +49,9 @@ boolean MQ131_available = false;
 #define BMP_CS 10
 
 Adafruit_BMP280 bmp; // I2C
+long bmp280InitTime;
+long bmp280InitInterval = 10000; //10 seconden init wait time
+
 
 // AM320 =======
 #include <AM2320.h>
@@ -123,6 +126,8 @@ void setup() {
 //      Serial.println("Could not find a valid BMP280 sensor, check wiring!");
 //    }  
 //    Serial.println("BMP280 sensor connected");
+    bmp280InitTime = millis();
+    Serial.println("start bmp280 init fase");
 
     Wire.begin();
 
@@ -459,6 +464,12 @@ bool pmsx003ReadData() {
 
 bool BMP280_read() {
 
+    // wait some time while in init fase (also during soft reset) 
+    if ( millis() - bmp280InitTime < bmp280InitInterval ) {
+      //Serial.println("bmp280 init fase");
+      return;
+    }
+    
     float pressure = bmp.readPressure();
     if (pressure == 0) {
       //Serial.println("No value for BMP280 found");
@@ -468,6 +479,15 @@ bool BMP280_read() {
     float seaLevelHPa = pressureHPa;
     float temperature = bmp.readTemperature();
 
+    // reset sensor when temperature value below -100
+    if (temperature < -100) {
+      Serial.println("start bmp280 soft reset");
+      bmp.begin();
+      bmp280InitTime = millis();
+      return; 
+    }
+
+    
     Serial.print("BMP280");
     Serial.print(";");
     Serial.print(bmp.readTemperature());

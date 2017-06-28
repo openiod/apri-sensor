@@ -1,0 +1,20 @@
+{
+  "name": "apri-sensor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openiod/apri-sensor.git"
+  },
+  "keywords": [],
+  "author": "André van der Wiel <awiel@scapeler.com> (http://scapeler.com/)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/openiod/apri-sensor/issues"
+  },
+  "homepage": "https://github.com/openiod/apri-sensor#readme"
+}

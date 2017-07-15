@@ -250,7 +250,7 @@ void loop() {
       BMP280_read();
       AM2320_read();
       DS18B20_read();
-      MQ131_read();
+     // MQ131_read();
       loopStartTime = millis();  //restart measure cycle
     }
 

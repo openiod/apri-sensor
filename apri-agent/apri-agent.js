@@ -223,6 +223,24 @@ var getWifiScanInfo	= function(iface, callback) {
 		}
 	});
 }
+var getUsbInfo	= function(device, callback) {
+
+	sudo udevadm info -a -p $(udevadm info -q path -n /dev/ttyUSB0)
+
+	//hostname --all-ip-address
+	exec('udevadm info -a -p $(udevadm info -q path -n '+device+')', (error, stdout, stderr) => {
+		if (error) {
+			console.error(`exec error: ${error}`);
+			return;
+		}
+//		console.log(`stderr: ${stderr}`);	
+
+		if (callback != undefined) {
+			callback(device,stdout);
+		}
+	});
+}
+
 
 var getIpAddress	= function() {
 	//hostname --all-ip-address
@@ -253,6 +271,16 @@ var sendClientWifiInfo	= function(iface, stdout) {
 		, "unit": unit	
 		, "device": iface
 		, "wifiScan": stdout
+		}
+	);
+}
+
+var sendClientUsbInfo	= function(device, stdout) {
+	socket.emit('apriClientActionResponse', 
+		{"action":"getClientUsbInfo"
+		, "unit": unit	
+		, "device": device
+		, "usbInfo": stdout
 		}
 	);
 }
@@ -295,6 +323,10 @@ socket.on('disconnect', function() {
 		if (data.action == 'getClientWifiInfo') {
 			getWifiScanInfo('wlan0',sendClientWifiInfo);
 			getWifiScanInfo('wlan1',sendClientWifiInfo);
+		}
+		if (data.action == 'getClientUsbInfo') {
+			//getUsbPorts();
+			getUsbInfo(sendClientUsbInfo);
 		}
 		if (data.action == 'reboot') {
 			startActionReboot();

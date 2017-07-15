@@ -326,7 +326,8 @@ socket.on('disconnect', function() {
 		}
 		if (data.action == 'getClientUsbInfo') {
 			//getUsbPorts();
-			getUsbInfo(sendClientUsbInfo);
+			getUsbInfo('/dev/ttyUSB0',sendClientUsbInfo);
+			getUsbInfo('/dev/ttyUSB1',sendClientUsbInfo);
 		}
 		if (data.action == 'reboot') {
 			startActionReboot();

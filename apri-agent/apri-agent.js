@@ -276,6 +276,7 @@ var sendClientWifiInfo	= function(iface, stdout) {
 }
 
 var sendClientUsbInfo	= function(device, stdout) {
+	console.log('Send apriClientActionResponse for device %s', device);
 	socket.emit('apriClientActionResponse', 
 		{"action":"getClientUsbInfo"
 		, "unit": unit	

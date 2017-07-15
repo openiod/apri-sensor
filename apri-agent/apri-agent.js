@@ -225,7 +225,7 @@ var getWifiScanInfo	= function(iface, callback) {
 }
 var getUsbInfo	= function(device, callback) {
 
-	sudo udevadm info -a -p $(udevadm info -q path -n /dev/ttyUSB0)
+	//sudo udevadm info -a -p $(udevadm info -q path -n /dev/ttyUSB0)
 
 	//hostname --all-ip-address
 	exec('udevadm info -a -p $(udevadm info -q path -n '+device+')', (error, stdout, stderr) => {

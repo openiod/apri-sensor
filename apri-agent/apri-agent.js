@@ -242,16 +242,9 @@ var save99UsbSerialRules	= function() {
 
 var saveSystemServices	= function() {
 	var content = '';
-	var file = '/etc/udev/rules.d/99-usb-serial.rules';
+	var file = '';
 	if (unit.id == '00000000b7e92a99' || unit.id == '000000004659c5bc') {  //'s-Gravenpolder  2e voor test
-		console.log('save usb rules for unit ' + unit.id);
-		content = 
-			'SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="AL02V14T", SYMLINK+="ttyDylos1100", MODE:="0666" \n' + 
-		 	'SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="AJ03KNV9", SYMLINK+="ttyDylos1700", MODE:="0666" \n' +
- 			'SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="ttyArduinoNano", MODE:="0666" \n';
-		fs.writeFileSync(file, content);
-		console.log('     usb rules for unit ' + unit.id + ' saved. ');
-		
+		console.log('save Dylos service for unit ' + unit.id  + ' and device Dylos DC1700');
 		content =
 			'[Unit]\n' +
 			'Desription=SCAPE604-apri-sensor-dylos - start or restart apri-sensor-dylos service, respawn\n' +
@@ -264,6 +257,23 @@ var saveSystemServices	= function() {
 		file = '/etc/systemd/system/SCAPE604-apri-sensor-dylos#DC1700.service';
 		fs.writeFileSync(file, content);
 		console.log('     Dylos service for unit ' + unit.id + ' and device Dylos DC1700' + ' saved. ');
+		console.log('enable Dylos service for unit ' + unit.id  + ' and device Dylos DC1700');
+		exec('systemctl enable SCAPE604-apri-sensor-dylos#DC1700.service', (error, stdout, stderr) => {
+			if (error) {
+				console.error(`exec error: ${error}`);
+				return;
+			}
+//			console.log(`stderr: ${stderr}`);	
+
+			if (callback != undefined) {
+				callback(device,stdout);
+			}
+		});
+
+		
+		
+//sudo systemctl enable SCAPE604-apri-sensor-dylos.service
+//sudo systemctl start SCAPE604-apri-sensor-dylos.service
 
 
 	}

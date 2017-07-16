@@ -265,9 +265,9 @@ var saveSystemServices	= function() {
 			}
 //			console.log(`stderr: ${stderr}`);	
 
-			if (callback != undefined) {
-				callback(device,stdout);
-			}
+//			if (callback != undefined) {
+//				callback(device,stdout);
+//			}
 		});
 
 		

@@ -243,22 +243,52 @@ var save99UsbSerialRules	= function() {
 var saveSystemServices	= function() {
 	var content = '';
 	var file = '';
+	var sensorKey = '';
 	if (unit.id == '00000000b7e92a99' || unit.id == '000000004659c5bc') {  //'s-Gravenpolder  2e voor test
-		console.log('save Dylos service for unit ' + unit.id  + ' and device Dylos DC1700');
+
+		sensorKey	= 'DC1700';
+		console.log('save Dylos service for unit ' + unit.id  + ' and device Dylos ' + sensorKey);
 		content =
 			'[Unit]\n' +
-			'Desription=SCAPE604-apri-sensor-dylos - start or restart apri-sensor-dylos service, respawn\n' +
+			'Desription=SCAPE604-apri-sensor-dylos - start or restart apri-sensor-dylos '+ sensorKey + ' service, respawn\n' +
 			'After=network.target\n' +
 			'[Service]\n' +
-			'ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-dylos/apri-sensor-dylos.sh /opt/SCAPE604/log/SCAPE604-apri-sensor-dylos.log /dev/ttyDylos1700 \n' +
+			'ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-dylos/apri-sensor-dylos.sh /opt/SCAPE604/log/SCAPE604-apri-sensor-dylos_' + sensorKey + '.log /dev/ttyDylos1700 \n' +
 			'Restart=always\n'+
 			'[Install]\n' +
 			'WantedBy=multi-user.target';
-		file = '/etc/systemd/system/SCAPE604-apri-sensor-dylos_DC1700.service';
+		file = '/etc/systemd/system/SCAPE604-apri-sensor-dylos_' + sensorKey + '.service';
 		fs.writeFileSync(file, content);
-		console.log('     Dylos service for unit ' + unit.id + ' and device Dylos DC1700' + ' saved. ');
-		console.log('enable Dylos service for unit ' + unit.id  + ' and device Dylos DC1700');
-		exec('systemctl enable SCAPE604-apri-sensor-dylos_DC1700.service', (error, stdout, stderr) => {
+		console.log('     Dylos service for unit ' + unit.id + ' and device Dylos ' + sensorKey + ' saved. ');
+		console.log('enable Dylos service for unit ' + unit.id  + ' and device Dylos ' + sensorKey);
+		exec('systemctl enable SCAPE604-apri-sensor-dylos_' + sensorKey + '.service', (error, stdout, stderr) => {
+			if (error) {
+				console.error(`exec error: ${error}`);
+				return;
+			}
+//			console.log(`stderr: ${stderr}`);	
+
+//			if (callback != undefined) {
+//				callback(device,stdout);
+//			}
+		});
+
+		sensorKey	= 'DC1100';
+		console.log('save Dylos service for unit ' + unit.id  + ' and device Dylos ' + sensorKey);
+		content =
+			'[Unit]\n' +
+			'Desription=SCAPE604-apri-sensor-dylos - start or restart apri-sensor-dylos '+ sensorKey + ' service, respawn\n' +
+			'After=network.target\n' +
+			'[Service]\n' +
+			'ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-dylos/apri-sensor-dylos.sh /opt/SCAPE604/log/SCAPE604-apri-sensor-dylos_' + sensorKey + '.log /dev/ttyDylos1100 \n' +
+			'Restart=always\n'+
+			'[Install]\n' +
+			'WantedBy=multi-user.target';
+		file = '/etc/systemd/system/SCAPE604-apri-sensor-dylos_' + sensorKey + '.service';
+		fs.writeFileSync(file, content);
+		console.log('     Dylos service for unit ' + unit.id + ' and device Dylos ' + sensorKey + ' saved. ');
+		console.log('enable Dylos service for unit ' + unit.id  + ' and device Dylos ' + sensorKey);
+		exec('systemctl enable SCAPE604-apri-sensor-dylos_' + sensorKey + '.service', (error, stdout, stderr) => {
 			if (error) {
 				console.error(`exec error: ${error}`);
 				return;

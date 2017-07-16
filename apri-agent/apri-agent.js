@@ -237,7 +237,7 @@ var save99UsbSerialRules	= function() {
 		fs.writeFileSync(file, content);
 	}
 }
-*/
+
 
 var getUsbInfo	= function(device, callback) {
 

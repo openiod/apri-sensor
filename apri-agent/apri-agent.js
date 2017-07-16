@@ -224,7 +224,6 @@ var getWifiScanInfo	= function(iface, callback) {
 	});
 }
 
-/*
 var save99UsbSerialRules	= function() {
 
 //	99-usb-serial.rules
@@ -236,6 +235,7 @@ var save99UsbSerialRules	= function() {
 		 	'SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="AJ03KNV9", SYMLINK+="ttyDylos1700", MODE:="0666" \n' +
  			'SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="ttyArduinoNano", MODE:="0666" \n';
 		fs.writeFileSync(file, content);
+	}
 }
 */
 

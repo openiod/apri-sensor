@@ -9,6 +9,8 @@ Application for reading sensor data from multiple sensor
   - DS18B20 teperature sensor 
   - MQ131 ozone sensor 
 
+  RF433 ASK transmitter RadioHead, Implements a simplex (one-way) transmitter with an TX-C1 module
+
 */
 /* 
 
@@ -29,6 +31,16 @@ limitations under the License.
 */
 
 //-----------------------------------------------------------------------------
+
+//RF
+long sessionNr;
+unsigned long messageNr;
+#include <RH_ASK.h>
+//#include <SPI.h> // Not actually used but needed to compile
+RH_ASK rfDriver;
+// RH_ASK rfDriver(2000, 2, 4, 5); // ESP8266: do not use pin 11
+//RF
+
 #include <Wire.h>
 #include <Adafruit_BMP280.h>
 
@@ -37,11 +49,11 @@ unsigned long loopTime = 0;
 //int analogFanPin = 7; 
 
 // available sensors
-boolean BMP280_available = false;
-boolean AM2320_available = false;
-boolean DS18B20_available = false;
-boolean PMSx003_available = false;
-boolean MQ131_available = false;
+//boolean BMP280_available = false;
+//boolean AM2320_available = false;
+//boolean DS18B20_available = false;
+//boolean PMSx003_available = false;
+//boolean MQ131_available = false;
 
 #define BMP_SCK 13
 #define BMP_MISO 12
@@ -115,11 +127,20 @@ void setup() {
 
     //pinMode(analogFanPin, OUTPUT);
     //analogWrite(analogFanPin,0);
+
+    sessionNr = 0;
+    messageNr = 0;
     
     Serial.begin(9600);
     while (!Serial) {
     }
     Serial.println("Setup start");
+
+    if (!rfDriver.init()) {
+      Serial.println("RF init failed");
+    } else {
+      sessionNr = 1;  
+    }
     
     bmp.begin();
 //    while (!bmp.begin()) {
@@ -508,6 +529,9 @@ bool AM2320_read() {
       Serial.println("Sensor offline");
       break;
     case 0:
+      char rfBuf[50];
+      sprintf(rfBuf, "AM2320;%lu;%lu",th.h,th.t);
+      
       Serial.print("AM2320");
       Serial.print(";");
       Serial.print(th.h);
@@ -515,6 +539,9 @@ bool AM2320_read() {
 //      Serial.print("%, temperature: ");
       Serial.println(th.t);
 //      Serial.println("*C");
+
+      if (sessionNr >0) 
+        sendRfMessage(rfBuf);
       break;
   }
   // AM2320 =======
@@ -554,6 +581,27 @@ void printAddress(DeviceAddress deviceAddress)
     if (deviceAddress[i] < 16) Serial.print("0");
     Serial.print(deviceAddress[i], HEX);
   }
+}
+
+void sendRfMessage(char rfBuf) {
+    Serial.print("Send RF message:");
+//    Serial.print(sessionNr);
+//    Serial.print(";");
+    messageNr++;
+//    Serial.print(messageNr);
+//    Serial.print(";");
+    
+
+    //const char *msg = messageNr + ";hello from testboard";
+
+    char buf[40];
+    sprintf(buf, "%lu;%s", messageNr, rfBuf);
+
+//    rfDriver.send((uint8_t *)msg, strlen(msg));
+    rfDriver.send(buf, strlen(buf));
+    rfDriver.waitPacketSent();
+
+    Serial.println(buf);
 }
 
 

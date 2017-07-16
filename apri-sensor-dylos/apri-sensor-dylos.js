@@ -365,8 +365,8 @@ var getCpuInfo	= function() {
 };
 
 
-
 getCpuInfo();
+
 
 SerialPort.list(function(err, ports) {
 	console.log(ports);

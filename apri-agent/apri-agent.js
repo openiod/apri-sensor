@@ -223,9 +223,23 @@ var getWifiScanInfo	= function(iface, callback) {
 		}
 	});
 }
+var save99UsbSerialRules	= function(device, callback) {
+
+	99-usb-serial.rules
+	var content = '';
+	var file = '/etc/udev/rules.d/99-usb-serial.rules';
+	if (unit.id == '00000000b7e92a99' | unit.id == '000000004659c5bc') {  //'s-Gravenpolder  2e voor test
+		content = 
+			'SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="AL02V14T", SYMLINK+="ttyDylos1100", MODE:="0666" \n' + 
+		 	'SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="AJ03KNV9", SYMLINK+="ttyDylos1700", MODE:="0666" \n' +
+ 			'SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="ttyArduinoNano", MODE:="0666" \n';
+		fs.writeFileSync(file, content);
+}
+
 var getUsbInfo	= function(device, callback) {
 
-	//sudo udevadm info -a -p $(udevadm info -q path -n /dev/ttyUSB0)
+
+//sudo udevadm trigger	
 
 	//hostname --all-ip-address
 	exec('udevadm info -a -p $(udevadm info -q path -n '+device+')', (error, stdout, stderr) => {
@@ -329,6 +343,7 @@ socket.on('disconnect', function() {
 			//getUsbPorts();
 			getUsbInfo('/dev/ttyUSB0',sendClientUsbInfo);
 			getUsbInfo('/dev/ttyUSB1',sendClientUsbInfo);
+			save99UsbSerialRules();
 		}
 		if (data.action == 'reboot') {
 			startActionReboot();

@@ -224,6 +224,7 @@ var getWifiScanInfo	= function(iface, callback) {
 	});
 }
 
+/*
 var save99UsbSerialRules	= function() {
 
 //	99-usb-serial.rules
@@ -236,6 +237,7 @@ var save99UsbSerialRules	= function() {
  			'SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="ttyArduinoNano", MODE:="0666" \n';
 		fs.writeFileSync(file, content);
 }
+*/
 
 var getUsbInfo	= function(device, callback) {
 
@@ -344,7 +346,7 @@ socket.on('disconnect', function() {
 			//getUsbPorts();
 			getUsbInfo('/dev/ttyUSB0',sendClientUsbInfo);
 			getUsbInfo('/dev/ttyUSB1',sendClientUsbInfo);
-			save99UsbSerialRules();
+			//save99UsbSerialRules();
 		}
 		if (data.action == 'reboot') {
 			startActionReboot();

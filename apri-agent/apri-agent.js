@@ -225,7 +225,6 @@ var getWifiScanInfo	= function(iface, callback) {
 }
 
 var save99UsbSerialRules	= function() {
-
 //	99-usb-serial.rules
 	var content = '';
 	var file = '/etc/udev/rules.d/99-usb-serial.rules';
@@ -349,7 +348,7 @@ socket.on('disconnect', function() {
 			//getUsbPorts();
 			getUsbInfo('/dev/ttyUSB0',sendClientUsbInfo);
 			getUsbInfo('/dev/ttyUSB1',sendClientUsbInfo);
-			//save99UsbSerialRules();
+			save99UsbSerialRules();
 		}
 		if (data.action == 'reboot') {
 			startActionReboot();

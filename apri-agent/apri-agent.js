@@ -225,7 +225,7 @@ var getWifiScanInfo	= function(iface, callback) {
 }
 var save99UsbSerialRules	= function(device, callback) {
 
-	99-usb-serial.rules
+//	99-usb-serial.rules
 	var content = '';
 	var file = '/etc/udev/rules.d/99-usb-serial.rules';
 	if (unit.id == '00000000b7e92a99' | unit.id == '000000004659c5bc') {  //'s-Gravenpolder  2e voor test

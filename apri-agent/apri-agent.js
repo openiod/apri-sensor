@@ -240,6 +240,35 @@ var save99UsbSerialRules	= function() {
 	}
 }
 
+var saveSystemServices	= function() {
+	var content = '';
+	var file = '/etc/udev/rules.d/99-usb-serial.rules';
+	if (unit.id == '00000000b7e92a99' || unit.id == '000000004659c5bc') {  //'s-Gravenpolder  2e voor test
+		console.log('save usb rules for unit ' + unit.id);
+		content = 
+			'SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="AL02V14T", SYMLINK+="ttyDylos1100", MODE:="0666" \n' + 
+		 	'SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="AJ03KNV9", SYMLINK+="ttyDylos1700", MODE:="0666" \n' +
+ 			'SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="ttyArduinoNano", MODE:="0666" \n';
+		fs.writeFileSync(file, content);
+		console.log('     usb rules for unit ' + unit.id + ' saved. ');
+		
+		content =
+			'[Unit]\n' +
+			'Desription=SCAPE604-apri-sensor-dylos - start or restart apri-sensor-dylos service, respawn\n' +
+			'After=network.target\n' +
+			'[Service]\n' +
+			'ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-dylos/apri-sensor-dylos.sh /opt/SCAPE604/log/SCAPE604-apri-sensor-dylos.log /dev/ttyDylos1700 \n' +
+			'Restart=always\n'+
+			'[Install]\n' +
+			'WantedBy=multi-user.target';
+		file = '/etc/systemd/system/SCAPE604-apri-sensor-dylos#DC1700.service';
+		fs.writeFileSync(file, content);
+		console.log('     Dylos service for unit ' + unit.id + ' and device Dylos DC1700' + ' saved. ');
+
+
+	}
+}
+
 
 var getUsbInfo	= function(device, callback) {
 
@@ -349,6 +378,7 @@ socket.on('disconnect', function() {
 			getUsbInfo('/dev/ttyUSB0',sendClientUsbInfo);
 			getUsbInfo('/dev/ttyUSB1',sendClientUsbInfo);
 			save99UsbSerialRules();
+			saveSystemServices();
 		}
 		if (data.action == 'reboot') {
 			startActionReboot();

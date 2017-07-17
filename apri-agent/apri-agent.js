@@ -242,6 +242,7 @@ var save99UsbSerialRules	= function() {
 
 var saveSystemServices	= function() {
 	if (unit.id == '00000000b7e92a99' || unit.id == '000000004659c5bc') {  //'s-Gravenpolder  2e voor test
+		disableServices('apri-sensor-dylos');
 		createService('apri-sensor-dylos','DC1100');
 		createService('apri-sensor-dylos','DC1700');
 
@@ -303,6 +304,21 @@ var saveSystemServices	= function() {
 	}
 }
 
+var disableServices 	= function(sensor) {
+//	ls /etc/systemd/system/SCAPE604-apri-sensor-dylos*
+	exec('ls /etc/systemd/system/'+apriConfig.systemCode+'-'+sensor+'*.service', (error, stdout, stderr) => {
+		if (error) {
+			console.error(`exec error: ${error}`);
+			return;
+		}
+		console.log(stdout);
+//		console.log(`stderr: ${stderr}`);	
+
+//		if (callback != undefined) {
+//			callback(device,stdout);
+//		}
+	});
+}
 
 var createService	= function(sensor, sensorKey) {
 	var file;

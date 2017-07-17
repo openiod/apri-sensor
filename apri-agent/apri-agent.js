@@ -313,7 +313,7 @@ var createService	= function(sensor, sensorKey) {
 		'Desription='+apriConfig.systemCode+'-'+sensor+' - start or restart '+sensor+' '+ sensorKey + ' service, respawn\n' +
 		'After=network.target\n' +
 		'[Service]\n' +
-		'ExecStart=/opt/'+apriConfig.systemCode+'/apri-sensor/'+sensor+'/'+sensor+'.sh /opt/'+apriConfig.systemCode+'/log/+'apriConfig.systemCode+'-'+sensor+'_' + sensorKey + '.log /dev/ttyDylos1700 \n' +
+		'ExecStart=/opt/'+apriConfig.systemCode+'/apri-sensor/'+sensor+'/'+sensor+'.sh /opt/'+apriConfig.systemCode+'/log/'+apriConfig.systemCode+'-'+sensor+'_' + sensorKey + '.log /dev/ttyDylos1700 \n' +
 		'Restart=always\n'+
 		'[Install]\n' +
 		'WantedBy=multi-user.target';

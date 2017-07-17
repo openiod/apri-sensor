@@ -305,32 +305,24 @@ var saveSystemServices	= function() {
 }
 
 var disableServices 	= function(sensor) {
+	var services;
 //	ls /etc/systemd/system/SCAPE604-apri-sensor-dylos*
-	exec('ls /etc/systemd/system/'+apriConfig.systemCode+'-'+sensor+'*.service', (error, stdout, stderr) => {
-		if (error) {
-			console.error(`exec error: ${error}`);
-			return;
-		}
-		console.log(stdout);
+	services = execSync('ls /etc/systemd/system/'+apriConfig.systemCode+'-'+sensor+'*.service');
+		console.log('Revoke services:');
 		var services = stdout.split('\n');
 		console.log(services.length);
 		for (i=0;i<services.length-1;i++) {
 			var service = services[i].split('/')[4];
 			console.log(service);
+			revokeService(service);
 		}
 		
-		
+}
+
+var revokeService	= function(service) {
 //		sudo systemctl stop SCAPE604-apri-sensor-dylos_DC1100.service
 //		sudo systemctl disable /etc/systemd/system/SCAPE604-apri-sensor-dylos_DC1100.service
 //		sudo rm /etc/systemd/system/SCAPE604-apri-sensor-dylos_DC1100.service
-
-		
-//		console.log(`stderr: ${stderr}`);	
-
-//		if (callback != undefined) {
-//			callback(device,stdout);
-//		}
-	});
 }
 
 var createService	= function(sensor, sensorKey) {

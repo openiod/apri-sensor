@@ -241,9 +241,6 @@ var save99UsbSerialRules	= function() {
 }
 
 var saveSystemServices	= function() {
-	var content = '';
-	var file = '';
-	var sensorKey = '';
 	if (unit.id == '00000000b7e92a99' || unit.id == '000000004659c5bc') {  //'s-Gravenpolder  2e voor test
 		createService('apri-sensor-dylos','DC1100');
 		createService('apri-sensor-dylos','DC1700');
@@ -308,6 +305,8 @@ var saveSystemServices	= function() {
 
 
 var createService	= function(sensor, sensorKey) {
+	var file;
+	var content;
 	console.log('save Dylos service for unit ' + unit.id  + ' and device Dylos ' + sensorKey);
 	content =
 		'[Unit]\n' +

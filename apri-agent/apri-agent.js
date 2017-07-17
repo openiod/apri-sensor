@@ -314,8 +314,8 @@ var disableServices 	= function(sensor) {
 		console.log(stdout);
 		var services = stdout.split('\n');
 		console.log(services.length);
-		for (i=0;i<services.length;i++) {
-			var service = services[i].split('/')[3];
+		for (i=0;i<services.length-1;i++) {
+			var service = services[i].split('/')[4];
 			console.log(service);
 		}
 		

@@ -234,7 +234,7 @@ var save99UsbSerialRules	= function() {
 		content = 
 			'SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="AL02V14T", SYMLINK+="ttyDC1100", MODE:="0666" \n' + 
 		 	'SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="AJ03KNV9", SYMLINK+="ttyDC1700", MODE:="0666" \n' +
- 			'SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="ttyArduinoNano", MODE:="0666" \n';
+ 			'SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="ttyCOMBI1", MODE:="0666" \n';
 		fs.writeFileSync(file, content);
 		console.log('     usb rules for unit ' + unit.id + ' saved. ');
 
@@ -242,10 +242,16 @@ var save99UsbSerialRules	= function() {
 }
 
 var saveSystemServices	= function() {
-	if (unit.id == '00000000b7e92a99' || unit.id == '000000004659c5bc') {  //'s-Gravenpolder  2e voor test
+	if (unit.id == '00000000b7e92a99' || unit.id == '000000004659c5bc') {  //'s-Gravenpolder  2e is voor test
 		disableServices('apri-sensor-dylos');
 		createService('apri-sensor-dylos','DC1100');
 		createService('apri-sensor-dylos','DC1700');
+		
+		if (unit.id == '000000004659c5bc') {
+			disableServices('apri-sensor-combi-1');
+			createService('apri-sensor-combi-1','COMBI1');
+		
+		}
 
 /*
 		sensorKey	= 'DC1700';
@@ -358,7 +364,7 @@ var revokeService	= function(service) {
 var createService	= function(sensor, sensorKey) {
 	var file;
 	var content;
-	console.log('save Dylos service for unit ' + unit.id  + ' and device Dylos ' + sensorKey);
+	console.log('save '+sensor+' service for unit ' + unit.id  + ' and device ' + sensorKey);
 	content =
 		'[Unit]\n' +
 		'Desription='+apriConfig.systemCode+'-'+sensor+' - start or restart '+sensor+' '+ sensorKey + ' service, respawn\n' +

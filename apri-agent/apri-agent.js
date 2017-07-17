@@ -33,6 +33,7 @@ const SerialPort 		= require('serialport');
 const fs 				= require('fs');
 const io	 			= require('socket.io-client');
 const exec 				= require('child_process').exec;
+const execSync			= require('child_process').execSync;
 const execFile			= require('child_process').execFile;
 
 

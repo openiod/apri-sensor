@@ -312,7 +312,7 @@ var disableServices 	= function(sensor) {
 			return;
 		}
 		console.log(stdout);
-		var services = stdout.split(' ');
+		var services = stdout.split('\n');
 		console.log(services.length);
 		for (i=0;i<services.length;i++) {
 			var service = services[i].split('/')[3];

@@ -70,9 +70,6 @@ var usbPorts			= [];
 var ipAddress			= '';
 var wifiScan			= {};
 
-var deviceParam			= process.argv[3];
-console.log('Param for serial device is ' + deviceParam); 
-
 /*
 var serialPortPath		= "/dev/cu.usbmodem1411";
 //var serialPortPath		= "/dev/cu.usbmodem1421";

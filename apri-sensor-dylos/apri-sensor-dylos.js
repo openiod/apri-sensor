@@ -65,6 +65,12 @@ var loopTimeMax			= 60000; //ms, 60000=60 sec
 
 var usbPorts			= [];
 
+var deviceParam			= process.argv[2];
+console.log('Param for serial device is ' + deviceParam); 
+var deviceParam			= process.argv[3];
+console.log('Param for serial device is ' + deviceParam); 
+
+
 //var serialPortPath		= "/dev/cu.usbmodem1411";
 //var serialPortPath		= "/dev/cu.usbserial-A1056661";
 var serialPortPath		= "/dev/ttyUSB0";

@@ -316,7 +316,7 @@ var disableServices 	= function(sensor, separator) {
 	var stdout;
 //	ls /etc/systemd/system/SCAPE604-apri-sensor-dylos*
 	try {
-		stdout = execSync('ls /etc/systemd/system/'+apriConfig.systemCode+'-'+sensor+separator'*.service');
+		stdout = execSync('ls /etc/systemd/system/'+apriConfig.systemCode+'-'+sensor+separator+'*.service');
 	} catch (e) {
 //    	console.log("Errors:", e);
 		console.log('No service available to revoke for '+apriConfig.systemCode+'-'+sensor+'*.service');

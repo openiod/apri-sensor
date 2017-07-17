@@ -243,12 +243,12 @@ var save99UsbSerialRules	= function() {
 
 var saveSystemServices	= function() {
 	if (unit.id == '00000000b7e92a99' || unit.id == '000000004659c5bc') {  //'s-Gravenpolder  2e is voor test
-		disableServices('apri-sensor-dylos');
+		disableServices('apri-sensor-dylos','_');
 		createService('apri-sensor-dylos','DC1100');
 		createService('apri-sensor-dylos','DC1700');
 		
 		if (unit.id == '000000004659c5bc') {
-			disableServices('apri-sensor-combi-1');
+			disableServices('apri-sensor-combi-1','');
 			createService('apri-sensor-combi-1','COMBI1');
 		
 		}
@@ -311,12 +311,12 @@ var saveSystemServices	= function() {
 	}
 }
 
-var disableServices 	= function(sensor) {
+var disableServices 	= function(sensor, separator) {
 	var services;
 	var stdout;
 //	ls /etc/systemd/system/SCAPE604-apri-sensor-dylos*
 	try {
-		stdout = execSync('ls /etc/systemd/system/'+apriConfig.systemCode+'-'+sensor+'_*.service');
+		stdout = execSync('ls /etc/systemd/system/'+apriConfig.systemCode+'-'+sensor+separator'*.service');
 	} catch (e) {
 //    	console.log("Errors:", e);
 		console.log('No service available to revoke for '+apriConfig.systemCode+'-'+sensor+'*.service');

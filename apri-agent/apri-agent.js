@@ -245,7 +245,10 @@ var saveSystemServices	= function() {
 	var file = '';
 	var sensorKey = '';
 	if (unit.id == '00000000b7e92a99' || unit.id == '000000004659c5bc') {  //'s-Gravenpolder  2e voor test
+		createService('apri-sensor-dylos','DC1100');
+		createService('apri-sensor-dylos','DC1700');
 
+/*
 		sensorKey	= 'DC1700';
 		console.log('save Dylos service for unit ' + unit.id  + ' and device Dylos ' + sensorKey);
 		content =
@@ -299,6 +302,37 @@ var saveSystemServices	= function() {
 //				callback(device,stdout);
 //			}
 		});
+*/
+}
+
+
+var createService	= function(sensor, sensorKey) {
+	console.log('save Dylos service for unit ' + unit.id  + ' and device Dylos ' + sensorKey);
+	content =
+		'[Unit]\n' +
+		'Desription='+apriConfig.systemCode+'-'+sensor+' - start or restart '+sensor+' '+ sensorKey + ' service, respawn\n' +
+		'After=network.target\n' +
+		'[Service]\n' +
+		'ExecStart=/opt/'+apriConfig.systemCode+'/apri-sensor/'+sensor+'/'+sensor+'.sh /opt/'+apriConfig.systemCode+'/log/+'apriConfig.systemCode+'-'+sensor+'_' + sensorKey + '.log /dev/ttyDylos1700 \n' +
+		'Restart=always\n'+
+		'[Install]\n' +
+		'WantedBy=multi-user.target';
+	file = '/etc/systemd/system/'+apriConfig.systemCode+'-'+sensor+'_' + sensorKey + '.service';
+	fs.writeFileSync(file, content);
+	console.log('     '+sensor+' service for unit ' + unit.id + ' and device ' + sensorKey + ' saved. ');
+	console.log('enable '+sensor+' service for unit ' + unit.id  + ' and device ' + sensorKey);
+	exec('systemctl enable '+apriConfig.systemCode+'-'+sensor+'_' + sensorKey + '.service', (error, stdout, stderr) => {
+		if (error) {
+			console.error(`exec error: ${error}`);
+			return;
+		}
+//		console.log(`stderr: ${stderr}`);	
+
+//		if (callback != undefined) {
+//			callback(device,stdout);
+//		}
+	});
+}
 
 		
 		

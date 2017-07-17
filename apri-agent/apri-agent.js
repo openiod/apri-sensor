@@ -308,15 +308,15 @@ var saveSystemServices	= function() {
 var disableServices 	= function(sensor) {
 	var services;
 //	ls /etc/systemd/system/SCAPE604-apri-sensor-dylos*
-	services = execSync('ls /etc/systemd/system/'+apriConfig.systemCode+'-'+sensor+'*.service');
-		console.log('Revoke services:');
-		var services = stdout.split('\n');
-		console.log(services.length);
-		for (i=0;i<services.length-1;i++) {
-			var service = services[i].split('/')[4];
-			console.log(service);
-			revokeService(service);
-		}
+	var stdout = execSync('ls /etc/systemd/system/'+apriConfig.systemCode+'-'+sensor+'*.service');
+	console.log('Revoke services:');
+	var services = stdout.split('\n');
+	console.log(services.length);
+	for (i=0;i<services.length-1;i++) {
+		var service = services[i].split('/')[4];
+		console.log(service);
+		revokeService(service);
+	}
 		
 }
 

@@ -335,16 +335,19 @@ var revokeService	= function(service) {
 //		sudo rm /etc/systemd/system/SCAPE604-apri-sensor-dylos_DC1100.service
 
 	try {
+		console.log('Stop service '+service);
 		result	= execSync('sudo systemctl stop '+service);
 	} catch (e) {
     	console.log("Errors:", e);
   	} 
 	try {
+		console.log('Disable service '+service);
 		result	= execSync('sudo systemctl disable /etc/systemd/system/'+service);
 	} catch (e) {
     	console.log("Errors:", e);
   	} 
 	try {
+		console.log('Remove service '+service);
 		result	= execSync('sudo rm /etc/systemd/system/'+service);
 	} catch (e) {
     	console.log("Errors:", e);

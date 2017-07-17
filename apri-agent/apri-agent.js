@@ -312,6 +312,15 @@ var disableServices 	= function(sensor) {
 			return;
 		}
 		console.log(stdout);
+		var services = stdout.split(' ');
+		console.log(stdout.length);
+		
+		
+//		sudo systemctl stop SCAPE604-apri-sensor-dylos_DC1100.service
+//		sudo systemctl disable /etc/systemd/system/SCAPE604-apri-sensor-dylos_DC1100.service
+//		sudo rm /etc/systemd/system/SCAPE604-apri-sensor-dylos_DC1100.service
+
+		
 //		console.log(`stderr: ${stderr}`);	
 
 //		if (callback != undefined) {

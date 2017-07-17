@@ -65,15 +65,19 @@ var loopTimeMax			= 60000; //ms, 60000=60 sec
 
 var usbPorts			= [];
 
+var serialPortPath;
+
 var deviceParam			= process.argv[2];
 console.log('Param for serial device is ' + deviceParam); 
-var deviceParam			= process.argv[3];
-console.log('Param for serial device is ' + deviceParam); 
-
+if (deviceParam != undefined) {
+	serialPortPath		= deviceParam;
+} else {
+	serialPortPath		= "/dev/ttyUSB0";
+}
 
 //var serialPortPath		= "/dev/cu.usbmodem1411";
 //var serialPortPath		= "/dev/cu.usbserial-A1056661";
-var serialPortPath		= "/dev/ttyUSB0";
+
 
 
 
@@ -380,12 +384,14 @@ SerialPort.list(function(err, ports) {
 	console.log('Find usb comport:');
 	
 	usbPorts	= ports;
-
-	for (var i=0;i<usbPorts.length;i++) {
-		console.log('searching for usb comport FTDI ' + i + ' '+ usbPorts[i].manufacturer + ' ' +  usbPorts[i].comName);
-		if (usbPorts[i].manufacturer == 'FTDI' || usbPorts[i].manufacturer == 'Prolific_Technology_Inc.') {
-			serialPortPath	= usbPorts[i].comName;
-			break;
+	
+	if (serialPortPath != deviceParam) {
+		for (var i=0;i<usbPorts.length;i++) {
+			console.log('searching for usb comport FTDI ' + i + ' '+ usbPorts[i].manufacturer + ' ' +  usbPorts[i].comName);
+			if (usbPorts[i].manufacturer == 'FTDI' || usbPorts[i].manufacturer == 'Prolific_Technology_Inc.') {
+				serialPortPath	= usbPorts[i].comName;
+				break;
+			}
 		}
 	}
 	mainProcess();

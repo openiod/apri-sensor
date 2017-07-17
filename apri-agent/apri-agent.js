@@ -310,7 +310,7 @@ var disableServices 	= function(sensor) {
 //	ls /etc/systemd/system/SCAPE604-apri-sensor-dylos*
 	var stdout = execSync('ls /etc/systemd/system/'+apriConfig.systemCode+'-'+sensor+'*.service');
 	console.log('Revoke services:');
-	console.log(stdout);
+//	console.log(stdout);
 	var services = stdout.toString().split('\n');
 	console.log(services.length);
 	for (i=0;i<services.length-1;i++) {
@@ -322,9 +322,15 @@ var disableServices 	= function(sensor) {
 }
 
 var revokeService	= function(service) {
+	var result;
 //		sudo systemctl stop SCAPE604-apri-sensor-dylos_DC1100.service
 //		sudo systemctl disable /etc/systemd/system/SCAPE604-apri-sensor-dylos_DC1100.service
 //		sudo rm /etc/systemd/system/SCAPE604-apri-sensor-dylos_DC1100.service
+
+	result	= execSync('sudo systemctl stop '+service);
+	result	= execSync('sudo systemctl disable /etc/systemd/system/'+service);
+	result	= execSync('sudo rm /etc/systemd/system/'+service);
+	
 }
 
 var createService	= function(sensor, sensorKey) {

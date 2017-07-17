@@ -377,6 +377,12 @@ var createService	= function(sensor, sensorKey) {
 			console.error(`exec error: ${error}`);
 			return;
 		}
+		exec('systemctl start '+apriConfig.systemCode+'-'+sensor+'_' + sensorKey + '.service', (error, stdout, stderr) => {
+			if (error) {
+				console.error(`exec error: ${error}`);
+				return;
+			}
+		});
 //		console.log(`stderr: ${stderr}`);	
 
 //		if (callback != undefined) {

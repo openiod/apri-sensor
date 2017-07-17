@@ -312,7 +312,7 @@ var disableServices 	= function(sensor) {
 	try {
 		stdout = execSync('ls /etc/systemd/system/'+apriConfig.systemCode+'-'+sensor+'*.service');
 	} catch (e) {
-    	console.log("Errors:", e);
+//    	console.log("Errors:", e);
 		console.log('No service available to revoke for '+apriConfig.systemCode+'-'+sensor+'*.service');
 		return;
   	} 

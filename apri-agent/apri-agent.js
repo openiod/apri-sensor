@@ -307,11 +307,16 @@ var saveSystemServices	= function() {
 
 var disableServices 	= function(sensor) {
 	var services;
+	var stdout;
 //	ls /etc/systemd/system/SCAPE604-apri-sensor-dylos*
-	var stdout = execSync('ls /etc/systemd/system/'+apriConfig.systemCode+'-'+sensor+'*.service');
+	try {
+		stdout = execSync('ls /etc/systemd/system/'+apriConfig.systemCode+'-'+sensor+'*.service');
+	} catch (e) {
+    	console.log("Errors:", e);
+  	} 
 	console.log('Revoke services:');
 //	console.log(stdout);
-	var services = stdout.toString().split('\n');
+	services = stdout.toString().split('\n');
 	console.log(services.length);
 	for (i=0;i<services.length-1;i++) {
 		var service = services[i].split('/')[4];
@@ -327,9 +332,21 @@ var revokeService	= function(service) {
 //		sudo systemctl disable /etc/systemd/system/SCAPE604-apri-sensor-dylos_DC1100.service
 //		sudo rm /etc/systemd/system/SCAPE604-apri-sensor-dylos_DC1100.service
 
-	result	= execSync('sudo systemctl stop '+service);
-	result	= execSync('sudo systemctl disable /etc/systemd/system/'+service);
-	result	= execSync('sudo rm /etc/systemd/system/'+service);
+	try {
+		result	= execSync('sudo systemctl stop '+service);
+	} catch (e) {
+    	console.log("Errors:", e);
+  	} 
+	try {
+		result	= execSync('sudo systemctl disable /etc/systemd/system/'+service);
+	} catch (e) {
+    	console.log("Errors:", e);
+  	} 
+	try {
+		result	= execSync('sudo rm /etc/systemd/system/'+service);
+	} catch (e) {
+    	console.log("Errors:", e);
+  	} 
 	
 }
 

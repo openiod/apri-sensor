@@ -313,7 +313,11 @@ var disableServices 	= function(sensor) {
 		}
 		console.log(stdout);
 		var services = stdout.split(' ');
-		console.log(stdout.length);
+		console.log(services.length);
+		for (i=0;i<services.length;i++) {
+			var service = services[i].split('/')[3];
+			console.log(service);
+		}
 		
 		
 //		sudo systemctl stop SCAPE604-apri-sensor-dylos_DC1100.service

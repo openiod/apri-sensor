@@ -303,6 +303,7 @@ var saveSystemServices	= function() {
 //			}
 		});
 */
+	}
 }
 
 
@@ -334,14 +335,6 @@ var createService	= function(sensor, sensorKey) {
 	});
 }
 
-		
-		
-//sudo systemctl enable SCAPE604-apri-sensor-dylos.service
-//sudo systemctl start SCAPE604-apri-sensor-dylos.service
-
-
-	}
-}
 
 
 var getUsbInfo	= function(device, callback) {

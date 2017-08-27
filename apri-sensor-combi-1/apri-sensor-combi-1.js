@@ -110,40 +110,88 @@ var mainProcess = function() {
 		var observations = '';
 		console.log('Process sensor results');
 		for (var i=0;i<sensorDefs.length;i++) {
-			var _sensor	= sensorDefs[i];
-			if (_sensor.total.measurementCount > 0) {
-				_sensor.processResult(); 
+						
+			if (sensorDefs[i].units == undefined) {
+				var _sensor	= sensorDefs[i];
+			
+				if (_sensor.total.measurementCount > 0) {
+					_sensor.processResult(); 
 				
-				_sensor.file	= resultsFolder + _sensor.fileName + '_' + fileDateString + '_result' + sensorFileExtension;
-				fs.appendFile(_sensor.file, _sensor.record, function (err) {
-					if (err != null) {
-						console.log('Error writing header to results file: ' + err);
-					}
-				});
-				var data			= {};
-				data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;  
-				data.sensorSystem		= _sensor.sensorSystem;
-				data.foi				= 'SCRP' + unit.id;	
-				data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;	
-				data.cityCode			= 'GM0439'; //geoLocation.cityCode;	
-				data.cityName			= '..'; //geoLocation.cityName;
-				data.categories			= [];
-				data.observation		= _sensor.result.observations;
+					_sensor.file	= resultsFolder + _sensor.fileName + '_' + fileDateString + '_result' + sensorFileExtension;
+					fs.appendFile(_sensor.file, _sensor.record, function (err) {
+						if (err != null) {
+							console.log('Error writing header to results file: ' + err);
+						}
+					});
+					var data			= {};
+					data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;  
+					data.sensorSystem		= _sensor.sensorSystem;
+					data.foi				= 'SCRP' + unit.id;	
+					data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;	
+					data.cityCode			= 'GM0439'; //geoLocation.cityCode;	
+					data.cityName			= '..'; //geoLocation.cityName;
+					data.categories			= [];
+					data.observation		= _sensor.result.observations;
 				
 				
-				var _url = openiodUrl + '/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&offering=offering_0439_initial&commit=true';
-				_url = _url + '&sensorsystem=' + data.sensorSystem + '&region=0439' + '&foi=' + data.foi + '&neighborhoodcode=' + data.neighborhoodCode + '&citycode=' + data.cityCode + '&observation=' + data.observation ;
+					var _url = openiodUrl + '/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&offering=offering_0439_initial&commit=true';
+					_url = _url + '&sensorsystem=' + data.sensorSystem + '&region=0439' + '&foi=' + data.foi + '&neighborhoodcode=' + data.neighborhoodCode + '&citycode=' + data.cityCode + '&observation=' + data.observation ;
 		
-				console.log(_url);
-				request.get(_url)
-					.on('response', function(response) {
-						console.log(response.statusCode) // 200
-						console.log(response.headers['content-type']) // 'image/png'
-  					})
-					.on('error', function(err) {
-						console.log(err)
-					})
-				;
+					console.log(_url);
+					request.get(_url)
+						.on('response', function(response) {
+							console.log(response.statusCode) // 200
+							console.log(response.headers['content-type']) // 'image/png'
+  						})
+						.on('error', function(err) {
+							console.log(err)
+						})
+					;
+				}
+
+			} else {
+				console.log("process units");
+				for (var key in sensorDefs[i].units) {
+					var _sensor	= sensorDefs[i].units[key];
+				    console.log("process unit " + key);
+				
+					if (_sensor.total.measurementCount > 0) {
+						sensorDefs[i].processResult(key); 
+				
+						sensorDefs[i].file	= resultsFolder + sensorDefs[i].fileName + '_' + fileDateString + '_result' + sensorFileExtension;
+						fs.appendFile(sensorDefs[i].file, sensorDefs[i].record, function (err) {
+							if (err != null) {
+								console.log('Error writing header to results file: ' + err);
+							}
+						});
+						var data			= {};
+						data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;  
+						data.sensorSystem		= sensorDefs[i].sensorSystem;
+						data.foi				= 'SCRP' + unit.id + key;	
+						data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;	
+						data.cityCode			= 'GM0439'; //geoLocation.cityCode;	
+						data.cityName			= '..'; //geoLocation.cityName;
+						data.categories			= [];
+						data.observation		= sensorDefs[i].result.observations;
+				
+				
+						var _url = openiodUrl + '/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&offering=offering_0439_initial&commit=true';
+						_url = _url + '&sensorsystem=' + data.sensorSystem + '&region=0439' + '&foi=' + data.foi + '&neighborhoodcode=' + data.neighborhoodCode + '&citycode=' + data.cityCode + '&observation=' + data.observation ;
+		
+						console.log(_url);
+						request.get(_url)
+							.on('response', function(response) {
+								console.log(response.statusCode) // 200
+								console.log(response.headers['content-type']) // 'image/png'
+  							})
+							.on('error', function(err) {
+								console.log(err)
+							})
+						;
+					}
+				}
+
+
 			}
 		}
 

@@ -35,7 +35,7 @@
 #include "ApriSensorCombi2.h"
 #include <AES.h>
 
-uint8_t UNIT_ID = 1; // todo: dipswitch or otherwise?
+uint8_t UNIT_ID = 4; // todo: dipswitch or otherwise?
 
 long sessionNr;
 //byte byteHigh;

@@ -25,7 +25,7 @@ uint16_t serial2Available;
 RH_ASK rfDriver;
 // RH_ASK rfDriver(2000, 2, 4, 5); // ESP8266: do not use pin 11
 // RF
-SoftwareSerial Serial2(SERPORT_RX, SERPORT_RX);
+SoftwareSerial SerialPms(SERPORT_RX, SERPORT_RX);
 
 
 namespace aprisensorns {
@@ -38,6 +38,8 @@ class Sensor {
     unsigned long nowTime;
     long measurements[PMSOUTPUTS];
     long totals[PMSOUTPUTS];
+    long lowest[PMSOUTPUTS];
+    long highest[PMSOUTPUTS];
     long results[PMSOUTPUTS];
     unsigned long transactionTime; // 20 seconds per transaction, send measurement
     const unsigned long transactionTimeMax = 20000; // milliseconds per transaction period, then send message
@@ -68,7 +70,7 @@ class Sensor {
     Sensor() {};
     void init() {
       this->sensorData.messageNr = 0;
-      Serial2.begin(9600);
+      SerialPms.begin(9600);
       this->rfRepeatTime = 0;  //
       this->transactionTime = millis();
       this->initTotals();
@@ -100,19 +102,21 @@ class Sensor {
     };
     void setState(State state) {};
     void readUInt16(uint16_t* value, uint16_t* inputChecksum) {
-      int inputHigh = Serial2.read();
-      int inputLow = Serial2.read();
+      int inputHigh = SerialPms.read();
+      int inputLow = SerialPms.read();
       *inputChecksum += inputHigh + inputLow;
       *value = inputLow + (inputHigh << 8);
     };
     void readInt(uint8_t* value, uint16_t* inputChecksum) {
-      *value = Serial2.read();
+      *value = SerialPms.read();
       *inputChecksum += *value;
       return;
     };
     void processPmsRF() {
       this->nrOfMeasurements++;
       for (int i = 0; i < PMSOUTPUTS; i++) {
+        if (measurements[i] < this->lowest[i]) this->lowest[i] = measurements[i];
+        if (measurements[i] > this->highest[i]) this->highest[i] = measurements[i];
         this->totals[i] += measurements[i];
       }
       nowTime = millis();
@@ -152,6 +156,16 @@ class Sensor {
       }
       Serial.print("\n");
       for (int i = 0; i < PMSRESULTS; i++) {
+        Serial.print(this->lowest[i]);
+        Serial.print(";\t");
+      }
+      Serial.print("\n");
+      for (int i = 0; i < PMSRESULTS; i++) {
+        Serial.print(this->highest[i]);
+        Serial.print(";\t");
+      }
+      Serial.print("\n");
+      for (int i = 0; i < PMSRESULTS; i++) {
         Serial.print(this->results[i]);
         Serial.print(";\t");
       }
@@ -181,6 +195,8 @@ class Sensor {
     void initTotals() {
       for (int i = 0; i < PMSOUTPUTS; i++) {
         this->totals[i] = 0;
+        this->lowest[i] = 999999;
+        this->highest[i] = -999999;
       }
       this->nrOfMeasurements = 0;
     }
@@ -241,9 +257,19 @@ class Sensor {
       //  for(i==0;i<PMSRESULTSRF;i++) {  // only first x measurements for RF transmit
       //    pmsResultsRF[i] = round(this->totals[i]/this->nrOfMeasurements);
       //  }
+      bool corrLowHigh = false;
+      long _nrOfMeasurements = this->nrOfMeasurements;
+      if (_nrOfMeasurements>3) { // ignore highest / lowest values
+          _nrOfMeasurements -= 2 ;
+          corrLowHigh = true;
+      }
 
       for (i = 0; i < PMSOUTPUTS; i++) { // only first 3 measurements for RF transmit
-        this->results[i] = (((this->totals[i] * 100) / this->nrOfMeasurements) + .49) / 10;
+        if (corrLowHigh) {
+          this->totals[i] -= this->highest[i];
+          this->totals[i] -= this->lowest[i];          
+        }
+        this->results[i] = (((this->totals[i] * 100) / _nrOfMeasurements ) + .49) / 10;
         //    long tmpResult = round(this->totals[i] / this->nrOfMeasurements);
         //    long tmpResult = round((this->totals[i]*10) / this->nrOfMeasurements);
         //    this->results[i] = tmpResult;
@@ -254,7 +280,7 @@ class Sensor {
 
     };
     bool serialReady() {
-      if (Serial2) return true; else return false;
+      if (SerialPms) return true; else return false;
     }
     bool readData() {
 
@@ -275,7 +301,7 @@ class Sensor {
       uint16_t checksum;
       uint16_t inputChecksum;
 
-      serial2Available = Serial2.available();
+      serial2Available = SerialPms.available();
 
       if (serial2Available < 32) {
         return;
@@ -347,8 +373,8 @@ class Sensor {
       if (version == 145) this->sensorType = S_PMSA003; // "PMSA003";
 
       // read sensor record checksum
-      uint8_t inputHigh = Serial2.read();
-      uint8_t inputLow  = Serial2.read();
+      uint8_t inputHigh = SerialPms.read();
+      uint8_t inputLow  = SerialPms.read();
       checksum  = inputLow + (inputHigh << 8);
 
       if (checksum != inputChecksum) {
@@ -364,7 +390,7 @@ class Sensor {
         }
       }
 
-      while (Serial2.read() != -1) {}; //clear buffer
+      while (SerialPms.read() != -1) {}; //clear buffer
 
       //delay(700);  // 700 when other sensors not included // higher will get you checksum errors
       //delay(1000);     // 50  when other sensors are included //higher will get you checksum errors

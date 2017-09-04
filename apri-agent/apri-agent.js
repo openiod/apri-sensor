@@ -197,7 +197,7 @@ var getUsbPorts	= function() {
 var getMacAddress	= function(networkInterface) {
 	var fileName	= '/sys/class/net/' + networkInterface + '/address';
 	fs.readFile(fileName, "utf8", function (err, data) {
-        if (err) {
+        if (err || data == undefined) {
 			macAddress[networkInterface]	= null;
 			console.log('Network interface not available: ' + networkInterface);
 			return;

@@ -32,35 +32,30 @@
 
 //-----------------------------------------------------------------------------
 
-#include "ApriSensorCombi2.h"
-#include <AES.h>
-
-uint8_t UNIT_ID = 4; // todo: dipswitch or otherwise?
-
-long sessionNr;
-//byte byteHigh;
-//byte byteLow;
-
-
 #include <Wire.h>
-#include <Adafruit_BMP280.h>
+#include <AM2320.h>
 
-unsigned long loopStartTime;
-unsigned long loopTime = 0;
-//int analogFanPin = 7;
+#include <RH_ASK.h>
+//#include <SPI.h> // Not actually used but needed to compile
+RH_ASK rfDriver;
+// RH_ASK rfDriver(2000, 2, 4, 5); // ESP8266: do not use pin 11
+// RF
 
-// available sensors
-//boolean BMP280_available = false;
-//boolean AM2320_available = false;
-//boolean DS18B20_available = false;
-//boolean PMSx003_available = false;
-//boolean MQ131_available = false;
+const uint8_t CHANNEL_ID = 123; // default channelId use setChannel/getChannel methodes to set/get channel id
+const uint8_t UNIT_ID = 5; // todo: dipswitch or otherwise?
 
-#define BMP_SCK 13
-#define BMP_MISO 12
-#define BMP_MOSI 11
-#define BMP_CS 10
+#include "ApriSensor.h"
+#include "ApriSensorPmsx003.h"
+#include "ApriSensorBmp280.h"
+#include "ApriSensorAm2320.h"
+#include "ApriSensorDs18b20.h"
 
+//#include <AES.h>
+
+
+//long sessionNr;
+//unsigned long loopStartTime;
+//unsigned long loopTime = 0;
 
 /*
   Adafruit_BMP280 bmp; // I2C
@@ -88,20 +83,26 @@ unsigned long loopTime = 0;
   #define TEMPERATURE_PRECISION 12 // 12=higher resolution
   // Temperature DS18B20 ====
 */
-
+/*
 // ozone MQ131  ====
 int mq131AnalogPin = 3;     // potentiometer wiper (middle terminal) connected to analog pin 3
 //int mq131AnalogPin4 = 4;
 int mq131Val = 0;           // variable to store the value read
 // ozone MQ131  ====
+*/
 
 void setup() {
   Serial.begin(9600);
   while (!Serial) {
   }
   Serial.println("Setup start");
+  if (!rfDriver.init()) {
+    Serial.println("RF init failed");
+  }
 
-  /*
+
+  //Wire.begin();
+ /*
       bmp.begin();
     //    while (!bmp.begin()) {
     //      Serial.println("Could not find a valid BMP280 sensor, check wiring!");
@@ -195,24 +196,58 @@ void setup() {
       Serial.print (analogRead (mq131AnalogPin4) * 5.0 / 1024) ; Serial.println ("V when an output") ;Serial.println (analogRead (mq131AnalogPin4) ) ;
   */
 
-  pinMode(mq131AnalogPin, INPUT);
-  //   digitalWrite(mq131AnalogPin, INPUT_PULLUP);
+//  pinMode(mq131AnalogPin, INPUT);
+//  //   digitalWrite(mq131AnalogPin, INPUT_PULLUP);
 
-  Serial.println("Sensors ready");
+//  Serial.println("Sensors ready");
 
-  delay(4000); // 5 sec delay for sensors to start / initiate
+  delay(6000); // 6 sec delay for sensors to start / initiate
   // analogWrite(analogFanPin,255);
-  delay(1000); // 5 sec delay for sensors to start / initiate
-  loopStartTime = millis();
-  delay(1);
+//  delay(1000); // 5 sec delay for sensors to start / initiate
+//  loopStartTime = millis();
+//  delay(1);
 }
 
 void loop() {
 
-  aprisensorns::Sensor mySensor;
-  mySensor.setState('On');
-  mySensor.init();
-  mySensor.setUnitId(UNIT_ID); 
+/*  switch(th.Read()) {
+    case 2:
+      Serial.println("CRC failed");
+      break;
+    case 1:
+      Serial.println("Sensor offline");
+      break;
+    case 0:
+      Serial.println("");
+      Serial.print("AM2320");
+      Serial.print(';');
+      Serial.print(th.h);
+      Serial.print(';');
+//      Serial.print("%, temperature: ");
+      Serial.print(th.t);
+//      Serial.println("*C");
+      break;
+  }
+*/
+  aprisensor_ns::Pmsx003Sensor pmsx003Sensor;
+//  pmsx003Sensor.setState('On');
+  pmsx003Sensor.init();
+//  pmsx003Sensor.setUnitId(UNIT_ID); 
+
+  aprisensor_ns::Bmp280Sensor bmp280Sensor;
+//  bmp280Sensor.setState('On');
+  bmp280Sensor.init();
+//  bmp280Sensor.setUnitId(UNIT_ID); 
+
+  aprisensor_ns::Am2320Sensor am2320Sensor;
+//  am2320Sensor.setState('On');
+  am2320Sensor.init();
+//  am2320Sensor.setUnitId(UNIT_ID); 
+
+  aprisensor_ns::Ds18b20Sensor ds18b20Sensor;
+//  ds18b20Sensor.setState('On');
+  ds18b20Sensor.init();
+//  ds18b20Sensor.setUnitId(UNIT_ID); 
 
   /*
     bool BMP280_read() {
@@ -317,31 +352,34 @@ void loop() {
   */
 
   while (1) {
-    loopTime = millis() - loopStartTime;
 
-    if (loopTime > 1000)
-    {
-      //      BMP280_read();
-      //      AM2320_read();
-      //      DS18B20_read();
-      // MQ131_read();
-      loopStartTime = millis();  //restart measure cycle
-    }
 
-    //    BMP280_read();
-    //    AM2320_read();
-    //    DS18B20_read();
-    //    MQ131_read();
-    //    delay(1000);
-    //    return;
-    //  }
-
+// pms werkt samen met sd18b20
+/*
+ * 
+ */
     //Serial.println("Sensor PMS7003 get sensor data");
     // fine dust PMS7003/A003 =====
-    if (mySensor.serialReady() ) {
-      mySensor.readData();
+    if (pmsx003Sensor.serialReady() ) {
+      pmsx003Sensor.readData();
     }
-    // fine dust PMS7003/A003 =====
+
+
+
+    if (bmp280Sensor.serialReady() ) {
+//      Serial.print("BMP280");
+      bmp280Sensor.readData();
+    }  
+
+//Serial.print(".");
+//    if (am2320Sensor.serialReady()==0 ) {
+//      Serial.print("AM2320");
+      am2320Sensor.readData();
+//    }  
+//delay(100);
+   // if (ds18b20Sensor.serialReady()==0 ) {
+      ds18b20Sensor.readData();
+    //}  
 
   }
 

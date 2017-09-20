@@ -153,13 +153,11 @@ class Bmp280Sensor {
 
       printPrefix(MEASUREMENT);Serial.print("BMP280");
       Serial.print(";");
-      Serial.print(this->results[0]);
+      Serial.print(this->results[0]); // pressureHPa
       Serial.print(";");
-      Serial.print(this->results[1]);
+      Serial.print(this->results[2]); // temperature
       Serial.print(";");
-      Serial.print(this->results[2]); 
-      Serial.print(";");
-      Serial.print(this->results[3]); 
+      Serial.print(this->results[3]); // altitude
       Serial.println();
 
     };

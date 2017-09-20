@@ -42,8 +42,8 @@ sensor	: {
 	}	
 	, addMeasurement: function(data) {
 		this.total.measurementCount	++;
-		this.total.rHum				+= parseFloat(data[1]);
-		this.total.temperature		+= parseFloat(data[2]);
+		this.total.rHum				+= parseFloat(data[1])\10;
+		this.total.temperature		+= parseFloat(data[2])\10;
 		this.total.measurementTime	= new Date();
 		if (this.total.measurementTimeStart == undefined) this.total.measurementTimeStart = this.total.measurementTime;
 	}

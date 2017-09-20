@@ -31,7 +31,7 @@ sensor	: {
 		this.total.temperature		= 0;
 		}
 	, isSensorType: function(data) {
-		var _dataPrefix = _dataArray[0].split('@');
+		var _dataPrefix = data[0].split('@');
 		if (_dataPrefix[2] != this.id ) return false;
 		// test data
 		if (data.length == 4 

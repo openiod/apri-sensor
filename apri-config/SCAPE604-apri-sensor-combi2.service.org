@@ -1,0 +1,9 @@
+[Unit]
+Desription=SCAPE604-apri-sensor-combi2 - start or restart apri-sensor-combi2 service, respawn
+After=network.target
+[Service]
+ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-combi2/apri-sensor-combi2.sh /opt/SCAPE604/log/SCAPE604-apri-sensor-combi2.log
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

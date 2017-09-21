@@ -33,7 +33,7 @@ sensor	: {
 		var _dataPrefix = data[0].split('@');
 		if (_dataPrefix[2] != this.id ) return false;
 		// test data
-		if (data.length == 3 && isNumeric(data[1] && isNumeric(data[2]) ) {
+		if (data.length == 3 && isNumeric(data[1]) && isNumeric(data[2]) ) {
 			if (this.total.measurementCount == undefined) this.init();
 			return true;
 		};

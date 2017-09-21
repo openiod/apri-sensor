@@ -37,7 +37,7 @@ sensor	: {
 		if (data.length == 5 
 			&& isNumeric(data[1]) 
 			&& isNumeric(data[2]) 
-			&& isNumeric(data[3]
+			&& isNumeric(data[3])
 			&& isNumeric(data[4]) ) {
 			if (this.total.measurementCount == undefined) this.init();
 			return true;

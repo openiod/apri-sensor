@@ -34,7 +34,7 @@ sensor	: {
 		var _dataPrefix = data[0].split('@');
 		if (_dataPrefix[2] != this.id ) return false;
 		// test data
-		if (data.length == 3 && isNumeric(data[1]) && isNumeric(data[2]) ) {
+		if (data.length == 4 && isNumeric(data[1]) && isNumeric(data[2]&& isNumeric(data[3]) ) {
 			if (this.total.measurementCount == undefined) this.init();
 			return true;
 		};
@@ -42,8 +42,8 @@ sensor	: {
 	}	
 	, addMeasurement: function(data) {
 		this.total.measurementCount	++;
-		this.total.rHum				+= parseFloat(data[1])/10;
-		this.total.temperature		+= parseFloat(data[2])/10;
+		this.total.rHum				+= parseFloat(data[2])/10;
+		this.total.temperature		+= parseFloat(data[3])/10;
 		this.total.measurementTime	= new Date();
 		if (this.total.measurementTimeStart == undefined) this.total.measurementTimeStart = this.total.measurementTime;
 	}

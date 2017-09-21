@@ -39,7 +39,14 @@ RH_ASK rfDriver;
 // RH_ASK rfDriver(2000, 2, 4, 5); // ESP8266: do not use pin 11
 // RF
 
-const uint8_t CHANNEL_ID = 123; // default channelId use setChannel/getChannel methodes to set/get channel id
+const byte channelId4b = 7;  // 0-15 left 4 bits for channel identification, xxxx .... -> 1111 0000 = channel 15
+const byte extenderId2b = 0; // 1-7, 0 is for sensor. left most 2 bits of right most 4 bits for extender identification, .... xx.. = extender 3 of channel 15 
+// extender skips messages sent by the same extender by checking extenderId bits. Retransmitted messages get +1 until rightmost two bits = 11 
+// when extending a message, the channelId will ++ (plus one) until max '11b' = 3
+// sensor sends ccccxx00. first extender: ccccxx01, second ccccxx10, third and last try: ccccxx11
+// extender fills in its own extenderid when extending a message.
+
+const uint8_t CHANNEL_ID = channelId4b<<4; // default channelId use setChannel/getChannel methodes to set/get channel id. extenderId=0,msgcount=0;
 const uint8_t UNIT_ID = 5; // todo: dipswitch or otherwise?
 
 #include "ApriSensorMeteo.h"

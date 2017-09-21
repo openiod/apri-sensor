@@ -4,8 +4,8 @@
 #define MSGTYPE_NEW 'N'
 #define MSGTYPE_REPEAT 'R'
 #define MSGTYPE_INFO 'I'
-
-#define MSGLENGTH_82 12  // 82=S_PMSA003
+#define MSGTYPE_EXTEND 'X' // retransmitted by "jumper transciever" or message extender;
+#define MSGTYPE_EXTENDR 'Y' // Repeated message retransmitted by "jumper transciever" or message extender;
 
 // sensortypes
 #define S_DS18B20 51  // DS18B20
@@ -27,10 +27,6 @@
 #define MSGMAXLENGTH 15 // maximum buffer length message
 #define DATAINDEXMAX 10 // max different channel/unit/sensor types combinations (PMS7003/PMSA003/DS18B20/AM2320/BMP280/etc.) 
 
-char INFO = 'I';
-char ERROR = 'E';
-char WARNING = 'W';
-char MEASUREMENT = 'M';
 
 //#include <SoftwareSerial.h>
 //uint16_t serial2Available;
@@ -59,7 +55,7 @@ class Receiver {
 //    unsigned long prevMsgNr_PMSA003Time = 0;
     static const int dataIndexMax = 6;
     struct SensorData {
-      uint8_t channelId;
+      uint8_t msgChannelNr;
       uint8_t unitId;
       uint8_t sensorType;
       uint8_t msgType;
@@ -75,7 +71,7 @@ class Receiver {
     void init() {
       rfDriverPtr = &rfDriver;
       for (int i=0;i<dataIndexMax;i++) {
-        sensorDataArray[i].channelId = 0;
+        sensorDataArray[i].msgChannelNr = 0;
         sensorDataArray[i].unitId = 0;
         sensorDataArray[i].sensorType = 0;    
         sensorDataArray[i].msgType = 0;
@@ -85,14 +81,11 @@ class Receiver {
       }
       if ((*rfDriverPtr).init()) {receiverState = true;}
     }
-//    uint16_t getPointer() {return this->rfDriverPtr;}  
-
     void receiveData() {
       uint8_t buf[RH_ASK_MAX_MESSAGE_LEN];
       uint8_t buflen = sizeof(buf);
       //Serial.println("loop");
 
-//      if (rfDriver.recv(buf, &buflen)) // Non-blocking
       if ((*rfDriverPtr).recv(buf, &buflen)) { // Non-blocking      
         int index = -1;
         if (buflen == 0) {
@@ -100,37 +93,97 @@ class Receiver {
           return; //message ingnored
         }
         byte channelId = buf[0];
-        if (channelId != 123) {
+        byte msgChannelNr = channelId>>4;
+        byte msgChannelNrInId = msgChannelNr<<4;
+        byte msgExtNr = (channelId - msgChannelNrInId) >>2;
+        byte msgExtNrInId = msgExtNr<<2;
+        byte msgCycle = channelId - msgChannelNrInId - msgExtNrInId;
+        
+        if (msgChannelNr != channelId4b ) {
           Serial.print("E@Invalid ApriSensor message received, first byte value: ");
           Serial.println(buf[0]);
           return; //message discarded
         }
+        if (repeater && msgExtNr == extenderId2b ) {  // skip its own sent messages
+          Serial.print("W@Extender skipped its own sent message (first byte): ");
+          Serial.println(buf[0]);
+          return; //message discarded
+        }
+
         byte unitId = buf[1];
         byte sensorType = buf[2];
         char msgType = buf[3];
         byte msgNr = buf[4];
         byte delayTime = buf[5];
 
+        //if (repeater and msgType == MSGTYPE_EXTEND) return; // skip extended messages or should it always retranscieve messages?
+        // or maybe transmit it true extended channel (channel+1) to prevent looping msg to itself.
+          
+        if (repeater) {  //act as an extender
+          buf[3] = MSGTYPE_EXTEND;
+ //         byte _id = buf[0];
+ //         byte _tmpCh = _id>>4<<4;
+ //         byte _tmpExt = (_id-_tmpCh)>>2;
+ //         byte _tmpCycle = (_id-_id>>6<<6);
+          //Serial.print(_tmpCycle);
+          if (msgExtNr==extenderId2b) {
+            Serial.print("W@Message from own extender ignored ");
+            Serial.print(msgExtNr);
+            Serial.print(' ');
+            Serial.print(extenderId2b);
+            Serial.print('\n');
+            return; //Message from own extender ignored
+          }
+          if (msgCycle>=3) {
+            Serial.print("E@Max extends reached ");
+            Serial.print(msgChannelNr);
+            Serial.print(' ');
+            Serial.print(msgExtNr);
+            Serial.print(' ');
+            Serial.print(msgCycle);
+            Serial.print(' ');
+            Serial.print(extenderId2b);
+            Serial.print('\n');
+            return; // max extends reached, skip/ stop extending this message
+          }
+          byte _tmpExtNew = extenderId2b<<2;
+          byte _newId = msgChannelNrInId + msgExtNrInId + msgCycle; 
+ //           Serial.print("I@Test ");
+ //           Serial.print(_tmpExtNew);
+ //           Serial.print(' ');
+ //           Serial.print(_tmpCycle);
+ //           Serial.print('\n');
+          
+          buf[0]= _newId+1;  // increase channelnr to prevent looping msg's
+          Serial.print("X@Extend message");
+          Serial.print(buf[0]);
+          Serial.print(' ');
+          Serial.print(buf[1]);
+          Serial.print(sensorType);
+          Serial.print(msgType);
+          Serial.print(buf[4]);          
+          Serial.print(';');
+          Serial.print(buflen);
+          Serial.print('\n');
+          rfDriver.send(buf, buflen);
+          rfDriver.waitPacketSent();
+          return;
+        }
+        
+
         // find index in array for message with channel, unit, sensorType or init new entry
         for (int i=0;i<dataIndexMax;i++) {
-          if (sensorDataArray[i].channelId == channelId &&
+          if (sensorDataArray[i].msgChannelNr == msgChannelNr &&
               sensorDataArray[i].unitId == unitId &&
               sensorDataArray[i].sensorType == sensorType
           ) {
             index = i;
             break;
           }
-          if (sensorDataArray[i].channelId == 0) {
-            sensorDataArray[i].channelId = channelId;
+          if (sensorDataArray[i].msgChannelNr == 0) {
+            sensorDataArray[i].msgChannelNr = msgChannelNr;
             sensorDataArray[i].unitId = unitId;
             sensorDataArray[i].sensorType = sensorType;
-            index = i;
-            break;
-          }
-          if (sensorDataArray[i].channelId == channelId &&
-              sensorDataArray[i].unitId == unitId &&
-              sensorDataArray[i].sensorType == sensorType
-          ) {
             index = i;
             break;
           }
@@ -147,6 +200,13 @@ class Receiver {
           return;
         }
 
+        if (sensorDataArray[index].prevMsgNr == msgNr) {
+         // Serial.print("I@Repeated or Extended message already recieved. Ignoring ");
+         // Serial.print(msgType);
+         // Serial.print('\n');
+          return;
+        }
+
         if (sensorType == S_PMSA003) {
           uint16_t pm1  = buf[6] << 8;
           pm1 += buf[7];
@@ -155,13 +215,13 @@ class Receiver {
           uint16_t pm10 = buf[10] << 8;
           pm10 += buf[11];
 
-          if ( msgType == MSGTYPE_REPEAT ) {
+          if ( msgType == MSGTYPE_REPEAT || msgType == MSGTYPE_EXTENDR ) {
             if ( msgNr == sensorDataArray[index].prevMsgNr) {
               //Serial.println("repeated message already received, ignore.");
               //Serial.print(".");  // signal for received message
               return;
             }
-            Serial.print("I@nrepeated message received as new, processing. Delaytime: ");
+            Serial.print("I@repeated message received as new, processing. Delaytime: ");
             Serial.print(delayTime);
             Serial.print(" channel:");
             Serial.print(channelId);
@@ -193,13 +253,11 @@ class Receiver {
           if (sensorType ==  S_PMSA003) strncpy(sensorId, S_PMSA003_ID,20);
          
           // first the ID for ApriSensor system eg. "RF_PMSA003"
-          Serial.print("M@RF_");
-          Serial.print(sensorId);
-          Serial.print(";*RF");
+          Serial.print("M@RF");
           Serial.print(channelId);
           Serial.print("*");
           Serial.print(unitId);
-          Serial.print(";");
+          Serial.print("@");
           Serial.print(sensorId);
           Serial.print(";");
           Serial.print(msgNr);
@@ -221,7 +279,7 @@ class Receiver {
           uint16_t temperature  = buf[6] << 8;
           temperature += buf[7];
 
-          if ( msgType == MSGTYPE_REPEAT ) {
+          if ( msgType == MSGTYPE_REPEAT || msgType == MSGTYPE_EXTENDR ) {
             if ( msgNr == sensorDataArray[index].prevMsgNr) {
               //Serial.println("repeated message already received, ignore.");
               //Serial.print(".");  // signal for received message
@@ -250,7 +308,20 @@ class Receiver {
               Serial.print(" in  ");
               unsigned long diffTime = (millis() - sensorDataArray[index].prevMsgTime) / 1000;
               Serial.print(diffTime);
-              Serial.println(" seconds.");
+              Serial.print(" seconds. ");
+              Serial.print(delayTime);
+/*            Serial.print(" channel:");
+            Serial.print(channelId);
+            Serial.print(" Unit:");
+            Serial.print(unitId);
+            Serial.print(" Sensor:");
+            Serial.print(sensorType);              
+            Serial.print(" Msgnr:");
+            Serial.print(msgNr);              
+            Serial.print(" MsgnrPrev:");
+            Serial.print(prev);              
+*/
+              Serial.print('\n');
             }
           }
 
@@ -259,13 +330,11 @@ class Receiver {
           //if (sensorType ==  S_PMSA003) strncpy(sensorId, S_PMSA003_ID,20);
          
           // first the ID for ApriSensor system eg. "RF_DS18B20"
-          Serial.print("M@RF_");
-          Serial.print(sensorId);
-          Serial.print(";*RF");
+          Serial.print("M@RF");
           Serial.print(channelId);
           Serial.print("*");
           Serial.print(unitId);
-          Serial.print(";");
+          Serial.print("@");
           Serial.print(sensorId);
           Serial.print(";");
           Serial.print(msgNr);
@@ -285,7 +354,7 @@ class Receiver {
           uint16_t temperature  = buf[8] << 8;
           temperature += buf[9];
 
-          if ( msgType == MSGTYPE_REPEAT ) {
+          if ( msgType == MSGTYPE_REPEAT || msgType == MSGTYPE_EXTENDR ) {
             if ( msgNr == sensorDataArray[index].prevMsgNr) {
               //Serial.println("repeated message already received, ignore.");
               //Serial.print(".");  // signal for received message
@@ -323,13 +392,11 @@ class Receiver {
           //if (sensorType ==  S_PMSA003) strncpy(sensorId, S_PMSA003_ID,20);
          
           // first the ID for ApriSensor system eg. "RF_AM2320"
-          Serial.print("M@RF_");
-          Serial.print(sensorId);
-          Serial.print(";*RF");
+          Serial.print("M@RF");
           Serial.print(channelId);
           Serial.print("*");
           Serial.print(unitId);
-          Serial.print(";");
+          Serial.print("@");
           Serial.print(sensorId);
           Serial.print(";");
           Serial.print(msgNr);
@@ -353,7 +420,7 @@ class Receiver {
           uint16_t altitude  = buf[10] << 8;
           altitude += buf[11];
 
-          if ( msgType == MSGTYPE_REPEAT ) {
+          if ( msgType == MSGTYPE_REPEAT || msgType == MSGTYPE_EXTENDR ) {
             if ( msgNr == sensorDataArray[index].prevMsgNr) {
               //Serial.println("repeated message already received, ignore.");
               //Serial.print(".");  // signal for received message
@@ -391,13 +458,11 @@ class Receiver {
           //if (sensorType ==  S_PMSA003) strncpy(sensorId, S_PMSA003_ID,20);
          
           // first the ID for ApriSensor system eg. "RF_BMP280"
-          Serial.print("M@RF_");
-          Serial.print(sensorId);
-          Serial.print(";*RF");
+          Serial.print("M@RF");
           Serial.print(channelId);
           Serial.print("*");
           Serial.print(unitId);
-          Serial.print(";");
+          Serial.print("@");
           Serial.print(sensorId);
           Serial.print(";");
           Serial.print(msgNr);

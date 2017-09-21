@@ -68,7 +68,7 @@ sensor	: {
 			this.total.type = 'RF';
 			this.total.concPM1_0_CF1	+= parseFloat(data[2]);						
 			this.total.concPM2_5_CF1	+= parseFloat(data[3]);
-			this.total.concPM10_0_CF1	+= parseFloat(data[5]);
+			this.total.concPM10_0_CF1	+= parseFloat(data[4]);
 		} else {
 			this.total.type = '01';
 			this.total.concPM1_0_CF1	+= parseFloat(data[1]);						

@@ -254,7 +254,7 @@ class Receiver {
          
           // first the ID for ApriSensor system eg. "RF_PMSA003"
           Serial.print("M@RF");
-          Serial.print(channelId);
+          Serial.print(msgChannelNr);
           Serial.print("*");
           Serial.print(unitId);
           Serial.print("@");

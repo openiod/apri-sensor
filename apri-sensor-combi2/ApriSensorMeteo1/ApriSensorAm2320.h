@@ -109,7 +109,7 @@ class Am2320Sensor {
       Serial.print("\n");
 */
 
-      rfBuf[0] = CHANNEL_ID;
+      rfBuf[0] = MSG_ID;
       rfBuf[1] = UNIT_ID;
       rfBuf[2] = this->sensorType;
       rfBuf[3] = 0; // msgType initiated when calling function sendRfMessage
@@ -126,7 +126,7 @@ class Am2320Sensor {
       this->transactionTime = millis();
       initTotals();
 
-      printPrefix(MEASUREMENT);Serial.print("AM2320");
+      printPrefix(MEASUREMENT);Serial.print(this->sensorType);
       Serial.print(";");
       Serial.print(this->results[0]);
       Serial.print(";");

@@ -199,7 +199,7 @@ class Ds18b20Sensor {
       Serial.print("\n");
 */
 
-      rfBuf[0] = CHANNEL_ID;
+      rfBuf[0] = MSG_ID;
       rfBuf[1] = UNIT_ID;
       rfBuf[2] = this->sensorType;
       rfBuf[3] = 0; // msgType initiated when calling function sendRfMessage
@@ -214,7 +214,7 @@ class Ds18b20Sensor {
       this->transactionTime = millis();
       initTotals();
 
-      printPrefix(MEASUREMENT);Serial.print("DS18B20");
+      printPrefix(MEASUREMENT);Serial.print(this->sensorType);
       Serial.print(";");
       Serial.print(this->results[0]);
       Serial.println();

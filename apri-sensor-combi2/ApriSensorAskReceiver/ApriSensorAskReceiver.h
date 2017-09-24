@@ -331,7 +331,7 @@ class Receiver {
          
           // first the ID for ApriSensor system eg. "RF_DS18B20"
           Serial.print("M@RF");
-          Serial.print(channelId);
+          Serial.print(msgChannelNr);
           Serial.print("*");
           Serial.print(unitId);
           Serial.print("@");
@@ -393,7 +393,7 @@ class Receiver {
          
           // first the ID for ApriSensor system eg. "RF_AM2320"
           Serial.print("M@RF");
-          Serial.print(channelId);
+          Serial.print(msgChannelNr);
           Serial.print("*");
           Serial.print(unitId);
           Serial.print("@");
@@ -459,7 +459,7 @@ class Receiver {
          
           // first the ID for ApriSensor system eg. "RF_BMP280"
           Serial.print("M@RF");
-          Serial.print(channelId);
+          Serial.print(msgChannelNr);
           Serial.print("*");
           Serial.print(unitId);
           Serial.print("@");

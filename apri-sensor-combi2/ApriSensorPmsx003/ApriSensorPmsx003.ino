@@ -30,9 +30,6 @@
 
 //-----------------------------------------------------------------------------
 
-#include <Wire.h>
-#include <AM2320.h>
-
 #include <RH_ASK.h>
 //#include <SPI.h> // Not actually used but needed to compile
 RH_ASK rfDriver;
@@ -47,12 +44,10 @@ const byte extenderId2b = 0; // 1-7, 0 is for sensor. left most 2 bits of right 
 // extender fills in its own extenderid when extending a message.
 
 const uint8_t MSG_ID = channelId4b<<4; // default channelId use setChannel/getChannel methodes to set/get channel id. extenderId=0,msgcount=0;
-const uint8_t UNIT_ID = 5; // todo: dipswitch or otherwise?
+const uint8_t UNIT_ID = 1; // todo: dipswitch or otherwise?
 
-#include "ApriSensorMeteo.h"
-#include "ApriSensorBmp280.h"
-#include "ApriSensorAm2320.h"
-#include "ApriSensorDs18b20.h"
+#include "ApriSensorAll.h"
+#include "ApriSensorPmsx003.h"
 
 //#include <AES.h> //todo encryption
 
@@ -62,12 +57,12 @@ void setup() {
   Serial.begin(9600);
   while (!Serial) {
   }
-  printPrefix(MSGTYPE_INFO);Serial.print("Setup start\n");
+  printPrefix(INFO);Serial.print("Setup start\n");
   if (!rfDriver.init()) {
-    printPrefix(MSGTYPE_INFO);Serial.print("RF init failed\n");
+    printPrefix(INFO);Serial.print("RF init failed\n");
   }
 
-  printPrefix(MSGTYPE_INFO);Serial.print("Sensors ready\n");
+  printPrefix(INFO);Serial.print("Sensors ready\n");
 
   delay(2000); // 2 sec delay for sensors to start / initiate
 
@@ -75,28 +70,13 @@ void setup() {
 
 void loop() {
 
-  aprisensor_ns::Bmp280Sensor bmp280Sensor;
-  bmp280Sensor.init();
-
-  aprisensor_ns::Am2320Sensor am2320Sensor;
-  am2320Sensor.init();
-
-  aprisensor_ns::Ds18b20Sensor ds18b20Sensor;
-  ds18b20Sensor.init();
-
+  aprisensor_ns::Pmsx003Sensor pmsx003Sensor;
+  pmsx003Sensor.init();
 
   while (1) {
 
-//    printPrefix(INFO);Serial.print("BMP280");
-    bmp280Sensor.readData();
-
-//    printPrefix(INFO);Serial.print("AM2320");
-    am2320Sensor.readData();
-
-   // if (ds18b20Sensor.serialReady()==0 ) {
-      ds18b20Sensor.readData();
-    //}  
-
+    //printPrefix(INFO);Serial.print("PMSX003");
+    pmsx003Sensor.readData();
   }
 
 } // end loop()

@@ -29,15 +29,15 @@
 
 // this application can act like a reciever (base station reciever) or extender for extend the range of wireless transmit.
 
-const bool repeater = false;  // true=receive and direct re-transmit; false=connected to base station  
+const bool extender = false;  // true=receive and re-transmit; false=recieve only and send to connected base station   
 
 const byte channelId4b = 7;  // 1-15 left 4 bits for channel identification, xxxx .... -> 1111 0000 = channel 15. NOT ZERO!
-const byte extenderId2b = 1; // 1-7 (0 is for sensor, base reciever can be anything) left most 2 bits of right most 4 bits for extender identification, .... xx.. = extender 3 of channel 15 
+const byte extenderId2b = 2; // 1-7 (0 is for sensor, base reciever can be anything) left most 2 bits of right most 4 bits for extender identification, .... xx.. = extender 3 of channel 15 
 // extender skips messages sent by the same extender by checking extenderId bits. Retransmitted messages get +1 until rightmost two bits = 11 
 // when extending a message, the channelId will ++ (plus one) until max '11b' = 3
 // sensor sends ccccxx00. first extender: ccccxx01, second ccccxx10, third and last try: ccccxx11
 // extender fills in its own extenderid when extending a message.
-
+const bool debug = true;  //true for extra log messages
 
 #include "ApriSensorAskReceiver.h"
 
@@ -45,7 +45,8 @@ const byte extenderId2b = 1; // 1-7 (0 is for sensor, base reciever can be anyth
 void setup()
 {
   Serial.begin(9600);	// Debugging only
-  Serial.println("I@Receiver init succeeded");
+  Serial.print("I@Receiver init succeeded");
+  Serial.print("\r\n");
 }
 
 void loop()
@@ -54,7 +55,8 @@ void loop()
   aprisensor_ns::Receiver myReceiver;
   myReceiver.init();
 //  if (myReceiver.isActive() ) {
-    Serial.println("I@RF receiver is ready to receive data");
+    Serial.print("I@RF receiver is ready to receive data");
+    Serial.print("\r\n");
 //  }
 
   while (1) {

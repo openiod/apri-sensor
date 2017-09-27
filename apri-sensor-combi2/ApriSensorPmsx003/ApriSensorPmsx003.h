@@ -133,7 +133,7 @@ class Pmsx003Sensor {
       Serial.print(this->results[1]);
       Serial.print(";");
       Serial.print(this->results[2]);
-      Serial.print('\n');
+      Serial.print("\r\n");
     };
 
     void initTotals() {
@@ -151,8 +151,8 @@ class Pmsx003Sensor {
       if (msgType == MSGTYPE_REPEAT) {
         unsigned long rfDelayTime = millis() - this->rfSentMsgTime;
         if (rfDelayTime > this->rfDelayTimeMax) { // max delaytime exceeded, end processing repeat
-          //Serial.println("RF max repeat time exceeded, stop repeating this message");
-          //Serial.println(rfDelayTime);
+          //Serial.print("RF max repeat time exceeded, stop repeating this message");Serial.print("\r\n");
+          //Serial.print(rfDelayTime);Serial.print("\r\n");
           this->rfRepeatTime = 0; // stop repeating this message
           return;
         }
@@ -170,7 +170,8 @@ class Pmsx003Sensor {
       Serial.print(rfBuffer[2]);
       Serial.print(msgType);
       Serial.print(" #");
-      Serial.println(this->nrOfMeasurements);
+      Serial.print(this->nrOfMeasurements);
+      Serial.print("\r\n");
       
       rfDriver.send(rfBuffer, msgLength);
       rfDriver.waitPacketSent();
@@ -200,12 +201,12 @@ class Pmsx003Sensor {
     }
     bool readData() {
 //      if ( millis() - this->pmsx003MeasureTime < this->pmsx003MeasureInterval ) {
-//        //printPrefix(INFO);Serial.println("pmsx003 interval "); //delay(100);
+//        //printPrefix(INFO);Serial.print("pmsx003 interval ");Serial.print("\r\n"); //delay(100);
 //        return;
 //      }
       // wait some time while in init fase (also during soft reset)
       if ( millis() - this->pmsx003InitTime < this->pmsx003InitInterval ) {
-        //printPrefix(INFO);Serial.println("pmsx003 init fase");
+        //printPrefix(INFO);Serial.print("pmsx003 init fase");Serial.print("\r\n");
         return;
       }
       
@@ -249,7 +250,7 @@ class Pmsx003Sensor {
       this->measurements[0] = value;
       readUInt16(&value, &inputChecksum );  //pm2.5
       this->measurements[1] = value;
-            //Serial.print("\n");
+            //Serial.print("\r\n");
             //Serial.print(value);
       readUInt16(&value, &inputChecksum );  //pm10
       this->measurements[2] = value;
@@ -312,14 +313,15 @@ class Pmsx003Sensor {
 //            Serial.print(checksum);
 //            Serial.print(";");
 //            Serial.print(inputChecksum);
-            Serial.print("\nPMSx003 checksum error");
+            Serial.print("PMSx003 checksum error");
+            Serial.print("\r\n");
       } else {
         if (errorCode == 0) {
           // send message via RF
 //          this->measurements[0] = this->pm1;
 //          this->measurements[1] = this->pm25;
 //          this->measurements[2] = this->pm10;
-          //Serial.println("processing data PMSx003 RF");
+          //Serial.print("processing data PMSx003 RF");Serial.print("\r\n");
           processPmsRF();
         }
       }

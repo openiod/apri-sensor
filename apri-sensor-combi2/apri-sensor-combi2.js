@@ -89,7 +89,7 @@ var today				= new Date();
 
 var fileDateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today.getDate() + "_" + today.getHours(); // + ":" + today.getMinutes();
 
-
+var tmpPrefix;
 
 var mainProcess = function() {
 	
@@ -247,6 +247,15 @@ var mainProcess = function() {
 				return;
 			}
 */
+			tmpPrefix = data.substr(0,2);
+			if (tmpPrefix == 'I@' || tmpPrefix == 'W@') { // Information or Warning message
+				console.log(data);
+				return;
+			}
+			if (tmpPrefix == 'E@' ) { // Error message
+				console.log('**** ' + data);
+				return;
+			}
 			console.log('log not valid sensor measurement data: ' + data);
 		});
 

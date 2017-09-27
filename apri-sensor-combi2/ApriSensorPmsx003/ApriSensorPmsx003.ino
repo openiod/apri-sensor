@@ -44,7 +44,7 @@ const byte extenderId2b = 0; // 1-7, 0 is for sensor. left most 2 bits of right 
 // extender fills in its own extenderid when extending a message.
 
 const uint8_t MSG_ID = channelId4b<<4; // default channelId use setChannel/getChannel methodes to set/get channel id. extenderId=0,msgcount=0;
-const uint8_t UNIT_ID = 1; // todo: dipswitch or otherwise?
+const uint8_t UNIT_ID = 6; // todo: dipswitch or otherwise?
 
 #include "ApriSensorAll.h"
 #include "ApriSensorPmsx003.h"
@@ -57,12 +57,12 @@ void setup() {
   Serial.begin(9600);
   while (!Serial) {
   }
-  printPrefix(INFO);Serial.print("Setup start\n");
+  printPrefix(INFO);Serial.print("Setup start\r\n");
   if (!rfDriver.init()) {
-    printPrefix(INFO);Serial.print("RF init failed\n");
+    printPrefix(INFO);Serial.print("RF init failed\r\n");
   }
 
-  printPrefix(INFO);Serial.print("Sensors ready\n");
+  printPrefix(INFO);Serial.print("Sensors ready\r\n");
 
   delay(2000); // 2 sec delay for sensors to start / initiate
 
@@ -75,7 +75,7 @@ void loop() {
 
   while (1) {
 
-    //printPrefix(INFO);Serial.print("PMSX003");
+    //printPrefix(INFO);Serial.print("PMSX003\r\n");
     pmsx003Sensor.readData();
   }
 

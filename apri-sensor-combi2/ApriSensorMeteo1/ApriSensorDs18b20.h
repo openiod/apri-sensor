@@ -137,19 +137,19 @@ class Ds18b20Sensor {
       // Temperature DS18B20 ====
 
     };
-    void getMsgNr() {
-      return this->messageNr;
-    };
-    void setDs18b20Address(byte ds18b20_address) {
-      this->ds18b20_address = ds18b20_address;
-    };
+//    void getMsgNr() {
+//      return this->messageNr;
+//    };
+//    void setDs18b20Address(byte ds18b20_address) {
+//      this->ds18b20_address = ds18b20_address;
+//    };
     // function to print a device address
-    void printAddress(DeviceAddress deviceAddress) {
-      for (uint8_t i = 0; i < 8; i++) {
-        if (deviceAddress[i] < 16) Serial.print("0");
-        Serial.print(deviceAddress[i], HEX);
-      }
-    };
+//    void printAddress(DeviceAddress deviceAddress) {
+//      for (uint8_t i = 0; i < 8; i++) {
+//        if (deviceAddress[i] < 16) Serial.print("0");
+//        Serial.print(deviceAddress[i], HEX);
+//      }
+//    };
     void processDs18b20RF() {
       this->nrOfMeasurements++;
       for (int i = 0; i < PMSOUTPUTS; i++) {

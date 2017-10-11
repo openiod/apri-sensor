@@ -62,6 +62,9 @@ uint8_t syncBuflen = sizeof(syncBuf);
 
 //#include <AES.h> //todo encryption
 
+  aprisensor_ns::Bmp280Sensor bmp280Sensor;
+  aprisensor_ns::Am2320Sensor am2320Sensor;
+  aprisensor_ns::Ds18b20Sensor ds18b20Sensor;
 
 
 void setup() {
@@ -76,23 +79,23 @@ void setup() {
 
   printPrefix(MSGTYPE_INFO);Serial.print("Sensors ready\n");
 
+
+  bmp280Sensor.init();
+
+  am2320Sensor.init();
+
+  ds18b20Sensor.init();
+  
+  
   delay(1000); // 1 sec delay for sensors to start / initiate
 
 }
 
 void loop() {
 
-  aprisensor_ns::Bmp280Sensor bmp280Sensor;
-  bmp280Sensor.init();
-
-  aprisensor_ns::Am2320Sensor am2320Sensor;
-  am2320Sensor.init();
-
-  aprisensor_ns::Ds18b20Sensor ds18b20Sensor;
-  ds18b20Sensor.init();
 
     
-  while (1) {
+//  while (1) {
 
 //    printPrefix(INFO);Serial.print("BMP280");
     bmp280Sensor.readData();
@@ -127,7 +130,7 @@ void loop() {
       return;          
     }
 
-  }
+//  }
 
 } // end loop()
 

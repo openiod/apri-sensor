@@ -67,7 +67,7 @@ class Am2320Sensor {
         if (measurements[i] > this->highest[i]) this->highest[i] = measurements[i];
         this->totals[i] += measurements[i];
       }
-      nowTime = millis();
+/*      nowTime = millis();
       // repeat last sent RF messagde during transaction building process
       unsigned long diffTime = nowTime - this->transactionTime;
       if ( diffTime < this->transactionTimeMax ) {
@@ -80,9 +80,28 @@ class Am2320Sensor {
         }
         return;
       }
-
+*/
+    };
+    
+      
+    void sendResults() {
+      if (this->nrOfMeasurements ==0) return; // no measurements recieved so far
+      printPrefix(INFO);
+      Serial.print(" C/U:");
+      Serial.print(MSG_ID);
+      Serial.print("/");
+      Serial.print(UNIT_ID);
+      Serial.print(", T:");
+      Serial.print(this->sensorType);
+      Serial.print(" #");
+      Serial.print(this->nrOfMeasurements);
+      Serial.print(" Preparing new message. difftime:");
+      Serial.print(nowTime - this->transactionTime);
+      Serial.print(" freeSRam:");
+      Serial.print(getFreeSram());
+      Serial.print("\r\n");
+      
       // process data once per transactiontime limit
-
       computeResults();
 /*    
       for (int i = 0; i < PMSRESULTS; i++) {
@@ -195,7 +214,7 @@ class Am2320Sensor {
       }
 
     };
-    bool readData() {
+    void readData() {
       if ( millis() - this->am2320MeasureTime < this->am2320MeasureInterval ) {
         //printPrefix(INFO);Serial.println("am2320 interval "); //delay(100);
         return;

@@ -6,6 +6,7 @@
 #define MSGTYPE_INFO 'I'
 #define MSGTYPE_EXTEND 'X' // retransmitted by "jumper transciever" or message extender;
 #define MSGTYPE_EXTENDR 'Y' // Repeated message retransmitted by "jumper transciever" or message extender;
+#define MSGTYPE_SYNC 'S' //Sync message/pulse
 
 // sensortypes
 #define S_DS18B20 51  // DS18B20
@@ -40,16 +41,58 @@
 /// then:
 /// Connect D3 (pin 2) as the output to the transmitter
 /// Connect D4 (pin 3) as the input from the receiver.
+    RH_ASK rfDriver;
+    RH_ASK *rfDriverPtr;
 
 // RF
+
+long syncTimeMax = 15000;  // send sync pulse every 10 sec
+long syncTime = millis();
+byte syncBuf[4];
+uint8_t syncBuflen = sizeof(syncBuf);
+
+
+
+long resetAfterSilenceTime = 50000;  // reset after 50 sec without measurements
+long resetLastMeasurementTime = millis();
+
+long periodicResetTime = millis()+3600000; // reset every hour
+
+// automatic restart
+void resetArduino() {
+  //printPrefix(INFO);Serial.print("Reset");Serial.print("\r\n");
+  resetLastMeasurementTime = millis()+resetAfterSilenceTime;
+  //delay(1000);
+
+  asm volatile (" jmp 0"); 
+}
+
+void syncPulse() {
+  char syncMsgType = MSGTYPE_SYNC;
+  syncBuf[0]=channelId4b<<4;
+  syncBuf[1]=UNIT_ID;
+  syncBuf[2]=0; //sensorType
+  syncBuf[3]=syncMsgType; //msgTpe Sync
+  rfDriver.send(syncBuf, syncBuflen);
+  rfDriver.waitPacketSent();
+  syncTime = millis();
+  Serial.print("I@Sync pulse channelnr:");
+  Serial.print(channelId4b);
+  Serial.print(" channelId:");
+  Serial.print(syncBuf[0]);
+  Serial.print(" from unit:");
+  Serial.print(UNIT_ID);
+  Serial.print(" (Receiver) ");
+  Serial.print(" MsgType:");
+  Serial.print(syncMsgType);
+  Serial.print("\r\n");
+}
 
 namespace aprisensor_ns {
 
 class Receiver {
 
   private:
-    RH_ASK rfDriver;
-    RH_ASK *rfDriverPtr;
     bool receiverState = false;
 //    byte prevMsgNr_PMSA003 = 0;
 //    unsigned long prevMsgNr_PMSA003Time = 0;
@@ -130,7 +173,11 @@ class Receiver {
         if (extender) {  //act as an extender
           if (msgType == MSGTYPE_REPEAT) {
             buf[3] = MSGTYPE_EXTENDR;
-          } else buf[3] = MSGTYPE_EXTEND;
+          } else {
+            if (msgType != MSGTYPE_EXTENDR) {
+            buf[3] = MSGTYPE_EXTEND;
+            } 
+          }
           
           if (msgExtNr==extenderId2b) {
             Serial.print("W@Message from own extender ignored ");
@@ -289,12 +336,26 @@ class Receiver {
             }
             uint16_t diff = curr - prev - 1;
             if (diff > 0 ) {
-              Serial.print("W@Messages not received: ");
+              Serial.print("E@Messages not received: ");
               Serial.print(diff);
               Serial.print(" in  ");
               unsigned long diffTime = (millis() - sensorDataArray[index].prevMsgTime) / 1000;
               Serial.print(diffTime);
               Serial.print(" seconds.");
+              Serial.print(" channelnr:");
+              Serial.print(msgChannelNr);
+              Serial.print(" channelId:");
+              Serial.print(channelId);
+              Serial.print(" Unit:");
+              Serial.print(unitId);
+              Serial.print(" Sensor:");
+              Serial.print(sensorType);
+              Serial.print(" MsgType:");
+              Serial.print(msgType);
+              Serial.print(" MsgNr:");
+              Serial.print(msgNr);
+              Serial.print(" PrevMsgNr:");
+              Serial.print(prev);
               Serial.print("\r\n");
             }
           }

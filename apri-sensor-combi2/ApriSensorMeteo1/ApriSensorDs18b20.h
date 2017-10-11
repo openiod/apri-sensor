@@ -100,6 +100,8 @@ class Ds18b20Sensor {
       sensors.setResolution(12);
       printPrefix(INFO);Serial.print("DS18B20_powersupply;");
       Serial.println(sensors.readPowerSupply(0));
+ 
+ /*     
       // Loop through each device, print out address
       for(int i=0;i<this->numberOfDevices; i++)
       {
@@ -127,7 +129,7 @@ class Ds18b20Sensor {
           Serial.println(" but could not detect address. Check power and cabling");
         }
       }
-
+*/
       //printPrefix(INFO);Serial.print("DS18B20_resolution;");
       //Serial.println(sensors.getResolution());
       //printPrefix(INFO);Serial.print("DS18B20_resolution_global;");
@@ -155,6 +157,7 @@ class Ds18b20Sensor {
         if (measurements[i] > this->highest[i]) this->highest[i] = measurements[i];
         this->totals[i] += measurements[i];
       }
+/*
       nowTime = millis();
       // repeat last sent RF messagde during transaction building process
 
@@ -169,9 +172,27 @@ class Ds18b20Sensor {
         }
         return;
       }
-
-      // process data once per transactiontime limit
+*/
+    };
+    
+    void sendResults() {
+      if (this->nrOfMeasurements ==0) return; // no measurements recieved so far
+      printPrefix(INFO);
+      Serial.print(" C/U:");
+      Serial.print(MSG_ID);
+      Serial.print("/");
+      Serial.print(UNIT_ID);
+      Serial.print(", T:");
+      Serial.print(this->sensorType);
+      Serial.print(" #");
+      Serial.print(this->nrOfMeasurements);
+      Serial.print(" Preparing new message. difftime:");
+      Serial.print(nowTime - this->transactionTime);
+      Serial.print(" freeSRam:");
+      Serial.print(getFreeSram());
+      Serial.print("\r\n");
       
+      // process data once per transactiontime limit     
       computeResults();
       
 /*    
@@ -280,7 +301,7 @@ class Ds18b20Sensor {
       }
 
     };
-    bool readData() {
+    void readData() {
       if ( millis() - this->ds18b20MeasureTime < this->ds18b20MeasureInterval ) {
         //printPrefix(INFO);Serial.println("ds18b20 interval "); //delay(100);
         return;

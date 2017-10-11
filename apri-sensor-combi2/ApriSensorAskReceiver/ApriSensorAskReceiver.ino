@@ -25,14 +25,18 @@
 */
 
 //-----------------------------------------------------------------------------
+const byte VersionMajor = 0;
+const byte VersionMinor = 2;  // reciever + pulser (sync sensors)
+
 //#include <AES.h>
 
 // this application can act like a reciever (base station reciever) or extender for extend the range of wireless transmit.
 
 const bool extender = false;  // true=receive and re-transmit; false=recieve only and send to connected base station   
 
+const uint8_t UNIT_ID = 201; // todo: dipswitch or otherwise? >100<255 for recievers/pulsers/repeaters
 const byte channelId4b = 7;  // 1-15 left 4 bits for channel identification, xxxx .... -> 1111 0000 = channel 15. NOT ZERO!
-const byte extenderId2b = 2; // 1-7 (0 is for sensor, base reciever can be anything) left most 2 bits of right most 4 bits for extender identification, .... xx.. = extender 3 of channel 15 
+const byte extenderId2b = 0; // 1-7 (0 is for sensor, base reciever can be anything) left most 2 bits of right most 4 bits for extender identification, .... xx.. = extender 3 of channel 15 
 // extender skips messages sent by the same extender by checking extenderId bits. Retransmitted messages get +1 until rightmost two bits = 11 
 // when extending a message, the channelId will ++ (plus one) until max '11b' = 3
 // sensor sends ccccxx00. first extender: ccccxx01, second ccccxx10, third and last try: ccccxx11
@@ -62,6 +66,15 @@ void loop()
   while (1) {
 //    if (myReceiver.isActive() ) {
       myReceiver.receiveData();
+
+      if (millis()-syncTime>syncTimeMax) {
+        //Serial.print("Sync **********************************");
+        syncPulse();
+      }
+
+      if (millis() > periodicResetTime) {  // reset for cleanup stack etc.
+        resetArduino();
+      }
 //    }
   }
 

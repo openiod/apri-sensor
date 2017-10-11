@@ -54,7 +54,7 @@ long periodicResetTime = millis()+3600000;
 //}
 
 
-
+/*
 void receiveSyncMsg() {
 //      if ((*rfDriverPtr).recv(buf, &buflen)) { // Non-blocking      
 //      Serial.print("loop");
@@ -114,12 +114,14 @@ void receiveSyncMsg() {
         return;        
 //      }
 }
+*/
+//extern unsigned int __bss_end;
+//extern unsigned int __heap_start;
+//extern void *__brkval;
 
-extern unsigned int __bss_end;
-extern unsigned int __heap_start;
-extern void *__brkval;
-
-uint16_t getFreeSram() {
+/*
+ * 
+ *uint16_t getFreeSram() {
   uint8_t newVariable;
   // heap is empty, use bss as start memory address
   if ((uint16_t)__brkval == 0)
@@ -128,5 +130,6 @@ uint16_t getFreeSram() {
   else
     return (((uint16_t)&newVariable) - ((uint16_t)__brkval));
 };
+*/
 
 

@@ -29,15 +29,13 @@
 */
 
 //-----------------------------------------------------------------------------
+const byte VersionMajor = 0;
+const byte VersionMinor = 1;
 
 #include <Wire.h>
 #include <AM2320.h>
 
-#include <RH_ASK.h>
-//#include <SPI.h> // Not actually used but needed to compile
-RH_ASK rfDriver;
-// RH_ASK rfDriver(2000, 2, 4, 5); // ESP8266: do not use pin 11
-// RF
+const uint8_t UNIT_ID = 5; // todo: dipswitch or otherwise?
 
 const byte channelId4b = 7;  // 0-15 left 4 bits for channel identification, xxxx .... -> 1111 0000 = channel 15
 const byte extenderId2b = 0; // 1-7, 0 is for sensor. left most 2 bits of right most 4 bits for extender identification, .... xx.. = extender 3 of channel 15 
@@ -47,7 +45,15 @@ const byte extenderId2b = 0; // 1-7, 0 is for sensor. left most 2 bits of right 
 // extender fills in its own extenderid when extending a message.
 
 const uint8_t MSG_ID = channelId4b<<4; // default channelId use setChannel/getChannel methodes to set/get channel id. extenderId=0,msgcount=0;
-const uint8_t UNIT_ID = 5; // todo: dipswitch or otherwise?
+
+#include <RH_ASK.h>
+//#include <SPI.h> // Not actually used but needed to compile
+RH_ASK rfDriver;
+RH_ASK *rfDriverPtr;
+// RH_ASK rfDriver(2000, 2, 4, 5); // ESP8266: do not use pin 11
+byte syncBuf[RH_ASK_MAX_MESSAGE_LEN];
+uint8_t syncBuflen = sizeof(syncBuf);
+// RF
 
 #include "ApriSensorMeteo.h"
 #include "ApriSensorBmp280.h"
@@ -59,6 +65,7 @@ const uint8_t UNIT_ID = 5; // todo: dipswitch or otherwise?
 
 
 void setup() {
+  rfDriverPtr = &rfDriver;
   Serial.begin(9600);
   while (!Serial) {
   }
@@ -69,7 +76,7 @@ void setup() {
 
   printPrefix(MSGTYPE_INFO);Serial.print("Sensors ready\n");
 
-  delay(2000); // 2 sec delay for sensors to start / initiate
+  delay(1000); // 1 sec delay for sensors to start / initiate
 
 }
 
@@ -84,7 +91,7 @@ void loop() {
   aprisensor_ns::Ds18b20Sensor ds18b20Sensor;
   ds18b20Sensor.init();
 
-
+    
   while (1) {
 
 //    printPrefix(INFO);Serial.print("BMP280");
@@ -94,8 +101,31 @@ void loop() {
     am2320Sensor.readData();
 
    // if (ds18b20Sensor.serialReady()==0 ) {
-      ds18b20Sensor.readData();
+    ds18b20Sensor.readData();
     //}  
+
+    if ((*rfDriverPtr).recv(syncBuf, &syncBuflen)) { // Non-blocking receiveSyncMsg();
+        //Serial.print(" process Sync \r\n");
+        //      if (rfDriver.recv(syncBuf, &syncBuflen)) { // Non-blocking receiveSyncMsg();
+        receiveSyncMsg();
+    };
+    if (syncMsgActive == true) {
+      long _delay = 500 + 500*UNIT_ID;
+      Serial.print("I@Sync delay is ");
+      Serial.print(_delay);
+      Serial.print("\r\n");
+      delay((10 + 500*UNIT_ID));  // 1 sec after sync plus unitid x secs delaytime
+      bmp280Sensor.sendResults();
+      am2320Sensor.sendResults();
+      ds18b20Sensor.sendResults();
+      syncMsgActive = false;
+    }
+    if (syncMsgActive == true && millis() - syncMsgTime >= syncMaxTime) {
+      syncMsgActive = false;
+      Serial.print("W@Sync time is deactivated");
+      Serial.print("\r\n");          
+      return;          
+    }
 
   }
 

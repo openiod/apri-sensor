@@ -29,29 +29,34 @@
 */
 
 //-----------------------------------------------------------------------------
+const byte VersionMajor = 0;
+const byte VersionMinor = 1;
 
-#include <RH_ASK.h>
-//#include <SPI.h> // Not actually used but needed to compile
-RH_ASK rfDriver;
-// RH_ASK rfDriver(2000, 2, 4, 5); // ESP8266: do not use pin 11
-// RF
+
+const uint8_t UNIT_ID = 1; // todo: dipswitch or otherwise? >100 for recievers/pulsers/repeaters
 
 const byte channelId4b = 7;  // 0-15 left 4 bits for channel identification, xxxx .... -> 1111 0000 = channel 15
 const byte extenderId2b = 0; // 1-7, 0 is for sensor. left most 2 bits of right most 4 bits for extender identification, .... xx.. = extender 3 of channel 15 
 // extender skips messages sent by the same extender by checking extenderId bits. Retransmitted messages get +1 until rightmost two bits = 11 
 // when extending a message, the channelId will ++ (plus one) until max '11b' = 3
 // sensor sends ccccxx00. first extender: ccccxx01, second ccccxx10, third and last try: ccccxx11
-// extender fills in its own extenderid when extending a message.
 
 const uint8_t MSG_ID = channelId4b<<4; // default channelId use setChannel/getChannel methodes to set/get channel id. extenderId=0,msgcount=0;
-const uint8_t UNIT_ID = 6; // todo: dipswitch or otherwise?
+// extender fills in its own extenderid when extending a message.
+
+#include <RH_ASK.h>
+//#include <SPI.h> // Not actually used but needed to compile
+RH_ASK rfDriver;
+RH_ASK *rfDriverPtr;
+// RH_ASK rfDriver(2000, 2, 4, 5); // ESP8266: do not use pin 11
+byte syncBuf[RH_ASK_MAX_MESSAGE_LEN];
+uint8_t syncBuflen = sizeof(syncBuf);
+// RF
 
 #include "ApriSensorAll.h"
 #include "ApriSensorPmsx003.h"
 
 //#include <AES.h> //todo encryption
-
-
 
 void setup() {
   Serial.begin(9600);
@@ -64,7 +69,7 @@ void setup() {
 
   printPrefix(INFO);Serial.print("Sensors ready\r\n");
 
-  delay(2000); // 2 sec delay for sensors to start / initiate
+  delay(1000); // 1 sec delay for sensors to start / initiate
 
 }
 
@@ -77,6 +82,25 @@ void loop() {
 
     //printPrefix(INFO);Serial.print("PMSX003\r\n");
     pmsx003Sensor.readData();
+
+    pmsx003Sensor.readSyncMsg();
+    
+    if (syncMsgActive == true) {
+      long _delay = 500 + 500*UNIT_ID;
+      Serial.print("I@Sync delay is ");
+      Serial.print(_delay);
+      Serial.print("\r\n");
+      delay((10 + 500*UNIT_ID));  // 1 sec after sync plus unitid x secs delaytime
+      pmsx003Sensor.sendResults();
+      syncMsgActive = false;
+    }
+    if (syncMsgActive == true && millis() - syncMsgTime >= syncMaxTime) {
+        syncMsgActive = false;
+        Serial.print("W@Sync time is deactivated");
+        Serial.print("\r\n");          
+        return;          
+      }
+
   }
 
 } // end loop()

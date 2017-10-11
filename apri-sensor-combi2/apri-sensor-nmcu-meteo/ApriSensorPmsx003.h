@@ -20,7 +20,7 @@ class Pmsx003Sensor {
   private:
 
     long pmsx003InitTime;
-    long pmsx003InitInterval = 2000; //10 seconden init wait time
+    long pmsx003InitInterval = 1000; //1 seconden init wait time
 //    long pmsx003MeasureTime;
 //    long pmsx003MeasureInterval = 500;  // measurement interval in millisecs
 
@@ -61,7 +61,7 @@ class Pmsx003Sensor {
   public:
     Pmsx003Sensor() {};
     void init() {
-      rfDriverPtr = &rfDriver;
+     // rfDriverPtr = &rfDriver;
       this->messageNr = 0;
       this->sensorType = S_PMSA003;  // default
       
@@ -71,7 +71,7 @@ class Pmsx003Sensor {
       this->transactionTime = millis();
 //      this->pmsx003MeasureTime = millis();
       this->initTotals();
-      resetLastMeasurementTime = millis()+resetAfterSilenceTime;
+//      resetLastMeasurementTime = millis()+resetAfterSilenceTime;
     };
     void readUInt16(uint16_t* value, uint16_t* inputChecksum) {
       int inputHigh = SerialPms.read();
@@ -150,8 +150,8 @@ class Pmsx003Sensor {
       Serial.print(this->nrOfMeasurements);
       Serial.print(" Preparing new message. difftime:");
       Serial.print(nowTime - this->transactionTime);
-      Serial.print(" freeSRam:");
-      Serial.print(getFreeSram());
+//      Serial.print(" freeSRam:");
+//      Serial.print(getFreeSram());
       Serial.print("\r\n");
       
       // process data once per transactiontime limit
@@ -173,7 +173,7 @@ class Pmsx003Sensor {
       rfBuf[11] = lowByte(this->results[2]); //
 
 
-      sendRfMessage(rfBuf, MSGLENGTH_PMSX003, MSGTYPE_NEW); // new message
+//      sendRfMessage(rfBuf, MSGLENGTH_PMSX003, MSGTYPE_NEW); // new message
 
       this->transactionTime = millis();
       initTotals();
@@ -189,9 +189,9 @@ class Pmsx003Sensor {
 //      Serial.print(getFreeSram());
       Serial.print("\r\n");
 
-      if (millis() > periodicResetTime) {  // reset for cleanup stack etc.
+//      if (millis() > periodicResetTime) {  // reset for cleanup stack etc.
 //        resetArduino();
-      }
+//      }
       
     };
 
@@ -204,6 +204,7 @@ class Pmsx003Sensor {
       this->nrOfMeasurements = 0;
     };
 
+/*
     void readSyncMsg() {
       if ((*rfDriverPtr).recv(syncBuf, &syncBuflen)) { // Non-blocking receiveSyncMsg();
 //Serial.print(" process Sync \r\n");
@@ -211,8 +212,8 @@ class Pmsx003Sensor {
         receiveSyncMsg();
       };
     };
-        
-    void sendRfMessage(byte rfBuffer[], int msgLength, char msgType) {
+*/        
+/*    void sendRfMessage(byte rfBuffer[], int msgLength, char msgType) {
       // fille message type (New, Repeat)
       rfBuffer[3] = msgType;
 
@@ -262,6 +263,7 @@ class Pmsx003Sensor {
 
       resetLastMeasurementTime = millis();
     }
+*/
     void computeResults() {
       int i;
       bool corrLowHigh = false;
@@ -283,7 +285,7 @@ class Pmsx003Sensor {
     bool serialReady() {
       if (SerialPms) return true; else return false;
     }
-    bool readData() {
+    void readData() {
 //      if ( millis() - this->pmsx003MeasureTime < this->pmsx003MeasureInterval ) {
 //        //printPrefix(INFO);Serial.print("pmsx003 interval ");Serial.print("\r\n"); //delay(100);
 //        return;
@@ -291,14 +293,14 @@ class Pmsx003Sensor {
       // wait some time while in init fase (also during soft reset)
 
       if ( millis() - this->pmsx003InitTime < this->pmsx003InitInterval ) {
-        //printPrefix(INFO);Serial.print("pmsx003 init fase");Serial.print("\r\n");
-        resetLastMeasurementTime=millis() + resetAfterSilenceTime*2;
+        printPrefix(INFO);Serial.print("pmsx003 init fase");Serial.print("\r\n");
+//        resetLastMeasurementTime=millis() + resetAfterSilenceTime*2;
         return;
       }
 
-      if ( millis() > resetLastMeasurementTime + resetAfterSilenceTime) {
+ //     if ( millis() > resetLastMeasurementTime + resetAfterSilenceTime) {
        // resetArduino();
-      }
+ //     }
       
 
 //      uint16_t concPM1_0_CF1;
@@ -316,14 +318,14 @@ class Pmsx003Sensor {
 
       
       serialPmsAvailable = SerialPms.available();
-      //Serial.print(serialPmsAvailable);
+      Serial.print(serialPmsAvailable);
 
       if (serialPmsAvailable < 32) {
         //delay(10);
         return;
       }
 
-      //Serial.print(serialPmsAvailable);
+      Serial.print(serialPmsAvailable);
 
       inputChecksum = 0;
 
@@ -337,7 +339,7 @@ class Pmsx003Sensor {
       if (controleCodes != 0x001c) return;
 
       // read all sensor output values and sum Checksum
-      int value;
+      uint16_t value;
       readUInt16(&value, &inputChecksum );  //pm1
       this->measurements[0] = value;
       readUInt16(&value, &inputChecksum );  //pm2.5

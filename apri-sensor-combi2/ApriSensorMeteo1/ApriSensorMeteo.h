@@ -5,6 +5,7 @@
 #define MSGTYPE_REPEAT 'R'
 #define MSGTYPE_INFO 'I'
 #define MSGTYPE_EXTEND 'X'
+#define MSGTYPE_SYNC 'S'
 
 // sensortypes
 #define S_DS18B20 51  // DS18B20
@@ -32,4 +33,80 @@ void printPrefix(char type) {
   Serial.print("@");
 }
 
+bool syncMsgActive = false;
+long syncMsgTime=-1;
+long syncMaxTime = 4000; // 4 seconds max active time sync.
+
+void receiveSyncMsg() {
+//      if ((*rfDriverPtr).recv(buf, &buflen)) { // Non-blocking      
+//      Serial.print("loop");
+//      Serial.print("\r\n");
+//      delay(1000);
+
+        if (syncBuflen == 0) {
+         // Serial.print("W@RF message length 0 received, ignoring ");
+         // Serial.print("\r\n");
+          return; //message ingnored
+        }
+        
+        byte channelId = syncBuf[0];
+        byte msgChannelNr = channelId>>4;
+        byte msgChannelNrInId = msgChannelNr<<4;
+//        byte msgExtNr = (channelId - msgChannelNrInId) >>2;
+//        byte msgExtNrInId = msgExtNr<<2;
+//        byte msgCycle = channelId - msgChannelNrInId - msgExtNrInId;
+        
+        if (msgChannelNr != channelId4b ) {
+          Serial.print("E@Invalid ApriSensor message received, first byte value: ");
+          Serial.print(syncBuf[0]);
+          Serial.print("\r\n");
+          return; //message discarded
+        }
+//        if (extender && msgExtNr == extenderId2b ) {  // skip its own sent messages
+//          Serial.print("W@Extender skipped its own sent message (first byte): ");
+//          Serial.print(syncBuf[0]);
+//          Serial.print("\r\n");
+//          return; //message discarded
+//        }
+
+        byte unitId = syncBuf[1];
+        byte sensorType = syncBuf[2];
+        char msgType = syncBuf[3];
+        if (msgType != 'S') {
+//          Serial.print("W@Not a sync message received by sensor, ignore msgType ");
+//          Serial.print(msgType);
+//          Serial.print("\r\n");          
+          return;
+        }
+        if (millis() - syncMsgTime < syncMaxTime) {
+          Serial.print("W@Sync time is active, ignore another sync request. ");
+          Serial.print(millis() - syncMsgTime);          
+          Serial.print(" ");          
+          Serial.print(syncMaxTime);          
+          Serial.print("\r\n");          
+          return;          
+        }
+        syncMsgActive = true;
+        syncMsgTime = millis();
+          Serial.print("W@Set sync time active ");
+          Serial.print(millis() - syncMsgTime);          
+          Serial.print(" ");          
+          Serial.print(syncMaxTime);          
+          Serial.print("\r\n");
+        return;        
+//      }
+}
+extern unsigned int __bss_end;
+extern unsigned int __heap_start;
+extern void *__brkval;
+
+uint16_t getFreeSram() {
+  uint8_t newVariable;
+  // heap is empty, use bss as start memory address
+  if ((uint16_t)__brkval == 0)
+    return (((uint16_t)&newVariable) - ((uint16_t)&__bss_end));
+  // use heap end as the start of the memory address
+  else
+    return (((uint16_t)&newVariable) - ((uint16_t)__brkval));
+};
 

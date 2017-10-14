@@ -5,6 +5,7 @@
 #define MSGTYPE_REPEAT 'R'
 #define MSGTYPE_INFO 'I'
 #define MSGTYPE_EXTEND 'X'
+#define MSGTYPE_SYNC 'S'
 
 // sensortypes
 #define S_DS18B20 51  // DS18B20

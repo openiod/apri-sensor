@@ -229,7 +229,7 @@ var save99UsbSerialRules	= function() {
 //	99-usb-serial.rules
 	var content = '';
 	var file = '/etc/udev/rules.d/99-usb-serial.rules';
-	if (unit.id == '00000000b7e92a99' || unit.id == '000000004659c5bc') {  //'s-Gravenpolder  2e voor test
+	if (unit.id == '00000000b7e92a99' || unit.id == '00000000ac35e5d3') {  //'s-Gravenpolder  2x
 		console.log('save usb rules for unit ' + unit.id);
 		content = 
 			'SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="AL02V14T", SYMLINK+="ttyDC1100", MODE:="0666" \n' + 

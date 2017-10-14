@@ -10,18 +10,24 @@
 #define PMSOUTPUTS 4 // nr of outputs like 1=PM0.3, 2=PM0.5, etc.
 #define PMSRESULTS 4
 
+const PROGMEM byte bmp280_address = 0x76;
+const PROGMEM byte bmp280InitInterval = 5000; // 5 seconden init wait time
+//const long PROGMEM bmp280MeasureInterval = 1000;  // measurement interval in millisecs
+//const PROGMEM unsigned long rfRepeatTimeMax = 5000; // milliseconds waittime for repeating message
+//const PROGMEM unsigned long transactionTimeMax = 20000; // milliseconds per transaction period, then send message
+//const PROGMEM unsigned long rfDelayTimeMax = 60000; // maximum delaytime in millisec for repeating messages
+
+
 namespace aprisensor_ns {
 
 class Bmp280Sensor {
 
   private:
-    byte bmp280_address = 0x76; //default
+//    byte bmp280_address = 0x76; //default
 
     Adafruit_BMP280 bmp; // I2C
     long bmp280InitTime;
-    long bmp280InitInterval = 10000; //10 seconden init wait time
     long bmp280MeasureTime;
-    long bmp280MeasureInterval = 1000;  // measurement interval in millisecs
 
     float pressure;
     float pressureHPa;
@@ -29,19 +35,16 @@ class Bmp280Sensor {
     float temperature;
     float altitude;
     
-    long nrOfMeasurements;
-    unsigned long nowTime;
+    uint8_t nrOfMeasurements;
+    //unsigned long nowTime;
     float measurements[PMSOUTPUTS];
     float totals[PMSOUTPUTS];
     float lowest[PMSOUTPUTS];
     float highest[PMSOUTPUTS];
     long results[PMSOUTPUTS];
     unsigned long transactionTime; // 20 seconds per transaction, send measurement
-    const unsigned long transactionTimeMax = 20000; // milliseconds per transaction period, then send message
     unsigned long rfRepeatTime;
-    const unsigned long rfRepeatTimeMax = 5000; // milliseconds waittime for repeating message
     unsigned long rfSentMsgTime;  // to calculate delay for repeat message
-    const unsigned long rfDelayTimeMax = 60000; // maximum delaytime in millisec for repeating messages
     byte messageNr;
     char rfBuf[MSGLENGTH_BMP280];
     byte sensorType; // eg = "BMP280" 
@@ -57,7 +60,7 @@ class Bmp280Sensor {
     Bmp280Sensor() {};
     void init() {
       this->messageNr = 0;
-      printPrefix(INFO);Serial.println("BMP280 sensor start");
+      printPrefix(INFO);//Serial.println("BMP280 sensor start");
       this->sensorType = S_BMP280;
       
       //while (!this->bmp.begin(bmp280_address)) {
@@ -65,23 +68,21 @@ class Bmp280Sensor {
       //}
       this->bmp.begin(bmp280_address);
 
-      printPrefix(INFO);Serial.println("BMP280 sensor connected");
+      printPrefix(INFO);//Serial.println("BMP280 sensor connected");
       this->bmp280InitTime = millis();
-      printPrefix(INFO);Serial.println("start bmp280 init fase");
+      printPrefix(INFO);//Serial.println("start bmp280 init fase");
 
       this->rfRepeatTime = 0;  //
-      this->transactionTime = millis();
-      this->bmp280MeasureTime = millis();
       this->initTotals();
 
     };
 
-    void getMsgNr() {
-      return this->messageNr;
-    };
-    void setBmp280Address(byte bmp280_address) {
-      this->bmp280_address = bmp280_address;
-    };
+//    void getMsgNr() {
+//      return this->messageNr;
+//    };
+//    void setBmp280Address(byte bmp280_address) {
+//      this->bmp280_address = bmp280_address;
+//    };
     void processBmp280RF() {
       this->nrOfMeasurements++;
       for (int i = 0; i < PMSOUTPUTS; i++) {
@@ -116,11 +117,11 @@ class Bmp280Sensor {
       Serial.print(this->sensorType);
       Serial.print(" #");
       Serial.print(this->nrOfMeasurements);
-      Serial.print(" Preparing new message. difftime:");
-      Serial.print(nowTime - this->transactionTime);
-      Serial.print(" freeSRam:");
-      Serial.print(getFreeSram());
-      Serial.print("\r\n");
+      Serial.print(SPACE);
+      Serial.print(millis() - this->transactionTime);
+//      Serial.print(FREESRAMTXT);
+//      Serial.print(getFreeSram());
+      Serial.print(NEWLINE);
       
       // process data once per transactiontime limit
       computeResults();
@@ -165,7 +166,6 @@ class Bmp280Sensor {
 
       sendRfMessage(rfBuf, MSGLENGTH_BMP280, MSGTYPE_NEW); // new message
 
-      this->transactionTime = millis();
       initTotals();
 
       printPrefix(MEASUREMENT);Serial.print(this->sensorType);
@@ -186,11 +186,14 @@ class Bmp280Sensor {
         this->highest[i] = -999999;
       }
       this->nrOfMeasurements = 0;
+      this->transactionTime = millis();
+
     }
     void sendRfMessage(byte rfBuffer[], int msgLength, char msgType) {
       // fille message type (New, Repeat)
       rfBuffer[3] = msgType;
 
+/*
       if (msgType == MSGTYPE_REPEAT) {
         unsigned long rfDelayTime = millis() - this->rfSentMsgTime;
         if (rfDelayTime > this->rfDelayTimeMax) { // max delaytime exceeded, end processing repeat
@@ -202,6 +205,7 @@ class Bmp280Sensor {
         // fill delaytime in seconds
         rfBuffer[5] = rfDelayTime / 1000;
       }
+*/
 
       printPrefix(INFO);Serial.print("RF l:");
       Serial.print(msgLength);
@@ -239,13 +243,13 @@ class Bmp280Sensor {
     };
     
     void readData() {
-      if ( millis() - this->bmp280MeasureTime < this->bmp280MeasureInterval ) {
-        //Serial.println("bmp280 init fase");
-        return;
-      }
+//      if ( millis() - this->bmp280MeasureTime < this->bmp280MeasureInterval ) {
+//        //Serial.println("bmp280 init fase");
+//        return;
+//      }
       
       // wait some time while in init fase (also during soft reset)
-      if ( millis() - this->bmp280InitTime < this->bmp280InitInterval ) {
+      if ( millis() - this->bmp280InitTime < bmp280InitInterval ) {
         //Serial.println("bmp280 init fase");
         return;
       }
@@ -282,6 +286,6 @@ class Bmp280Sensor {
 
 };
 
-extern Bmp280Sensor gBmp280Sensor;  // global instance
+//extern Bmp280Sensor gBmp280Sensor;  // global instance
 
 }  // end namespace  ApriSensor

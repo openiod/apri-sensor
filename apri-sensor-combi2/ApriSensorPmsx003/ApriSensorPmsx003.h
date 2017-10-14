@@ -283,7 +283,7 @@ class Pmsx003Sensor {
     bool serialReady() {
       if (SerialPms) return true; else return false;
     }
-    bool readData() {
+    void readData() {
 //      if ( millis() - this->pmsx003MeasureTime < this->pmsx003MeasureInterval ) {
 //        //printPrefix(INFO);Serial.print("pmsx003 interval ");Serial.print("\r\n"); //delay(100);
 //        return;

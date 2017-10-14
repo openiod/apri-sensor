@@ -18,7 +18,14 @@
 #define PMSOUTPUTS 1 // nr of outputs like 1=PM0.3, 2=PM0.5, etc.
 #define PMSRESULTS 1
 
+const PROGMEM byte  ds18b20InitInterval = 5000; // 5 seconden init wait time
+//const long PROGMEM ds18b20MeasureInterval = 500;  // measurement interval in millisecs
+//const PROGMEM unsigned long rfRepeatTimeMax = 5000; // milliseconds waittime for repeating message
+//const PROGMEM unsigned long transactionTimeMax = 20000; // milliseconds per transaction period, then send message
+//const PROGMEM unsigned long rfDelayTimeMax = 60000; // maximum delaytime in millisec for repeating messages
 
+
+//const PROGMEM String PREPMESG = " Preparing new message. difftime:";
 namespace aprisensor_ns {
 
 class Ds18b20Sensor {
@@ -32,25 +39,23 @@ class Ds18b20Sensor {
     DeviceAddress tempDeviceAddress; // We'll use this variable to store a found device address
     
     long ds18b20InitTime;
-    long ds18b20InitInterval = 10000; //10 seconden init wait time
     long ds18b20MeasureTime;
-    long ds18b20MeasureInterval = 500;  // measurement interval in millisecs
 
-    float temperature;
+    float temperature;  // must be float !!
    
-    long nrOfMeasurements;
-    unsigned long nowTime;
-    float measurements[PMSOUTPUTS];
-    float totals[PMSOUTPUTS];
-    float lowest[PMSOUTPUTS];
-    float highest[PMSOUTPUTS];
-    long results[PMSOUTPUTS];
+    uint8_t nrOfMeasurements;
+    //unsigned long nowTime;
+    //float measurements[PMSOUTPUTS];
+    float totalTemperature;
+    float lowestTemperature;
+    float highestTemperature;
+    long resultTemperature;  // must be long  !!
+//    int lowest[PMSOUTPUTS];
+//    int highest[PMSOUTPUTS];
+//    int results[PMSOUTPUTS];
     unsigned long transactionTime; // 20 seconds per transaction, send measurement
-    const unsigned long transactionTimeMax = 20000; // milliseconds per transaction period, then send message
     unsigned long rfRepeatTime;
-    const unsigned long rfRepeatTimeMax = 5000; // milliseconds waittime for repeating message
     unsigned long rfSentMsgTime;  // to calculate delay for repeat message
-    const unsigned long rfDelayTimeMax = 60000; // maximum delaytime in millisec for repeating messages
     byte messageNr;
     char rfBuf[MSGLENGTH_DS18B20];
     byte sensorType; // = "PMSx003"; //Plantower PMS7003 or PMSA003
@@ -63,7 +68,7 @@ class Ds18b20Sensor {
     };
 
   public:
-    Ds18b20Sensor() {};
+    //Ds18b20Sensor() {};
     void init() {
   
       this->messageNr = 0;
@@ -93,15 +98,15 @@ class Ds18b20Sensor {
       printPrefix(INFO);Serial.print("Parasite power is: ");
       if (sensors.isParasitePowerMode()) {printPrefix(INFO);Serial.println("ON");}
       else {printPrefix(INFO);Serial.println("OFF");}
-      //printPrefix(INFO);Serial.print("DS18B20_resolution;");
-      //Serial.println(sensors.getResolution());
-      //printPrefix(INFO);Serial.print("DS18B20_resolution_global;");
-      //Serial.println(sensors.getResolution());
+      printPrefix(INFO);Serial.print("DS18B20_resolution;");
+      Serial.println(sensors.getResolution());
+      printPrefix(INFO);Serial.print("DS18B20_resolution_global;");
+      Serial.println(sensors.getResolution());
       sensors.setResolution(12);
       printPrefix(INFO);Serial.print("DS18B20_powersupply;");
       Serial.println(sensors.readPowerSupply(0));
  
- /*     
+      
       // Loop through each device, print out address
       for(int i=0;i<this->numberOfDevices; i++)
       {
@@ -124,16 +129,16 @@ class Ds18b20Sensor {
           Serial.print(sensors.getResolution(this->tempDeviceAddress), DEC);
           Serial.println();
         } else {
-          printPrefix(WARNING);Serial.print("Found ghost device at ");
-          Serial.print(i, DEC);
-          Serial.println(" but could not detect address. Check power and cabling");
+     //     printPrefix(WARNING);Serial.print("Found ghost device at ");
+     //     Serial.print(i, DEC);
+     //     Serial.println(" but could not detect address. Check power and cabling");
         }
       }
-*/
-      //printPrefix(INFO);Serial.print("DS18B20_resolution;");
-      //Serial.println(sensors.getResolution());
-      //printPrefix(INFO);Serial.print("DS18B20_resolution_global;");
-      //Serial.println(sensors.getResolution());
+
+      printPrefix(INFO);Serial.print("DS18B20_resolution;");
+      Serial.println(sensors.getResolution());
+      printPrefix(INFO);Serial.print("DS18B20_resolution_global;");
+      Serial.println(sensors.getResolution());
       // Temperature DS18B20 ====
 
     };
@@ -144,19 +149,24 @@ class Ds18b20Sensor {
 //      this->ds18b20_address = ds18b20_address;
 //    };
     // function to print a device address
-//    void printAddress(DeviceAddress deviceAddress) {
-//      for (uint8_t i = 0; i < 8; i++) {
-//        if (deviceAddress[i] < 16) Serial.print("0");
-//        Serial.print(deviceAddress[i], HEX);
-//      }
-//    };
+    void printAddress(DeviceAddress deviceAddress) {
+      for (uint8_t i = 0; i < 8; i++) {
+        if (deviceAddress[i] < 16) Serial.print("0");
+        Serial.print(deviceAddress[i], HEX);
+      }
+    };
     void processDs18b20RF() {
       this->nrOfMeasurements++;
-      for (int i = 0; i < PMSOUTPUTS; i++) {
-        if (measurements[i] < this->lowest[i]) this->lowest[i] = measurements[i];
-        if (measurements[i] > this->highest[i]) this->highest[i] = measurements[i];
-        this->totals[i] += measurements[i];
-      }
+ //     for (int i = 0; i < PMSOUTPUTS; i++) {
+ //       if (measurements[i] < this->lowest[i]) this->lowest[i] = measurements[i];
+ //       if (measurements[i] > this->highest[i]) this->highest[i] = measurements[i];
+ //       this->totals[i] += measurements[i];
+ //     }
+ 
+      if (this->temperature < this->lowestTemperature) this->lowestTemperature =this->temperature;
+      if (this->temperature > this->highestTemperature) this->highestTemperature = this->temperature;
+      this->totalTemperature += this->temperature;
+
 /*
       nowTime = millis();
       // repeat last sent RF messagde during transaction building process
@@ -186,11 +196,11 @@ class Ds18b20Sensor {
       Serial.print(this->sensorType);
       Serial.print(" #");
       Serial.print(this->nrOfMeasurements);
-      Serial.print(" Preparing new message. difftime:");
-      Serial.print(nowTime - this->transactionTime);
-      Serial.print(" freeSRam:");
-      Serial.print(getFreeSram());
-      Serial.print("\r\n");
+      Serial.print(SPACE);
+      Serial.print(millis() - this->transactionTime);
+//      Serial.print(FREESRAMTXT);
+//      Serial.print(getFreeSram());
+      Serial.print(NEWLINE);
       
       // process data once per transactiontime limit     
       computeResults();
@@ -227,8 +237,8 @@ class Ds18b20Sensor {
       rfBuf[4] = this->getNewMsgNr();
       rfBuf[5] = 0;  // delaytime equal zero for first time sending message. In seconds.
       this->rfSentMsgTime = millis();
-      rfBuf[6] = highByte(this->results[0]); // temperature
-      rfBuf[7] = lowByte(this->results[0]);  //
+      rfBuf[6] = highByte(this->resultTemperature); // temperature
+      rfBuf[7] = lowByte(this->resultTemperature);  //
 
       sendRfMessage(rfBuf, MSGLENGTH_DS18B20, MSGTYPE_NEW); // new message
 
@@ -237,16 +247,19 @@ class Ds18b20Sensor {
 
       printPrefix(MEASUREMENT);Serial.print(this->sensorType);
       Serial.print(";");
-      Serial.print(this->results[0]);
+      Serial.print(this->resultTemperature);
       Serial.println();
     };
 
     void initTotals() {
-      for (int i = 0; i < PMSOUTPUTS; i++) {
-        this->totals[i] = 0;
-        this->lowest[i] = 999999;
-        this->highest[i] = -999999;
-      }
+      this->totalTemperature = 0;
+      this->lowestTemperature = 9999;
+      this->highestTemperature = -9999;
+//      for (int i = 0; i < PMSOUTPUTS; i++) {
+//        this->totals[i] = 0;
+//        this->lowest[i] = 999999;
+//        this->highest[i] = -999999;
+//      }
       this->nrOfMeasurements = 0;
     }
     void sendRfMessage(byte rfBuffer[], int msgLength, char msgType) {
@@ -254,6 +267,7 @@ class Ds18b20Sensor {
       // fill message type (New, Repeat)
       rfBuffer[3] = msgType;
 
+/*
       if (msgType == MSGTYPE_REPEAT) {
         unsigned long rfDelayTime = millis() - this->rfSentMsgTime;
         if (rfDelayTime > this->rfDelayTimeMax) { // max delaytime exceeded, end processing repeat
@@ -265,7 +279,7 @@ class Ds18b20Sensor {
         // fill delaytime in seconds
         rfBuffer[5] = rfDelayTime / 1000;
       }
-
+*/
       printPrefix(INFO);Serial.print("RF l:");
       Serial.print(msgLength);
       Serial.print(", C/U:");
@@ -292,23 +306,23 @@ class Ds18b20Sensor {
           corrLowHigh = true;
       }
 
-      for (i = 0; i < PMSOUTPUTS; i++) { // only first 3 measurements for RF transmit
+//      for (i = 0; i < PMSOUTPUTS; i++) { // only first 3 measurements for RF transmit
         if (corrLowHigh) {
-          this->totals[i] -= this->highest[i];
-          this->totals[i] -= this->lowest[i];          
+          this->totalTemperature -= this->highestTemperature;
+          this->totalTemperature -= this->lowestTemperature;          
         }
-        this->results[i] = (((this->totals[i] * 100) / _nrOfMeasurements ) + .49) / 10;
-      }
+        this->resultTemperature = (((this->totalTemperature * 100) / _nrOfMeasurements ) + .49) / 10;
+//      }
 
     };
     void readData() {
-      if ( millis() - this->ds18b20MeasureTime < this->ds18b20MeasureInterval ) {
-        //printPrefix(INFO);Serial.println("ds18b20 interval "); //delay(100);
-        return;
-      }
+//      if ( millis() - this->ds18b20MeasureTime < ds18b20MeasureInterval ) {
+//        //printPrefix(INFO);Serial.println("ds18b20 interval "); //delay(100);
+//        return;
+//      }
       
       // wait some time while in init fase (also during soft reset)
-      if ( millis() - this->ds18b20InitTime < this->ds18b20InitInterval ) {
+      if ( millis() - this->ds18b20InitTime < ds18b20InitInterval ) {
         //printPrefix(INFO);Serial.println("ds18b20 init fase");
         return;
       }
@@ -324,9 +338,8 @@ class Ds18b20Sensor {
       // 0 refers to the first IC on the wire
       // Temperature DS18B20 ====
 	  
-      this->temperature = sensors.getTempC(this->tempDeviceAddress);
-
-      this->measurements[0] = this->temperature;
+      this->temperature = sensors.getTempC(this->tempDeviceAddress) ;   
+      //this->measurements[0] = this->temperature;
 
       processDs18b20RF();
 
@@ -335,6 +348,6 @@ class Ds18b20Sensor {
 
 };
 
-extern Ds18b20Sensor gDs18b20Sensor;  // global instance
+//extern Ds18b20Sensor gDs18b20Sensor;  // global instance
 
 }  // end namespace  ApriSensor

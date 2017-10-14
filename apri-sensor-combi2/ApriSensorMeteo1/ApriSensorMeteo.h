@@ -1,11 +1,12 @@
 #pragma once
 
 // RF
-#define MSGTYPE_NEW 'N'
-#define MSGTYPE_REPEAT 'R'
-#define MSGTYPE_INFO 'I'
-#define MSGTYPE_EXTEND 'X'
-#define MSGTYPE_SYNC 'S'
+const byte PROGMEM  MSGTYPE_NEW ='N';
+//#define MSGTYPE_REPEAT 'R'
+const byte PROGMEM MSGTYPE_REPEAT= 'R';
+const byte PROGMEM  MSGTYPE_INFO= 'I';
+const byte PROGMEM  MSGTYPE_EXTEND= 'X';
+const byte PROGMEM  MSGTYPE_SYNC= 'S';
 
 // sensortypes
 #define S_DS18B20 51  // DS18B20
@@ -19,33 +20,44 @@
 #define MSGLENGTH_BMP280 12  // 71=S_BMP280
 //#define MSGLENGTH_PMSX003 10 //12  // 82=S_PMSx003
 
-char INFO = 'I';
-char ERROR = 'E';
-char WARNING = 'W';
-char MEASUREMENT = 'M';
+const PROGMEM byte  INFO = 'I';
+const PROGMEM byte  ERROR = 'E';
+const PROGMEM byte  WARNING = 'W';
+const PROGMEM byte  MEASUREMENT = 'M';
+
+const PROGMEM String ERRORFIRSTBYTE = "E@Invalid first byte: \0"; 
+const PROGMEM String SYNCTIMEACTIVETXT = "W@Sync time is active, ignore another sync request. ";
+const PROGMEM String SETSYNCTIMEACTIVETXT ="W@Set sync time active ";
+const PROGMEM String FREESRAMTXT =" freeSRam:";
+const PROGMEM String NEWLINE = "\r\n";
+const char PROGMEM AT = '@';
+const char PROGMEM SLASH = '/';
+const char PROGMEM SPACE = ' ';
+const uint8_t PROGMEM ZERO = 0;
+const uint8_t PROGMEM ONE = 1;
 
 void printPrefix(char type) {
   Serial.print(type);
-  Serial.print("@");
+  Serial.print(AT);
   Serial.print(MSG_ID);
-  Serial.print("/");
+  Serial.print(SLASH);
   Serial.print(UNIT_ID);
-  Serial.print("@");
+  Serial.print(AT);
 }
 
 bool syncMsgActive = false;
 long syncMsgTime=-1;
-long syncMaxTime = 4000; // 4 seconds max active time sync.
+const long PROGMEM syncMaxTime = 10000; // 10 seconds max active time sync.
 
 void receiveSyncMsg() {
 //      if ((*rfDriverPtr).recv(buf, &buflen)) { // Non-blocking      
 //      Serial.print("loop");
-//      Serial.print("\r\n");
+//      Serial.print(NEWLINE);
 //      delay(1000);
 
         if (syncBuflen == 0) {
          // Serial.print("W@RF message length 0 received, ignoring ");
-         // Serial.print("\r\n");
+         // Serial.print(NEWLINE);
           return; //message ingnored
         }
         
@@ -57,45 +69,46 @@ void receiveSyncMsg() {
 //        byte msgCycle = channelId - msgChannelNrInId - msgExtNrInId;
         
         if (msgChannelNr != channelId4b ) {
-          Serial.print("E@Invalid ApriSensor message received, first byte value: ");
+          Serial.print(ERRORFIRSTBYTE);
           Serial.print(syncBuf[0]);
-          Serial.print("\r\n");
+          Serial.print(NEWLINE);
           return; //message discarded
         }
 //        if (extender && msgExtNr == extenderId2b ) {  // skip its own sent messages
 //          Serial.print("W@Extender skipped its own sent message (first byte): ");
 //          Serial.print(syncBuf[0]);
-//          Serial.print("\r\n");
+//          Serial.print(NEWLINE);
 //          return; //message discarded
 //        }
 
         byte unitId = syncBuf[1];
         byte sensorType = syncBuf[2];
         char msgType = syncBuf[3];
-        if (msgType != 'S') {
+        if (msgType !=  MSGTYPE_SYNC) {
 //          Serial.print("W@Not a sync message received by sensor, ignore msgType ");
 //          Serial.print(msgType);
-//          Serial.print("\r\n");          
+//          Serial.print(NEWLINE);          
           return;
         }
         if (millis() - syncMsgTime < syncMaxTime) {
-          Serial.print("W@Sync time is active, ignore another sync request. ");
+          Serial.print(SYNCTIMEACTIVETXT);
           Serial.print(millis() - syncMsgTime);          
-          Serial.print(" ");          
+          Serial.print(SPACE);          
           Serial.print(syncMaxTime);          
-          Serial.print("\r\n");          
+          Serial.print(NEWLINE);          
           return;          
         }
         syncMsgActive = true;
         syncMsgTime = millis();
-          Serial.print("W@Set sync time active ");
-          Serial.print(millis() - syncMsgTime);          
-          Serial.print(" ");          
-          Serial.print(syncMaxTime);          
-          Serial.print("\r\n");
+        Serial.print(SETSYNCTIMEACTIVETXT);
+        Serial.print(millis() - syncMsgTime);          
+        Serial.print(SPACE);          
+        Serial.print(syncMaxTime);          
+        Serial.print(NEWLINE);
         return;        
 //      }
 }
+/*
 extern unsigned int __bss_end;
 extern unsigned int __heap_start;
 extern void *__brkval;
@@ -109,4 +122,4 @@ uint16_t getFreeSram() {
   else
     return (((uint16_t)&newVariable) - ((uint16_t)__brkval));
 };
-
+*/

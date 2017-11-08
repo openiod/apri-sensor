@@ -1,0 +1,9 @@
+[Unit]
+Desription=SCAPE604-apri-sensor-radiationd - start or restart apri-sensor-radiationd service, respawn
+After=network.target
+[Service]
+ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-radiationd/apri-sensor-radiationd.sh /opt/SCAPE604/log/SCAPE604-apri-sensor-radiationd.log
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

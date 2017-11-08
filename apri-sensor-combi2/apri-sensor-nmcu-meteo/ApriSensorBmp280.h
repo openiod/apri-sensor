@@ -17,12 +17,14 @@ class Bmp280Sensor {
   private:
     byte bmp280_address = 0x76; //default
 
+    String sensorSystem = "apri-sensor-bmp280\0";
+
     Adafruit_BMP280 bmp; // I2C
     long bmp280InitTime;
     long bmp280InitInterval = 10000; //10 seconden init wait time
     long bmp280MeasureTime;
-    long bmp280MeasureInterval = 1000;  // measurement interval in millisecs
-
+    long bmp280MeasureInterval = 5000;  // measurement interval in millisecs
+    bool sensorFound = false;
     float pressure;
     float pressureHPa;
     float seaLevelHPa;
@@ -35,12 +37,12 @@ class Bmp280Sensor {
     float totals[PMSOUTPUTS];
     float lowest[PMSOUTPUTS];
     float highest[PMSOUTPUTS];
-    long results[PMSOUTPUTS];
+    float results[PMSOUTPUTS];
     unsigned long transactionTime; // 20 seconds per transaction, send measurement
-    const unsigned long transactionTimeMax = 20000; // milliseconds per transaction period, then send message
+    const unsigned long transactionTimeMax = 57800; // milliseconds per transaction period, then send message. 57.8secs=+-1x per minute
     unsigned long rfRepeatTime;
     const unsigned long rfRepeatTimeMax = 5000; // milliseconds waittime for repeating message
-    unsigned long rfSentMsgTime;  // to calculate delay for repeat message
+ //   unsigned long rfSentMsgTime;  // to calculate delay for repeat message
     const unsigned long rfDelayTimeMax = 60000; // maximum delaytime in millisec for repeating messages
     byte messageNr;
     char rfBuf[MSGLENGTH_BMP280];
@@ -59,10 +61,10 @@ class Bmp280Sensor {
       this->messageNr = 0;
       printPrefix(INFO);Serial.println("BMP280 sensor start");
       this->sensorType = S_BMP280;
-      
-      while (!this->bmp.begin(bmp280_address)) {
-        Serial.println("Could not find a valid BMP280 sensor, check wiring!");
-      }
+      sensorFound = this->bmp.begin(bmp280_address);
+      //while (!this->bmp.begin(bmp280_address)) {
+      //  Serial.println("Could not find a valid BMP280 sensor, check wiring!");
+      //}
       //this->bmp.begin(bmp280_address);
 
       printPrefix(INFO);Serial.println("BMP280 sensor connected");
@@ -113,24 +115,24 @@ class Bmp280Sensor {
         Serial.print(this->totals[i]);
         Serial.print(";\t");
       }
-      Serial.print("\n");
+      Serial.print("\r\n");
 
       for (int i = 0; i < PMSRESULTS; i++) {
         Serial.print(this->lowest[i]);
         Serial.print(";\t");
       }
-      Serial.print("\n");
+      Serial.print("\r\n");
       for (int i = 0; i < PMSRESULTS; i++) {
         Serial.print(this->highest[i]);
         Serial.print(";\t");
       }
 
-      Serial.print("\n");
+      Serial.print("\r\n");
       for (int i = 0; i < PMSRESULTS; i++) {
         Serial.print(this->results[i]);
         Serial.print(";\t");
       }
-      Serial.print("\n");
+      Serial.print("\r\n");
 */
 
       rfBuf[0] = MSG_ID;
@@ -139,28 +141,42 @@ class Bmp280Sensor {
       rfBuf[3] = 0; // msgType initiated when calling function sendRfMessage
       rfBuf[4] = this->getNewMsgNr();
       rfBuf[5] = 0;  // delaytime equal zero for first time sending message. In seconds.
-      this->rfSentMsgTime = millis();
-      rfBuf[6] = highByte(this->results[0]); // pressureHPa
-      rfBuf[7] = lowByte(this->results[0]);  //
-      rfBuf[8] = highByte(this->results[2]); // temperature
-      rfBuf[9] = lowByte(this->results[2]);  //
-      rfBuf[10] = highByte(this->results[3]);// altitude
-      rfBuf[11] = lowByte(this->results[3]); //
+//      this->rfSentMsgTime = millis();
+//      rfBuf[6] = highByte(this->results[0]); // pressureHPa
+//      rfBuf[7] = lowByte(this->results[0]);  //
+//      rfBuf[8] = highByte(this->results[2]); // temperature
+//      rfBuf[9] = lowByte(this->results[2]);  //
+//      rfBuf[10] = highByte(this->results[3]);// altitude
+//      rfBuf[11] = lowByte(this->results[3]); //
 
-      Serial.print("send message");  
+//      Serial.print("send message");  
 //      sendRfMessage(rfBuf, MSGLENGTH_BMP280, MSGTYPE_NEW); // new message
 
       this->transactionTime = millis();
-      initTotals();
 
-      printPrefix(MEASUREMENT);Serial.print(this->sensorType);
+      printPrefix(MEASUREMENT);
+      Serial.print(this->sensorType);
       Serial.print(";");
       Serial.print(this->results[0]); // pressureHPa
       Serial.print(";");
       Serial.print(this->results[2]); // temperature
       Serial.print(";");
       Serial.print(this->results[3]); // altitude
-      Serial.println();
+      Serial.print(";");
+      Serial.print(this->nrOfMeasurements);
+      Serial.print("\r\n");
+
+      String urlParams = "&observation=apri-sensor-bmp280-pressure:\0";
+      double pressureHPa = this->results[0];  // double for String conversion and decimals)
+      double temperature = this->results[2];
+      //double altitude = this->results[3];
+      urlParams += String(pressureHPa, 2) + ",";
+      urlParams += "apri-sensor-bmp280-temperature:\0";
+      urlParams += String(temperature, 2); 
+      urlParams += "&sensorsystem=" + this->sensorSystem; 
+      sendObservations(urlParams);
+
+      initTotals();
 
     };
 
@@ -221,12 +237,16 @@ class Bmp280Sensor {
           this->totals[i] -= this->highest[i];
           this->totals[i] -= this->lowest[i];          
         }
-        this->results[i] = (((this->totals[i] * 100) / _nrOfMeasurements ) + .49) / 10;
+//        this->results[i] = (((this->totals[i] * 100) / _nrOfMeasurements ) + .49) / 10;
+        this->results[i] = this->totals[i] / _nrOfMeasurements ;
       }
     };
     void readData() {
 
-
+      if (!sensorFound) {
+        sensorFound = this->bmp.begin(bmp280_address);
+        return;
+      }
       if ( millis() - this->bmp280MeasureTime < this->bmp280MeasureInterval ) {
         //Serial.println("bmp280 init fase");
         return;

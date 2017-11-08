@@ -35,7 +35,7 @@ class Am2320Sensor {
     long highest[PMSOUTPUTS];
     long results[PMSOUTPUTS];
     unsigned long transactionTime; // 20 seconds per transaction, send measurement
-    unsigned long rfRepeatTime;
+//    unsigned long rfRepeatTime;
     unsigned long rfSentMsgTime;  // to calculate delay for repeat message
     byte messageNr;
     char rfBuf[MSGLENGTH_AM2320];
@@ -56,7 +56,7 @@ class Am2320Sensor {
       this->am2320InitTime = millis();
       printPrefix(INFO);Serial.print("start am2320 init fase\r\n");
 
-      this->rfRepeatTime = 0;  //
+//      this->rfRepeatTime = 0;  //
       this->transactionTime = millis();
       this->am2320MeasureTime = millis();
       this->initTotals();
@@ -145,7 +145,8 @@ class Am2320Sensor {
       rfBuf[8] = highByte(this->results[ONE]); // temperature
       rfBuf[9] = lowByte(this->results[ONE]);  //
 
-      sendRfMessage(rfBuf, MSGLENGTH_AM2320, MSGTYPE_NEW); // new message
+      sendRfMessage(rfBuf, MSGLENGTH_AM2320, MSGTYPE_NEW, this->nrOfMeasurements); // new message
+ //     this->rfRepeatTime = millis();
 
       this->transactionTime = millis();
       initTotals();
@@ -166,41 +167,6 @@ class Am2320Sensor {
         this->highest[i] = -999999;
       }
       this->nrOfMeasurements = 0;
-    }
-    void sendRfMessage(byte rfBuffer[], int msgLength, char msgType) {
-
-      // fille message type (New, Repeat)
-      rfBuffer[3] = msgType;
-
-/*
-      if (msgType == MSGTYPE_REPEAT) {
-        unsigned long rfDelayTime = millis() - this->rfSentMsgTime;
-        if (rfDelayTime > rfDelayTimeMax) { // max delaytime exceeded, end processing repeat
-          printPrefix(INFO);Serial.print("RF max repeat time exceeded, stop repeating this message ");
-          Serial.println(rfDelayTime);
-          this->rfRepeatTime = 0; // stop repeating this message
-          return;
-        }
-        // fill delaytime in seconds
-        rfBuffer[5] = rfDelayTime / 1000;
-      }
-*/
-      printPrefix(INFO);Serial.print("RF l:");
-      Serial.print(msgLength);
-      Serial.print(", C/U:");
-      Serial.print(rfBuffer[0]);
-      Serial.print(SLASH);
-      Serial.print(rfBuffer[1]);
-      Serial.print(", T:");
-      Serial.print(rfBuffer[2]);
-      Serial.print(msgType);
-      Serial.print(" #");
-      Serial.println(this->nrOfMeasurements);
-      
-      rfDriver.send(rfBuffer, msgLength);
-      rfDriver.waitPacketSent();
-
-      this->rfRepeatTime = millis();
     }
     void computeResults() {
       int i;

@@ -33,7 +33,7 @@ const byte VersionMajor = 0;
 const byte VersionMinor = 1;
 
 
-const uint8_t UNIT_ID = 1; // todo: dipswitch or otherwise? >100 for recievers/pulsers/repeaters
+const uint8_t UNIT_ID = 2; // todo: dipswitch or otherwise? >100 for recievers/pulsers/repeaters
 
 const byte channelId4b = 7;  // 0-15 left 4 bits for channel identification, xxxx .... -> 1111 0000 = channel 15
 const byte extenderId2b = 0; // 1-7, 0 is for sensor. left most 2 bits of right most 4 bits for extender identification, .... xx.. = extender 3 of channel 15 

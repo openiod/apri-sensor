@@ -1,17 +1,6 @@
 #pragma once
 
-// RF
-#define MSGTYPE_NEW 'N'
-#define MSGTYPE_REPEAT 'R'
-#define MSGTYPE_INFO 'I'
-#define MSGTYPE_EXTEND 'X'
-
 const String NEWLINE = "\r\n";
-const char  AT = '@';
-const char  SLASH = '/';
-const char  SPACE = ' ';
-const uint8_t  ZERO = 0;
-const uint8_t  ONE = 1;
 
 // sensortypes
 #define S_DS18B20 51  // DS18B20
@@ -19,7 +8,7 @@ const uint8_t  ONE = 1;
 #define S_BMP280  71  // BMP280
 #define S_PMS7003 81  // Plantower PMS7003
 #define S_PMSA003 82  // Plantower PMSA003
-
+#define S_DYLOS   90  // Dylos DC1100 / Dylos DC1700
 #define MSGLENGTH_DS18B20 8  // 51=S_DS18B20
 #define MSGLENGTH_AM2320 10  // 61=S_AM2320
 #define MSGLENGTH_BMP280 12  // 71=S_BMP280
@@ -33,23 +22,6 @@ const char* fingerprint = "FD:C8:1C:3E:29:DB:00:29:72:0E:BC:C0:CD:BB:E2:66:79:25
 
 String URL = "https://openiod.org/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&offering=offering_0439_initial&commit=true&region=0439&neighborhoodcode=UNKNOWN&citycode=UNKNOWN";
 String foi = "WEMOSD1test\0";
-
-char INFO = 'I';
-char ERROR = 'E';
-char WARNING = 'W';
-char MEASUREMENT = 'M';
-
-
- 
- void printPrefix(char type) {
-  Serial.print(type);
-  Serial.print("@");
-  Serial.print(MSG_ID);
-  Serial.print("/");
-  Serial.print(UNIT_ID);
-  Serial.print("@");
-};
-
 
 
 void sendObservations(String urlParams) {

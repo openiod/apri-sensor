@@ -117,7 +117,9 @@ void loop() {
       Serial.print(NEWLINE);
       delay((10 + 500*UNIT_ID));  // 1 sec after sync plus unitid x secs delaytime
       bmp280Sensor.sendResults();
+      delay(100);
       am2320Sensor.sendResults();
+      delay(100);
       ds18b20Sensor.sendResults();
       syncMsgActive = false;
     }

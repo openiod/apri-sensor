@@ -33,8 +33,9 @@ const byte VersionMinor = 2;  // reciever + pulser (sync sensors)
 // this application can act like a reciever (base station reciever) or extender for extend the range of wireless transmit.
 
 const bool extender = false;  // true=receive and re-transmit; false=recieve only and send to connected base station   
+const bool syncer = false;  // false= does not send synchronisation signals
+const uint8_t UNIT_ID = 202; // todo: dipswitch or otherwise? >100<255 for recievers/pulsers/repeaters
 
-const uint8_t UNIT_ID = 201; // todo: dipswitch or otherwise? >100<255 for recievers/pulsers/repeaters
 const byte channelId4b = 7;  // 1-15 left 4 bits for channel identification, xxxx .... -> 1111 0000 = channel 15. NOT ZERO!
 const byte extenderId2b = 0; // 1-7 (0 is for sensor, base reciever can be anything) left most 2 bits of right most 4 bits for extender identification, .... xx.. = extender 3 of channel 15 
 // extender skips messages sent by the same extender by checking extenderId bits. Retransmitted messages get +1 until rightmost two bits = 11 
@@ -66,8 +67,11 @@ void loop()
   while (1) {
 //    if (myReceiver.isActive() ) {
       myReceiver.receiveData();
+//      rfDriver.setModeIdle();
+//      rfDriver.setModeTx();
+      rfDriver.setModeRx();
 
-      if (millis()-syncTime>syncTimeMax) {
+      if (syncer == true && millis()-syncTime>syncTimeMax) {
         //Serial.print("Sync **********************************");
         syncPulse();
       }

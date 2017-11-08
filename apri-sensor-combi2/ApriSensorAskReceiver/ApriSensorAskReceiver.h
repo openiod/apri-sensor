@@ -129,8 +129,8 @@ class Receiver {
       uint8_t buflen = sizeof(buf);
 
       if ((*rfDriverPtr).recv(buf, &buflen)) { // Non-blocking      
-//      Serial.print("loop");
-//      Serial.print("\r\n");
+      Serial.print("loop");
+      Serial.print("\r\n");
 //      delay(1000);
         int index = -1;
         if (buflen == 0) {

@@ -123,3 +123,36 @@ uint16_t getFreeSram() {
     return (((uint16_t)&newVariable) - ((uint16_t)__brkval));
 };
 */
+    void sendRfMessage(byte rfBuffer[], int msgLength, char msgType, uint8_t nrOfMeasurements) {
+      // fille message type (New, Repeat)
+      rfBuffer[3] = msgType;
+
+/*
+      if (msgType == MSGTYPE_REPEAT) {
+        unsigned long rfDelayTime = millis() - this->rfSentMsgTime;
+        if (rfDelayTime > this->rfDelayTimeMax) { // max delaytime exceeded, end processing repeat
+          //Serial.println("RF max repeat time exceeded, stop repeating this message");
+          //Serial.println(rfDelayTime);
+          this->rfRepeatTime = 0; // stop repeating this message
+          return;
+        }
+        // fill delaytime in seconds
+        rfBuffer[5] = rfDelayTime / 1000;
+      }
+*/
+
+      printPrefix(INFO);Serial.print("RF l:");
+      Serial.print(msgLength);
+      Serial.print(", C/U:");
+      Serial.print(rfBuffer[0]);
+      Serial.print("/");
+      Serial.print(rfBuffer[1]);
+      Serial.print(", T:");
+      Serial.print(rfBuffer[2]);
+      Serial.print(msgType);
+      Serial.print(" #");
+      Serial.println(nrOfMeasurements);
+
+      rfDriver.send(rfBuffer, msgLength);
+      rfDriver.waitPacketSent();
+    }

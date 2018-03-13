@@ -148,6 +148,8 @@ var myParser = function(emitter, buffer) {
 					tmpBuffer = incommingData.slice(i+9);
 					incommingData = tmpBuffer;
 					console.log ('bufferlengte wordt: '+incommingData.length);
+				} else {
+					console.log ('nieuwe foutieve byte was: '+ incommingData[i];
 				}
 			}
 //      emitter.emit("data", incommingData);

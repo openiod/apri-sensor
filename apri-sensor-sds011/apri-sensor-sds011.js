@@ -142,7 +142,7 @@ var myParser = function(emitter, buffer) {
 //						emitBuffer = Buffer.concat([emitBuffer, incommingData[i+j]]);
 //					}
           emitter.emit("data", emitBuffer);
-					incommingData = incommingData.slice(i+11);
+					incommingData = incommingData.slice(i+10);
 				}
 			}
 //      emitter.emit("data", incommingData);

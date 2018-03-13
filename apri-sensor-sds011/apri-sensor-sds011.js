@@ -142,6 +142,7 @@ var myParser = function(emitter, buffer) {
 //						emitBuffer = Buffer.concat([emitBuffer, incommingData[i+j]]);
 //					}
           emitter.emit("data", emitBuffer);
+					console.log('parser new byte incommingdata to process: ' + incommingData[i+10]);
 					incommingData = incommingData.slice(i+10);
 				}
 			}

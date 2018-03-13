@@ -129,7 +129,8 @@ var tmpBuffer = new Buffer(0);
 var emitBuffer = new Buffer(0);
 var myParser = function(emitter, buffer) {
 	  console.log('parser datalength: ' + buffer.length);
-    incommingData = Buffer.concat([incommingData, buffer]);
+    tmpBuffer = Buffer.concat([incommingData, buffer]);
+		incommingData = tmpBuffer;
 //    if (incommingData.length > 3 && incommingData[incommingData.length - 3] == 3) {
 		if (incommingData.length >= 10 ) {
 			for (var i=0;i<incommingData.length;i++) {

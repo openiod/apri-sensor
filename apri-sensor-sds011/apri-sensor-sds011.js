@@ -136,7 +136,8 @@ var incommingData = new Buffer(0);
 var tmpBuffer = new Buffer(0);
 var emitBuffer = new Buffer(0);
 var myParser = function(emitter, buffer) {
-	  printHex(buffer,'input buffer');
+	  printHex(incommingData,'nog niet verwerkt');
+	  printHex(buffer,'input buffer erbij');
 	  console.log('parser datalength: ' + incommingData.length + ' plus '+ buffer.length);
     tmpBuffer = Buffer.concat([incommingData, buffer]);
 		incommingData = tmpBuffer;

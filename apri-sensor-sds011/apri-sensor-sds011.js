@@ -240,7 +240,7 @@ var processMeasurement = function(data) {
 	id         = data[6].toString(16)+data[7].toString(16);
 
 	measureMentCount++;
-  console.log(pm25+' '+pm10+' '+id+' '+measureMentCount);
+  //console.log(pm25+' '+pm10+' '+id+' '+measureMentCount);
 
 }
 

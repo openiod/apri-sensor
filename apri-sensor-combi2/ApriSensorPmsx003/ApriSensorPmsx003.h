@@ -3,7 +3,7 @@
 #define PMSOUTPUTS 3 // nr of outputs like 1=PM0.3, 2=PM0.5, etc.
 #define PMSRESULTS 3 
 
-const uint8_t SERPORT_RX = 9;
+const uint8_t SERPORT_RX = 6; //was 19;
 const uint8_t SERPORT_TX = 3;
 
 #include <SoftwareSerial.h>
@@ -149,7 +149,7 @@ class Pmsx003Sensor {
       Serial.print(" #");
       Serial.print(this->nrOfMeasurements);
       Serial.print(" Preparing new message. difftime:");
-      Serial.print(nowTime - this->transactionTime);
+      Serial.print(millis() - this->transactionTime);
       Serial.print(" freeSRam:");
       Serial.print(getFreeSram());
       Serial.print("\r\n");
@@ -413,7 +413,7 @@ class Pmsx003Sensor {
 //          this->measurements[0] = this->pm1;
 //          this->measurements[1] = this->pm25;
 //          this->measurements[2] = this->pm10;
-          //Serial.print("processing data PMSx003 RF");Serial.print("\r\n");
+//          Serial.print("processing data PMSx003 RF");Serial.print("\r\n");
           processPmsRF();
         }
       }

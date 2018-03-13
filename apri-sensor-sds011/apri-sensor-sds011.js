@@ -149,7 +149,7 @@ var myParser = function(emitter, buffer) {
 					incommingData = tmpBuffer;
 					console.log ('bufferlengte wordt: '+incommingData.length);
 				} else {
-					console.log ('nieuwe foutieve byte was: '+ incommingData[i];
+					console.log ('nieuwe foutieve byte was: '+ incommingData[i]);
 				}
 			}
 //      emitter.emit("data", incommingData);

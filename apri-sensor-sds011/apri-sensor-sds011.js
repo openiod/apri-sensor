@@ -148,7 +148,7 @@ var myParser = function(emitter, buffer) {
 			for (var i=0;i<incommingData.length;i++) {
 				if (incommingData.length-i<10 ){
 					console.log('parser klaar datalength: ' + incommingData.length + ' i '+ i);
-					tmpBuffer = incommingData.slice(i+1);
+					tmpBuffer = incommingData.slice(i);
 					incommingData = tmpBuffer;
 					break;
 				}

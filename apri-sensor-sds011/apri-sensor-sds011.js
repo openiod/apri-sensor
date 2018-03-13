@@ -125,6 +125,7 @@ var pm10Result;
 var id = "SDS011";
 
 var incommingData = new Buffer(0);
+var tmpBuffer = new Buffer(0);
 var emitBuffer = new Buffer(0);
 var myParser = function(emitter, buffer) {
 	  console.log('parser datalength: ' + buffer.length);
@@ -143,7 +144,10 @@ var myParser = function(emitter, buffer) {
 //					}
           emitter.emit("data", emitBuffer);
 					console.log('parser new byte incommingdata to process: ' + incommingData[i+10]);
-					incommingData = incommingData.slice(i+9);
+					console.log ('bufferlengte was: '+incommingData.length);
+					tmpBuffer = incommingData.slice(i+9);
+					incommingData = tmpBuffer;
+					console.log ('bufferlengte wordt: '+incommingData.length);
 				}
 			}
 //      emitter.emit("data", incommingData);

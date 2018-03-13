@@ -169,9 +169,11 @@ var myParser = function(emitter, buffer) {
 					console.log ('nieuwe foutieve byte was: '+ incommingData[i]);
 				}
 			}
-			//if (i==incommingData.length) {
+			console.log('1 parser klaar datalength: ' + incommingData.length + ' i '+ i);
+			if (i==incommingData.length) {
 				incommingData = new Buffer(0);
-			//}
+			}
+			console.log('2 parser klaar datalength: ' + incommingData.length + ' i '+ i);
 			//tmpBuffer = incommingData.slice(i+1);
 			//incommingData = tmpBuffer;
 

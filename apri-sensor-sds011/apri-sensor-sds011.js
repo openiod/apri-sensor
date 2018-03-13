@@ -136,8 +136,8 @@ var incommingData = new Buffer(0);
 var tmpBuffer = new Buffer(0);
 var emitBuffer = new Buffer(0);
 var myParser = function(emitter, buffer) {
-	  printHex(incommingData,'nog niet verwerkt');
-	  printHex(buffer,'input buffer erbij');
+	  //printHex(incommingData,'nog niet verwerkt');
+	  //printHex(buffer,'input buffer erbij');
 	  console.log('parser datalength: ' + incommingData.length + ' plus '+ buffer.length);
     tmpBuffer = Buffer.concat([incommingData, buffer]);
 		incommingData = tmpBuffer;
@@ -147,7 +147,7 @@ var myParser = function(emitter, buffer) {
 		if (incommingData.length >= 10 ) {
 			for (var i=0;i<incommingData.length;i++) {
 				if (incommingData.length-i<10 ){
-					console.log('parser klaar datalength: ' + incommingData.length + ' i '+ i);
+//					console.log('parser klaar datalength: ' + incommingData.length + ' i '+ i);
 					tmpBuffer = incommingData.slice(i);
 					incommingData = tmpBuffer;
 					break;
@@ -160,20 +160,20 @@ var myParser = function(emitter, buffer) {
 //					}
           emitter.emit("data", emitBuffer);
 					i=i+9;
-					console.log('parser new byte incommingdata to process: ' + incommingData[i+10]);
-					console.log ('bufferlengte was: '+incommingData.length);
+//					console.log('parser new byte incommingdata to process: ' + incommingData[i+10]);
+//					console.log ('bufferlengte was: '+incommingData.length);
 					//tmpBuffer = incommingData.slice(i+10);
 					//incommingData = tmpBuffer;
-					console.log ('bufferlengte wordt: '+incommingData.length);
+//					console.log ('bufferlengte wordt: '+incommingData.length);
 				} else {
-					console.log ('nieuwe foutieve byte was: '+ incommingData[i]);
+//					console.log ('nieuwe foutieve byte was: '+ incommingData[i]);
 				}
 			}
-			console.log('1 parser klaar datalength: ' + incommingData.length + ' i '+ i);
+//			console.log('1 parser klaar datalength: ' + incommingData.length + ' i '+ i);
 			if (i==incommingData.length) {
 				incommingData = new Buffer(0);
 			}
-			console.log('2 parser klaar datalength: ' + incommingData.length + ' i '+ i);
+//			console.log('2 parser klaar datalength: ' + incommingData.length + ' i '+ i);
 			//tmpBuffer = incommingData.slice(i+1);
 			//incommingData = tmpBuffer;
 

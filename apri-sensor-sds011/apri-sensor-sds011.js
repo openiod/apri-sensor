@@ -131,10 +131,14 @@ var myParser = function(emitter, buffer) {
 	  console.log('parser datalength: ' + incommingData.length + ' plus '+ buffer.length);
     tmpBuffer = Buffer.concat([incommingData, buffer]);
 		incommingData = tmpBuffer;
+
+
 //    if (incommingData.length > 3 && incommingData[incommingData.length - 3] == 3) {
 		if (incommingData.length >= 10 ) {
 			for (var i=0;i<incommingData.length;i++) {
 				if (incommingData.length-i<10 ){
+					tmpBuffer = incommingData.slice(i);
+					incommingData = tmpBuffer;
 					break;
 				}
 				if (incommingData[i]==170 && incommingData[i+1]==192) {
@@ -146,8 +150,8 @@ var myParser = function(emitter, buffer) {
           emitter.emit("data", emitBuffer);
 					console.log('parser new byte incommingdata to process: ' + incommingData[i+10]);
 					console.log ('bufferlengte was: '+incommingData.length);
-					tmpBuffer = incommingData.slice(i+10);
-					incommingData = tmpBuffer;
+					//tmpBuffer = incommingData.slice(i+10);
+					//incommingData = tmpBuffer;
 					console.log ('bufferlengte wordt: '+incommingData.length);
 				} else {
 					console.log ('nieuwe foutieve byte was: '+ incommingData[i]);

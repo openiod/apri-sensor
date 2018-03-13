@@ -351,7 +351,7 @@ var writeResults	= function(measureTime, loopTime) {
 	});
 
 	data.categories			= [];
-	data.observation		= 'scapeler_sds011_pm25:'+pm25Result+','+'scapeler_sds011_pm10:'+pm10Result ;
+	data.observation		= 'apri-sensor-sds011-pm25:'+pm25Result+','+'apri-sensor-sds011-pm10:'+pm10Result ;
 
 	sendData(data);
 
@@ -362,10 +362,10 @@ var sendData = function(data) {
 // oud //		http://openiod.com/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&inputformat=insertom&objectid=humansensor&format=xml
 // oud //			&region=EHV		&lat=50.1		&lng=4.0		&category=airquality		&value=1
 
-//http://localhost:4000/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=scapeler_sds011&offering=offering_0439_initial&verbose=true&commit=true&observation=scapeler_sds011:12.345&neighborhoodcode=BU04390402
-//https://openiod.org/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=scapeler_sds011&offering=offering_0439_initial&verbose=true&commit=true&observation=scapeler_sds011_pm25:12345,scapeler_sds011_pm10:345&neighborhoodcode=BU04390402
+//http://localhost:4000/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=apri-sensor-sds011&offering=offering_0439_initial&verbose=true&commit=true&observation=apri-sensor-sds011-pm25:12.345&neighborhoodcode=BU04390402
+//https://openiod.org/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=apri-sensor-sds011&offering=offering_0439_initial&verbose=true&commit=true&observation=apri-sensor-sds011-pm25:12345,apri-sensor-sds011-pm10:345&neighborhoodcode=BU04390402
 
-		var _url = openiodUrl + '/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=scapeler_sds011&offering=offering_0439_initial&commit=true';
+		var _url = openiodUrl + '/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=apri-sensor-sds011&offering=offering_0439_initial&commit=true';
 		_url = _url +
 		//'&region=0439' +
 		'&foi=' + data.foi +

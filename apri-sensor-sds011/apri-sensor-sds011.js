@@ -136,13 +136,13 @@ var myParser = function(emitter, buffer) {
 					break;
 				}
 				if (incommingData[i]==170 && incommingData[i+1]==192) {
-					emitBuffer = new Buffer(0);
+					//emitBuffer = new Buffer(0);
           emitBuffer = incommingData.slice(i,i+10);
 //					for (var j=0;j<10;j++) {
 //						emitBuffer = Buffer.concat([emitBuffer, incommingData[i+j]]);
 //					}
           emitter.emit("data", emitBuffer);
-					incommingData = incommingData.slice(i,i+10);
+					incommingData = incommingData.slice(i+11);
 				}
 			}
 //      emitter.emit("data", incommingData);

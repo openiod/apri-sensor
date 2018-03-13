@@ -146,7 +146,7 @@ var myParser = function(emitter, buffer) {
           emitter.emit("data", emitBuffer);
 					console.log('parser new byte incommingdata to process: ' + incommingData[i+10]);
 					console.log ('bufferlengte was: '+incommingData.length);
-					tmpBuffer = incommingData.slice(i+9);
+					tmpBuffer = incommingData.slice(i+10);
 					incommingData = tmpBuffer;
 					console.log ('bufferlengte wordt: '+incommingData.length);
 				} else {

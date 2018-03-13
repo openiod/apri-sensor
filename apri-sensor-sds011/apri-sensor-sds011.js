@@ -124,10 +124,19 @@ var pm25Result;
 var pm10Result;
 var id = "SDS011";
 
+var printHex = function(buffer, tekst) {
+	var str="";
+  for (var i=0;i<buffer.length;i++) {
+	  str = str+ buffer[i].toString(16)+' ';
+  }
+  console.log('log: ' + tekst +'  lengte:'+buffer.length+ " "+ str); // + data);
+}
+
 var incommingData = new Buffer(0);
 var tmpBuffer = new Buffer(0);
 var emitBuffer = new Buffer(0);
 var myParser = function(emitter, buffer) {
+	  printHex(buffer,'input buffer');
 	  console.log('parser datalength: ' + incommingData.length + ' plus '+ buffer.length);
     tmpBuffer = Buffer.concat([incommingData, buffer]);
 		incommingData = tmpBuffer;

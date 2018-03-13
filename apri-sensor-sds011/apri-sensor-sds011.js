@@ -137,6 +137,7 @@ var myParser = function(emitter, buffer) {
 		if (incommingData.length >= 10 ) {
 			for (var i=0;i<incommingData.length;i++) {
 				if (incommingData.length-i<10 ){
+					console.log('parser klaar datalength: ' + incommingData.length + ' i '+ i);
 					tmpBuffer = incommingData.slice(i+1);
 					incommingData = tmpBuffer;
 					break;
@@ -148,6 +149,7 @@ var myParser = function(emitter, buffer) {
 //						emitBuffer = Buffer.concat([emitBuffer, incommingData[i+j]]);
 //					}
           emitter.emit("data", emitBuffer);
+					i=i+10;
 					console.log('parser new byte incommingdata to process: ' + incommingData[i+10]);
 					console.log ('bufferlengte was: '+incommingData.length);
 					//tmpBuffer = incommingData.slice(i+10);
@@ -157,6 +159,12 @@ var myParser = function(emitter, buffer) {
 					console.log ('nieuwe foutieve byte was: '+ incommingData[i]);
 				}
 			}
+			//if (i==incommingData.length) {
+				incommingData = new Buffer(0);
+			//}
+			//tmpBuffer = incommingData.slice(i+1);
+			//incommingData = tmpBuffer;
+
 //      emitter.emit("data", incommingData);
 //      incommingData = new Buffer(0);
     }

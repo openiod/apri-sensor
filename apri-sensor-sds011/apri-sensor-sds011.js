@@ -124,17 +124,43 @@ var pm25Result;
 var pm10Result;
 var id = "SDS011";
 
+var incommingData = new Buffer(0);
+var emitBuffer = new Buffer(0);
+var myParser = function(emitter, buffer) {
+	  console.log('parser datalength: ' + buffer.length);
+    incommingData = Buffer.concat([incommingData, buffer]);
+//    if (incommingData.length > 3 && incommingData[incommingData.length - 3] == 3) {
+		if (incommingData.length >= 10 ) {
+			for (var i=0;i<incommingData.length;i++) {
+				if (incommingData.length-i<10 ){
+					break;
+				}
+				if (incommingData[i]==170 && incommingData[i+1]==192) {
+					emitBuffer = new Buffer(0);
+          emitBuffer = incommingData.slice(i,i+10);
+//					for (var j=0;j<10;j++) {
+//						emitBuffer = Buffer.concat([emitBuffer, incommingData[i+j]]);
+//					}
+          emitter.emit("data", emitBuffer);
+					incommingData = incommingData.slice(i,i+10);
+				}
+			}
+//      emitter.emit("data", incommingData);
+//      incommingData = new Buffer(0);
+    }
+};
+
 var mainProcess = function() {
 	console.log('Found usb comname: ' + serialPortPath );
 
 
 //	var serialport = new SerialPort(serialPortPath, {parser: SerialPort.parsers.readline('\n')} );
-	var serialport = new SerialPort(serialPortPath, {} );
+	var serialport = new SerialPort(serialPortPath, {parser: myParser} );
 	serialport.on('open', function(){
 		console.log('Serial Port connected');
 		if (writeHeaders == true) writeHeaderIntoFile();
 		serialport.on('data', function(data){
-			//console.log('datalength: ' + data.length);
+			console.log('datalength: ' + data.length);
 			var checksum = 0;
 			if (data.length == 10 ) {
 				var c1 =(data[2]+data[3]+data[4]+data[5]+data[6]+data[7]);

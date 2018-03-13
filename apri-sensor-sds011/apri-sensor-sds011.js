@@ -143,7 +143,7 @@ var myParser = function(emitter, buffer) {
 //					}
           emitter.emit("data", emitBuffer);
 					console.log('parser new byte incommingdata to process: ' + incommingData[i+10]);
-					incommingData = incommingData.slice(i+10);
+					incommingData = incommingData.slice(i+9);
 				}
 			}
 //      emitter.emit("data", incommingData);

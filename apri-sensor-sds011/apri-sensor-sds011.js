@@ -311,7 +311,7 @@ var writeHeaderIntoFile = function() {
 }
 
 var writeResults	= function(measureTime, loopTime) {
-	console.log('Results: ' + measureTime.toISOString() );
+	console.log('Results: ' + measureTime.toISOString() + ' count: ' + measureMentCount);
 
 
 /*

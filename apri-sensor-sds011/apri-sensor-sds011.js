@@ -137,7 +137,7 @@ var myParser = function(emitter, buffer) {
 		if (incommingData.length >= 10 ) {
 			for (var i=0;i<incommingData.length;i++) {
 				if (incommingData.length-i<10 ){
-					tmpBuffer = incommingData.slice(i);
+					tmpBuffer = incommingData.slice(i+1);
 					incommingData = tmpBuffer;
 					break;
 				}

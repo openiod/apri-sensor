@@ -138,7 +138,7 @@ var emitBuffer = new Buffer(0);
 var myParser = function(emitter, buffer) {
 	  //printHex(incommingData,'nog niet verwerkt');
 	  //printHex(buffer,'input buffer erbij');
-	  console.log('parser datalength: ' + incommingData.length + ' plus '+ buffer.length);
+	  //console.log('parser datalength: ' + incommingData.length + ' plus '+ buffer.length);
     tmpBuffer = Buffer.concat([incommingData, buffer]);
 		incommingData = tmpBuffer;
 
@@ -192,7 +192,7 @@ var mainProcess = function() {
 		console.log('Serial Port connected');
 		if (writeHeaders == true) writeHeaderIntoFile();
 		serialport.on('data', function(data){
-			console.log('datalength: ' + data.length);
+//			console.log('datalength: ' + data.length);
 			var checksum = 0;
 			if (data.length == 10 ) {
 				var c1 =(data[2]+data[3]+data[4]+data[5]+data[6]+data[7]);

@@ -149,7 +149,7 @@ var myParser = function(emitter, buffer) {
 //						emitBuffer = Buffer.concat([emitBuffer, incommingData[i+j]]);
 //					}
           emitter.emit("data", emitBuffer);
-					i=i+10;
+					i=i+9;
 					console.log('parser new byte incommingdata to process: ' + incommingData[i+10]);
 					console.log ('bufferlengte was: '+incommingData.length);
 					//tmpBuffer = incommingData.slice(i+10);

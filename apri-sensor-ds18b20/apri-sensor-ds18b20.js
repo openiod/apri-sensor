@@ -172,7 +172,7 @@ var processDeviceData	= function(err,temperatureData) {
 	//console.log(line2);
 	//console.log(_temperature);
 	if (isNumeric(_temperature) ) {
-		var temperature = parseFloat(_temperature)/1000;
+		var temperature = Math.round(parseFloat(_temperature)/10)/100; // round to 2 decimals
 		console.log(temperature);
 		//processMeasurement(temperature);
 		var sensorId			= sensorId;

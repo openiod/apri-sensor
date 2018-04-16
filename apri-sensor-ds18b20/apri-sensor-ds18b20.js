@@ -158,9 +158,11 @@ var getCpuInfo	= function() {
 	return '0';
 };
 
-var processDeviceData	= function() {
+var processDeviceData	= function(err,data) {
 	console.log('processDeviceData');
-	var line2 = _file.toString().split(/\n/)[1];
+	if (err) throw err;
+  console.log(data);
+	var line2 = data.toString().split(/\n/)[1];
 	var _temperature = line2.split('t=')[1];
 	//console.log(line2);
 	//console.log(_temperature);
@@ -210,7 +212,6 @@ try {
   return;
 }
 
-var _file;
 //var sensorKey			= 'DS18B20';
 //console.log('SensorKey = ' + sensorKey);
 
@@ -222,7 +223,7 @@ for (var i=0;i<devicesFolder.length;i++) {
 		//for (var i=0;i<deviceFolder.length;i++) {
 		try {
 			console.log(path+ '/w1_slave');
-			_file = fs.readFile(path+'/w1_slave',processDeviceData);
+			fs.readFile(path+'/w1_slave',processDeviceData);
 		} catch (err) {
 		  console.log('Directory or file for DS18B20 not found. ('+path+ '/w1_slave'+')');
 		  return;

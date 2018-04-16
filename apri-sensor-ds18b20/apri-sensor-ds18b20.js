@@ -168,7 +168,10 @@ var _temperature = line2.split('t=')[1];
 if (isNumeric(_temperature) ) {
 	var temperature = parseInt(_temperature,10)/1000;
 	console.log(temperature);
-	processMeasurement(temperature);
+	//processMeasurement(temperature);
+	var sensorId			= sensorId;
+	var measureMentTime		= new Date();
+	writeResults(measureMentTime);
 }
 
 

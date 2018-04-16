@@ -123,87 +123,6 @@ function isNumeric(n) {
   return !isNaN(parseInt(n,10)) && isFinite(n);
 }
 
-
-
-var processMeasurement = function(data) {
-
-	var sensorId			= sensorId; //getSensorId(sensorId);
-
-//	var measureMentTime		= new Date();
-//	writeResults(measureMentTime, data);
-
-
-  //var sortMeasurements = function(numArray) {
-	//	return numArray.sort(function(a, b) {
-	//		return a - b;
-	//	});
-	//}
-
-/*
-	if (loopStart == undefined) {
-		 loopStart 		= new Date();
-		 pm25Total 	= 0;
-		 measureMentCount = 0;
-	};
-*/
-	var measureMentTime		= new Date();
-	writeResults(measureMentTime);
-
-//	var loopTime 			= measureMentTime.getTime() - loopStart.getTime();
-
-/*
-	if (loopTime >= loopTimeMax) {
-		if (measureMentCount > 0) {
-			pm25Result = Math.round((pm25Total / measureMentCount)*10)/100;
-
-			writeResults(measureMentTime, loopTime);
-		}
-
-		loopStart 		= new Date();
-		pm25Total 	= 0;
-		measureMentCount = 0;
-	}
-
-//	calculate fillChannel(sensorId, measureMentTime, data);
-  var pm25 = data[2]+(data[3]<<8);
-  pm25Total += pm25;
-	id         = data[6].toString(16)+data[7].toString(16);
-
-	measureMentCount++;
-*/
-}
-
-/*
-var getSensorId = function(sId) {
-	var sensorId = '' + sId;
-	if (sensors[sensorId] == undefined) initSensor(sensorId);
-	return sensorId;
-}
-*/
-
-/*
-var initSensor = function(sensorId) {
-	sensors[sensorId] 			= {};
-	sensors[sensorId].channel	= [];
-	for (var i=0;i<nrOfChannels;i++){
-		var _channel = {};
-		_channel.pulseTotal	= 0;
-		_channel.count		= 0;
-		sensors[sensorId].channel.push(_channel);
-	};
-};
-
-var fillChannel = function(sensorId, measureMentTime, data) {
-	for (var i=nrOfChannels-1;i>=0;i--) {
-		if (data[2] >= channelTreshold[i]) {
-			sensors[sensorId].channel[i].count++;
-			sensors[sensorId].channel[i].pulseTotal += parseFloat(data[2]);
-			break;
-		}
-	}
-}
-*/
-
 var writeHeaderIntoFile = function() {
 	fs.appendFile(resultsFileName + '_raw' + sensorFileExtension, headerRaw, function (err) {
 		if (err != null) {
@@ -211,80 +130,6 @@ var writeHeaderIntoFile = function() {
 		}
 	});
 	writeHeaders	= false;
-}
-
-var writeResults	= function(measureTime, loopTime) {
-	console.log('Results: ' + measureTime.toISOString() + ' count: ' + measureMentCount);
-
- return;
-/*
-	var sosCount		= 0;
-	var sosSensorCount 	= 0;
-
-	for (var sensorId in sensors) {
-		var recordCounts 		= measureTime.toISOString() + ';' + loopTime + ';' + sensorId;
-		var recordPulseTotals 	= measureTime.toISOString() + ';' + loopTime + ';' + sensorId;
-		var recordAvg			= measureTime.toISOString() + ';' + loopTime + ';' + sensorId;
-
-		for (var i=0; i<nrOfChannels; i++) {
-			recordCounts 		= recordCounts + ';' +  Math.round(sensors[sensorId].channel[i].count / loopTime * loopTimeMax *100)/100;
-			recordPulseTotals 	= recordPulseTotals + ';' + sensors[sensorId].channel[i].pulseTotal;
-			recordAvg			= recordAvg + ';' + Math.round(sensors[sensorId].channel[i].pulseTotal / loopTime * loopTimeMax *100)/100;
-		}
-		recordCounts 					= recordCounts + '\n';
-		recordPulseTotals 				= recordPulseTotals + '\n';
-		recordAvg		 				= recordAvg + '\n';
-		//console.log(record);
-		fs.appendFile(resultsFileName + '_counts' + sensorFileExtension, recordCounts, function (err) {
-			if (err != null) {
-				console.log('Error writing results to file: ' + err);
-			}
-		});
-		fs.appendFile(resultsFileName + '_pulse-totals' + sensorFileExtension, recordPulseTotals, function (err) {
-			if (err != null) {
-				console.log('Error writing results to file: ' + err);
-			}
-		});
-		fs.appendFile(resultsFileName + '_avg' + sensorFileExtension, recordAvg, function (err) {
-			if (err != null) {
-				console.log('Error writing results to file: ' + err);
-			}
-		});
-
-		for (var i=0; i<nrOfChannels; i++) {
-			sosCount 	+= Math.round(sensors[sensorId].channel[i].count / loopTime * loopTimeMax *100)/100;
-		}
-		sosSensorCount++;
-
-		initSensor(sensorId);
-	}
-*/
-
-console.log('Results: ' + measureTime.toISOString() + ' count: ' + measureMentCount);
-
-	var data			= {};
-	//data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;
-	data.foi				= 'SCRP' + unit.id;
-	if (sensorKey != '') {
-		data.foi	+= '_' + sensorKey;
-	}
-	//data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;
-	//data.cityCode			= 'GM0439'; //geoLocation.cityCode;
-	//data.cityName			= '..'; //geoLocation.cityName;
-
-	var recordOut 			= measureTime.toISOString() + ';' + temperatureResult + '\n';
-
-	fs.appendFile(resultsFileName + '_raw' + sensorFileExtension, recordOut, function (err) {
-		if (err != null) {
-			console.log('Error writing results to file: ' + err);
-		}
-	});
-
-	data.categories			= [];
-	data.observation		= 'apri-sensor-ds18b20-pm25:'+pm25Result+','+'apri-sensor-ds18b20-temperature:'+temperatureResult ;
-
-	sendData(data);
-
 }
 
 // send data to SOS service via OpenIoD REST service
@@ -314,54 +159,6 @@ var sendData = function(data) {
 		;
 
 };
-
-/*
-var printChannelResults	= function() {
-	//console.log(sensors);
-	for (var sensorKey in sensors) {
-		var line = 'Sensor: ' + sensorKey + '\t';
-		for (var i=0; i<nrOfChannels; i++) {
-			line = line + '\t' + i + ': ';
-			if (sensors[sensorKey].channel[i].count==0) {
-				line = line + '\t';
-			} else {
-				line = line + sensors[sensorKey].channel[i].count + 'x';
-			}
-		}
-		console.log(line);
-	}
-}
-*/
-
-
-/*
-app.all('/*', function(req, res, next) {
-  console.log("app.all/: " + req.url + " ; systemCode: " + apriConfig.systemCode );
-//  res.header("Access-Control-Allow-Origin", "*");
-//  res.header("Access-Control-Allow-Headers", "X-Requested-With");
-  next();
-});
-
-// test url for systemcode
-app.get('/'+apriConfig.systemCode+'/', function(req, res) {
-  console.log("Reqparam: " + req.url);
-  res.send("ok");
-});
-*/
-/*
-app.get('/'+apriConfig.systemCode+'/eventsource/:eventsource', function(req, res) {
-	//getLocalFile(req, res, {contentType:'text/css'});
-	console.log('EventSource action from '+ req.params.eventsource );
-
-});
-*/
-
-/*
-var io = require('socket.io').listen(app.listen(apriConfig.systemListenPort),{
-    //serveClient: config.env !== 'production',
-    path: '/SCAPE604/socket.io'
-});
-*/
 
 var getCpuInfo	= function() {
 	//hostname --all-ip-address
@@ -432,49 +229,8 @@ var processDeviceData	= function() {
 
 		//writeResults(measureMentTime);
 };
-
+console.log('getCpuInfo');
 console.log(getCpuInfo());
-
-/*
-SerialPort.list(function(err, ports) {
-	console.log(ports);
-
-	console.log('Find usb comport:');
-
-	usbPorts	= ports;
-
-	if (serialPortPath != deviceParam) {
-		for (var i=0;i<usbPorts.length;i++) {
-			console.log('searching for usb comport FTDI ' + i + ' '+ usbPorts[i].manufacturer + ' ' +  usbPorts[i].comName);
-			if (usbPorts[i].manufacturer == 'FTDI' || usbPorts[i].manufacturer == 'Prolific_Technology_Inc.') {
-				serialPortPath	= usbPorts[i].comName;
-				break;
-			}
-		}
-	}
-	mainProcess();
-});
-*/
-
-/*
-var socket = io(socketUrl, {path:socketPath});
-
-socket.on('connection', function (socket) {
-	var currTime = new Date();
-	console.log(currTime +': connect from '+ socket.request.connection.remoteAddress + ' / '+ socket.handshake.headers['x-forwarded-for'] || socket.handshake.address.address);
-
-});
-
-socket.on('disconnect', function() {
-	console.log('Disconnected from web-socket ');
-});
-
-socket.on('info', function(data) {
-	console.log('websocket info '+ data);
-	//io.sockets.emit('aireassignal', { data: data } );
-	//socket.broadcast.emit('aireassignal', { data: data } );
-});
-*/
 
 try {
 	var devicesFolder = fs.readdirSync('/sys/bus/w1/devices');
@@ -511,8 +267,3 @@ for (var i=0;i<devicesFolder.length;i++) {
 		//}
 	}
 }
-
-
-
-}
-return;

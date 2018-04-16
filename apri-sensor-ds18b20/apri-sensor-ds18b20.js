@@ -161,7 +161,7 @@ console.log(file[1]);
 console.log(file[2]);
 console.log(file[3]);
 console.log(file[4]);
-var temperature = file.split('t=');
+var temperature = file[1].split('t=');
 console.log(temperature);
 
 

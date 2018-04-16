@@ -392,6 +392,45 @@ var getCpuInfo	= function() {
 	return '0';
 };
 
+var processDeviceData	= function() {
+	var line2 = _file.toString().split(/\n/)[1];
+	var _temperature = line2.split('t=')[1];
+	//console.log(line2);
+	//console.log(_temperature);
+	if (isNumeric(_temperature) ) {
+		var temperature = parseInt(_temperature,10)/1000;
+		console.log(temperature);
+		//processMeasurement(temperature);
+		var sensorId			= sensorId;
+		var measureTime		= new Date();
+		console.log('Results: ' + measureTime.toISOString());
+
+			var data			= {};
+			//data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;
+			data.foi				= 'SCRP' + unit.id;
+	//		if (sensorKey != '') {
+	//			data.foi	+= '_' + sensorKey;
+	//		}
+			//data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;
+			//data.cityCode			= 'GM0439'; //geoLocation.cityCode;
+			//data.cityName			= '..'; //geoLocation.cityName;
+
+			var recordOut 			= measureTime.toISOString() + ';' + temperatureResult + '\n';
+
+			fs.appendFile(resultsFileName + '_raw' + sensorFileExtension, recordOut, function (err) {
+				if (err != null) {
+					console.log('Error writing results to file: ' + err);
+				}
+			});
+
+			data.categories			= [];
+			data.observation		= 'apri-sensor-ds18b20-temperature:'+temperatureResult ;
+	    console.log('Writing: ');
+			console.dir(data);
+			//sendData(data);
+
+		//writeResults(measureMentTime);
+};
 
 console.log(getCpuInfo());
 
@@ -463,7 +502,7 @@ for (var i=0;i<devicesFolder.length;i++) {
 		//for (var i=0;i<deviceFolder.length;i++) {
 		try {
 			console.log(path+ '/w1_slave');
-			_file = fs.readFileSync(path+ '/w1_slave');
+			_file = fs.readFile(path+'/w1_slave',processDeviceData);
 		} catch (err) {
 		  console.log('Directory or file for DS18B20 not found. ('+path+ '/w1_slave'+')');
 		  return;
@@ -473,42 +512,6 @@ for (var i=0;i<devicesFolder.length;i++) {
 }
 
 
-var line2 = _file.toString().split(/\n/)[1];
-var _temperature = line2.split('t=')[1];
-//console.log(line2);
-//console.log(_temperature);
-if (isNumeric(_temperature) ) {
-	var temperature = parseInt(_temperature,10)/1000;
-	console.log(temperature);
-	//processMeasurement(temperature);
-	var sensorId			= sensorId;
-	var measureTime		= new Date();
-	console.log('Results: ' + measureTime.toISOString());
 
-		var data			= {};
-		//data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;
-		data.foi				= 'SCRP' + unit.id;
-//		if (sensorKey != '') {
-//			data.foi	+= '_' + sensorKey;
-//		}
-		//data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;
-		//data.cityCode			= 'GM0439'; //geoLocation.cityCode;
-		//data.cityName			= '..'; //geoLocation.cityName;
-
-		var recordOut 			= measureTime.toISOString() + ';' + temperatureResult + '\n';
-
-		fs.appendFile(resultsFileName + '_raw' + sensorFileExtension, recordOut, function (err) {
-			if (err != null) {
-				console.log('Error writing results to file: ' + err);
-			}
-		});
-
-		data.categories			= [];
-		data.observation		= 'apri-sensor-ds18b20-temperature:'+temperatureResult ;
-    console.log('Writing: ');
-		console.dir(data);
-		//sendData(data);
-
-	//writeResults(measureMentTime);
 }
 return;

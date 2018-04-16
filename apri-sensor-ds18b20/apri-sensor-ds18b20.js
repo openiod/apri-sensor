@@ -156,7 +156,7 @@ for (var i=0;i<devicesFolder.length;i++) {
 		//}
 	}
 }
-var line2 = _file.toString().split(/\n/)[0];
+var line2 = _file.toString().split(/\n/)[1];
 var _temperature = line2.split('t=')[1];
 console.log(line2);
 console.log(_temperature);

@@ -139,6 +139,9 @@ try {
 }
 
 var _file;
+//var sensorKey			= 'DS18B20';
+//console.log('SensorKey = ' + sensorKey);
+
 
 for (var i=0;i<devicesFolder.length;i++) {
 	if (devicesFolder[i].split('-')[0] == '28') {
@@ -176,9 +179,9 @@ if (isNumeric(_temperature) ) {
 		var data			= {};
 		//data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;
 		data.foi				= 'SCRP' + unit.id;
-		if (sensorKey != '') {
-			data.foi	+= '_' + sensorKey;
-		}
+//		if (sensorKey != '') {
+//			data.foi	+= '_' + sensorKey;
+//		}
 		//data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;
 		//data.cityCode			= 'GM0439'; //geoLocation.cityCode;
 		//data.cityName			= '..'; //geoLocation.cityName;

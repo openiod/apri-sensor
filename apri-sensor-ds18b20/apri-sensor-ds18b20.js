@@ -98,12 +98,6 @@ var sensors				= {};
 var nrOfChannels		= 15;
 var channelMaxValue;
 
-var channelTreshold		= [];
-for (var i=0;i<nrOfChannels;i++) {
-	channelTreshold.push(i*5000)
-}
-channelMaxValue			= channelTreshold[nrOfChannels-1];
-
 // create headers to only use ones in the result files
 var writeHeaders		= true;
 var headerRaw			= 'dateiso;temperature\n';
@@ -409,28 +403,32 @@ var getCpuInfo	= function() {
 	exec("cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2", (error, stdout, stderr) => {
 		if (error) {
 			console.error(`exec error: ${error}`);
-			return;
+			return '1A';
 		}
 		unit.id = stdout.substr(0,stdout.length-1);
+		return '1B';
 	});
 	exec("cat /proc/cpuinfo | grep Hardware | cut -d ' ' -f 2", (error, stdout, stderr) => {
 		if (error) {
 			console.error(`exec error: ${error}`);
-			return;
+			return '2A';
 		}
 		unit.hardware = stdout.substr(0,stdout.length-1);
+		return '2B';
 	});
 	exec("cat /proc/cpuinfo | grep Revision | cut -d ' ' -f 2", (error, stdout, stderr) => {
 		if (error) {
 			console.error(`exec error: ${error}`);
-			return;
+			return '3A';
 		}
 		unit.revision = stdout.substr(0,stdout.length-1);
+		return '3B';
 	});
+	return '0';
 };
 
 
-getCpuInfo();
+console.log(getCpuInfo());
 
 /*
 SerialPort.list(function(err, ports) {
@@ -453,6 +451,7 @@ SerialPort.list(function(err, ports) {
 });
 */
 
+/*
 var socket = io(socketUrl, {path:socketPath});
 
 socket.on('connection', function (socket) {
@@ -470,6 +469,7 @@ socket.on('info', function(data) {
 	//io.sockets.emit('aireassignal', { data: data } );
 	//socket.broadcast.emit('aireassignal', { data: data } );
 });
+*/
 
 var line2 = _file.toString().split(/\n/)[1];
 var _temperature = line2.split('t=')[1];
@@ -509,3 +509,4 @@ if (isNumeric(_temperature) ) {
 
 	//writeResults(measureMentTime);
 }
+return;

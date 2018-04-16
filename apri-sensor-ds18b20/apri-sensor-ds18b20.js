@@ -103,6 +103,7 @@ var writeHeaderIntoFile = function() {
 
 // send data to SOS service via OpenIoD REST service
 var sendData = function(data) {
+	console.log('send data');
 // oud //		http://openiod.com/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&inputformat=insertom&objectid=humansensor&format=xml
 // oud //			&region=EHV		&lat=50.1		&lng=4.0		&category=airquality		&value=1
 
@@ -124,8 +125,7 @@ var sendData = function(data) {
   			})
 			.on('error', function(err) {
 				console.log(err)
-			})
-		;
+			});
 
 };
 
@@ -175,13 +175,6 @@ var processDeviceData	= function() {
 			var data			= {};
 			//data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;
 			data.foi				= 'SCRP' + unit.id;
-	//		if (sensorKey != '') {
-	//			data.foi	+= '_' + sensorKey;
-	//		}
-			//data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;
-			//data.cityCode			= 'GM0439'; //geoLocation.cityCode;
-			//data.cityName			= '..'; //geoLocation.cityName;
-
 			var recordOut 			= measureTime.toISOString() + ';' + temperatureResult + '\n';
 
 			fs.appendFile(resultsFileName + '_raw' + sensorFileExtension, recordOut, function (err) {
@@ -197,6 +190,7 @@ var processDeviceData	= function() {
 			//sendData(data);
 
 		//writeResults(measureMentTime);
+  };
 };
 
 console.log('getCpuInfo');

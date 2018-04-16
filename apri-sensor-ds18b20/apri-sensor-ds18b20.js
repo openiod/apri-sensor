@@ -106,7 +106,7 @@ channelMaxValue			= channelTreshold[nrOfChannels-1];
 
 // create headers to only use ones in the result files
 var writeHeaders		= true;
-var headerRaw			= 'dateiso;pm25;pm10\n';
+var headerRaw			= 'dateiso;temperature\n';
 
 var sensorFileName 		= 'sensor-ds18b20-result';
 var sensorFileExtension	= '.csv';
@@ -156,144 +156,21 @@ for (var i=0;i<devicesFolder.length;i++) {
 		//}
 	}
 }
-var line2 = _file.toString().split(/\n/)[1];
-var _temperature = line2.split('t=')[1];
-console.log(line2);
-console.log(_temperature);
-var temperature = parseInt(_temperature,10)/1000;
-console.log(temperature);
-
-
-return;
-
-
-
-var printHex = function(buffer, tekst) {
-	var str="";
-  for (var i=0;i<buffer.length;i++) {
-	  str = str+ buffer[i].toString(16)+' ';
-  }
-  console.log('log: ' + tekst +'  lengte:'+buffer.length+ " "+ str); // + data);
-}
-
-var incommingData = new Buffer(0);
-var tmpBuffer = new Buffer(0);
-var emitBuffer = new Buffer(0);
-var myParser = function(emitter, buffer) {
-	  //printHex(incommingData,'nog niet verwerkt');
-	  //printHex(buffer,'input buffer erbij');
-	  //console.log('parser datalength: ' + incommingData.length + ' plus '+ buffer.length);
-    tmpBuffer = Buffer.concat([incommingData, buffer]);
-		incommingData = tmpBuffer;
-
-
-//    if (incommingData.length > 3 && incommingData[incommingData.length - 3] == 3) {
-		if (incommingData.length >= 10 ) {
-			for (var i=0;i<incommingData.length;i++) {
-				if (incommingData.length-i<10 ){
-//					console.log('parser klaar datalength: ' + incommingData.length + ' i '+ i);
-					tmpBuffer = incommingData.slice(i);
-					incommingData = tmpBuffer;
-					break;
-				}
-				if (incommingData[i]==170 && incommingData[i+1]==192) {
-					//emitBuffer = new Buffer(0);
-          emitBuffer = incommingData.slice(i,i+10);
-//					for (var j=0;j<10;j++) {
-//						emitBuffer = Buffer.concat([emitBuffer, incommingData[i+j]]);
-//					}
-          emitter.emit("data", emitBuffer);
-					i=i+9;
-//					console.log('parser new byte incommingdata to process: ' + incommingData[i+10]);
-//					console.log ('bufferlengte was: '+incommingData.length);
-					//tmpBuffer = incommingData.slice(i+10);
-					//incommingData = tmpBuffer;
-//					console.log ('bufferlengte wordt: '+incommingData.length);
-				} else {
-//					console.log ('nieuwe foutieve byte was: '+ incommingData[i]);
-				}
-			}
-//			console.log('1 parser klaar datalength: ' + incommingData.length + ' i '+ i);
-			if (i==incommingData.length) {
-				incommingData = new Buffer(0);
-			}
-//			console.log('2 parser klaar datalength: ' + incommingData.length + ' i '+ i);
-			//tmpBuffer = incommingData.slice(i+1);
-			//incommingData = tmpBuffer;
-
-//      emitter.emit("data", incommingData);
-//      incommingData = new Buffer(0);
-    }
-};
-
-var mainProcess = function() {
-	console.log('Found usb comname: ' + serialPortPath );
-
-
-//	var serialport = new SerialPort(serialPortPath, {parser: SerialPort.parsers.readline('\n')} );
-	var serialport = new SerialPort(serialPortPath, {parser: myParser} );
-	serialport.on('open', function(){
-		console.log('Serial Port connected');
-		if (writeHeaders == true) writeHeaderIntoFile();
-		serialport.on('data', function(data){
-//			console.log('datalength: ' + data.length);
-			var checksum = 0;
-			if (data.length == 10 ) {
-				var c1 =(data[2]+data[3]+data[4]+data[5]+data[6]+data[7]);
-				var c2 = c1>>8;
-				checksum = c1 - (c2<<8);
-			}
-			if (data.length == 10 && data[0]==170 && data[1]==192 && data[9]==171 &&
-			   checksum==data[8]) {  // AA;C0;AB
-				//console.log('message recieved: ');
-//				var str="";
-//				for (var i=0;i<data.length;i++) {
-//					str = str+ data[i].toString(16)+ ' ';
-//				}
-//				console.log('log: data gevonden, lengte:'+data.length+ " "+ str); // + data);
-				processMeasurement(data);
-
-// aac0 1a03 00 703e f8 ab  26 48 703e 6
-// aac0 1b04 20 703e .b ab
-
-
-
-			} else {
-				var str="";
-				for (var i=0;i<data.length;i++) {
-					str = str+ data[i].toString(16)+' ';
-				}
-				console.log('log: data gevonden maar niet herkend, lengte:'+data.length+ " "+ str); // + data);
-			}
-			//console.log(roughScale(data,16))
-			// var _data = data.substr(0,data.length-1);
-//			for (var i=0;i<data.length;i++){
-//				console.log(data[0]);
-//				if (data.substr(i,1)==0xAA) console.log('0:AA');
-//				if (data.substr(i,1)==0xC0) console.log('0:C0');
-//			}
-//			if (data.substr(0,1)==0xAA) console.log('0:AA');
-//			if (data.substr(0,1)==0xC0) console.log('0:C0');
-//			if (data.substr(1,1)==0xAA) console.log('1:AA');
-//			if (data.substr(1,1)==0xC0) console.log('1:C0');
-/*
-			if (_dataArray.length == 2 && isNumeric(_dataArray[0]) && isNumeric(_dataArray[1]) && data[data.length-1] =='\r' ) {
-				console.log('measurement: ' + _data);
-				processMeasurement(_dataArray);
-			} else {
-				console.log('log: data gevonden maar niet herkend'); // + data);
-			}
-*/
-		});
-	});
-	serialport.on('error', function(err) {
-		console.log('Error: ', err.message);
-	});
-};
 
 function isNumeric(n) {
-  return !isNaN(parseFloat(n)) && isFinite(n);
+  return !isNaN(parseInt(n,10)) && isFinite(n);
 }
+
+var line2 = _file.toString().split(/\n/)[1];
+var _temperature = line2.split('t=')[1];
+//console.log(line2);
+//console.log(_temperature);
+if (isNumeric(_temperature) ) {
+	var temperature = parseInt(_temperature,10)/1000;
+	console.log(temperature);
+	processMeasurement(temperature);
+}
+
 
 var processMeasurement = function(data) {
 
@@ -309,41 +186,38 @@ var processMeasurement = function(data) {
 	//	});
 	//}
 
-
+/*
 	if (loopStart == undefined) {
 		 loopStart 		= new Date();
 		 pm25Total 	= 0;
-		 pm10Total 	= 0;
 		 measureMentCount = 0;
 	};
-
+*/
 	var measureMentTime		= new Date();
-	var loopTime 			= measureMentTime.getTime() - loopStart.getTime();
+	writeResults(measureMentTime);
 
+//	var loopTime 			= measureMentTime.getTime() - loopStart.getTime();
+
+/*
 	if (loopTime >= loopTimeMax) {
 		if (measureMentCount > 0) {
 			pm25Result = Math.round((pm25Total / measureMentCount)*10)/100;
-			pm10Result = Math.round((pm10Total / measureMentCount)*10)/100;
 
 			writeResults(measureMentTime, loopTime);
 		}
 
 		loopStart 		= new Date();
 		pm25Total 	= 0;
-		pm10Total 	= 0;
 		measureMentCount = 0;
 	}
 
 //	calculate fillChannel(sensorId, measureMentTime, data);
   var pm25 = data[2]+(data[3]<<8);
-	var pm10 = data[4]+(data[5]<<8);
   pm25Total += pm25;
-	pm10Total += pm10;
 	id         = data[6].toString(16)+data[7].toString(16);
 
 	measureMentCount++;
-  //console.log(pm25+' '+pm10+' '+id+' '+measureMentCount);
-
+*/
 }
 
 /*
@@ -389,7 +263,7 @@ var writeHeaderIntoFile = function() {
 var writeResults	= function(measureTime, loopTime) {
 	console.log('Results: ' + measureTime.toISOString() + ' count: ' + measureMentCount);
 
-
+ return;
 /*
 	var sosCount		= 0;
 	var sosSensorCount 	= 0;
@@ -444,7 +318,7 @@ var writeResults	= function(measureTime, loopTime) {
 	//data.cityCode			= 'GM0439'; //geoLocation.cityCode;
 	//data.cityName			= '..'; //geoLocation.cityName;
 
-	var recordOut 			= measureTime.toISOString() + ';' + pm25Result + ';' + pm10Result + '\n';
+	var recordOut 			= measureTime.toISOString() + ';' + temperatureResult + '\n';
 
 	fs.appendFile(resultsFileName + '_raw' + sensorFileExtension, recordOut, function (err) {
 		if (err != null) {
@@ -453,7 +327,7 @@ var writeResults	= function(measureTime, loopTime) {
 	});
 
 	data.categories			= [];
-	data.observation		= 'apri-sensor-ds18b20-pm25:'+pm25Result+','+'apri-sensor-ds18b20-pm10:'+pm10Result ;
+	data.observation		= 'apri-sensor-ds18b20-pm25:'+pm25Result+','+'apri-sensor-ds18b20-temperature:'+temperatureResult ;
 
 	sendData(data);
 
@@ -464,8 +338,8 @@ var sendData = function(data) {
 // oud //		http://openiod.com/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&inputformat=insertom&objectid=humansensor&format=xml
 // oud //			&region=EHV		&lat=50.1		&lng=4.0		&category=airquality		&value=1
 
-//http://localhost:4000/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=apri-sensor-ds18b20&offering=offering_0439_initial&verbose=true&commit=true&observation=apri-sensor-ds18b20-pm25:12.345&neighborhoodcode=BU04390402
-//https://openiod.org/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=apri-sensor-ds18b20&offering=offering_0439_initial&verbose=true&commit=true&observation=apri-sensor-ds18b20-pm25:12345,apri-sensor-ds18b20-pm10:345&neighborhoodcode=BU04390402
+//http://localhost:4000/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=apri-sensor-ds18b20&offering=offering_0439_initial&verbose=true&commit=true&observation=apri-sensor-ds18b20-temperature:12.345&neighborhoodcode=BU04390402
+//https://openiod.org/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=apri-sensor-ds18b20&offering=offering_0439_initial&verbose=true&commit=true&observation=apri-sensor-ds18b20-temperature:12345&neighborhoodcode=BU04390402
 
 		var _url = openiodUrl + '/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=apri-sensor-ds18b20&offering=offering_0439_initial&commit=true';
 		_url = _url +

@@ -3,6 +3,11 @@
 **
 ** Main system module for handling sensor measurement data via serial port
 **
+
+** sudo su -
+** crontab -e
+** * * * * * /opt/SCAPE604/apri-sensor/apri-sensor-ds18b20/apri-sensor-ds18b20.sh /opt/SCAPE604/log/SCAPE604-apri-sensor-ds18b20.log
+** :wq
 */
 
 "use strict"; // This is for your code to comply with the ECMAScript 5 standard.
@@ -167,7 +172,7 @@ var processDeviceData	= function(err,temperatureData) {
 	//console.log(line2);
 	//console.log(_temperature);
 	if (isNumeric(_temperature) ) {
-		var temperature = parseInt(_temperature,10)/1000;
+		var temperature = parseFloat(_temperature)/1000;
 		console.log(temperature);
 		//processMeasurement(temperature);
 		var sensorId			= sensorId;

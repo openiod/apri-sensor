@@ -164,44 +164,6 @@ function isNumeric(n) {
   return !isNaN(parseInt(n,10)) && isFinite(n);
 }
 
-var line2 = _file.toString().split(/\n/)[1];
-var _temperature = line2.split('t=')[1];
-//console.log(line2);
-//console.log(_temperature);
-if (isNumeric(_temperature) ) {
-	var temperature = parseInt(_temperature,10)/1000;
-	console.log(temperature);
-	//processMeasurement(temperature);
-	var sensorId			= sensorId;
-	var measureTime		= new Date();
-	console.log('Results: ' + measureTime.toISOString());
-
-		var data			= {};
-		//data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;
-		data.foi				= 'SCRP' + unit.id;
-//		if (sensorKey != '') {
-//			data.foi	+= '_' + sensorKey;
-//		}
-		//data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;
-		//data.cityCode			= 'GM0439'; //geoLocation.cityCode;
-		//data.cityName			= '..'; //geoLocation.cityName;
-
-		var recordOut 			= measureTime.toISOString() + ';' + temperatureResult + '\n';
-
-		fs.appendFile(resultsFileName + '_raw' + sensorFileExtension, recordOut, function (err) {
-			if (err != null) {
-				console.log('Error writing results to file: ' + err);
-			}
-		});
-
-		data.categories			= [];
-		data.observation		= 'apri-sensor-ds18b20-temperature:'+temperatureResult ;
-    console.log('Writing: ');
-		console.dir(data);
-		//sendData(data);
-
-	//writeResults(measureMentTime);
-}
 
 
 var processMeasurement = function(data) {
@@ -508,3 +470,42 @@ socket.on('info', function(data) {
 	//io.sockets.emit('aireassignal', { data: data } );
 	//socket.broadcast.emit('aireassignal', { data: data } );
 });
+
+var line2 = _file.toString().split(/\n/)[1];
+var _temperature = line2.split('t=')[1];
+//console.log(line2);
+//console.log(_temperature);
+if (isNumeric(_temperature) ) {
+	var temperature = parseInt(_temperature,10)/1000;
+	console.log(temperature);
+	//processMeasurement(temperature);
+	var sensorId			= sensorId;
+	var measureTime		= new Date();
+	console.log('Results: ' + measureTime.toISOString());
+
+		var data			= {};
+		//data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;
+		data.foi				= 'SCRP' + unit.id;
+//		if (sensorKey != '') {
+//			data.foi	+= '_' + sensorKey;
+//		}
+		//data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;
+		//data.cityCode			= 'GM0439'; //geoLocation.cityCode;
+		//data.cityName			= '..'; //geoLocation.cityName;
+
+		var recordOut 			= measureTime.toISOString() + ';' + temperatureResult + '\n';
+
+		fs.appendFile(resultsFileName + '_raw' + sensorFileExtension, recordOut, function (err) {
+			if (err != null) {
+				console.log('Error writing results to file: ' + err);
+			}
+		});
+
+		data.categories			= [];
+		data.observation		= 'apri-sensor-ds18b20-temperature:'+temperatureResult ;
+    console.log('Writing: ');
+		console.dir(data);
+		//sendData(data);
+
+	//writeResults(measureMentTime);
+}

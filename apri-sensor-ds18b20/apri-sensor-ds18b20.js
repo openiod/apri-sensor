@@ -128,12 +128,13 @@ try {
 	var devicesFolder = fs.readdirSync('/sys/bus/w1/devices');
 	for (var i=0;i<devicesFolder.length;i++) {
 	  if (devicesFolder[i].split('-')[0] == '28') {
-			var path = '/sys/bus/w1/devices'+devicesFolder[i];
+			console.log('DS18B20 device: ' +  devicesFolder[i]);
+			var path = '/sys/bus/w1/devices/'+devicesFolder[i];
 			//var deviceFolder = fs.readdirSync(path);
 			//for (var i=0;i<deviceFolder.length;i++) {
 				var file = fs.readFileSync(path+ '/w1_slave');
 				var temperature = file.split('t=');
-				console.log(teperature);
+				console.log(temperature);
 			//}
 		}
 	}

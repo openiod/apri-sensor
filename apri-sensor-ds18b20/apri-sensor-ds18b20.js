@@ -138,7 +138,7 @@ try {
   return;
 }
 
-var file;
+var _file;
 
 for (var i=0;i<devicesFolder.length;i++) {
 	if (devicesFolder[i].split('-')[0] == '28') {
@@ -148,7 +148,7 @@ for (var i=0;i<devicesFolder.length;i++) {
 		//for (var i=0;i<deviceFolder.length;i++) {
 		try {
 			console.log(path+ '/w1_slave');
-			file = fs.readFileSync(path+ '/w1_slave');
+			_file = fs.readFileSync(path+ '/w1_slave');
 		} catch (err) {
 		  console.log('Directory or file for DS18B20 not found. ('+path+ '/w1_slave'+')');
 		  return;
@@ -156,12 +156,11 @@ for (var i=0;i<devicesFolder.length;i++) {
 		//}
 	}
 }
-
-console.log(file[1]);
-console.log(file[2]);
-console.log(file[3]);
-console.log(file[4]);
-var temperature = file[1].split('t=');
+var line2 = _file.toString().split(/\n/)[0];
+var _temperature = line2.split('t=')[1];
+console.log(line2);
+console.log(_temperature);
+var temperature = _temperature;
 console.log(temperature);
 
 

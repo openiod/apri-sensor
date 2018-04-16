@@ -393,6 +393,7 @@ var getCpuInfo	= function() {
 };
 
 var processDeviceData	= function() {
+	console.log('processDeviceData');
 	var line2 = _file.toString().split(/\n/)[1];
 	var _temperature = line2.split('t=')[1];
 	//console.log(line2);

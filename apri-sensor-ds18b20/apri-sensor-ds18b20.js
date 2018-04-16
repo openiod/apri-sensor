@@ -469,7 +469,7 @@ var getCpuInfo	= function() {
 
 getCpuInfo();
 
-
+/*
 SerialPort.list(function(err, ports) {
 	console.log(ports);
 
@@ -488,7 +488,7 @@ SerialPort.list(function(err, ports) {
 	}
 	mainProcess();
 });
-
+*/
 
 var socket = io(socketUrl, {path:socketPath});
 

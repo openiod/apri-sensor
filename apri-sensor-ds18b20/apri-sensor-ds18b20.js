@@ -170,8 +170,8 @@ if (isNumeric(_temperature) ) {
 	console.log(temperature);
 	//processMeasurement(temperature);
 	var sensorId			= sensorId;
-	var measureMentTime		= new Date();
-	console.log('Results: ' + measureTime.toISOString() + ' count: ' + measureMentCount);
+	var measureTime		= new Date();
+	console.log('Results: ' + measureTime.toISOString());
 
 		var data			= {};
 		//data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;
@@ -193,8 +193,8 @@ if (isNumeric(_temperature) ) {
 
 		data.categories			= [];
 		data.observation		= 'apri-sensor-ds18b20-temperature:'+temperatureResult ;
-
-		sendData(data);
+    console.log('Writing: ' + data);
+		//sendData(data);
 
 	//writeResults(measureMentTime);
 }

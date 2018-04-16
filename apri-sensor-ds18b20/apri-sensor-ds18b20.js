@@ -126,21 +126,36 @@ var id = "DS18B20";
 
 try {
 	var devicesFolder = fs.readdirSync('/sys/bus/w1/devices');
-	for (var i=0;i<devicesFolder.length;i++) {
-	  if (devicesFolder[i].split('-')[0] == '28') {
-			console.log('DS18B20 device: ' +  devicesFolder[i]);
-			var path = '/sys/bus/w1/devices/'+devicesFolder[i];
-			//var deviceFolder = fs.readdirSync(path);
-			//for (var i=0;i<deviceFolder.length;i++) {
-				var file = fs.readFileSync(path+ '/w1_slave');
-				var temperature = file.split('t=');
-				console.log(temperature);
-			//}
-		}
-	}
 } catch (err) {
   console.log('Directory or file for DS18B20 not found. (/sys/bus/w1/devices/28-*/w1_slave)');
+  return;
 }
+
+try {
+	var devicesFolder = fs.readdirSync('/sys/bus/w1/devices');
+} catch (err) {
+  console.log('Directory or file for DS18B20 not found. (/sys/bus/w1/devices/28-*/w1_slave)');
+  return;
+}
+for (var i=0;i<devicesFolder.length;i++) {
+	if (devicesFolder[i].split('-')[0] == '28') {
+		console.log('DS18B20 device: ' +  devicesFolder[i]);
+		var path = '/sys/bus/w1/devices/'+devicesFolder[i];
+		//var deviceFolder = fs.readdirSync(path);
+		//for (var i=0;i<deviceFolder.length;i++) {
+		try {
+			console.log(path+ '/w1_slave');
+			var file = fs.readFileSync(path+ '/w1_slave');
+			var temperature = file.split('t=');
+			console.log(temperature);
+		} catch (err) {
+		  console.log('Directory or file for DS18B20 not found. ('+path+ '/w1_slave'+')');
+		  return;
+		}
+		//}
+	}
+}
+
 
 return;
 

@@ -158,11 +158,11 @@ var getCpuInfo	= function() {
 	return '0';
 };
 
-var processDeviceData	= function(err,data) {
+var processDeviceData	= function(err,temperatureData) {
 	console.log('processDeviceData');
 	if (err) throw err;
-  console.log(data);
-	var line2 = data.toString().split(/\n/)[1];
+  //console.log(temperatureData);
+	var line2 = temperatureData.toString().split(/\n/)[1];
 	var _temperature = line2.split('t=')[1];
 	//console.log(line2);
 	//console.log(_temperature);
@@ -185,11 +185,11 @@ var processDeviceData	= function(err,data) {
 				}
 			});
 
-			data.categories			= [];
+			//data.categories			= [];
 			data.observation		= 'apri-sensor-ds18b20-temperature:'+temperature ;
 	    console.log('Writing: ');
 			console.dir(data);
-			//sendData(data);
+			sendData(data);
 
 		//writeResults(measureMentTime);
   };

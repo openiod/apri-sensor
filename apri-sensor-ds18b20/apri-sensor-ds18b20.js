@@ -137,6 +137,9 @@ try {
   console.log('Directory or file for DS18B20 not found. (/sys/bus/w1/devices/28-*/w1_slave)');
   return;
 }
+
+var file;
+
 for (var i=0;i<devicesFolder.length;i++) {
 	if (devicesFolder[i].split('-')[0] == '28') {
 		console.log('DS18B20 device: ' +  devicesFolder[i]);
@@ -145,9 +148,7 @@ for (var i=0;i<devicesFolder.length;i++) {
 		//for (var i=0;i<deviceFolder.length;i++) {
 		try {
 			console.log(path+ '/w1_slave');
-			var file = fs.readFileSync(path+ '/w1_slave');
-			var temperature = file.split('t=');
-			console.log(temperature);
+			file = fs.readFileSync(path+ '/w1_slave');
 		} catch (err) {
 		  console.log('Directory or file for DS18B20 not found. ('+path+ '/w1_slave'+')');
 		  return;
@@ -155,6 +156,10 @@ for (var i=0;i<devicesFolder.length;i++) {
 		//}
 	}
 }
+
+console.log(temperature);
+var temperature = file.split('t=');
+console.log(temperature);
 
 
 return;

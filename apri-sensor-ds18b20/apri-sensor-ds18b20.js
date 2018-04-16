@@ -118,41 +118,6 @@ var temperatureResult;
 var temperatureResult;
 var id = "DS18B20";
 
-try {
-	var devicesFolder = fs.readdirSync('/sys/bus/w1/devices');
-} catch (err) {
-  console.log('Directory or file for DS18B20 not found. (/sys/bus/w1/devices/28-*/w1_slave)');
-  return;
-}
-
-try {
-	var devicesFolder = fs.readdirSync('/sys/bus/w1/devices');
-} catch (err) {
-  console.log('Directory or file for DS18B20 not found. (/sys/bus/w1/devices/28-*/w1_slave)');
-  return;
-}
-
-var _file;
-//var sensorKey			= 'DS18B20';
-//console.log('SensorKey = ' + sensorKey);
-
-
-for (var i=0;i<devicesFolder.length;i++) {
-	if (devicesFolder[i].split('-')[0] == '28') {
-		console.log('DS18B20 device: ' +  devicesFolder[i]);
-		var path = '/sys/bus/w1/devices/'+devicesFolder[i];
-		//var deviceFolder = fs.readdirSync(path);
-		//for (var i=0;i<deviceFolder.length;i++) {
-		try {
-			console.log(path+ '/w1_slave');
-			_file = fs.readFileSync(path+ '/w1_slave');
-		} catch (err) {
-		  console.log('Directory or file for DS18B20 not found. ('+path+ '/w1_slave'+')');
-		  return;
-		}
-		//}
-	}
-}
 
 function isNumeric(n) {
   return !isNaN(parseInt(n,10)) && isFinite(n);
@@ -470,6 +435,43 @@ socket.on('info', function(data) {
 	//socket.broadcast.emit('aireassignal', { data: data } );
 });
 */
+
+try {
+	var devicesFolder = fs.readdirSync('/sys/bus/w1/devices');
+} catch (err) {
+  console.log('Directory or file for DS18B20 not found. (/sys/bus/w1/devices/28-*/w1_slave)');
+  return;
+}
+
+try {
+	var devicesFolder = fs.readdirSync('/sys/bus/w1/devices');
+} catch (err) {
+  console.log('Directory or file for DS18B20 not found. (/sys/bus/w1/devices/28-*/w1_slave)');
+  return;
+}
+
+var _file;
+//var sensorKey			= 'DS18B20';
+//console.log('SensorKey = ' + sensorKey);
+
+
+for (var i=0;i<devicesFolder.length;i++) {
+	if (devicesFolder[i].split('-')[0] == '28') {
+		console.log('DS18B20 device: ' +  devicesFolder[i]);
+		var path = '/sys/bus/w1/devices/'+devicesFolder[i];
+		//var deviceFolder = fs.readdirSync(path);
+		//for (var i=0;i<deviceFolder.length;i++) {
+		try {
+			console.log(path+ '/w1_slave');
+			_file = fs.readFileSync(path+ '/w1_slave');
+		} catch (err) {
+		  console.log('Directory or file for DS18B20 not found. ('+path+ '/w1_slave'+')');
+		  return;
+		}
+		//}
+	}
+}
+
 
 var line2 = _file.toString().split(/\n/)[1];
 var _temperature = line2.split('t=')[1];

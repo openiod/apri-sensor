@@ -63,40 +63,10 @@ var siteProtocol 		= secureSite?'https://':'http://';
 var openiodUrl			= siteProtocol + 'openiod.org/' + apriConfig.systemCode; //SCAPE604';
 var loopTimeMax			= 60000; //ms, 60000=60 sec
 
-/*
-var usbPorts			= [];
-
-var serialPortPath;
-
-var deviceParam			= process.argv[2];
-console.log('Param for serial device is ' + deviceParam);
-var sensorKey			= '';
-if (deviceParam != undefined) {
-	serialPortPath		= deviceParam;
-	sensorKey			= serialPortPath.substring(8);  // minus '/dev/tty'
-	console.log('SensorKey = ' + sensorKey);
-} else {
-//	serialPortPath		= "/dev/ttyUSB0";
-//	serialPortPath		= "/dev/tty.wchusbserial1d1330";
-	serialPortPath		= "/dev/tty.wchusbserial1d1310";
-}
-
-
-//var serialPortPath		= "/dev/cu.usbmodem1411";
-//var serialPortPath		= "/dev/cu.usbserial-A1056661";
-*/
-
-
 
 var unit				= {};
 
-var loopStart;
-var loopTime			= 0; // ms
-
 var sensors				= {};
-
-var nrOfChannels		= 15;
-var channelMaxValue;
 
 // create headers to only use ones in the result files
 var writeHeaders		= true;
@@ -114,7 +84,6 @@ var resultsFileName = resultsFolder + sensorFileName + '_' + dateString;
 
 var temperatureTotal;
 var measureMentCount;
-var temperatureResult;
 var temperatureResult;
 var id = "DS18B20";
 
@@ -229,6 +198,7 @@ var processDeviceData	= function() {
 
 		//writeResults(measureMentTime);
 };
+
 console.log('getCpuInfo');
 console.log(getCpuInfo());
 
@@ -249,7 +219,6 @@ try {
 var _file;
 //var sensorKey			= 'DS18B20';
 //console.log('SensorKey = ' + sensorKey);
-
 
 for (var i=0;i<devicesFolder.length;i++) {
 	if (devicesFolder[i].split('-')[0] == '28') {

@@ -157,7 +157,7 @@ for (var i=0;i<devicesFolder.length;i++) {
 	}
 }
 
-console.log(temperature);
+console.log(file[1]);
 var temperature = file.split('t=');
 console.log(temperature);
 

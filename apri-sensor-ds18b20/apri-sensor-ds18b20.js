@@ -186,7 +186,7 @@ var processDeviceData	= function(err,data) {
 			});
 
 			data.categories			= [];
-			data.observation		= 'apri-sensor-ds18b20-temperature:'+temperatureResult ;
+			data.observation		= 'apri-sensor-ds18b20-temperature:'+temperature ;
 	    console.log('Writing: ');
 			console.dir(data);
 			//sendData(data);

@@ -196,7 +196,8 @@ if (isNumeric(_temperature) ) {
 
 		data.categories			= [];
 		data.observation		= 'apri-sensor-ds18b20-temperature:'+temperatureResult ;
-    console.log('Writing: ' + data);
+    console.log('Writing: ';
+		console.dir(data);
 		//sendData(data);
 
 	//writeResults(measureMentTime);

@@ -520,7 +520,15 @@ socket.on('disconnect', function() {
 });
 
 	socket.on('info', function(data) {
-		console.log('websocket info '+ data);
+		console.log('websocket info: ');
+		try {
+			var dataStr = JSON.stringify(data);
+			console.log(dataStr);
+		}
+		catch(err) {
+			console.dir(data);
+		}
+		var dataStr = JSON.stringify(data);
 		//io.sockets.emit('aireassignal', { data: data } );
 		//socket.broadcast.emit('aireassignal', { data: data } );
 	});

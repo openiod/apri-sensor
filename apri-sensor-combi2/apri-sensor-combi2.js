@@ -168,7 +168,7 @@ var mainProcess = function() {
 						data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;
 						data.sensorSystem		= sensorDefs[i].sensorSystem;
 						if (key == 'MAIN') {
-							data.foi				= 'SCRP' + unit.id;	
+							data.foi				= 'SCRP' + unit.id;
 						} else {
 							data.foi				= 'SCRP' + unit.id + '*'+ key;
 						}
@@ -452,7 +452,16 @@ socket.on('disconnect', function() {
 });
 
 socket.on('info', function(data) {
-	console.log('websocket info '+ data);
+	console.log('websocket info: ');
+	try {
+		var dataStr = JSON.stringify(data);
+		console.log(dataStr);
+	}
+	catch(err) {
+		console.dir(data);
+	}
+
+
 	//io.sockets.emit('aireassignal', { data: data } );
 	//socket.broadcast.emit('aireassignal', { data: data } );
 });

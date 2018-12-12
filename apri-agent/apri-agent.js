@@ -527,7 +527,6 @@ socket.on('disconnect', function() {
 		catch(err) {
 			console.dir(data);
 		}
-		var dataStr = JSON.stringify(data);
 		//io.sockets.emit('aireassignal', { data: data } );
 		//socket.broadcast.emit('aireassignal', { data: data } );
 	});

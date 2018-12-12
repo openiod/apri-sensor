@@ -40,9 +40,9 @@ sensor	: {
 //		}
 	, isSensorType: function(data) {
 		var _dataPrefix = data[0].split('@');
-    console.log(this.id);
-    console.log(_dataPrefix[2]);
-    console.log(data.length);
+    //console.log(this.id);
+    //console.log(_dataPrefix[2]);
+    //console.log(data.length);
 		if (_dataPrefix[2] != this.id ) return false;
 		if (data.length == 6
 			&& isNumeric(data[1])
@@ -54,8 +54,8 @@ sensor	: {
         data.unitId='MAIN';
       } else {
         data.unitId=_dataPrefix[1].split('/')[1];
-        if (this.units[data.unitId] == undefined) this.initUnit(data.unitId);
       }
+      if (this.units[data.unitId] == undefined) this.initUnit(data.unitId);
 			return true;
 		};
 		return false;

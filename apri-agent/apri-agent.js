@@ -267,13 +267,11 @@ var save99UsbSerialRules	= function() {
 		content =
 			'{"apri-sensor-combi-1": {"comName": "/dev/ttyArduinoMega"} }\n';
 		fs.writeFileSync(file, content);
-		try {
-			console.log('Activate usb rules');
-			result	= execSync('udevadm trigger');  // activate usb rules
-		} catch (e) {
-    		console.log("Errors:", e);
-  		}
-		console.log('     usb rules for unit ' + unit.id + ' saved and activated.');
+//		try {
+//		} catch (e) {
+//    		console.log("Errors:", e);
+//  		}
+		console.log('     usb config for unit ' + unit.id + ' saved.');
 	}
 
 }
@@ -555,6 +553,7 @@ socket.on('disconnect', function() {
 			//getUsbPorts();
 			getUsbInfo('/dev/ttyUSB0',sendClientUsbInfo);
 			getUsbInfo('/dev/ttyUSB1',sendClientUsbInfo);
+			getUsbInfo('/dev/ttyArduinoMega',sendClientUsbInfo);
 			save99UsbSerialRules();
 			saveSystemServices();
 		}

@@ -147,7 +147,7 @@ sensor	: {
 			this.result.observations	=
 				'apri-sensor-pmsa003-concPM1_0_CF1:' + this.result.concPM1_0_CF1 + ',' +
 				'apri-sensor-pmsa003-concPM2_5_CF1:' + this.result.concPM2_5_CF1 + ',' +
-				'apri-sensor-pmsa003-concPM10_0_CF1:'+ this.result.concPM10_0_CF1;
+				'apri-sensor-pmsa003-concPM10_0_CF1:'+ this.result.concPM10_0_CF1 + ',' +
         'apri-sensor-pmsa003-concPM1_0_amb:' + this.result.concPM1_0_amb + ',' +
 				'apri-sensor-pmsa003-concPM2_5_amb:' + this.result.concPM2_5_amb + ',' +
 				'apri-sensor-pmsa003-concPM10_0_amb:'+ this.result.concPM10_0_amb + ',' +

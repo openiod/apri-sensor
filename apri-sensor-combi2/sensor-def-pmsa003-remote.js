@@ -20,7 +20,7 @@ sensor	: {
 	, cycleFixed: true
 	, cycleTimeMax: 60000
 	, fileName	: 'sensor-PMSA003-result'
-	, csvHeader	: 'sensor;dateiso;duration;subNr;concPM1_0_CF1;concPM2_5_CF1;concPM10_0_CF1;count\n'
+	, csvHeader	: 'sensor;dateiso;duration;subNr;concPM1_0_CF1;concPM2_5_CF1;concPM10_0_CF1;concPM1_0_amb;concPM2_5_amb;concPM10_0_amb;rawGt0_3um;rawGt0_5um;rawGt1_0um;rawGt2_5um;rawGt5_0um;rawGt10_0um;count\n'
 	, units		: {}
 	, result	: {}
 	, record	: ''
@@ -73,18 +73,18 @@ sensor	: {
 		var unitId = data.unitId;
 		if (this.units[unitId] == undefined) this.initUnit(unitId);
 		this.units[unitId].total.measurementCount	++;
-		this.units[unitId].total.concPM1_0_CF1	+= parseFloat(data[2])/10;
-		this.units[unitId].total.concPM2_5_CF1	+= parseFloat(data[3])/10;
-		this.units[unitId].total.concPM10_0_CF1	+= parseFloat(data[4])/10;
-    this.units[unitId].total.concPM1_0_amb	+= parseFloat(data[5])/10;
-		this.units[unitId].total.concPM2_5_amb	+= parseFloat(data[6])/10;
-		this.units[unitId].total.concPM10_0_amb	+= parseFloat(data[7])/10;
-    this.units[unitId].total.rawGt0_3um	    += parseFloat(data[8])/10;
-		this.units[unitId].total.rawGt0_5um	    += parseFloat(data[9])/10;
-		this.units[unitId].total.rawGt1_0um	    += parseFloat(data[10])/10;
-    this.units[unitId].total.rawGt2_5um	    += parseFloat(data[11])/10;
-		this.units[unitId].total.rawGt5_0um	    += parseFloat(data[12])/10;
-		this.units[unitId].total.rawGt10_0um	  += parseFloat(data[13])/10;
+		this.units[unitId].total.concPM1_0_CF1	+= parseFloat(data[1])/10;
+		this.units[unitId].total.concPM2_5_CF1	+= parseFloat(data[2])/10;
+		this.units[unitId].total.concPM10_0_CF1	+= parseFloat(data[3])/10;
+    this.units[unitId].total.concPM1_0_amb	+= parseFloat(data[4])/10;
+		this.units[unitId].total.concPM2_5_amb	+= parseFloat(data[5])/10;
+		this.units[unitId].total.concPM10_0_amb	+= parseFloat(data[6])/10;
+    this.units[unitId].total.rawGt0_3um	    += parseFloat(data[7])/10;
+		this.units[unitId].total.rawGt0_5um	    += parseFloat(data[8])/10;
+		this.units[unitId].total.rawGt1_0um	    += parseFloat(data[9])/10;
+    this.units[unitId].total.rawGt2_5um	    += parseFloat(data[10])/10;
+		this.units[unitId].total.rawGt5_0um	    += parseFloat(data[11])/10;
+		this.units[unitId].total.rawGt10_0um	  += parseFloat(data[12])/10;
 		this.units[unitId].total.measurementTime	= new Date();
 		if (this.units[unitId].total.measurementTimeStart == undefined) this.units[unitId].total.measurementTimeStart = this.units[unitId].total.measurementTime;
 	}

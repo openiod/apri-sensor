@@ -64,9 +64,9 @@ sensor	: {
 		var unitId = data.unitId;
 		if (this.units[unitId] == undefined) this.initUnit(unitId);
 		this.units[unitId].total.measurementCount		++;
-		this.units[unitId].total.pressure			  	+= parseFloat(data[2])/10;
-		this.units[unitId].total.temperature			+= parseFloat(data[3])/10;
-    this.units[unitId].total.rHumAvg    			+= parseFloat(data[4])/10;
+		this.units[unitId].total.pressure			    	+= parseFloat(data[1])/100;
+		this.units[unitId].total.temperature  	 		+= parseFloat(data[2])/100;
+    this.units[unitId].total.rHum    	      		+= parseFloat(data[4])/100;
 		this.units[unitId].total.measurementTime		= new Date();
 		if (this.units[unitId].total.measurementTimeStart == undefined) this.units[unitId].total.measurementTimeStart = this.units[unitId].total.measurementTime;
 	}

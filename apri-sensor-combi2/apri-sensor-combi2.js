@@ -1,7 +1,7 @@
 /*
 ** Module: apri-sensor-combi2
 **
-** Main system module for handling sensor measurement data via serial port 
+** Main system module for handling sensor measurement data via serial port
 **
 */
 
@@ -40,7 +40,7 @@ const execFile			= require('child_process').execFile;
 
 // **********************************************************************************
 		/* web-socket */
-	var socketUrl, socketPath;	
+	var socketUrl, socketPath;
 //		socketUrl 	= 'http://localhost:3010';
 //		socketUrl 	= 'http://openiod.org';
 //		socketUrl 	= 'https://openiod.org';
@@ -52,7 +52,7 @@ const execFile			= require('child_process').execFile;
 		//console.log(apriConfig);
 
 //test:
-//		socketPort	= 3010; socketUrl 	= ':'+socketPort; 
+//		socketPort	= 3010; socketUrl 	= ':'+socketPort;
 //		socketPath	= apriConfig.urlSystemRoot + '/socket.io';
 
 
@@ -92,11 +92,11 @@ var fileDateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  t
 var tmpPrefix;
 
 var mainProcess = function() {
-	
+
 	console.dir(sensorDefs);
-	
+
 	for (var i=0;i<sensorDefs.length;i++) {
-		var _sensor	= sensorDefs[i]; 
+		var _sensor	= sensorDefs[i];
 		_sensor.file	= resultsFolder + _sensor.fileName + '_' + fileDateString + '_result' + sensorFileExtension;
 		fs.appendFile(_sensor.file, _sensor.csvHeader, function (err) {
 			if (err != null) {
@@ -104,19 +104,19 @@ var mainProcess = function() {
 			}
 		});
 	}
-	
+
 
 	var processSensorResults	= function() {
 		var observations = '';
 		console.log('Process sensor results');
 		for (var i=0;i<sensorDefs.length;i++) {
-						
+
 			if (sensorDefs[i].units == undefined) {
 				var _sensor	= sensorDefs[i];
-			
+
 				if (_sensor.total.measurementCount > 0) {
-					_sensor.processResult(); 
-				
+					_sensor.processResult();
+
 					_sensor.file	= resultsFolder + _sensor.fileName + '_' + fileDateString + '_result' + sensorFileExtension;
 					fs.appendFile(_sensor.file, _sensor.record, function (err) {
 						if (err != null) {
@@ -124,19 +124,19 @@ var mainProcess = function() {
 						}
 					});
 					var data			= {};
-					data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;  
+					data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;
 					data.sensorSystem		= _sensor.sensorSystem;
-					data.foi				= 'SCRP' + unit.id;	
-					data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;	
-					data.cityCode			= 'GM0439'; //geoLocation.cityCode;	
+					data.foi				= 'SCRP' + unit.id;
+					data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;
+					data.cityCode			= 'GM0439'; //geoLocation.cityCode;
 					data.cityName			= '..'; //geoLocation.cityName;
 					data.categories			= [];
 					data.observation		= _sensor.result.observations;
-				
-				
+
+
 					var _url = openiodUrl + '/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&offering=offering_0439_initial&commit=true';
 					_url = _url + '&sensorsystem=' + data.sensorSystem + '&region=0439' + '&foi=' + data.foi + '&neighborhoodcode=' + data.neighborhoodCode + '&citycode=' + data.cityCode + '&observation=' + data.observation ;
-		
+
 					console.log(_url);
 					request.get(_url)
 						.on('response', function(response) {
@@ -154,10 +154,10 @@ var mainProcess = function() {
 				for (var key in sensorDefs[i].units) {
 					var _sensor	= sensorDefs[i].units[key];
 				    console.log("process unit " + key);
-				
+
 					if (_sensor.total.measurementCount > 0) {
-						sensorDefs[i].processResult(key); 
-				
+						sensorDefs[i].processResult(key);
+
 						sensorDefs[i].file	= resultsFolder + sensorDefs[i].fileName + '_' + fileDateString + '_result' + sensorFileExtension;
 						fs.appendFile(sensorDefs[i].file, sensorDefs[i].record, function (err) {
 							if (err != null) {
@@ -165,19 +165,23 @@ var mainProcess = function() {
 							}
 						});
 						var data			= {};
-						data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;  
+						data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;
 						data.sensorSystem		= sensorDefs[i].sensorSystem;
-						data.foi				= 'SCRP' + unit.id + '*'+ key;	
-						data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;	
-						data.cityCode			= 'GM0439'; //geoLocation.cityCode;	
+						if (key == 'MAIN') {
+							data.foi				= 'SCRP' + unit.id;	
+						} else {
+							data.foi				= 'SCRP' + unit.id + '*'+ key;
+						}
+						data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;
+						data.cityCode			= 'GM0439'; //geoLocation.cityCode;
 						data.cityName			= '..'; //geoLocation.cityName;
 						data.categories			= [];
 						data.observation		= sensorDefs[i].result.observations;
-				
-				
+
+
 						var _url = openiodUrl + '/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&offering=offering_0439_initial&commit=true';
 						_url = _url + '&sensorsystem=' + data.sensorSystem + '&region=0439' + '&foi=' + data.foi + '&neighborhoodcode=' + data.neighborhoodCode + '&citycode=' + data.cityCode + '&observation=' + data.observation ;
-		
+
 						console.log(_url);
 						request.get(_url)
 							.on('response', function(response) {
@@ -207,24 +211,24 @@ var mainProcess = function() {
 			var _sensorId	= '';
 			var _dataArray	= data.split(';');
 			var _dataPrefix = _dataArray[0].split('@');
-			
+
 			if (_dataPrefix[0] == 'M') { // Measurements
 				for (var i=0;i<sensorDefs.length;i++) {
 					var _sensor		= sensorDefs[i];
-					if (_sensor.isSensorType(_dataArray)==true) {	
+					if (_sensor.isSensorType(_dataArray)==true) {
 						_sensor.processData(_dataArray);
 						_sensorId	= _sensor.id;
 						validData	= true;
 						break;
 					}
-				}		
+				}
 			}
-				
+
 			if (validData == true) {
 				//console.log('valid data retrieved from sensor ' + _sensorId);
 				return;
 			}
-			
+
 /*
 			if (_dataArray.length == 3 && _dataArray[0] == 'AM2320' && isNumeric(_dataArray[1]) && isNumeric(_dataArray[2]) ) {
 				processMeasurement(_dataArray);
@@ -278,26 +282,26 @@ var processMeasurement = function(data) {
 	//console.log(data);
 	var _sensorId	= data[0];
 	var _sensor	= combi_1_sensors[_sensorId];
-	
+
 	console.dir(_sensor);
-	
-	
-	if (loopStart == undefined) { 
-		loopStart 			= new Date(); 
+
+
+	if (loopStart == undefined) {
+		loopStart 			= new Date();
 		_sensor.init();
 	};
 
 	var measureMentTime		= new Date();
 	var loopTime 			= measureMentTime.getTime() - loopStart.getTime();
-	
+
 	if (loopTime >= loopTimeMax) { //loopTime) {
-			
+
 		_sensor.computeAverage();
-		
+
 		writeResults(_sensorId, measureMentTime, loopTime);
 		loopStart 			= new Date();
 	}
-	
+
 	_sensor.addMeasurement(data);
 
 }
@@ -306,13 +310,13 @@ var processMeasurement = function(data) {
 
 var writeResults	= function(sensorId, measureTime, loopTime) {
 	console.log('Results ' + sensorId + ': ' + measureTime.toISOString() );
-	
+
 	var recordAvg	= measureTime.toISOString() + ';' + loopTime ;
-		
-	recordAvg		= recordAvg + ';' +  
+
+	recordAvg		= recordAvg + ';' +
 		rHumAvg	+ ';' +
 		temperatureAvg;
-	recordAvg		= recordAvg + ';' + measurementCount; 
+	recordAvg		= recordAvg + ';' + measurementCount;
 	recordAvg		= recordAvg + '\n';
 	//console.log(record);
 	fs.appendFile(resultsFileName + '_avg' + sensorFileExtension, recordAvg, function (err) {
@@ -322,22 +326,22 @@ var writeResults	= function(sensorId, measureTime, loopTime) {
 	});
 
 	var data			= {};
-	data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;  
-	data.foi				= 'SCRP' + unit.id;	
-	data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;	
-	data.cityCode			= 'GM0439'; //geoLocation.cityCode;	
+	data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;
+	data.foi				= 'SCRP' + unit.id;
+	data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;
+	data.cityCode			= 'GM0439'; //geoLocation.cityCode;
 	data.cityName			= '..'; //geoLocation.cityName;
-		
+
 	//observation=stress:01
-		
+
 	data.categories			= [];
-	data.observation		= 
+	data.observation		=
 		'apri-sensor-am2320-rHum:'+ rHumAvg + ',' +
 		'apri-sensor-am2320-temperature:'+temperatureAvg;
 
 //console.log(data);
 //	sendData(data);
- 
+
 }
 
 // send data to SOS service via OpenIoD REST service
@@ -350,7 +354,7 @@ var sendData = function(data) {
 
 		var _url = openiodUrl + '/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=apri-sensor-am2320&offering=offering_0439_initial&commit=true';
 		_url = _url + '&region=0439' + '&foi=' + data.foi + '&neighborhoodcode=' + data.neighborhoodCode + '&citycode=' + data.cityCode + '&observation=' + data.observation ;
-		
+
 		console.log(_url);
 		request.get(_url)
 			.on('response', function(response) {
@@ -361,7 +365,7 @@ var sendData = function(data) {
 				console.log(err)
 			})
 		;
-		
+
 };
 
 var readSensorDefs	= function(location) {
@@ -370,14 +374,14 @@ var readSensorDefs	= function(location) {
 			throw err;
 		}
 		files.map(function(file) {
-			return path.join(location, file);  
+			return path.join(location, file);
 		}).filter(function (file) {
         	if (fs.statSync(file).isFile() & path.basename(file).substr(0,11) == 'sensor-def-' & path.extname(file) == '.js') return true;
 			return false;
     	}).forEach(function (file) {
 			var _sensorDef = require(file);
 			sensorDefs.push(_sensorDef.sensor);
-		});	
+		});
 	})
 }
 
@@ -415,7 +419,7 @@ SerialPort.list(function(err, ports) {
 	console.log(ports);
 
 	console.log('Find usb comport:');
-	
+
 	usbPorts	= ports;
 
 	if (usbComNames['apri-sensor-combi2'] != undefined && usbComNames['apri-sensor-combi2'].comName != undefined) {
@@ -435,12 +439,12 @@ SerialPort.list(function(err, ports) {
 
 
 
-var socket = io(socketUrl, {path:socketPath}); 
+var socket = io(socketUrl, {path:socketPath});
 
 socket.on('connection', function (socket) {
 	var currTime = new Date();
 	console.log(currTime +': connect from '+ socket.request.connection.remoteAddress + ' / '+ socket.handshake.headers['x-forwarded-for'] || socket.handshake.address.address);
-	
+
 });
 
 socket.on('disconnect', function() {
@@ -452,11 +456,3 @@ socket.on('info', function(data) {
 	//io.sockets.emit('aireassignal', { data: data } );
 	//socket.broadcast.emit('aireassignal', { data: data } );
 });
-
-
-
-
-
-
-
-

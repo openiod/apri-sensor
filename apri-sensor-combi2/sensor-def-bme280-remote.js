@@ -50,8 +50,12 @@ sensor	: {
 			&& isNumeric(data[3])
       && isNumeric(data[4])
 			&& isNumeric(data[5]) ) {
-			data.unitId=_dataPrefix[1];
-			if (this.units[data.unitId] == undefined) this.initUnit(data.unitId);
+      if(_dataPrefix[1]=='' || _dataPrefix[1]=='M/U') { //messageId / unitId
+        data.unitId='MAIN';
+      } else {
+        data.unitId=_dataPrefix[1].split('/')[1];
+        if (this.units[data.unitId] == undefined) this.initUnit(data.unitId);
+      }
 			return true;
 		};
 		return false;

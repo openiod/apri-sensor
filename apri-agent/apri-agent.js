@@ -265,7 +265,7 @@ var save99UsbSerialRules	= function() {
 	if (unit.id == '00000000b7710419') { // || unit.id == '0000000098e6a65d') {  // Purmerend / Aalten
 		console.log('save usb config for unit ' + unit.id);
 		content =
-			'{"apri-sensor-combi-1": {"comName": "/dev/ttyArduinoMega"}\n';
+			'{"apri-sensor-combi-1": {"comName": "/dev/ttyArduinoMega"} }\n';
 		fs.writeFileSync(file, content);
 		try {
 			console.log('Activate usb rules');

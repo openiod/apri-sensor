@@ -228,6 +228,7 @@ var getWifiScanInfo	= function(iface, callback) {
 var save99UsbSerialRules	= function() {
 //	99-usb-serial.rules
 	var content = '';
+	var result;
 	var file = '/etc/udev/rules.d/99-usb-serial.rules';
 	if (unit.id == '00000000b7e92a99' || unit.id == '00000000ac35e5d3') {  //'s-Gravenpolder  2x
 		console.log('save usb rules for unit ' + unit.id);
@@ -259,7 +260,7 @@ var save99UsbSerialRules	= function() {
 		console.log('     usb rules for unit ' + unit.id + ' saved and activated.');
 	}
 
-	file = startFolderParent + 'conf/apri-sensor-usb.json';
+	file = startFolderParent + '/config/apri-sensor-usb.json';
 
 	if (unit.id == '00000000b7710419') { // || unit.id == '0000000098e6a65d') {  // Purmerend / Aalten
 		console.log('save usb config for unit ' + unit.id);

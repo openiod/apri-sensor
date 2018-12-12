@@ -289,7 +289,8 @@ var saveSystemServices	= function() {
 
 		if (unit.id == '00000000b7710419') {
 			disableServices('apri-sensor-combi-1','');
-			createService('apri-sensor-combi-1','COMBI1');
+			disableServices('apri-sensor-combi2','');
+			createService('apri-sensor-combi2','COMBI2');
 		}
 
 /*

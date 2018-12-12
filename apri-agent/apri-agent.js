@@ -247,8 +247,24 @@ var save99UsbSerialRules	= function() {
 	if (unit.id == '00000000b7710419') { // || unit.id == '0000000098e6a65d') {  // Purmerend / Aalten
 		console.log('save usb rules for unit ' + unit.id);
 		content =
-			'SUBSYSTEM=="tty", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="0042", ATTRS{serial}=="AL02V14T", SYMLINK+="ttyArduinoMega", MODE:="0666" \n';
+			'SUBSYSTEM=="tty", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="0042", SYMLINK+="ttyArduinoMega", MODE:="0666" \n';
+     // ATTRS{serial}=="Arduino__www.arduino.cc__0042_556393135333519071C2"
+		fs.writeFileSync(file, content);
+		try {
+			console.log('Activate usb rules');
+			result	= execSync('udevadm trigger');  // activate usb rules
+		} catch (e) {
+    		console.log("Errors:", e);
+  		}
+		console.log('     usb rules for unit ' + unit.id + ' saved and activated.');
+	}
 
+	file = startFolderParent + 'conf/apri-sensor-usb.json';
+
+	if (unit.id == '00000000b7710419') { // || unit.id == '0000000098e6a65d') {  // Purmerend / Aalten
+		console.log('save usb config for unit ' + unit.id);
+		content =
+			'{"apri-sensor-combi-1": {"comName": "/dev/ttyArduinoMega"}\n';
 		fs.writeFileSync(file, content);
 		try {
 			console.log('Activate usb rules');

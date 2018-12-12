@@ -25,10 +25,11 @@ sensor	: {
 	, result	: {}
 	, record	: ''
 	, init		: function() {
-		this.total					= {};
+		this.total					        = {};
 		this.total.measurementCount	= 0;
-		this.total.pressure			= 0;
-		this.total.temperature		= 0;
+		this.total.pressure			    = 0;
+		this.total.temperature		  = 0;
+    this.total.rHumAvg  		    = 0;
 		}
 	, isSensorType: function(data) {
 		if (data[0] != this.id ) return false;
@@ -78,7 +79,7 @@ sensor	: {
 
 			this.result.observations	=
 				'apri-sensor-bme280-pressure:' + this.result.pressure + ',' +
-				'apri-sensor-bme280-temperature:' + this.result.temperature + ',' + 
+				'apri-sensor-bme280-temperature:' + this.result.temperature + ',' +
         'apri-sensor-bme280-rHum:' + this.result.rHum;
 			this.init();
 		}

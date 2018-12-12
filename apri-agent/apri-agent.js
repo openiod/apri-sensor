@@ -1,7 +1,7 @@
 /*
 ** Module: apri-agent
 **
-** Main system module for handling sensor system configuration and updates 
+** Main system module for handling sensor system configuration and updates
 **
 */
 
@@ -41,7 +41,7 @@ var app = express();
 
 // **********************************************************************************
 		/* web-socket */
-var socketUrl, socketPath;	
+var socketUrl, socketPath;
 //		socketUrl 	= 'http://localhost:3010';
 //		socketUrl 	= 'http://openiod.org';
 //		socketUrl 	= 'https://openiod.org';
@@ -53,7 +53,7 @@ var socketUrl, socketPath;
 		//console.log(apriConfig);
 
 //test:
-//		socketPort	= 3010; socketUrl 	= ':'+socketPort; 
+//		socketPort	= 3010; socketUrl 	= ':'+socketPort;
 //		socketPath	= apriConfig.urlSystemRoot + '/socket.io';
 
 
@@ -126,7 +126,7 @@ var sendData = function(data) {
 
 		var _url = openiodUrl + '/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=scapeler_barometer&offering=offering_0439_initial&commit=true';
 		_url = _url + '&region=0439' + '&neighborhoodcode=' + data.neighborhoodCode + '&citycode=' + data.cityCode + '&observation=' + data.observation ;
-		
+
 		console.log(_url);
 		request.get(_url)
 			.on('response', function(response) {
@@ -137,7 +137,7 @@ var sendData = function(data) {
 				console.log(err)
 			})
 		;
-		
+
 };
 
 var startActionReboot = function() {
@@ -190,7 +190,7 @@ var getUsbPorts	= function() {
 		//console.log('The usb ports of this system are: ');
 		//for (var i=0;i<usbPorts.length;i++) {
 		//	console.log(usbPorts[i]);
-		//} 
+		//}
 	});
 }
 
@@ -216,9 +216,9 @@ var getWifiScanInfo	= function(iface, callback) {
 			return;
 		}
 		wifiScan[iface]	= "" + stdout;
-//		console.log(`stderr: ${stderr}`);	
+//		console.log(`stderr: ${stderr}`);
 
-		
+
 		if (callback != undefined) {
 			callback(iface,stdout);
 		}
@@ -231,8 +231,8 @@ var save99UsbSerialRules	= function() {
 	var file = '/etc/udev/rules.d/99-usb-serial.rules';
 	if (unit.id == '00000000b7e92a99' || unit.id == '00000000ac35e5d3') {  //'s-Gravenpolder  2x
 		console.log('save usb rules for unit ' + unit.id);
-		content = 
-			'SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="AL02V14T", SYMLINK+="ttyDC1100", MODE:="0666" \n' + 
+		content =
+			'SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="AL02V14T", SYMLINK+="ttyDC1100", MODE:="0666" \n' +
 		 	'SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="AJ03KNV9", SYMLINK+="ttyDC1700", MODE:="0666" \n' +
  			'SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="ttyCOMBI1", MODE:="0666" \n';
 		fs.writeFileSync(file, content);
@@ -241,9 +241,24 @@ var save99UsbSerialRules	= function() {
 			result	= execSync('udevadm trigger');  // activate usb rules
 		} catch (e) {
     		console.log("Errors:", e);
-  		} 
+  		}
 		console.log('     usb rules for unit ' + unit.id + ' saved and activated.');
 	}
+	if (unit.id == '00000000b7710419') { // || unit.id == '0000000098e6a65d') {  // Purmerend / Aalten
+		console.log('save usb rules for unit ' + unit.id);
+		content =
+			'SUBSYSTEM=="tty", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="0042", ATTRS{serial}=="AL02V14T", SYMLINK+="ttyArduinoMega", MODE:="0666" \n';
+
+		fs.writeFileSync(file, content);
+		try {
+			console.log('Activate usb rules');
+			result	= execSync('udevadm trigger');  // activate usb rules
+		} catch (e) {
+    		console.log("Errors:", e);
+  		}
+		console.log('     usb rules for unit ' + unit.id + ' saved and activated.');
+	}
+
 }
 
 var saveSystemServices	= function() {
@@ -251,11 +266,15 @@ var saveSystemServices	= function() {
 		disableServices('apri-sensor-dylos','');  // met de tweede parameter kan een extra filter worden toegepast bijv. '_' om alleen dylos_DCxxx te selecteren
 		createService('apri-sensor-dylos','DC1100');
 		createService('apri-sensor-dylos','DC1700');
-		
+
 		if (unit.id == '000000004659c5bc') {
 			disableServices('apri-sensor-combi-1','');
 			createService('apri-sensor-combi-1','COMBI1');
-		
+		}
+
+		if (unit.id == '00000000b7710419') {
+			disableServices('apri-sensor-combi-1','');
+			createService('apri-sensor-combi-1','COMBI1');
 		}
 
 /*
@@ -279,7 +298,7 @@ var saveSystemServices	= function() {
 				console.error(`exec error: ${error}`);
 				return;
 			}
-//			console.log(`stderr: ${stderr}`);	
+//			console.log(`stderr: ${stderr}`);
 
 //			if (callback != undefined) {
 //				callback(device,stdout);
@@ -306,7 +325,7 @@ var saveSystemServices	= function() {
 				console.error(`exec error: ${error}`);
 				return;
 			}
-//			console.log(`stderr: ${stderr}`);	
+//			console.log(`stderr: ${stderr}`);
 
 //			if (callback != undefined) {
 //				callback(device,stdout);
@@ -326,7 +345,7 @@ var disableServices 	= function(sensor, separator) {
 //    	console.log("Errors:", e);
 		console.log('No service available to revoke for '+apriConfig.systemCode+'-'+sensor+'*.service');
 		return;
-  	} 
+  	}
 	console.log('Revoke services:');
 //	console.log(stdout);
 	services = stdout.toString().split('\n');
@@ -336,7 +355,7 @@ var disableServices 	= function(sensor, separator) {
 		console.log(service);
 		revokeService(service);
 	}
-		
+
 }
 
 var revokeService	= function(service) {
@@ -350,20 +369,20 @@ var revokeService	= function(service) {
 		result	= execSync('systemctl stop '+service);
 	} catch (e) {
     	console.log("Errors:", e);
-  	} 
+  	}
 	try {
 		console.log('Disable service '+service);
 		result	= execSync('systemctl disable /etc/systemd/system/'+service);
 	} catch (e) {
     	console.log("Errors:", e);
-  	} 
+  	}
 	try {
 		console.log('Remove service '+service);
 		result	= execSync('rm /etc/systemd/system/'+service);
 	} catch (e) {
     	console.log("Errors:", e);
-  	} 
-	
+  	}
+
 }
 
 var createService	= function(sensor, sensorKey) {
@@ -394,7 +413,7 @@ var createService	= function(sensor, sensorKey) {
 				return;
 			}
 		});
-//		console.log(`stderr: ${stderr}`);	
+//		console.log(`stderr: ${stderr}`);
 
 //		if (callback != undefined) {
 //			callback(device,stdout);
@@ -407,7 +426,7 @@ var createService	= function(sensor, sensorKey) {
 var getUsbInfo	= function(device, callback) {
 
 
-//sudo udevadm trigger	
+//sudo udevadm trigger
 
 	//hostname --all-ip-address
 	exec('udevadm info -a -p $(udevadm info -q path -n '+device+')', (error, stdout, stderr) => {
@@ -415,7 +434,7 @@ var getUsbInfo	= function(device, callback) {
 			console.error(`exec error: ${error}`);
 			return;
 		}
-//		console.log(`stderr: ${stderr}`);	
+//		console.log(`stderr: ${stderr}`);
 
 		if (callback != undefined) {
 			callback(device,stdout);
@@ -433,7 +452,7 @@ var getIpAddress	= function() {
 		}
 		var stdoutArray	= stdout.split('\n');
 		ipAddress = stdoutArray[0];
-//		console.log(`stderr: ${stderr}`);	
+//		console.log(`stderr: ${stderr}`);
 	});
 };
 
@@ -448,9 +467,9 @@ var updateSoftware	= function() {
 };
 
 var sendClientWifiInfo	= function(iface, stdout) {
-	socket.emit('apriClientActionResponse', 
+	socket.emit('apriClientActionResponse',
 		{"action":"getClientWifiInfo"
-		, "unit": unit	
+		, "unit": unit
 		, "device": iface
 		, "wifiScan": stdout
 		}
@@ -459,16 +478,16 @@ var sendClientWifiInfo	= function(iface, stdout) {
 
 var sendClientUsbInfo	= function(device, stdout) {
 	console.log('Send apriClientActionResponse for device %s', device);
-	socket.emit('apriClientActionResponse', 
+	socket.emit('apriClientActionResponse',
 		{"action":"getClientUsbInfo"
-		, "unit": unit	
+		, "unit": unit
 		, "device": device
 		, "usbInfo": stdout
 		}
 	);
 }
 
-var socket = io(socketUrl, {path:socketPath}); 
+var socket = io(socketUrl, {path:socketPath});
 
 socket.on('connect', function (socket) {
 	var currTime = new Date();
@@ -520,7 +539,7 @@ socket.on('disconnect', function() {
 	});
 	socket.on('apriAgentPing', function(data) {
         console.log('ApriAgent Ping message recieved ');
-		socket.emit('apriAgentPong', data ); // pong, return message. 
+		socket.emit('apriAgentPong', data ); // pong, return message.
     });
 	socket.on('apriAgentPong', function(data) {
         console.log('ApriAgent Pong message recieved ');
@@ -546,12 +565,12 @@ var startConnection	= function() {
 	} else {
 		console.log('Socket is NOT connected');
 	}
-	socket.emit('apriAgentBoot', 
+	socket.emit('apriAgentBoot',
 		{"action":"boot"
 		, "macAddress": macAddress
 		, "usbPorts": usbPorts
 		, "ipAddress": ipAddress
-		, "unit": unit	
+		, "unit": unit
 		, "wifiScan": wifiScan
 		}
 	);
@@ -569,8 +588,8 @@ app.all('/*', function(req, res, next) {
 	  	console.dir(localServer.ConfigMenu);
 	} else {
 	    console.log('NO init menu! (already done?)');
-	}		
-  
+	}
+
 //  res.header("Access-Control-Allow-Origin", "*");
 //  res.header("Access-Control-Allow-Headers", "X-Requested-With");
   next();
@@ -611,5 +630,3 @@ app.get('/*', function(req, res) {
 
 app.listen(apriConfig.systemListenPort);
 console.log('listening to http://proxyintern: ' + apriConfig.systemListenPort);
-
-

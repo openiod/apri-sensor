@@ -65,9 +65,21 @@ var openiodUrl			= siteProtocol + 'openiod.org/' + apriConfig.systemCode; //SCAP
 var usbComNames			= apriConfig.getSensorUsbComName();
 console.log(usbComNames);
 var usbPorts			= [];
-//var serialPortPath		= "/dev/cu.usbmodem1411";
-//var serialPortPath		= "/dev/cu.usbmodem1421";
-var serialPortPath		= "/dev/cu.wchusbserial1430";
+
+var serialPortPath;
+
+var deviceParam			= process.argv[2];
+console.log('Param for serial device is ' + deviceParam);
+var sensorKey			= '';
+if (deviceParam != undefined) {
+	serialPortPath		= deviceParam;
+	sensorKey			= serialPortPath.substring(8);  // minus '/dev/tty'
+	console.log('SensorKey = ' + sensorKey);
+} else {
+	serialPortPath		= "/dev/ttyUSB0";
+}
+
+
 
 
 var unit				= {};
@@ -422,9 +434,10 @@ SerialPort.list(function(err, ports) {
 
 	usbPorts	= ports;
 
-	if (usbComNames['apri-sensor-combi2'] != undefined && usbComNames['apri-sensor-combi2'].comName != undefined) {
-		serialPortPath	= usbComNames['apri-sensor-combi2'].comName;
-	} else {
+	if (serialPortPath != deviceParam) {
+//	if (usbComNames['apri-sensor-combi2'] != undefined && usbComNames['apri-sensor-combi2'].comName != undefined) {
+//		serialPortPath	= usbComNames['apri-sensor-combi2'].comName;
+//	} else {
 		for (var i=0;i<usbPorts.length;i++) {
 			console.log('searching for usb comport 1a86 ' + i + ' '+ usbPorts[i].manufacturer + ' ' +  usbPorts[i].comName);
 			if (usbPorts[i].manufacturer == '1a86') { // && usbPorts[i].comName == '/dev/ttyUSB0') {

@@ -1,7 +1,7 @@
 /*
 ** Module: apri-sensor-dylos
 **
-** Main system module for handling sensor measurement data via serial port 
+** Main system module for handling sensor measurement data via serial port
 **
 */
 
@@ -40,7 +40,7 @@ const execFile			= require('child_process').execFile;
 
 // **********************************************************************************
 		/* web-socket */
-	var socketUrl, socketPath;	
+	var socketUrl, socketPath;
 //		socketUrl 	= 'http://localhost:3010';
 //		socketUrl 	= 'http://openiod.org';
 //		socketUrl 	= 'https://openiod.org';
@@ -52,7 +52,7 @@ const execFile			= require('child_process').execFile;
 		//console.log(apriConfig);
 
 //test:
-//		socketPort	= 3010; socketUrl 	= ':'+socketPort; 
+//		socketPort	= 3010; socketUrl 	= ':'+socketPort;
 //		socketPath	= apriConfig.urlSystemRoot + '/socket.io';
 
 
@@ -68,7 +68,7 @@ var usbPorts			= [];
 var serialPortPath;
 
 var deviceParam			= process.argv[2];
-console.log('Param for serial device is ' + deviceParam); 
+console.log('Param for serial device is ' + deviceParam);
 var sensorKey			= '';
 if (deviceParam != undefined) {
 	serialPortPath		= deviceParam;
@@ -162,9 +162,9 @@ var processMeasurement = function(data) {
 		loopStart 		= new Date();
 	}
 	calculate fillChannel(sensorId, measureMentTime, data);
-*/	
-	
-	
+*/
+
+
 }
 
 /*
@@ -183,7 +183,7 @@ var initSensor = function(sensorId) {
 		var _channel = {};
 		_channel.pulseTotal	= 0;
 		_channel.count		= 0;
-		sensors[sensorId].channel.push(_channel);		  
+		sensors[sensorId].channel.push(_channel);
 	};
 };
 
@@ -209,21 +209,21 @@ var writeHeaderIntoFile = function() {
 
 var writeResults	= function(measureTime, dataIn) {
 	console.log('Results: ' + measureTime.toISOString() );
-	
+
 
 /*
 	var sosCount		= 0;
 	var sosSensorCount 	= 0;
-	
+
 	for (var sensorId in sensors) {
 		var recordCounts 		= measureTime.toISOString() + ';' + loopTime + ';' + sensorId;
 		var recordPulseTotals 	= measureTime.toISOString() + ';' + loopTime + ';' + sensorId;
 		var recordAvg			= measureTime.toISOString() + ';' + loopTime + ';' + sensorId;
-		
+
 		for (var i=0; i<nrOfChannels; i++) {
-			recordCounts 		= recordCounts + ';' +  Math.round(sensors[sensorId].channel[i].count / loopTime * loopTimeMax *100)/100; 
-			recordPulseTotals 	= recordPulseTotals + ';' + sensors[sensorId].channel[i].pulseTotal; 
-			recordAvg			= recordAvg + ';' + Math.round(sensors[sensorId].channel[i].pulseTotal / loopTime * loopTimeMax *100)/100; 
+			recordCounts 		= recordCounts + ';' +  Math.round(sensors[sensorId].channel[i].count / loopTime * loopTimeMax *100)/100;
+			recordPulseTotals 	= recordPulseTotals + ';' + sensors[sensorId].channel[i].pulseTotal;
+			recordAvg			= recordAvg + ';' + Math.round(sensors[sensorId].channel[i].pulseTotal / loopTime * loopTimeMax *100)/100;
 		}
 		recordCounts 					= recordCounts + '\n';
 		recordPulseTotals 				= recordPulseTotals + '\n';
@@ -244,31 +244,31 @@ var writeResults	= function(measureTime, dataIn) {
 				console.log('Error writing results to file: ' + err);
 			}
 		});
-		
+
 		for (var i=0; i<nrOfChannels; i++) {
-			sosCount 	+= Math.round(sensors[sensorId].channel[i].count / loopTime * loopTimeMax *100)/100; 
+			sosCount 	+= Math.round(sensors[sensorId].channel[i].count / loopTime * loopTimeMax *100)/100;
 		}
 		sosSensorCount++;
-				
+
 		initSensor(sensorId);
 	}
 */
 
 
 	var data			= {};
-	data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;  
+	data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;
 	data.foi				= 'SCRP' + unit.id;
 	if (sensorKey != '') {
 		data.foi	+= '_' + sensorKey;
 	}
-	data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;	
-	data.cityCode			= 'GM0439'; //geoLocation.cityCode;	
+	data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;
+	data.cityCode			= 'GM0439'; //geoLocation.cityCode;
 	data.cityName			= '..'; //geoLocation.cityName;
-		
-	
+
+
 	var raw0				= dataIn[0];
 	var raw1				= dataIn[1];
-	
+
 	var recordOut 			= measureTime.toISOString() + ';' + raw0 + ';' + raw1 + '\n';
 
 	fs.appendFile(resultsFileName + '_raw' + sensorFileExtension, recordOut, function (err) {
@@ -276,12 +276,12 @@ var writeResults	= function(measureTime, dataIn) {
 			console.log('Error writing results to file: ' + err);
 		}
 	});
-		
+
 	data.categories			= [];
 	data.observation		= 'scapeler_dylos_raw0:'+raw0+','+'scapeler_dylos_raw1:'+raw1 ;
 
 	sendData(data);
- 
+
 }
 
 // send data to SOS service via OpenIoD REST service
@@ -294,7 +294,7 @@ var sendData = function(data) {
 
 		var _url = openiodUrl + '/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=scapeler_dylos&offering=offering_0439_initial&commit=true';
 		_url = _url + '&region=0439' + '&foi=' + data.foi + '&neighborhoodcode=' + data.neighborhoodCode + '&citycode=' + data.cityCode + '&observation=' + data.observation ;
-		
+
 		console.log(_url);
 		request.get(_url)
 			.on('response', function(response) {
@@ -305,7 +305,7 @@ var sendData = function(data) {
 				console.log(err)
 			})
 		;
-		
+
 };
 
 /*
@@ -316,13 +316,13 @@ var printChannelResults	= function() {
 		for (var i=0; i<nrOfChannels; i++) {
 			line = line + '\t' + i + ': ';
 			if (sensors[sensorKey].channel[i].count==0) {
-				line = line + '\t'; 
+				line = line + '\t';
 			} else {
-				line = line + sensors[sensorKey].channel[i].count + 'x'; 
+				line = line + sensors[sensorKey].channel[i].count + 'x';
 			}
 		}
 		console.log(line);
-	} 
+	}
 }
 */
 
@@ -345,7 +345,7 @@ app.get('/'+apriConfig.systemCode+'/', function(req, res) {
 app.get('/'+apriConfig.systemCode+'/eventsource/:eventsource', function(req, res) {
 	//getLocalFile(req, res, {contentType:'text/css'});
 	console.log('EventSource action from '+ req.params.eventsource );
-		
+
 });
 */
 
@@ -389,9 +389,9 @@ SerialPort.list(function(err, ports) {
 	console.log(ports);
 
 	console.log('Find usb comport:');
-	
+
 	usbPorts	= ports;
-	
+
 	if (serialPortPath != deviceParam) {
 		for (var i=0;i<usbPorts.length;i++) {
 			console.log('searching for usb comport FTDI ' + i + ' '+ usbPorts[i].manufacturer + ' ' +  usbPorts[i].comName);
@@ -405,12 +405,12 @@ SerialPort.list(function(err, ports) {
 });
 
 
-var socket = io(socketUrl, {path:socketPath}); 
+var socket = io(socketUrl, {path:socketPath});
 
 socket.on('connection', function (socket) {
 	var currTime = new Date();
 	console.log(currTime +': connect from '+ socket.request.connection.remoteAddress + ' / '+ socket.handshake.headers['x-forwarded-for'] || socket.handshake.address.address);
-	
+
 });
 
 socket.on('disconnect', function() {
@@ -418,9 +418,15 @@ socket.on('disconnect', function() {
 });
 
 socket.on('info', function(data) {
-	console.log('websocket info '+ data);
+	console.log('websocket info: ');
+	try {
+		var dataStr = JSON.stringify(data);
+		console.log(dataStr);
+	}
+	catch(err) {
+		console.dir(data);
+	}
+
 	//io.sockets.emit('aireassignal', { data: data } );
 	//socket.broadcast.emit('aireassignal', { data: data } );
 });
-
-

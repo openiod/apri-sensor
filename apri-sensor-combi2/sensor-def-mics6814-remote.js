@@ -98,9 +98,9 @@ sensor	: {
 			//console.log(record);
 
 			this.result.observations	=
-				'apri-sensor-mics6814-pressure:' + this.result.co + ',' +
-        'apri-sensor-mics6814-rHum:' + this.result.nh3 + ',' +
-				'apri-sensor-mics6814-temperature:' + this.result.no2;
+				'apri-sensor-mics6814-co:' + this.result.co + ',' +
+        'apri-sensor-mics6814-nh3:' + this.result.nh3 + ',' +
+				'apri-sensor-mics6814-no2:' + this.result.no2;
 			this.result.unitid = unitId;
 			this.initUnit(unitId);
 		}

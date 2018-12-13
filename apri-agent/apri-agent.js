@@ -283,7 +283,7 @@ var saveSystemServices	= function() {
 		disableServices('apri-sensor-combi-1','');
 		disableServices('apri-sensor-combi2','');
 		createService('apri-sensor-combi2','ArduinoMega');
-		createService('apri-sensor-combi2','COMBI2_MICS6814');
+		createService('apri-sensor-combi2','COMBI2MICS6814');
 	}
 	if (unit.id == '000000004659c5bc') {
 		disableServices('apri-sensor-combi-1','');

@@ -245,7 +245,7 @@ var save99UsbSerialRules	= function() {
   		}
 		console.log('     usb rules for unit ' + unit.id + ' saved and activated.');
 	}
-	if (unit.id == '00000000b7710419' || unit.id == '000000004659c5bc') ) { // || unit.id == '0000000098e6a65d') {  // Purmerend / Aalten
+	if (unit.id == '00000000b7710419' || unit.id == '000000004659c5bc') { // || unit.id == '0000000098e6a65d') {  // Purmerend / Aalten
 		console.log('save usb rules for unit ' + unit.id);
 		content =
 			'SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="ttyCOMBI2MICS6814", MODE:="0666" \n' +

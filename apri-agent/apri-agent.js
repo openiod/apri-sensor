@@ -245,7 +245,7 @@ var save99UsbSerialRules	= function() {
   		}
 		console.log('     usb rules for unit ' + unit.id + ' saved and activated.');
 	}
-	if (unit.id == '00000000b7710419') { // || unit.id == '0000000098e6a65d') {  // Purmerend / Aalten
+	if (unit.id == '00000000b7710419' || unit.id == '000000004659c5bc') ) { // || unit.id == '0000000098e6a65d') {  // Purmerend / Aalten
 		console.log('save usb rules for unit ' + unit.id);
 		content =
 			'SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="ttyCOMBI2MICS6814", MODE:="0666" \n' +
@@ -285,10 +285,16 @@ var saveSystemServices	= function() {
 		createService('apri-sensor-combi2','ArduinoMega');
 		createService('apri-sensor-combi2','COMBI2MICS6814');
 	}
-	if (unit.id == '000000004659c5bc') {
+	if (unit.id == '000000004659c5bc') {  //test 2e MICS6814 sensor
 		disableServices('apri-sensor-combi-1','');
-		createService('apri-sensor-combi-1','COMBI1');
+		disableServices('apri-sensor-combi2','');
+//		createService('apri-sensor-combi2','ArduinoMega');
+		createService('apri-sensor-combi2','COMBI2MICS6814');
 	}
+//	if (unit.id == '000000004659c5bc') {
+//		disableServices('apri-sensor-combi-1','');
+//		createService('apri-sensor-combi-1','COMBI1');
+//	}
 	if (unit.id == '00000000b7e92a99' || unit.id == '00000000ac35e5d3') {  //'s-Gravenpolder  2e is voor test
 		disableServices('apri-sensor-dylos','');  // met de tweede parameter kan een extra filter worden toegepast bijv. '_' om alleen dylos_DCxxx te selecteren
 		createService('apri-sensor-dylos','DC1100');

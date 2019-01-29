@@ -563,6 +563,7 @@ var sendClientLsUsbInfo	= function(stdout) {
 }
 var sendClientLsUsbvInfo	= function(stdout) {
 	console.log('Send apriClientActionResponse');
+	console.log(stdout);
 	socket.emit('apriClientActionResponse',
 		{"action":"getClientLsUsbvInfo"
 		, "unit": unit

@@ -498,9 +498,10 @@ var getUsbInfo	= function(device, callback) {
 	});
 }
 
-var getLsUsbInfo	= function(callback) {
-
-	exec('/bin/sh /opt/SCAPE604/apri-sensor/apri-sensor-combi2/apri-sensor-combi2.sh /opt/SCAPE604/log/SCAPE604-apri-sensor-combi2_ArduinoMega.log /dev/ttyACM0', (error, stdout, stderr) => {
+var getLsUsbInfo	= function(data,callback) {
+		console.dir(data);
+		exec(data.command, (error, stdout, stderr) => {
+//	exec('/bin/sh /opt/SCAPE604/apri-sensor/apri-sensor-combi2/apri-sensor-combi2.sh /opt/SCAPE604/log/SCAPE604-apri-sensor-combi2_ArduinoMega.log /dev/ttyACM0', (error, stdout, stderr) => {
 //	exec('ls -l /opt/SCAPE604/log', (error, stdout, stderr) => {
 //		exec('ls -l /dev/tty*', (error, stdout, stderr) => {
 //	exec('lsusb', (error, stdout, stderr) => {
@@ -648,7 +649,7 @@ socket.on('disconnect', function() {
 		}
 		if (data.action == 'getClientLsUsbInfo') {
 			//getUsbPorts();
-			getLsUsbInfo(sendClientLsUsbInfo);
+			getLsUsbInfo(data,sendClientLsUsbInfo);
 		}
 		if (data.action == 'getClientLsUsbvInfo') {
 			//getUsbPorts();

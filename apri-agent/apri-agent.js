@@ -499,7 +499,8 @@ var getUsbInfo	= function(device, callback) {
 }
 
 var getLsUsbInfo	= function(callback) {
-	exec('ls -l /dev/tty*', (error, stdout, stderr) => {
+	exec('ls -l /opt/SCAPE604/log', (error, stdout, stderr) => {
+//		exec('ls -l /dev/tty*', (error, stdout, stderr) => {
 //	exec('lsusb', (error, stdout, stderr) => {
 		if (error) {
 			console.error(`exec error: ${error}`);

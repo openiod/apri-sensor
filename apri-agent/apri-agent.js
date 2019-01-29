@@ -230,6 +230,19 @@ var save99UsbSerialRules	= function() {
 	var content = '';
 	var result;
 	var file = '/etc/udev/rules.d/99-usb-serial.rules';
+	if (unit.id == '0000000098e6a65d') { // Aalten
+		console.log('save usb rules for unit ' + unit.id);
+		content =
+			'SUBSYSTEM=="tty", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="0042", SYMLINK+="ttyArduinoMega", MODE:="0666" \n';
+		fs.writeFileSync(file, content);
+		try {
+			console.log('Activate usb rules');
+			result	= execSync('udevadm trigger');  // activate usb rules
+		} catch (e) {
+    		console.log("Errors:", e);
+  		}
+		console.log('     usb rules for unit ' + unit.id + ' saved and activated.');
+	}
 	if (unit.id == '00000000b7e92a99' || unit.id == '00000000ac35e5d3') {  //'s-Gravenpolder  2x
 		console.log('save usb rules for unit ' + unit.id);
 		content =
@@ -278,6 +291,12 @@ var save99UsbSerialRules	= function() {
 }
 
 var saveSystemServices	= function() {
+
+
+	if (unit.id == '0000000098e6a65d') {   // Aalten
+		disableServices('apri-sensor-combi2','');
+		createService('apri-sensor-combi2','ArduinoMega');
+	}
 
 	if (unit.id == '00000000b7710419') {
 		disableServices('apri-sensor-combi-1','');
@@ -447,8 +466,6 @@ var createService	= function(sensor, sensorKey) {
 
 
 var getUsbInfo	= function(device, callback) {
-
-
 //sudo udevadm trigger
 
 	//hostname --all-ip-address
@@ -461,6 +478,31 @@ var getUsbInfo	= function(device, callback) {
 
 		if (callback != undefined) {
 			callback(device,stdout);
+		}
+	});
+}
+
+var getLsUsbInfo	= function(callback) {
+	exec('lsusb', (error, stdout, stderr) => {
+		if (error) {
+			console.error(`exec error: ${error}`);
+			return;
+		}
+//		console.log(`stderr: ${stderr}`);
+		if (callback != undefined) {
+			callback(stdout);
+		}
+	});
+}
+var getLsUsbvInfo	= function(callback) {
+	exec('lsusb -v', (error, stdout, stderr) => {
+		if (error) {
+			console.error(`exec error: ${error}`);
+			return;
+		}
+//		console.log(`stderr: ${stderr}`);
+		if (callback != undefined) {
+			callback(stdout);
 		}
 	});
 }
@@ -506,6 +548,24 @@ var sendClientUsbInfo	= function(device, stdout) {
 		, "unit": unit
 		, "device": device
 		, "usbInfo": stdout
+		}
+	);
+}
+var sendClientLsUsbInfo	= function(stdout) {
+	console.log('Send apriClientActionResponse');
+	socket.emit('apriClientActionResponse',
+		{"action":"getClientLsUsbInfo"
+		, "unit": unit
+		, "lsusbInfo": stdout
+		}
+	);
+}
+var sendClientLsUsbvInfo	= function(stdout) {
+	console.log('Send apriClientActionResponse');
+	socket.emit('apriClientActionResponse',
+		{"action":"getClientLsUsbvInfo"
+		, "unit": unit
+		, "lsusbInfo": stdout
 		}
 	);
 }
@@ -563,6 +623,14 @@ socket.on('disconnect', function() {
 			getUsbInfo('/dev/ttyArduinoMega',sendClientUsbInfo);
 			save99UsbSerialRules();
 			saveSystemServices();
+		}
+		if (data.action == 'getClientLsUsbInfo') {
+			//getUsbPorts();
+			getLsUsbInfo(sendClientLsUsbInfo);
+		}
+		if (data.action == 'getClientLsUsbvInfo') {
+			//getUsbPorts();
+			getLsUsbvInfo(sendClientLsUsbvInfo);
 		}
 		if (data.action == 'reboot') {
 			startActionReboot();

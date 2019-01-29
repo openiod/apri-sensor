@@ -499,7 +499,9 @@ var getUsbInfo	= function(device, callback) {
 }
 
 var getLsUsbInfo	= function(callback) {
-	exec('ls -l /opt/SCAPE604/log', (error, stdout, stderr) => {
+
+	exec('/bin/sh /opt/SCAPE604/apri-sensor/apri-sensor-combi2/apri-sensor-combi2.sh /opt/SCAPE604/log/SCAPE604-apri-sensor-combi2_ArduinoMega.log /dev/ttyACM0', (error, stdout, stderr) => {
+//	exec('ls -l /opt/SCAPE604/log', (error, stdout, stderr) => {
 //		exec('ls -l /dev/tty*', (error, stdout, stderr) => {
 //	exec('lsusb', (error, stdout, stderr) => {
 		if (error) {

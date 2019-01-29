@@ -278,6 +278,18 @@ var save99UsbSerialRules	= function() {
 	}
 
 	file = startFolderParent + '/config/apri-sensor-usb.json';
+	// /dev/ttyACM0
+	if (unit.id == '0000000098e6a65d') { //  Aalten
+		console.log('save usb config for unit ' + unit.id);
+		content =
+			'{"apri-sensor-combi2": {"comName": "/dev/ttyACM0"} }\n';
+		fs.writeFileSync(file, content);
+	//		try {
+	//		} catch (e) {
+	//    		console.log("Errors:", e);
+	//  		}
+		console.log('     usb config for unit ' + unit.id + ' saved.');
+	}
 
 	if (unit.id == '00000000b7710419') { // || unit.id == '0000000098e6a65d') {  // Purmerend / Aalten
 		console.log('save usb config for unit ' + unit.id);

@@ -185,7 +185,7 @@ var getCpuInfo	= function() {
 };
 
 var getUsbPorts	= function() {
-	/*
+
 	SerialPort.list(function(err, ports) {
 		usbPorts	= ports;
 		//console.log('The usb ports of this system are: ');
@@ -193,7 +193,7 @@ var getUsbPorts	= function() {
 		//	console.log(usbPorts[i]);
 		//}
 	});
-	*/
+	
 
 }
 

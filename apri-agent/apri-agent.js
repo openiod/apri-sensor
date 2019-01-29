@@ -185,6 +185,7 @@ var getCpuInfo	= function() {
 };
 
 var getUsbPorts	= function() {
+	/*
 	SerialPort.list(function(err, ports) {
 		usbPorts	= ports;
 		//console.log('The usb ports of this system are: ');
@@ -192,6 +193,8 @@ var getUsbPorts	= function() {
 		//	console.log(usbPorts[i]);
 		//}
 	});
+	*/
+
 }
 
 var getMacAddress	= function(networkInterface) {
@@ -483,7 +486,8 @@ var getUsbInfo	= function(device, callback) {
 }
 
 var getLsUsbInfo	= function(callback) {
-	exec('lsusb', (error, stdout, stderr) => {
+	exec('ls -l /dev/tty*', (error, stdout, stderr) => {
+//	exec('lsusb', (error, stdout, stderr) => {
 		if (error) {
 			console.error(`exec error: ${error}`);
 			return;

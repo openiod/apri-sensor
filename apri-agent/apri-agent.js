@@ -557,7 +557,7 @@ var sendClientLsUsbInfo	= function(stdout) {
 	socket.emit('apriClientActionResponse',
 		{"action":"getClientLsUsbInfo"
 		, "unit": unit
-		, "lsusbInfo": stdout
+		, "usbInfo": stdout
 		}
 	);
 }
@@ -567,7 +567,7 @@ var sendClientLsUsbvInfo	= function(stdout) {
 	socket.emit('apriClientActionResponse',
 		{"action":"getClientLsUsbvInfo"
 		, "unit": unit
-		, "lsusbInfo": stdout
+		, "usbInfo": stdout
 		}
 	);
 }

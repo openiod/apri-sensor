@@ -553,6 +553,7 @@ var sendClientUsbInfo	= function(device, stdout) {
 }
 var sendClientLsUsbInfo	= function(stdout) {
 	console.log('Send apriClientActionResponse');
+	console.log(stdout);
 	socket.emit('apriClientActionResponse',
 		{"action":"getClientLsUsbInfo"
 		, "unit": unit

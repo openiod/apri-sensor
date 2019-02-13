@@ -139,6 +139,9 @@ var mainProcess = function() {
 					data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;
 					data.sensorSystem		= _sensor.sensorSystem;
 					data.foi				= 'SCRP' + unit.id;
+					if (sensorKey != '') {
+						data.foi	+= '_' + sensorKey;
+					}
 					data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;
 					data.cityCode			= 'GM0439'; //geoLocation.cityCode;
 					data.cityName			= '..'; //geoLocation.cityName;
@@ -183,6 +186,9 @@ var mainProcess = function() {
 							data.foi				= 'SCRP' + unit.id;
 						} else {
 							data.foi				= 'SCRP' + unit.id + '*'+ key;
+						}
+						if (sensorKey != '') {
+							data.foi	+= '_' + sensorKey;
 						}
 						data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;
 						data.cityCode			= 'GM0439'; //geoLocation.cityCode;

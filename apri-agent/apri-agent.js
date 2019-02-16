@@ -309,8 +309,8 @@ var saveSystemServices	= function() {
 
 	if (unit.id == '0000000098e6a65d') {   // Aalten
 		disableServices('apri-sensor-combi2','');
-//		createService('apri-sensor-combi2','ArduinoMega');
-		createService('apri-sensor-combi2','ACM0');
+		createService('apri-sensor-combi2','ArduinoMega');
+//		createService('apri-sensor-combi2','ACM0');
 	}
 
 	if (unit.id == '00000000b7710419') {

@@ -227,7 +227,6 @@ var getWifiScanInfo	= function(iface, callback) {
 		}
 	});
 }
-
 var save99UsbSerialRules	= function() {
 //	99-usb-serial.rules
 	var content = '';
@@ -251,6 +250,18 @@ var save99UsbSerialRules	= function() {
 			'SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="AL02V14T", SYMLINK+="ttyDC1100", MODE:="0666" \n' +
 		 	'SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="AJ03KNV9", SYMLINK+="ttyDC1700", MODE:="0666" \n' +
  			'SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="ttyCOMBI1", MODE:="0666" \n';
+		fs.writeFileSync(file, content);
+		try {
+			console.log('Activate usb rules');
+			result	= execSync('udevadm trigger');  // activate usb rules
+		} catch (e) {
+    		console.log("Errors:", e);
+  		}
+		console.log('     usb rules for unit ' + unit.id + ' saved and activated.');
+	}
+	if (unit.id == '00000000479e571b') {  // Valkenburg
+		console.log('save usb rules for unit ' + unit.id);
+		content = 'SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="AL03GQBB", SYMLINK+="ttyDC1700PM", MODE:="0666" \n';
 		fs.writeFileSync(file, content);
 		try {
 			console.log('Activate usb rules');

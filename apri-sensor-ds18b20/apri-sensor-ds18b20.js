@@ -198,7 +198,6 @@ var processDeviceData	= function(err,temperatureData) {
 
 		//writeResults(measureMentTime);
   };
-	setTimeout(processDeviceData, 60000);
 };
 
 console.log('getCpuInfo');
@@ -214,19 +213,24 @@ try {
 //var sensorKey			= 'DS18B20';
 //console.log('SensorKey = ' + sensorKey);
 
-for (var i=0;i<devicesFolder.length;i++) {
-	if (devicesFolder[i].split('-')[0] == '28') {
-		console.log('DS18B20 device: ' +  devicesFolder[i]);
-		var path = '/sys/bus/w1/devices/'+devicesFolder[i];
-		//var deviceFolder = fs.readdirSync(path);
-		//for (var i=0;i<deviceFolder.length;i++) {
-		try {
-			console.log(path+ '/w1_slave');
-			fs.readFile(path+'/w1_slave',processDeviceData);  // start process
-		} catch (err) {
-		  console.log('Directory or file for DS18B20 not found. ('+path+ '/w1_slave'+')');
-		  return;
+var processDevices = function() {
+	for (var i=0;i<devicesFolder.length;i++) {
+		if (devicesFolder[i].split('-')[0] == '28') {
+			console.log('DS18B20 device: ' +  devicesFolder[i]);
+			var path = '/sys/bus/w1/devices/'+devicesFolder[i];
+			//var deviceFolder = fs.readdirSync(path);
+			//for (var i=0;i<deviceFolder.length;i++) {
+			try {
+				console.log(path+ '/w1_slave');
+				fs.readFile(path+'/w1_slave',processDeviceData);  // start process
+			} catch (err) {
+			  console.log('Directory or file for DS18B20 not found. ('+path+ '/w1_slave'+')');
+			  return;
+			}
+			//}
 		}
-		//}
 	}
+	setTimeout(processDevices, 60000);
 }
+
+processDevices();

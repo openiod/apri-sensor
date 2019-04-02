@@ -198,17 +198,11 @@ var processDeviceData	= function(err,temperatureData) {
 
 		//writeResults(measureMentTime);
   };
+	setTimeout(processDeviceData, 60000);
 };
 
 console.log('getCpuInfo');
 console.log(getCpuInfo());
-
-try {
-	var devicesFolder = fs.readdirSync('/sys/bus/w1/devices');
-} catch (err) {
-  console.log('Directory or file for DS18B20 not found. (/sys/bus/w1/devices/28-*/w1_slave)');
-  return;
-}
 
 try {
 	var devicesFolder = fs.readdirSync('/sys/bus/w1/devices');
@@ -228,7 +222,7 @@ for (var i=0;i<devicesFolder.length;i++) {
 		//for (var i=0;i<deviceFolder.length;i++) {
 		try {
 			console.log(path+ '/w1_slave');
-			fs.readFile(path+'/w1_slave',processDeviceData);
+			fs.readFile(path+'/w1_slave',processDeviceData);  // start process
 		} catch (err) {
 		  console.log('Directory or file for DS18B20 not found. ('+path+ '/w1_slave'+')');
 		  return;

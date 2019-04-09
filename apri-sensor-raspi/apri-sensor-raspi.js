@@ -270,6 +270,8 @@ var resetRaspiSerialArray = function() {
 var processRaspiSerialData = function (data) {
   var _data = data;
 
+	printHex(data,'processRaspiSerialData');
+
   if (pos>=4 & pos <32) {
     view8[pos] = data[0];
     if (pos<30 ) checksum=checksum+data[0];
@@ -388,6 +390,7 @@ var printHex = function(buffer, tekst) {
   console.log('log: ' + tekst +'  lengte:'+buffer.length+ " "+ str); // + data);
 }
 
+/*
 var incommingData = new Buffer(0);
 var tmpBuffer = new Buffer(0);
 var emitBuffer = new Buffer(0);
@@ -437,6 +440,7 @@ var myParser = function(emitter, buffer) {
 //      incommingData = new Buffer(0);
     }
 };
+*/
 
 /*
 var mainProcess = function() {
@@ -823,7 +827,7 @@ raspi.init(() => {
   var serial = new Serial({portId:'/dev/ttyS0',baudRate:9600});
   serial.open(() => {
     serial.on('data', (data) => {
-      //printHex(data,'T');
+      printHex(data,'T');
 			for (var i=0;i<data.length;i++) {
 				processRaspiSerialData(data[i]);
 			}

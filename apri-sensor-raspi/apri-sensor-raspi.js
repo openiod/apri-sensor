@@ -212,7 +212,7 @@ var view16 					= new Uint16Array(byteArray);
 var pos 						= 0;
 var checksum 				= 0;
 
-var processRaspiSerialRecord = function(data) {
+var processRaspiSerialRecord = function() {
 	counters.pms.nrOfMeas++;
 	counters.pms.pm1CF1				+= (view8[4]<<8)	+ view8[5];
 	counters.pms.pm25CF1			+= (view8[6]<<8)	+ view8[7];
@@ -268,35 +268,34 @@ var resetRaspiSerialArray = function() {
 
 
 var processRaspiSerialData = function (data) {
-  var _data = data;
+  var byte = data;
 
-	var str = _data.toString(16)+' ';
-	console.log('log processRaspiSerialData: ' + " "+ str); // + data);
+	var str = byte.toString(16)+' ';
+	//console.log('log processRaspiSerialData: ' + " "+ str); // + data);
 
 
   if (pos>=4 & pos <32) {
     view8[pos] = data[0];
-    if (pos<30 ) checksum=checksum+data[0];
+    if (pos<30 ) checksum=checksum+byte;
     pos++;
   }
   if (pos==32) {
+		console.log('Raspi-serial processing.');
 		if (checksum == ((view8[30]<<8)+view8[31])) {
 			if (counters.busy == false) {
-				processRaspiSerialRecord(_data);
+				processRaspiSerialRecord();
 			} else {
 				console.log('Raspi-serial processing is busy, measurement PMS skipped');
 			}
 		} else {
 			console.log('Raspi-serial checksum error');
 		}
-		processRaspiSerialRecord
-
     resetRaspiSerialArray();
   }
   if (pos==3) {
     if (data[0] == 0x1c) {
-      view8[pos] = data[0];
-      checksum=checksum+data[0];
+      view8[pos] = byte;
+      checksum=checksum+byte;
       pos++;
     } else {
 			resetRaspiSerialArray();
@@ -304,21 +303,21 @@ var processRaspiSerialData = function (data) {
   }
   if (pos==2) {
     if (data[0] == 0x00) {
-      view8[pos] = data[0];
-      checksum=checksum+data[0];
+      view8[pos] = byte;
+      checksum=checksum+byte;
       pos++;
     } else resetRaspiSerialArray();
   }
   if (pos==1) {
     if (data[0] == 0x4D) {
-      view8[pos] = data[0];
-      checksum=checksum+data[0];
+      view8[pos] = byte;
+      checksum=checksum+byte;
       pos++;
     } else resetRaspiSerialArray();
   }
   if (pos==0 & data[0] == 0x42) {
-    view8[pos] = data[0];
-    checksum=checksum+data[0];
+    view8[pos] = byte;
+    checksum=checksum+byte;
     pos = 1;
   }
 }

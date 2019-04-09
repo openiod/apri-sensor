@@ -270,18 +270,13 @@ var resetRaspiSerialArray = function() {
 var processRaspiSerialData = function (data) {
   var byte = data;
 
-	//var str = byte.toString(16)+' ';
-	//console.log('log processRaspiSerialData: ' + " "+ str); // + data);
-
-	console.log('pos: '+pos);
-
   if (pos>=4 & pos <32) {
     view8[pos] = byte;
     if (pos<30 ) checksum=checksum+byte;
     pos++;
   }
   if (pos==32) {
-		console.log('Raspi-serial processing.');
+//		console.log('Raspi-serial processing.');
 		if (checksum == ((view8[30]<<8)+view8[31])) {
 			if (counters.busy == false) {
 				processRaspiSerialRecord();

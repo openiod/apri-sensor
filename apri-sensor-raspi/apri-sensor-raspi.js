@@ -271,7 +271,7 @@ var processRaspiSerialData = function (data) {
   var _data = data;
 
 	var str = _data.toString(16)+' ';
-	console.log('log: ' + tekst + " "+ str); // + data);
+	console.log('log processRaspiSerialData: ' + " "+ str); // + data);
 
 
   if (pos>=4 & pos <32) {

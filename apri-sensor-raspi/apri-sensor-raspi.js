@@ -255,15 +255,17 @@ console.log('Checksum');
     console.log((view8[30]<<8)+view8[31]);
     console.log(checksum);
 */
+/*
   if (view8[28] == 0x80) {  //128=PMS7003
-    process.stdout.write('einde datarecord PMS7003-128\n');
+  //  process.stdout.write('einde datarecord PMS7003-128\n');
   }
   if (view8[28] == 0x91) {  //145=PMSA003
-    process.stdout.write('einde datarecord PMSA003-145\n');
+  //  process.stdout.write('einde datarecord PMSA003-145\n');
   }
   if (view8[28] == 0x97) {  //151=PMSA003
-    process.stdout.write('einde datarecord PMSA003-151\n');
+  //  process.stdout.write('einde datarecord PMSA003-151\n');
   }
+*/
 }
 
 var resetRaspiSerialArray = function() {
@@ -351,12 +353,12 @@ const readSensorData = () => {
 			} else {
 				console.log('Raspi-i2c processing is busy, measurement BME280 skipped');
 			}
-      console.log(`data = ${JSON.stringify(data, null, 2)}`);
-      setTimeout(readSensorData, 2000);
+      //console.log(`data = ${JSON.stringify(data, null, 2)}`);
+      setTimeout(readSensorData, 1000);
     })
     .catch((err) => {
       console.log(`BME280 read error: ${err}`);
-      setTimeout(readSensorData, 2000);
+      setTimeout(readSensorData, 1000);
     });
 };
 // Initialize the BME280 sensor

@@ -438,6 +438,7 @@ var myParser = function(emitter, buffer) {
     }
 };
 
+/*
 var mainProcess = function() {
 	console.log('Found usb comname: ' + serialPortPath );
 
@@ -488,20 +489,21 @@ var mainProcess = function() {
 //			if (data.substr(0,1)==0xC0) console.log('0:C0');
 //			if (data.substr(1,1)==0xAA) console.log('1:AA');
 //			if (data.substr(1,1)==0xC0) console.log('1:C0');
-/*
-			if (_dataArray.length == 2 && isNumeric(_dataArray[0]) && isNumeric(_dataArray[1]) && data[data.length-1] =='\r' ) {
-				console.log('measurement: ' + _data);
-				processMeasurement(_dataArray);
-			} else {
-				console.log('log: data gevonden maar niet herkend'); // + data);
-			}
-*/
+
+//			if (_dataArray.length == 2 && isNumeric(_dataArray[0]) && isNumeric(_dataArray[1]) && data[data.length-1] =='\r' ) {
+//				console.log('measurement: ' + _data);
+//				processMeasurement(_dataArray);
+//			} else {
+//				console.log('log: data gevonden maar niet herkend'); // + data);
+//			}
+
 		});
 	});
 	serialport.on('error', function(err) {
 		console.log('Error: ', err.message);
 	});
 };
+*/
 
 function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
@@ -775,7 +777,7 @@ var getCpuInfo	= function() {
 
 getCpuInfo();
 
-
+/*
 SerialPort.list(function(err, ports) {
 	console.log(ports);
 
@@ -794,7 +796,7 @@ SerialPort.list(function(err, ports) {
 	}
 	mainProcess();
 });
-
+*/
 
 var socket = io(socketUrl, {path:socketPath});
 

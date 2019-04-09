@@ -274,9 +274,9 @@ var processRaspiSerialData = function (data) {
 	//console.log('log processRaspiSerialData: ' + " "+ str); // + data);
 
 	console.log('pos: '+pos);
-	
+
   if (pos>=4 & pos <32) {
-    view8[pos] = data[0];
+    view8[pos] = byte;
     if (pos<30 ) checksum=checksum+byte;
     pos++;
   }
@@ -294,7 +294,7 @@ var processRaspiSerialData = function (data) {
     resetRaspiSerialArray();
   }
   if (pos==3) {
-    if (data[0] == 0x1c) {
+    if (byte == 0x1c) {
       view8[pos] = byte;
       checksum=checksum+byte;
       pos++;
@@ -303,20 +303,20 @@ var processRaspiSerialData = function (data) {
     }
   }
   if (pos==2) {
-    if (data[0] == 0x00) {
+    if (byte == 0x00) {
       view8[pos] = byte;
       checksum=checksum+byte;
       pos++;
     } else resetRaspiSerialArray();
   }
   if (pos==1) {
-    if (data[0] == 0x4D) {
+    if (byte == 0x4D) {
       view8[pos] = byte;
       checksum=checksum+byte;
       pos++;
     } else resetRaspiSerialArray();
   }
-  if (pos==0 & data[0] == 0x42) {
+  if (pos==0 & byte == 0x42) {
     view8[pos] = byte;
     checksum=checksum+byte;
     pos = 1;

@@ -367,7 +367,7 @@ bme280.init()
 
 
 
-processDataCycle	= function() {
+var processDataCycle	= function() {
 	console.log('processDataCycle');
 	initCounters();
 	setTimeout(processDataCycle, 2000);

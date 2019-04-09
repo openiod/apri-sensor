@@ -213,6 +213,10 @@ var pos 						= 0;
 var checksum 				= 0;
 
 var processRaspiSerialRecord = function() {
+	if (counters.busy==true) {
+		console.log('Counters busy, measurement ignored *******************************');
+		return;
+	}
 	counters.pms.nrOfMeas++;
 	counters.pms.pm1CF1				+= (view8[4]<<8)	+ view8[5];
 	counters.pms.pm25CF1			+= (view8[6]<<8)	+ view8[7];
@@ -226,7 +230,7 @@ var processRaspiSerialRecord = function() {
 	counters.pms.part2_5			+= (view8[22]<<8)	+ view8[23];
 	counters.pms.part5_0			+= (view8[24]<<8)	+ view8[25];
 	counters.pms.part10_0			+= (view8[26]<<8)	+ view8[27];
-
+/*
   console.log('');
     console.log(view8[0]);
     console.log(view8[1]);
@@ -250,6 +254,7 @@ console.log('Version/errcode');
 console.log('Checksum');
     console.log((view8[30]<<8)+view8[31]);
     console.log(checksum);
+*/
   if (view8[28] == 0x80) {  //128=PMS7003
     process.stdout.write('einde datarecord PMS7003-128\n');
   }
@@ -368,8 +373,9 @@ bme280.init()
 
 var processDataCycle	= function() {
 	console.log('processDataCycle');
+	console.log('Counters pms: '+ counters.pms.nrOfMeas + '; bme280: '+ counters.bme280.nrOfMeas + '; ds18b20: '+ counters.ds18b20.nrOfMeas )
 	initCounters();
-	setTimeout(processDataCycle, 2000);
+	setTimeout(processDataCycle, 20000);
 }
 
 
@@ -836,4 +842,4 @@ raspi.init(() => {
 
 
 
-setTimeout(processDataCycle, 2000);
+setTimeout(processDataCycle, 20000);

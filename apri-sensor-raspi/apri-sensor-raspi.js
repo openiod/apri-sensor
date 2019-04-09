@@ -72,19 +72,6 @@ var usbPorts			= [];
 var serialPortPath;
 
 
-	https://aprisensor-in.openiod.org:443
-	/bme280/v1/m?&foi=SCNMDC4F2211115A
-	&observation=pressure:1006.97,temperature:24.77,rHum:32.47
-	&timeOffsetMillis=2158
-
-	/pmsa003/v1/m?&foi=SCNMDC4F2211115A
-	&observation=pm25:52.67,pm1:33.33,pm10:63.87,pm1amb:27.27,pm25amb:42.73,pm10amb:56.13,raw0_3:3260.20,raw0_5:1062.67,raw1_0:288.93,raw2_5:42.40,raw5_0:3.60,raw10_0:1.60
-	&timeOffsetMillis=12871
-
-
-
-
-
 /*
 var deviceParam			= process.argv[2];
 console.log('Param for serial device is ' + deviceParam);
@@ -411,7 +398,7 @@ var processDataCycle	= function() {
 	initCounters();
 	counters.busy = false;
 
-  sendResults();
+  sendData();
 }
 
 
@@ -634,6 +621,7 @@ var fillChannel = function(sensorId, measureMentTime, data) {
 }
 */
 
+/*
 var writeHeaderIntoFile = function() {
 	fs.appendFile(resultsFileName + '_raw' + sensorFileExtension, headerRaw, function (err) {
 		if (err != null) {
@@ -647,7 +635,7 @@ var writeResults	= function(measureTime, loopTime) {
 	console.log('Results: ' + measureTime.toISOString() + ' count: ' + measureMentCount);
 
 
-/*
+//
 	var sosCount		= 0;
 	var sosSensorCount 	= 0;
 
@@ -688,7 +676,7 @@ var writeResults	= function(measureTime, loopTime) {
 
 		initSensor(sensorId);
 	}
-*/
+//
 
 
 	var data			= {};
@@ -715,6 +703,7 @@ var writeResults	= function(measureTime, loopTime) {
 	sendData(data);
 
 }
+*/
 
 
 var sendRequest = function(url) {

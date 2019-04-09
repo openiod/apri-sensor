@@ -31,8 +31,10 @@ var initResult 							= apriConfig.init(systemModuleFolderName+"/"+systemModuleN
 var request 								= require('request');
 //var express 								= require('express');
 var fs 											= require('fs');
-var SerialPort 							= require("serialport");
-const ByteLength 						= require('@serialport/parser-byte-length')
+//var SerialPort 							= require("serialport");
+const raspi									= require('raspi');
+const Serial								= require('raspi-serial').Serial;
+//const ByteLength 						= require('@serialport/parser-byte-length')
 var io	 										= require('socket.io-client');
 const exec 									= require('child_process').exec;
 const execFile							= require('child_process').execFile;
@@ -813,8 +815,21 @@ socket.on('info', function(data) {
 });
 
 // raspi-serial read port per byte
-const parser = port.pipe(new ByteLength({length: 1}))
-parser.on('data', processRaspiSerialData) // one byte per data event
+////const parser = port.pipe(new ByteLength({length: 1}))
+////parser.on('data', processRaspiSerialData) // one byte per data event
+raspi.init(() => {
+  var serial = new Serial({portId:'/dev/ttyS0',baudRate:9600});
+  serial.open(() => {
+    serial.on('data', (data) => {
+      //printHex(data,'T');
+			for (vari=0;i<data.length;i++) {
+				processRaspiSerialData(data[i]);
+			}
+      //process.stdout.write(data);
+    });
+    serial.write('Hello from raspi-serial');
+  });
+});
 
 
 

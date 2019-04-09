@@ -824,7 +824,7 @@ raspi.init(() => {
   serial.open(() => {
     serial.on('data', (data) => {
       //printHex(data,'T');
-			for (vari=0;i<data.length;i++) {
+			for (var i=0;i<data.length;i++) {
 				processRaspiSerialData(data[i]);
 			}
       //process.stdout.write(data);

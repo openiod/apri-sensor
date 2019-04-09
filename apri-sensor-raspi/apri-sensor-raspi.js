@@ -270,7 +270,9 @@ var resetRaspiSerialArray = function() {
 var processRaspiSerialData = function (data) {
   var _data = data;
 
-	printHex(data,'processRaspiSerialData');
+	var str = _data.toString(16)+' ';
+	console.log('log: ' + tekst + " "+ str); // + data);
+
 
   if (pos>=4 & pos <32) {
     view8[pos] = data[0];

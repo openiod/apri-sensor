@@ -373,26 +373,26 @@ var processDataCycle	= function() {
 	console.log(counters.bme280.temperature);
 	console.log(counters.bme280.temperature/counters.bme280.nrOfMeas);
 
-  results.pms.pm1CF1							= Math.round((counters.pms.pm1CF1/counters.pms.nrOfMeas)*100))/100;
-	results.pms.pm25CF1							= Math.round((counters.pms.pm25CF1/counters.pms.nrOfMeas)*100))/100;
-	results.pms.pm10CF1							= Math.round((counters.pms.pm10CF1/counters.pms.nrOfMeas)*100))/100;
-	results.pms.pm1amb							= Math.round((counters.pms.pm1amb/counters.pms.nrOfMeas)*100))/100;
-	results.pms.pm25amb							= Math.round((counters.pms.pm25amb/counters.pms.nrOfMeas)*100))/100;
-	results.pms.pm10amb							= Math.round((counters.pms.pm10amb/counters.pms.nrOfMeas)*100))/100;
-	results.pms.part0_3							= Math.round((counters.pms.part0_3/counters.pms.nrOfMeas)*100))/100;
-	results.pms.part0_5							= Math.round((counters.pms.part0_5/counters.pms.nrOfMeas)*100))/100;
-	results.pms.part1_0							= Math.round((counters.pms.part1_0/counters.pms.nrOfMeas)*100))/100;
-	results.pms.part2_5							= Math.round((counters.pms.part2_5/counters.pms.nrOfMeas)*100))/100;
-	results.pms.part5_0							= Math.round((counters.pms.part5_0/counters.pms.nrOfMeas)*100))/100;
-	results.pms.part10_0						= Math.round((counters.pms.part10_0/counters.pms.nrOfMeas)*100))/100;
+  results.pms.pm1CF1							= Math.round((counters.pms.pm1CF1/counters.pms.nrOfMeas)*100)/100;
+	results.pms.pm25CF1							= Math.round((counters.pms.pm25CF1/counters.pms.nrOfMeas)*100)/100;
+	results.pms.pm10CF1							= Math.round((counters.pms.pm10CF1/counters.pms.nrOfMeas)*100)/100;
+	results.pms.pm1amb							= Math.round((counters.pms.pm1amb/counters.pms.nrOfMeas)*100)/100;
+	results.pms.pm25amb							= Math.round((counters.pms.pm25amb/counters.pms.nrOfMeas)*100)/100;
+	results.pms.pm10amb							= Math.round((counters.pms.pm10amb/counters.pms.nrOfMeas)*100)/100;
+	results.pms.part0_3							= Math.round((counters.pms.part0_3/counters.pms.nrOfMeas)*100)/100;
+	results.pms.part0_5							= Math.round((counters.pms.part0_5/counters.pms.nrOfMeas)*100)/100;
+	results.pms.part1_0							= Math.round((counters.pms.part1_0/counters.pms.nrOfMeas)*100)/100;
+	results.pms.part2_5							= Math.round((counters.pms.part2_5/counters.pms.nrOfMeas)*100)/100;
+	results.pms.part5_0							= Math.round((counters.pms.part5_0/counters.pms.nrOfMeas)*100)/100;
+	results.pms.part10_0						= Math.round((counters.pms.part10_0/counters.pms.nrOfMeas)*100)/100;
 	results.pms.nrOfMeas						= counters.pms.nrOfMeas;
 
-	results.bme280.temperature			= Math.round((counters.bme280.temperature/counters.bme280.nrOfMeas)*100))/100;
-	results.bme280.pressure					= Math.round((counters.bme280.pressure/counters.bme280.nrOfMeas)*100))/100;
-	results.bme280.rHum							= Math.round((counters.bme280.rHum/counters.bme280.nrOfMeas)*100))/100;
+	results.bme280.temperature			= Math.round((counters.bme280.temperature/counters.bme280.nrOfMeas)*100)/100;
+	results.bme280.pressure					= Math.round((counters.bme280.pressure/counters.bme280.nrOfMeas)*100)/100;
+	results.bme280.rHum							= Math.round((counters.bme280.rHum/counters.bme280.nrOfMeas)*100)/100;
 	results.bme280.nrOfMeas					= counters.bme280.nrOfMeas;
 
-	results.ds18b20.temperature			= Math.round((counters.ds18b20.temperature/counters.ds18b20.nrOfMeas)*100))/100;
+	results.ds18b20.temperature			= Math.round((counters.ds18b20.temperature/counters.ds18b20.nrOfMeas)*100)/100;
 	results.ds18b20.nrOfMeas				= counters.ds18b20.nrOfMeas;
 
 	initCounters();

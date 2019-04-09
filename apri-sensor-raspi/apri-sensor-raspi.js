@@ -225,9 +225,6 @@ var processRaspiSerialRecord = function(data) {
 	counters.pms.part5_0			+= (view8[24]<<8)	+ view8[25];
 	counters.pms.part10_0			+= (view8[26]<<8)	+ view8[27];
 
-  console.log(0x0c);
-  console.log("\033[2J");
-//    console.log(view16[0]);
   console.log('');
     console.log(view8[0]);
     console.log(view8[1]);

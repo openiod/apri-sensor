@@ -368,10 +368,6 @@ var processDataCycle	= function() {
 	//console.log('processDataCycle');
 	counters.busy = true;
 	console.log('Counters pms: '+ counters.pms.nrOfMeas + '; bme280: '+ counters.bme280.nrOfMeas + '; ds18b20: '+ counters.ds18b20.nrOfMeas );
-	console.log(counters.pms.pm25CF1);
-	console.log(counters.pms.pm25CF1/counters.pms.nrOfMeas);
-	console.log(counters.bme280.temperature);
-	console.log(counters.bme280.temperature/counters.bme280.nrOfMeas);
 
   results.pms.pm1CF1							= Math.round((counters.pms.pm1CF1/counters.pms.nrOfMeas)*100)/100;
 	results.pms.pm25CF1							= Math.round((counters.pms.pm25CF1/counters.pms.nrOfMeas)*100)/100;
@@ -710,8 +706,7 @@ var sendRequest = function(url) {
 	var _url			= url;
 	request.get(_url)
 		.on('response', function(response) {
-			console.log(response.statusCode) // 200
-			console.log(response.headers['content-type']) // 'image/png'
+			console.log(response.statusCode + ' / ' + response.headers['content-type']) // 200
 			})
 		.on('error', function(err) {
 			console.log(err)
@@ -740,9 +735,7 @@ var sendData = function() {
 						',raw2_5:'+results.pms.part2_5+',raw5_0:'+results.pms.part5_0+',raw10_0:'+results.pms.part10_0;
 			console.log(url);
 			sendRequest(url);
-
 		}
-
 		if (results.bme280.nrOfMeas > 0) {
 			url = openiodUrl + '/bme280'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
 						'temperature:'+results.bme280.temperature+',pressure:'+results.bme280.pressure+',rHum:'+results.bme280.rHum ;
@@ -871,7 +864,8 @@ socket.on('disconnect', function() {
 });
 
 socket.on('info', function(data) {
-	console.log('websocket info '+ data);
+	console.log('websocket info: ');
+	console.dir(data);
 	//io.sockets.emit('aireassignal', { data: data } );
 	//socket.broadcast.emit('aireassignal', { data: data } );
 });

@@ -201,8 +201,6 @@ var initCounters	= function () {
 	counters.bme280.pressure		= 0;
 	counters.bme280.rHum				= 0;
 	counters.bme280.nrOfMeas		= 0;
-
-	counters.busy = false;
 }
 
 //-------------- raspi-serial
@@ -285,11 +283,7 @@ var processRaspiSerialData = function (data) {
   if (pos==32) {
 //		console.log('Raspi-serial processing.');
 		if (checksum == ((view8[30]<<8)+view8[31])) {
-			if (counters.busy == false) {
-				processRaspiSerialRecord();
-			} else {
-				console.log('Raspi-serial processing is busy, measurement PMS skipped');
-			}
+			processRaspiSerialRecord();
 		} else {
 			console.log('Raspi-serial checksum error');
 		}
@@ -374,10 +368,14 @@ bme280.init()
 
 
 var processDataCycle	= function() {
-	console.log('processDataCycle');
-	console.log('Counters pms: '+ counters.pms.nrOfMeas + '; bme280: '+ counters.bme280.nrOfMeas + '; ds18b20: '+ counters.ds18b20.nrOfMeas )
-	initCounters();
 	setTimeout(processDataCycle, 20000);
+	console.log('processDataCycle');
+	counters.busy = true;
+	console.log('Counters pms: '+ counters.pms.nrOfMeas + '; bme280: '+ counters.bme280.nrOfMeas + '; ds18b20: '+ counters.ds18b20.nrOfMeas );
+
+	initCounters();
+	counters.busy = false;
+
 }
 
 

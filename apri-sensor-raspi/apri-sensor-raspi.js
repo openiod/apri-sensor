@@ -64,13 +64,22 @@ console.log('web-socket url: '+socketUrl+socketPath);
 
 var secureSite 			= true;
 var siteProtocol 		= secureSite?'https://':'http://';
-var openiodUrl			= siteProtocol + 'openiod.org/' + apriConfig.systemCode; //SCAPE604';
-var loopTimeMax			= 20000; //ms, 20000=20 sec
+var openiodUrl			= siteProtocol + 'aprisensor-in.openiod.org/';
+var loopTimeCycle		= 20000; //ms, 20000=20 sec
 
 var usbPorts			= [];
 
 var serialPortPath;
 
+
+	https://aprisensor-in.openiod.org:443
+	/bme280/v1/m?&foi=SCNMDC4F2211115A
+	&observation=pressure:1006.97,temperature:24.77,rHum:32.47
+	&timeOffsetMillis=2158
+
+	/pmsa003/v1/m?&foi=SCNMDC4F2211115A
+	&observation=pm25:52.67,pm1:33.33,pm10:63.87,pm1amb:27.27,pm25amb:42.73,pm10amb:56.13,raw0_3:3260.20,raw0_5:1062.67,raw1_0:288.93,raw2_5:42.40,raw5_0:3.60,raw10_0:1.60
+	&timeOffsetMillis=12871
 
 
 
@@ -368,7 +377,7 @@ bme280.init()
 
 
 var processDataCycle	= function() {
-	setTimeout(processDataCycle, 20000);
+	setTimeout(processDataCycle, loopTimeCycle);
 	//console.log('processDataCycle');
 	counters.busy = true;
 	console.log('Counters pms: '+ counters.pms.nrOfMeas + '; bme280: '+ counters.bme280.nrOfMeas + '; ds18b20: '+ counters.ds18b20.nrOfMeas );
@@ -377,9 +386,32 @@ var processDataCycle	= function() {
 	console.log(counters.bme280.temperature);
 	console.log(counters.bme280.temperature/counters.bme280.nrOfMeas);
 
+  results.pms.pm1CF1							= Math.round((counters.pms.pm1CF1/counters.pms.nrOfMeas)*100))/100;
+	results.pms.pm25CF1							= Math.round((counters.pms.pm25CF1/counters.pms.nrOfMeas)*100))/100;
+	results.pms.pm10CF1							= Math.round((counters.pms.pm10CF1/counters.pms.nrOfMeas)*100))/100;
+	results.pms.pm1amb							= Math.round((counters.pms.pm1amb/counters.pms.nrOfMeas)*100))/100;
+	results.pms.pm25amb							= Math.round((counters.pms.pm25amb/counters.pms.nrOfMeas)*100))/100;
+	results.pms.pm10amb							= Math.round((counters.pms.pm10amb/counters.pms.nrOfMeas)*100))/100;
+	results.pms.part0_3							= Math.round((counters.pms.part0_3/counters.pms.nrOfMeas)*100))/100;
+	results.pms.part0_5							= Math.round((counters.pms.part0_5/counters.pms.nrOfMeas)*100))/100;
+	results.pms.part1_0							= Math.round((counters.pms.part1_0/counters.pms.nrOfMeas)*100))/100;
+	results.pms.part2_5							= Math.round((counters.pms.part2_5/counters.pms.nrOfMeas)*100))/100;
+	results.pms.part5_0							= Math.round((counters.pms.part5_0/counters.pms.nrOfMeas)*100))/100;
+	results.pms.part10_0						= Math.round((counters.pms.part10_0/counters.pms.nrOfMeas)*100))/100;
+	results.pms.nrOfMeas						= counters.pms.nrOfMeas;
+
+	results.bme280.temperature			= Math.round((counters.bme280.temperature/counters.bme280.nrOfMeas)*100))/100;
+	results.bme280.pressure					= Math.round((counters.bme280.pressure/counters.bme280.nrOfMeas)*100))/100;
+	results.bme280.rHum							= Math.round((counters.bme280.rHum/counters.bme280.nrOfMeas)*100))/100;
+	results.bme280.nrOfMeas					= counters.bme280.nrOfMeas;
+
+	results.ds18b20.temperature			= Math.round((counters.ds18b20.temperature/counters.ds18b20.nrOfMeas)*100))/100;
+	results.ds18b20.nrOfMeas				= counters.ds18b20.nrOfMeas;
+
 	initCounters();
 	counters.busy = false;
 
+  sendResults();
 }
 
 
@@ -684,33 +716,62 @@ var writeResults	= function(measureTime, loopTime) {
 
 }
 
-// send data to SOS service via OpenIoD REST service
-var sendData = function(data) {
-// oud //		http://openiod.com/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&inputformat=insertom&objectid=humansensor&format=xml
-// oud //			&region=EHV		&lat=50.1		&lng=4.0		&category=airquality		&value=1
 
-//http://localhost:4000/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=apri-sensor-sds011&offering=offering_0439_initial&verbose=true&commit=true&observation=apri-sensor-sds011-pm25:12.345&neighborhoodcode=BU04390402
-//https://openiod.org/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=apri-sensor-sds011&offering=offering_0439_initial&verbose=true&commit=true&observation=apri-sensor-sds011-pm25:12345,apri-sensor-sds011-pm10:345&neighborhoodcode=BU04390402
-
-		var _url = openiodUrl + '/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=apri-sensor-sds011&offering=offering_0439_initial&commit=true';
-		_url = _url +
-		//'&region=0439' +
-		'&foi=' + data.foi +
-		//'&neighborhoodcode=' + data.neighborhoodCode + '&citycode=' + data.cityCode +
-		'&observation=' + data.observation ;
-
-		console.log(_url);
-		request.get(_url)
-			.on('response', function(response) {
-				console.log(response.statusCode) // 200
-				console.log(response.headers['content-type']) // 'image/png'
-  			})
-			.on('error', function(err) {
-				console.log(err)
+var sendRequest = function(url) {
+	return;
+	var _url			= url;
+	request.get(_url)
+		.on('response', function(response) {
+			console.log(response.statusCode) // 200
+			console.log(response.headers['content-type']) // 'image/png'
 			})
-		;
+		.on('error', function(err) {
+			console.log(err)
+		})
+	;
+
+}
+// send data to SOS service via OpenIoD REST service
+var sendData = function() {
+/*
+		https://aprisensor-in.openiod.org:443
+		/bme280/v1/m?&foi=SCNMDC4F2211115A
+		&observation=pressure:1006.97,temperature:24.77,rHum:32.47
+		&timeOffsetMillis=2158
+
+		/pmsa003/v1/m?&foi=SCNMDC4F2211115A
+		&observation=pm25:52.67,pm1:33.33,pm10:63.87,pm1amb:27.27,pm25amb:42.73,pm10amb:56.13,raw0_3:3260.20,raw0_5:1062.67,raw1_0:288.93,raw2_5:42.40,raw5_0:3.60,raw10_0:1.60
+		&timeOffsetMillis=12871
+*/
+		var url = '';
+		if (results.pms.nrOfMeas > 0) {
+			url = openiodUrl + '/pmsa003'+ '/v/m?foi=' + 'SCRP' + unit.id + '&observation='+
+						'pm1:'+results.pms.pm1CF1+',pm25:'+results.pms.pm25CF1+',pm10:'+results.pms.pm10CF1 +
+			 			',pm1amb:'+results.pms.pm1amb+',pm25amb:'+results.pms.pm25amb+',pm10amb:'+results.pms.pm10amb +
+						',raw0_3:'+results.pms.part0_3+',raw0_5:'+results.pms.part0_5+',raw1_0:'+results.pms.part1_0 +
+						',raw2_5:'+results.pms.part2_5+',raw5_0:'+results.pms.part5_0+',raw10_0:'+results.pms.part10_0;
+			console.log(url);
+			sendRequest(url);
+
+		}
+
+		if (results.bme280.nrOfMeas > 0) {
+			url = openiodUrl + '/bme280'+ '/v/m?foi=' + 'SCRP' + unit.id + '&observation='+
+						'temperature:'+results.bme280.temperature+',pressure:'+results.bme280.pressure+',rHum:'+results.bme280.rHum ;
+			console.log(url);
+			sendRequest(url);
+		}
+		if (results.ds18b20.nrOfMeas > 0) {
+			url = openiodUrl + '/ds18b20'+ '/v/m?foi=' + 'SCRP' + unit.id + '&observation='+'temperature:'+results.ds18b20.temperature;
+			console.log(url);
+			sendRequest(url);
+		}
 
 };
+
+
+
+
 
 /*
 var printChannelResults	= function() {
@@ -846,4 +907,4 @@ raspi.init(() => {
 
 
 
-setTimeout(processDataCycle, 20000);
+setTimeout(processDataCycle, loopTimeCycle);

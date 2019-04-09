@@ -60,7 +60,7 @@ socketUrl 									= 'https://openiod.org'; socketPath	= '/'+apriConfig.systemCo
 
 console.log('web-socket url: '+socketUrl+socketPath);
 
-const port 					= new SerialPort('/dev/ttyS0')
+//const port 					= new SerialPort('/dev/ttyS0')
 
 var secureSite 			= true;
 var siteProtocol 		= secureSite?'https://':'http://';

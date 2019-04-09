@@ -64,7 +64,7 @@ console.log('web-socket url: '+socketUrl+socketPath);
 
 var secureSite 			= true;
 var siteProtocol 		= secureSite?'https://':'http://';
-var openiodUrl			= siteProtocol + 'aprisensor-in.openiod.org/';
+var openiodUrl			= siteProtocol + 'aprisensor-in.openiod.org';
 var loopTimeCycle		= 20000; //ms, 20000=20 sec
 
 var usbPorts			= [];
@@ -707,7 +707,6 @@ var writeResults	= function(measureTime, loopTime) {
 
 
 var sendRequest = function(url) {
-	return;
 	var _url			= url;
 	request.get(_url)
 		.on('response', function(response) {
@@ -734,7 +733,7 @@ var sendData = function() {
 */
 		var url = '';
 		if (results.pms.nrOfMeas > 0) {
-			url = openiodUrl + '/pmsa003'+ '/v/m?foi=' + 'SCRP' + unit.id + '&observation='+
+			url = openiodUrl + '/pmsa003'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
 						'pm1:'+results.pms.pm1CF1+',pm25:'+results.pms.pm25CF1+',pm10:'+results.pms.pm10CF1 +
 			 			',pm1amb:'+results.pms.pm1amb+',pm25amb:'+results.pms.pm25amb+',pm10amb:'+results.pms.pm10amb +
 						',raw0_3:'+results.pms.part0_3+',raw0_5:'+results.pms.part0_5+',raw1_0:'+results.pms.part1_0 +
@@ -745,13 +744,13 @@ var sendData = function() {
 		}
 
 		if (results.bme280.nrOfMeas > 0) {
-			url = openiodUrl + '/bme280'+ '/v/m?foi=' + 'SCRP' + unit.id + '&observation='+
+			url = openiodUrl + '/bme280'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
 						'temperature:'+results.bme280.temperature+',pressure:'+results.bme280.pressure+',rHum:'+results.bme280.rHum ;
 			console.log(url);
 			sendRequest(url);
 		}
 		if (results.ds18b20.nrOfMeas > 0) {
-			url = openiodUrl + '/ds18b20'+ '/v/m?foi=' + 'SCRP' + unit.id + '&observation='+'temperature:'+results.ds18b20.temperature;
+			url = openiodUrl + '/ds18b20'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+'temperature:'+results.ds18b20.temperature;
 			console.log(url);
 			sendRequest(url);
 		}

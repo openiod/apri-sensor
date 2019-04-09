@@ -369,9 +369,13 @@ bme280.init()
 
 var processDataCycle	= function() {
 	setTimeout(processDataCycle, 20000);
-	console.log('processDataCycle');
+	//console.log('processDataCycle');
 	counters.busy = true;
 	console.log('Counters pms: '+ counters.pms.nrOfMeas + '; bme280: '+ counters.bme280.nrOfMeas + '; ds18b20: '+ counters.ds18b20.nrOfMeas );
+	console.log(counters.pms.pm25CF1);
+	console.log(counters.pms.pm25CF1/counters.pms.nrOfMeas);
+	console.log(counters.bme280.temperature);
+	console.log(counters.bme280.temperature/counters.bme280.nrOfMeas);
 
 	initCounters();
 	counters.busy = false;

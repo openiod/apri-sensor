@@ -29,7 +29,7 @@ var initResult = apriConfig.init(systemModuleFolderName+"/"+systemModuleName);
 // add module specific requires
 const request 			= require('request');
 var express 			= require('express');
-const SerialPort 		= require('serialport');
+//const SerialPort 		= require('serialport');
 const fs 				= require('fs');
 const io	 			= require('socket.io-client');
 const exec 				= require('child_process').exec;
@@ -184,6 +184,7 @@ var getCpuInfo	= function() {
 	});
 };
 
+/*
 var getUsbPorts	= function() {
 
 	SerialPort.list(function(err, ports) {
@@ -193,9 +194,8 @@ var getUsbPorts	= function() {
 		//	console.log(usbPorts[i]);
 		//}
 	});
-
-
 }
+*/
 
 var getMacAddress	= function(networkInterface) {
 	var fileName	= '/sys/class/net/' + networkInterface + '/address';
@@ -683,7 +683,7 @@ socket.on('disconnect', function() {
 getCpuInfo();
 getMacAddress('wlan0');
 getIpAddress();
-getUsbPorts();
+//getUsbPorts();
 getWifiScanInfo('wlan0');
 getWifiScanInfo('wlan1');
 updateSoftware();

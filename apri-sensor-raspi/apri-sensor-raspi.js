@@ -45,7 +45,7 @@ const BME280 								= require('./BME280.js');
 
 var redisClient 						= redis.createClient();
 const {promisify} 					= require('util');
-#const redisGetAsync 				= promisify(redisClient.get).bind(redisClient);
+//const redisGetAsync 				= promisify(redisClient.get).bind(redisClient);
 const redisSetAsync 				= promisify(redisClient.set).bind(redisClient);
 
 redisClient.on("error", function (err) {

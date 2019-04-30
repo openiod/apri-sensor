@@ -759,11 +759,12 @@ var sendData = function() {
 			sendRequest(url);
 		}
 
-		redisSetAsync('bme280'
-		  , 'foi','SCRP' + unit.id
-		  , 'temperature', results.bme280.temperature
-			, 'pressure', results.bme280.pressure
-			, 'rHum', results.bme280.rHum
+		redisSetAsync(//'bme280'
+		  //, 'foi',
+			'SCRP' + unit.id
+//		  , 'temperature', results.bme280.temperature
+//			, 'pressure', results.bme280.pressure
+//			, 'rHum', results.bme280.rHum
 		  ).then(function(res) {
 	    	console.log(res);
 		});

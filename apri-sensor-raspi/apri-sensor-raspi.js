@@ -43,13 +43,13 @@ const BME280 								= require('./BME280.js');
 //const port = new SerialPort('/dev/ttyAMA0')
 //var app = express();
 
-var redisClient = redis.createClient();
-
-// if you'd like to select database 3, instead of 0 (default), call
-// client.select(3, function() { /* ... */ });
+var redisClient 						= redis.createClient();
+const {promisify} 					= require('util');
+#const redisGetAsync 				= promisify(redisClient.get).bind(redisClient);
+const redisSetAsync 				= promisify(redisClient.set).bind(redisClient);
 
 redisClient.on("error", function (err) {
-    console.log("Error " + err);
+    console.log("Redis client Error " + err);
 });
 
 // **********************************************************************************
@@ -405,6 +405,7 @@ var processDataCycle	= function() {
 	counters.busy = false;
 
   sendData();
+
 }
 
 
@@ -757,6 +758,15 @@ var sendData = function() {
 			console.log(url);
 			sendRequest(url);
 		}
+
+		redisSetAsync('bme280'
+		  , 'foi','SCRP' + unit.id
+		  , 'temperature', results.bme280.temperature
+			, 'pressure', results.bme280.pressure
+			, 'rHum', results.bme280.rHum
+		  ).then(function(res) {
+	    	console.log(res);
+		});
 
 };
 

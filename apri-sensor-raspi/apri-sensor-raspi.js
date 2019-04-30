@@ -495,9 +495,6 @@ var sendData = function() {
 			});
 		}
 		if (results.ds18b20.nrOfMeas > 0) {
-			url = openiodUrl + '/ds18b20'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+'temperature:'+results.ds18b20.temperature;
-			console.log(url);
-			sendRequest(url);
 			redisHmsetHashAsync(timeStampTime.toString()+':ds18b20'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'temperature', results.ds18b20.temperature

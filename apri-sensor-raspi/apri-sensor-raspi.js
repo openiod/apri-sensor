@@ -366,13 +366,13 @@ var processDeviceData	= function(err,temperatureData) {
 const readSensorDataDs18b20 = () => {
 	for (var i=0;i<devicesFolder.length;i++) {
 		if (devicesFolder[i].split('-')[0] == '28') {
-			console.log('DS18B20 device: ' +  devicesFolder[i]);
+//			console.log('DS18B20 device: ' +  devicesFolder[i]);
 			var path = '/sys/bus/w1/devices/'+devicesFolder[i];
 			try {
-				console.log(path+ '/w1_slave');
+//				console.log(path+ '/w1_slave');
 				fs.readFile(path+'/w1_slave',processDeviceData);  // start process
 			} catch (err) {
-			  console.log('Directory or file for DS18B20 not found. ('+path+ '/w1_slave'+')');
+//			  console.log('Directory or file for DS18B20 not found. ('+path+ '/w1_slave'+')');
 				setTimeout(readSensorDataDs18b20, 60000); // retry after 1 minute
 			  return;
 			}

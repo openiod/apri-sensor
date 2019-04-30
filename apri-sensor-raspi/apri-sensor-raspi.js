@@ -33,6 +33,7 @@ var request 								= require('request');
 var fs 											= require('fs');
 //var SerialPort 							= require("serialport");
 const raspi									= require('raspi');
+var redis										= require("redis");
 const Serial								= require('raspi-serial').Serial;
 //const ByteLength 						= require('@serialport/parser-byte-length')
 var io	 										= require('socket.io-client');
@@ -41,6 +42,15 @@ const execFile							= require('child_process').execFile;
 const BME280 								= require('./BME280.js');
 //const port = new SerialPort('/dev/ttyAMA0')
 //var app = express();
+
+redisClient = redis.createClient();
+
+// if you'd like to select database 3, instead of 0 (default), call
+// client.select(3, function() { /* ... */ });
+
+client.on("error", function (err) {
+    console.log("Error " + err);
+});
 
 // **********************************************************************************
 		/* web-socket */

@@ -82,7 +82,7 @@ var usbPorts			= [];
 
 var serialPortPath;
 
-var devicesFolder = NULL;  // DS18B20 devices
+var devicesFolder = undefined;  // DS18B20 devices
 
 
 /*
@@ -331,7 +331,6 @@ const readSensorData = () => {
 			} else {
 				console.log('Raspi-i2c processing is busy, measurement BME280 skipped');
 			}
-      //console.log(`data = ${JSON.stringify(data, null, 2)}`);
       setTimeout(readSensorData, 1000);
     })
     .catch((err) => {
@@ -544,7 +543,7 @@ try {
 	devicesFolder = fs.readdirSync('/sys/bus/w1/devices');
 	readSensorDataDs18b20();
 } catch (err) {
-	devicesFolder = NULL;
+	devicesFolder = undefined;
   console.log('Directory or file for DS18B20 not found. (/sys/bus/w1/devices/28-*/w1_slave)');
   //return;
 }

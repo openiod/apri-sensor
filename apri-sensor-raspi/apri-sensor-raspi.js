@@ -739,7 +739,7 @@ var sendData = function() {
 		&timeOffsetMillis=12871
 */
 		var timeStamp = new Date();
-		var timeStampTime = timeStampe.getTime();
+		var timeStampTime = timeStamp.getTime();
 		var url = '';
 		if (results.pms.nrOfMeas > 0) {
 			url = openiodUrl + '/pmsa003'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+

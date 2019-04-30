@@ -82,6 +82,8 @@ var usbPorts			= [];
 
 var serialPortPath;
 
+var devicesFolder = NULL;  // DS18B20 devices
+
 
 /*
 var deviceParam			= process.argv[2];
@@ -123,12 +125,12 @@ var headerRaw			= 'dateiso;pm25;pm10\n';
 var sensorFileName 		= 'sensor-raspi-result';
 var sensorFileExtension	= '.csv';
 var sensorLocalPathRoot = systemFolderParent + '/sensor/';
-var fileFolder 			= 'openiod-v1';
-var resultsFolder 		= sensorLocalPathRoot + fileFolder + "/" + 'results/';
+//var fileFolder 			= 'openiod-v1';
+//var resultsFolder 		= sensorLocalPathRoot + fileFolder + "/" + 'results/';
 
 var today				= new Date();
 var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today.getDate() + "_" + today.getHours(); // + ":" + today.getMinutes();
-var resultsFileName = resultsFolder + sensorFileName + '_' + dateString;
+//var resultsFileName = resultsFolder + sensorFileName + '_' + dateString;
 
 var counters	= {
 	busy: false,  // dont/skip count when processing of results is busy (busy=true)
@@ -235,31 +237,6 @@ var processRaspiSerialRecord = function() {
 	counters.pms.part2_5			+= (view8[22]<<8)	+ view8[23];
 	counters.pms.part5_0			+= (view8[24]<<8)	+ view8[25];
 	counters.pms.part10_0			+= (view8[26]<<8)	+ view8[27];
-/*
-  console.log('');
-    console.log(view8[0]);
-    console.log(view8[1]);
-    console.log(view8[2]);
-    console.log(view8[3]);
-    console.log((view8[4]<<8)+view8[5]);
-    console.log((view8[6]<<8)+view8[7]);
-    console.log((view8[8]<<8)+view8[9]);
-    console.log((view8[10]<<8)+view8[11]);
-    console.log((view8[12]<<8)+view8[13]);
-    console.log((view8[14]<<8)+view8[15]);
-    console.log((view8[16]<<8)+view8[17]);
-    console.log((view8[18]<<8)+view8[19]);
-    console.log((view8[20]<<8)+view8[21]);
-    console.log((view8[22]<<8)+view8[23]);
-    console.log((view8[24]<<8)+view8[25]);
-    console.log((view8[26]<<8)+view8[27]);
-console.log('Version/errcode');
-    console.log(view8[28]);  //version
-    console.log(view8[29]);  //errcode
-console.log('Checksum');
-    console.log((view8[30]<<8)+view8[31]);
-    console.log(checksum);
-*/
 /*
   if (view8[28] == 0x80) {  //128=PMS7003
   //  process.stdout.write('einde datarecord PMS7003-128\n');
@@ -373,10 +350,42 @@ bme280.init()
 //  end-of raspi-i2c variables and functions
 
 
+var processDeviceData	= function(err,temperatureData) {
+	if (err) throw err;
+	//console.log(temperatureData);
+	var line2 = temperatureData.toString().split(/\n/)[1];
+	var _temperature = line2.split('t=')[1];
+	if (isNumeric(_temperature) ) {
+		var temperature = Math.round(parseFloat(_temperature)/10)/100; // round to 2 decimals
+		if (counters.busy == false) {
+			counters.ds18b20.nrOfMeas++;
+			counters.ds18b20.temperature			+= temperature;
+		}
+	};
+};
+
+const readSensorDataDs18b20 = () => {
+	for (var i=0;i<devicesFolder.length;i++) {
+		if (devicesFolder[i].split('-')[0] == '28') {
+			console.log('DS18B20 device: ' +  devicesFolder[i]);
+			var path = '/sys/bus/w1/devices/'+devicesFolder[i];
+			try {
+				console.log(path+ '/w1_slave');
+				fs.readFile(path+'/w1_slave',processDeviceData);  // start process
+			} catch (err) {
+			  console.log('Directory or file for DS18B20 not found. ('+path+ '/w1_slave'+')');
+				setTimeout(readSensorDataDs18b20, 60000); // retry after 1 minute
+			  return;
+			}
+		}
+	}
+	setTimeout(readSensorDataDs18b20, 1000);  // repeat every second
+};
+
+
 
 var processDataCycle	= function() {
 	setTimeout(processDataCycle, loopTimeCycle);
-	//console.log('processDataCycle');
 	counters.busy = true;
 	console.log('Counters pms: '+ counters.pms.nrOfMeas + '; bme280: '+ counters.bme280.nrOfMeas + '; ds18b20: '+ counters.ds18b20.nrOfMeas );
 
@@ -424,295 +433,11 @@ var printHex = function(buffer, tekst) {
   console.log('log: ' + tekst +'  lengte:'+buffer.length+ " "+ str); // + data);
 }
 
-/*
-var incommingData = new Buffer(0);
-var tmpBuffer = new Buffer(0);
-var emitBuffer = new Buffer(0);
-var myParser = function(emitter, buffer) {
-	  //printHex(incommingData,'nog niet verwerkt');
-	  //printHex(buffer,'input buffer erbij');
-	  //console.log('parser datalength: ' + incommingData.length + ' plus '+ buffer.length);
-    tmpBuffer = Buffer.concat([incommingData, buffer]);
-		incommingData = tmpBuffer;
 
-
-//    if (incommingData.length > 3 && incommingData[incommingData.length - 3] == 3) {
-		if (incommingData.length >= 10 ) {
-			for (var i=0;i<incommingData.length;i++) {
-				if (incommingData.length-i<10 ){
-//					console.log('parser klaar datalength: ' + incommingData.length + ' i '+ i);
-					tmpBuffer = incommingData.slice(i);
-					incommingData = tmpBuffer;
-					break;
-				}
-				if (incommingData[i]==170 && incommingData[i+1]==192) {
-					//emitBuffer = new Buffer(0);
-          emitBuffer = incommingData.slice(i,i+10);
-//					for (var j=0;j<10;j++) {
-//						emitBuffer = Buffer.concat([emitBuffer, incommingData[i+j]]);
-//					}
-          emitter.emit("data", emitBuffer);
-					i=i+9;
-//					console.log('parser new byte incommingdata to process: ' + incommingData[i+10]);
-//					console.log ('bufferlengte was: '+incommingData.length);
-					//tmpBuffer = incommingData.slice(i+10);
-					//incommingData = tmpBuffer;
-//					console.log ('bufferlengte wordt: '+incommingData.length);
-				} else {
-//					console.log ('nieuwe foutieve byte was: '+ incommingData[i]);
-				}
-			}
-//			console.log('1 parser klaar datalength: ' + incommingData.length + ' i '+ i);
-			if (i==incommingData.length) {
-				incommingData = new Buffer(0);
-			}
-//			console.log('2 parser klaar datalength: ' + incommingData.length + ' i '+ i);
-			//tmpBuffer = incommingData.slice(i+1);
-			//incommingData = tmpBuffer;
-
-//      emitter.emit("data", incommingData);
-//      incommingData = new Buffer(0);
-    }
-};
-*/
-
-/*
-var mainProcess = function() {
-	console.log('Found usb comname: ' + serialPortPath );
-
-
-//	var serialport = new SerialPort(serialPortPath, {parser: SerialPort.parsers.readline('\n')} );
-	var serialport = new SerialPort(serialPortPath, {parser: myParser} );
-	serialport.on('open', function(){
-		console.log('Serial Port connected');
-		if (writeHeaders == true) writeHeaderIntoFile();
-		serialport.on('data', function(data){
-//			console.log('datalength: ' + data.length);
-			var checksum = 0;
-			if (data.length == 10 ) {
-				var c1 =(data[2]+data[3]+data[4]+data[5]+data[6]+data[7]);
-				var c2 = c1>>8;
-				checksum = c1 - (c2<<8);
-			}
-			if (data.length == 10 && data[0]==170 && data[1]==192 && data[9]==171 &&
-			   checksum==data[8]) {  // AA;C0;AB
-				//console.log('message recieved: ');
-//				var str="";
-//				for (var i=0;i<data.length;i++) {
-//					str = str+ data[i].toString(16)+ ' ';
-//				}
-//				console.log('log: data gevonden, lengte:'+data.length+ " "+ str); // + data);
-				processMeasurement(data);
-
-// aac0 1a03 00 703e f8 ab  26 48 703e 6
-// aac0 1b04 20 703e .b ab
-
-
-
-			} else {
-				var str="";
-				for (var i=0;i<data.length;i++) {
-					str = str+ data[i].toString(16)+' ';
-				}
-				console.log('log: data gevonden maar niet herkend, lengte:'+data.length+ " "+ str); // + data);
-			}
-			//console.log(roughScale(data,16))
-			// var _data = data.substr(0,data.length-1);
-//			for (var i=0;i<data.length;i++){
-//				console.log(data[0]);
-//				if (data.substr(i,1)==0xAA) console.log('0:AA');
-//				if (data.substr(i,1)==0xC0) console.log('0:C0');
-//			}
-//			if (data.substr(0,1)==0xAA) console.log('0:AA');
-//			if (data.substr(0,1)==0xC0) console.log('0:C0');
-//			if (data.substr(1,1)==0xAA) console.log('1:AA');
-//			if (data.substr(1,1)==0xC0) console.log('1:C0');
-
-//			if (_dataArray.length == 2 && isNumeric(_dataArray[0]) && isNumeric(_dataArray[1]) && data[data.length-1] =='\r' ) {
-//				console.log('measurement: ' + _data);
-//				processMeasurement(_dataArray);
-//			} else {
-//				console.log('log: data gevonden maar niet herkend'); // + data);
-//			}
-
-		});
-	});
-	serialport.on('error', function(err) {
-		console.log('Error: ', err.message);
-	});
-};
-*/
 
 function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
-
-var processMeasurement = function(data) {
-
-	var sensorId			= sensorId; //getSensorId(sensorId);
-
-//	var measureMentTime		= new Date();
-//	writeResults(measureMentTime, data);
-
-
-  //var sortMeasurements = function(numArray) {
-	//	return numArray.sort(function(a, b) {
-	//		return a - b;
-	//	});
-	//}
-
-
-	if (loopStart == undefined) {
-		 loopStart 		= new Date();
-		 pm25Total 	= 0;
-		 pm10Total 	= 0;
-		 measureMentCount = 0;
-	};
-
-	var measureMentTime		= new Date();
-	var loopTime 			= measureMentTime.getTime() - loopStart.getTime();
-
-	if (loopTime >= loopTimeMax) {
-		if (measureMentCount > 0) {
-			pm25Result = Math.round((pm25Total / measureMentCount)*10)/100;
-			pm10Result = Math.round((pm10Total / measureMentCount)*10)/100;
-
-			writeResults(measureMentTime, loopTime);
-		}
-
-		loopStart 		= new Date();
-		pm25Total 	= 0;
-		pm10Total 	= 0;
-		measureMentCount = 0;
-	}
-
-//	calculate fillChannel(sensorId, measureMentTime, data);
-  var pm25 = data[2]+(data[3]<<8);
-	var pm10 = data[4]+(data[5]<<8);
-  pm25Total += pm25;
-	pm10Total += pm10;
-	id         = data[6].toString(16)+data[7].toString(16);
-
-	measureMentCount++;
-  //console.log(pm25+' '+pm10+' '+id+' '+measureMentCount);
-
-}
-
-/*
-var getSensorId = function(sId) {
-	var sensorId = '' + sId;
-	if (sensors[sensorId] == undefined) initSensor(sensorId);
-	return sensorId;
-}
-*/
-
-/*
-var initSensor = function(sensorId) {
-	sensors[sensorId] 			= {};
-	sensors[sensorId].channel	= [];
-	for (var i=0;i<nrOfChannels;i++){
-		var _channel = {};
-		_channel.pulseTotal	= 0;
-		_channel.count		= 0;
-		sensors[sensorId].channel.push(_channel);
-	};
-};
-
-var fillChannel = function(sensorId, measureMentTime, data) {
-	for (var i=nrOfChannels-1;i>=0;i--) {
-		if (data[2] >= channelTreshold[i]) {
-			sensors[sensorId].channel[i].count++;
-			sensors[sensorId].channel[i].pulseTotal += parseFloat(data[2]);
-			break;
-		}
-	}
-}
-*/
-
-/*
-var writeHeaderIntoFile = function() {
-	fs.appendFile(resultsFileName + '_raw' + sensorFileExtension, headerRaw, function (err) {
-		if (err != null) {
-			console.log('Error writing results to file: ' + err);
-		}
-	});
-	writeHeaders	= false;
-}
-
-var writeResults	= function(measureTime, loopTime) {
-	console.log('Results: ' + measureTime.toISOString() + ' count: ' + measureMentCount);
-
-
-//
-	var sosCount		= 0;
-	var sosSensorCount 	= 0;
-
-	for (var sensorId in sensors) {
-		var recordCounts 		= measureTime.toISOString() + ';' + loopTime + ';' + sensorId;
-		var recordPulseTotals 	= measureTime.toISOString() + ';' + loopTime + ';' + sensorId;
-		var recordAvg			= measureTime.toISOString() + ';' + loopTime + ';' + sensorId;
-
-		for (var i=0; i<nrOfChannels; i++) {
-			recordCounts 		= recordCounts + ';' +  Math.round(sensors[sensorId].channel[i].count / loopTime * loopTimeMax *100)/100;
-			recordPulseTotals 	= recordPulseTotals + ';' + sensors[sensorId].channel[i].pulseTotal;
-			recordAvg			= recordAvg + ';' + Math.round(sensors[sensorId].channel[i].pulseTotal / loopTime * loopTimeMax *100)/100;
-		}
-		recordCounts 					= recordCounts + '\n';
-		recordPulseTotals 				= recordPulseTotals + '\n';
-		recordAvg		 				= recordAvg + '\n';
-		//console.log(record);
-		fs.appendFile(resultsFileName + '_counts' + sensorFileExtension, recordCounts, function (err) {
-			if (err != null) {
-				console.log('Error writing results to file: ' + err);
-			}
-		});
-		fs.appendFile(resultsFileName + '_pulse-totals' + sensorFileExtension, recordPulseTotals, function (err) {
-			if (err != null) {
-				console.log('Error writing results to file: ' + err);
-			}
-		});
-		fs.appendFile(resultsFileName + '_avg' + sensorFileExtension, recordAvg, function (err) {
-			if (err != null) {
-				console.log('Error writing results to file: ' + err);
-			}
-		});
-
-		for (var i=0; i<nrOfChannels; i++) {
-			sosCount 	+= Math.round(sensors[sensorId].channel[i].count / loopTime * loopTimeMax *100)/100;
-		}
-		sosSensorCount++;
-
-		initSensor(sensorId);
-	}
-//
-
-
-	var data			= {};
-	//data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;
-	data.foi				= 'SCRP' + unit.id;
-	if (sensorKey != '') {
-		data.foi	+= '_' + sensorKey;
-	}
-	//data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;
-	//data.cityCode			= 'GM0439'; //geoLocation.cityCode;
-	//data.cityName			= '..'; //geoLocation.cityName;
-
-	var recordOut 			= measureTime.toISOString() + ';' + pm25Result + ';' + pm10Result + '\n';
-
-	fs.appendFile(resultsFileName + '_raw' + sensorFileExtension, recordOut, function (err) {
-		if (err != null) {
-			console.log('Error writing results to file: ' + err);
-		}
-	});
-
-	data.categories			= [];
-	data.observation		= 'apri-sensor-sds011-pm25:'+pm25Result+','+'apri-sensor-sds011-pm10:'+pm10Result ;
-
-	sendData(data);
-
-}
-*/
-
 
 var sendRequest = function(url) {
 	var _url			= url;
@@ -726,18 +451,8 @@ var sendRequest = function(url) {
 	;
 
 }
-// send data to SOS service via OpenIoD REST service
+// send data to service
 var sendData = function() {
-/*
-		https://aprisensor-in.openiod.org:443
-		/bme280/v1/m?&foi=SCNMDC4F2211115A
-		&observation=pressure:1006.97,temperature:24.77,rHum:32.47
-		&timeOffsetMillis=2158
-
-		/pmsa003/v1/m?&foi=SCNMDC4F2211115A
-		&observation=pm25:52.67,pm1:33.33,pm10:63.87,pm1amb:27.27,pm25amb:42.73,pm10amb:56.13,raw0_3:3260.20,raw0_5:1062.67,raw1_0:288.93,raw2_5:42.40,raw5_0:3.60,raw10_0:1.60
-		&timeOffsetMillis=12871
-*/
 		var timeStamp = new Date();
 		var timeStampTime = timeStamp.getTime();
 		var url = '';
@@ -795,57 +510,6 @@ var sendData = function() {
 };
 
 
-
-
-
-/*
-var printChannelResults	= function() {
-	//console.log(sensors);
-	for (var sensorKey in sensors) {
-		var line = 'Sensor: ' + sensorKey + '\t';
-		for (var i=0; i<nrOfChannels; i++) {
-			line = line + '\t' + i + ': ';
-			if (sensors[sensorKey].channel[i].count==0) {
-				line = line + '\t';
-			} else {
-				line = line + sensors[sensorKey].channel[i].count + 'x';
-			}
-		}
-		console.log(line);
-	}
-}
-*/
-
-
-/*
-app.all('/*', function(req, res, next) {
-  console.log("app.all/: " + req.url + " ; systemCode: " + apriConfig.systemCode );
-//  res.header("Access-Control-Allow-Origin", "*");
-//  res.header("Access-Control-Allow-Headers", "X-Requested-With");
-  next();
-});
-
-// test url for systemcode
-app.get('/'+apriConfig.systemCode+'/', function(req, res) {
-  console.log("Reqparam: " + req.url);
-  res.send("ok");
-});
-*/
-/*
-app.get('/'+apriConfig.systemCode+'/eventsource/:eventsource', function(req, res) {
-	//getLocalFile(req, res, {contentType:'text/css'});
-	console.log('EventSource action from '+ req.params.eventsource );
-
-});
-*/
-
-/*
-var io = require('socket.io').listen(app.listen(apriConfig.systemListenPort),{
-    //serveClient: config.env !== 'production',
-    path: '/SCAPE604/socket.io'
-});
-*/
-
 var getCpuInfo	= function() {
 	//hostname --all-ip-address
 	exec("cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2", (error, stdout, stderr) => {
@@ -874,26 +538,17 @@ var getCpuInfo	= function() {
 
 getCpuInfo();
 
-/*
-SerialPort.list(function(err, ports) {
-	console.log(ports);
 
-	console.log('Find usb comport:');
 
-	usbPorts	= ports;
+try {
+	devicesFolder = fs.readdirSync('/sys/bus/w1/devices');
+	readSensorDataDs18b20();
+} catch (err) {
+	devicesFolder = NULL;
+  console.log('Directory or file for DS18B20 not found. (/sys/bus/w1/devices/28-*/w1_slave)');
+  //return;
+}
 
-	if (serialPortPath != deviceParam) {
-		for (var i=0;i<usbPorts.length;i++) {
-			console.log('searching for usb comport FTDI ' + i + ' '+ usbPorts[i].manufacturer + ' ' +  usbPorts[i].comName);
-			if (usbPorts[i].manufacturer == 'FTDI' || usbPorts[i].manufacturer == 'Prolific_Technology_Inc.') {
-				serialPortPath	= usbPorts[i].comName;
-				break;
-			}
-		}
-	}
-	mainProcess();
-});
-*/
 
 var socket = io(socketUrl, {path:socketPath});
 
@@ -914,9 +569,6 @@ socket.on('info', function(data) {
 	//socket.broadcast.emit('aireassignal', { data: data } );
 });
 
-// raspi-serial read port per byte
-////const parser = port.pipe(new ByteLength({length: 1}))
-////parser.on('data', processRaspiSerialData) // one byte per data event
 raspi.init(() => {
   var serial = new Serial({portId:'/dev/ttyS0',baudRate:9600});
   serial.open(() => {
@@ -925,12 +577,10 @@ raspi.init(() => {
 			for (var i=0;i<data.length;i++) {
 				processRaspiSerialData(data[i]);
 			}
-      //process.stdout.write(data);
     });
     serial.write('Hello from raspi-serial');
   });
 });
-
 
 
 setTimeout(processDataCycle, loopTimeCycle);

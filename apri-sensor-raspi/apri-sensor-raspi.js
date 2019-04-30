@@ -749,27 +749,48 @@ var sendData = function() {
 						',raw2_5:'+results.pms.part2_5+',raw5_0:'+results.pms.part5_0+',raw10_0:'+results.pms.part10_0;
 			console.log(url);
 			sendRequest(url);
+			redisHmsetHashAsync(timeStampTime.toString()+':pmsa003'
+			  //, 'foi', 'SCRP' + unit.id
+			  , 'pm1', results.pms.pm1CF1
+				, 'pm25', results.pms.pm25CF1
+				, 'pm10', results.pms.pm10CF1
+				, 'pm1', results.pms.pm1amb
+				, 'pm25', results.pms.pm25amb
+				, 'raw0_3', results.pms.raw0_3
+				, 'raw0_5', results.pms.raw0_5
+				, 'raw1_0', results.pms.raw1_0
+				, 'raw2_5', results.pms.raw2_5
+				, 'raw5_0', results.pms.raw5_0
+				, 'raw10_0', results.pms.raw10_0
+			  ).then(function(res) {
+		    	console.log(res);
+			});
 		}
 		if (results.bme280.nrOfMeas > 0) {
 			url = openiodUrl + '/bme280'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
 						'temperature:'+results.bme280.temperature+',pressure:'+results.bme280.pressure+',rHum:'+results.bme280.rHum ;
 			console.log(url);
 			sendRequest(url);
+			redisHmsetHashAsync(timeStampTime.toString()+':bme280'
+			  //, 'foi', 'SCRP' + unit.id
+			  , 'temperature', results.bme280.temperature
+				, 'pressure', results.bme280.pressure
+				, 'rHum', results.bme280.rHum
+			  ).then(function(res) {
+		    	console.log(res);
+			});
 		}
 		if (results.ds18b20.nrOfMeas > 0) {
 			url = openiodUrl + '/ds18b20'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+'temperature:'+results.ds18b20.temperature;
 			console.log(url);
 			sendRequest(url);
+			redisHmsetHashAsync(timeStampTime.toString()+':ds18b20'
+			  //, 'foi', 'SCRP' + unit.id
+			  , 'temperature', results.ds18b20.temperature
+			  ).then(function(res) {
+		    	console.log(res);
+			});
 		}
-
-		redisHmsetHashAsync(timeStampTime.toString()+':bme280'
-		  , 'foi', 'SCRP' + unit.id
-		  , 'temperature', results.bme280.temperature
-			, 'pressure', results.bme280.pressure
-			, 'rHum', results.bme280.rHum
-		  ).then(function(res) {
-	    	console.log(res);
-		});
 
 };
 

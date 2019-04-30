@@ -760,7 +760,8 @@ var sendData = function() {
 		}
 
 		redisSetAsync(//'bme280'
-		  //, 'foi',
+		  //,
+			'foi',
 			'SCRP' + unit.id
 //		  , 'temperature', results.bme280.temperature
 //			, 'pressure', results.bme280.pressure

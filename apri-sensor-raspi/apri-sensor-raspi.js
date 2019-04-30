@@ -43,12 +43,12 @@ const BME280 								= require('./BME280.js');
 //const port = new SerialPort('/dev/ttyAMA0')
 //var app = express();
 
-redisClient = redis.createClient();
+var redisClient = redis.createClient();
 
 // if you'd like to select database 3, instead of 0 (default), call
 // client.select(3, function() { /* ... */ });
 
-client.on("error", function (err) {
+redisClient.on("error", function (err) {
     console.log("Error " + err);
 });
 

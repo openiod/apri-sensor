@@ -46,7 +46,8 @@ const BME280 								= require('./BME280.js');
 var redisClient 						= redis.createClient();
 const {promisify} 					= require('util');
 //const redisGetAsync 				= promisify(redisClient.get).bind(redisClient);
-const redisSetAsync 				= promisify(redisClient.set).bind(redisClient);
+//const redisSetAsync 				= promisify(redisClient.set).bind(redisClient);
+const redisHmsetHashAsync 				= promisify(redisClient.hmset).bind(redisClient);
 
 redisClient.on("error", function (err) {
     console.log("Redis client Error " + err);
@@ -737,6 +738,8 @@ var sendData = function() {
 		&observation=pm25:52.67,pm1:33.33,pm10:63.87,pm1amb:27.27,pm25amb:42.73,pm10amb:56.13,raw0_3:3260.20,raw0_5:1062.67,raw1_0:288.93,raw2_5:42.40,raw5_0:3.60,raw10_0:1.60
 		&timeOffsetMillis=12871
 */
+		var timeStamp = new Date();
+		var timeStampTime = timeStampe.getTime();
 		var url = '';
 		if (results.pms.nrOfMeas > 0) {
 			url = openiodUrl + '/pmsa003'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
@@ -759,13 +762,11 @@ var sendData = function() {
 			sendRequest(url);
 		}
 
-		redisSetAsync(//'bme280'
-		  //,
-			'foi',
-			'SCRP' + unit.id
-//		  , 'temperature', results.bme280.temperature
-//			, 'pressure', results.bme280.pressure
-//			, 'rHum', results.bme280.rHum
+		redisHmsetHashAsync(timeStampTime.toString()+':bme280'
+		  , 'foi', 'SCRP' + unit.id
+		  , 'temperature', results.bme280.temperature
+			, 'pressure', results.bme280.pressure
+			, 'rHum', results.bme280.rHum
 		  ).then(function(res) {
 	    	console.log(res);
 		});

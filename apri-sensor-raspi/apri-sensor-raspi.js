@@ -478,6 +478,11 @@ var sendData = function() {
 				, 'raw5_0', results.pms.part5_0
 				, 'raw10_0', results.pms.part10_0
 			  ).then(function(res) {
+					redisSaddAsync('pmsa003', timeStampTime.toString()+':pmsa003')
+						.then(function(res) {
+							redisSaddAsync('pmsa003', timeStampTime.toString()+':pmsa003')
+							console.log('pmsa003 ', timeStampTime.toString()+':pmsa003'+ res);
+						});
 		    	console.log(res);
 			});
 		}
@@ -492,6 +497,11 @@ var sendData = function() {
 				, 'pressure', results.bme280.pressure
 				, 'rHum', results.bme280.rHum
 			  ).then(function(res) {
+					redisSaddAsync('bme280', timeStampTime.toString()+':bme280')
+						.then(function(res) {
+							redisSaddAsync('bme280', timeStampTime.toString()+':bme280')
+							console.log('bme280 ', timeStampTime.toString()+':bme280'+ res);
+						});
 		    	console.log(res);
 			});
 		}

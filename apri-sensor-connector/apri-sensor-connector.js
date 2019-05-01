@@ -113,7 +113,7 @@ var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today
 var processDataCycle	= function() {
 	setTimeout(processDataCycle, loopTimeCycle);
 
-  redisSortAsync('new', 'alpha limit 0 1 asc')
+  redisSortAsync('new', 'alpha','limit 0 5', 'asc')
     .then(function(res) {
       var _res = res;
     //	redisSaddAsync('ds18b20', timeStamp.toISOString()+':ds18b20')

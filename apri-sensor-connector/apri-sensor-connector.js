@@ -112,17 +112,21 @@ var today				= new Date();
 var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today.getDate() + "_" + today.getHours(); // + ":" + today.getMinutes();
 //var resultsFileName = resultsFolder + sensorFileName + '_' + dateString;
 
-var processDataCycle	= function() {
-	setTimeout(processDataCycle, loopTimeCycle);
-
-  redisSortAsync('new', 'alpha','limit',0,5,'asc')
+var processDataCycle	= function(parm) {
+  if (parm.repeat == true) {
+    setTimeout(processDataCycle, loopTimeCycle);
+  }
+  redisSortAsync('new', 'alpha','limit',0,1,'asc')
     .then(function(res) {
       var _res = res;
       var  result = res;
     //	redisSaddAsync('ds18b20', timeStamp.toISOString()+':ds18b20')
       console.log(_res);
       console.log(_res[0]);
-      redisSmoveAsync('new','old',_res[0]).then(function(e){console.log('Redis smove(d) from new to old-set success')});
+      redisSmoveAsync('new','old',_res[0]).then(function(e){
+        processDataCycle({repeat:false}); // continue with next measurement if available
+        //console.log('Redis smove(d) from new to old-set success')
+      });
     });
 /*
 	counters.busy = true;
@@ -277,4 +281,4 @@ socket.on('info', function(data) {
 	//socket.broadcast.emit('aireassignal', { data: data } );
 });
 
-setTimeout(processDataCycle, loopTimeCycle);
+processDataCycle({repeat:true});

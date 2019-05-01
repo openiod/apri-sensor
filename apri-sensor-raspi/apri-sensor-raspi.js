@@ -478,10 +478,10 @@ var sendData = function() {
 				, 'raw10_0', results.pms.part10_0
 			  ).then(function(res) {
 					var _res = res;
-					redisSaddAsync('pmsa003', timeStamp.toISOString()+':pmsa003')
+					redisSaddAsync('new', timeStamp.toISOString()+':pmsa003')
 						.then(function(res2) {
 							var _res2=res2;
-							redisSaddAsync('pmsa003', timeStamp.toISOString()+':pmsa003')
+						//	redisSaddAsync('pmsa003', timeStamp.toISOString()+':pmsa003')
 							console.log('pmsa003 ', timeStamp.toISOString()+':pmsa003'+ _res2);
 						});
 		    	console.log(timeStamp.toString()+':pmsa003'+_res);
@@ -499,10 +499,10 @@ var sendData = function() {
 				, 'rHum', results.bme280.rHum
 			  ).then(function(res) {
 					var _res = res;
-					redisSaddAsync('bme280', timeStamp.toISOString()+':bme280')
+					redisSaddAsync('new', timeStamp.toISOString()+':bme280')
 						.then(function(res2) {
 							var _res2 = res2;
-							redisSaddAsync('bme280', timeStamp.toISOString()+':bme280')
+						//	redisSaddAsync('bme280', timeStamp.toISOString()+':bme280')
 							console.log('bme280 ', timeStamp.toISOString()+':bme280'+ _res2);
 						});
 		    	console.log(timeStamp.toISOString()+':bme280'+_res);
@@ -514,10 +514,10 @@ var sendData = function() {
 			  , 'temperature', results.ds18b20.temperature
 			  ).then(function(res) {
 					var _res = res;
-					redisSaddAsync('ds18b20', timeStamp.toISOString()+':ds18b20')
+					redisSaddAsync('new', timeStamp.toISOString()+':ds18b20')
 						.then(function(res2) {
 							var _res2 = res2;
-							redisSaddAsync('ds18b20', timeStamp.toISOString()+':ds18b20')
+						//	redisSaddAsync('ds18b20', timeStamp.toISOString()+':ds18b20')
 			    		console.log('ds18b20 ', timeStamp.toISOString()+':ds18b20'+ _res2);
 						});
 				console.log(timeStamp.toISOString()+':ds18b20'+_res);

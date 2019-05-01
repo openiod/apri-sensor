@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/openiod/apri-sensor#readme",
   "dependencies": {
+    "redis": "^2.8.0",
     "request": "^2.81.0",
     "serialport": "^4.0.7",
     "socketio": "^1.0.0"

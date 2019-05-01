@@ -113,7 +113,7 @@ var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today
 //var resultsFileName = resultsFolder + sensorFileName + '_' + dateString;
 
 var processDataCycle	= function(parm) {
-  if (parm == undefined or parm.repeat == true) {
+  if (parm == undefined || parm.repeat == true) {
     setTimeout(processDataCycle, loopTimeCycle);
   }
   redisSortAsync('new', 'alpha','limit',0,1,'asc')

@@ -454,7 +454,6 @@ var sendRequest = function(url) {
 // send data to service
 var sendData = function() {
 		var timeStamp = new Date();
-		var timeStampTime = timeStamp.getTime();
 		var url = '';
 		if (results.pms.nrOfMeas > 0) {
 			url = openiodUrl + '/pmsa003'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
@@ -464,7 +463,7 @@ var sendData = function() {
 						',raw2_5:'+results.pms.part2_5+',raw5_0:'+results.pms.part5_0+',raw10_0:'+results.pms.part10_0;
 			console.log(url);
 			sendRequest(url);
-			redisHmsetHashAsync(timeStampTime.toISOString()+':pmsa003'
+			redisHmsetHashAsync(timeStamp.toISOString()+':pmsa003'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'pm1', results.pms.pm1CF1
 				, 'pm25', results.pms.pm25CF1
@@ -479,13 +478,13 @@ var sendData = function() {
 				, 'raw10_0', results.pms.part10_0
 			  ).then(function(res) {
 					var _res = res;
-					redisSaddAsync('pmsa003', timeStampTime.toISOString()+':pmsa003')
+					redisSaddAsync('pmsa003', timeStamp.toISOString()+':pmsa003')
 						.then(function(res2) {
 							var _res2=res2;
-							redisSaddAsync('pmsa003', timeStampTime.toISOString()+':pmsa003')
-							console.log('pmsa003 ', timeStampTime.toISOString()+':pmsa003'+ _res2);
+							redisSaddAsync('pmsa003', timeStamp.toISOString()+':pmsa003')
+							console.log('pmsa003 ', timeStamp.toISOString()+':pmsa003'+ _res2);
 						});
-		    	console.log(timeStampTime.toString()+':pmsa003'+_res);
+		    	console.log(timeStamp.toString()+':pmsa003'+_res);
 			});
 		}
 		if (results.bme280.nrOfMeas > 0) {
@@ -493,35 +492,35 @@ var sendData = function() {
 						'temperature:'+results.bme280.temperature+',pressure:'+results.bme280.pressure+',rHum:'+results.bme280.rHum ;
 			console.log(url);
 			sendRequest(url);
-			redisHmsetHashAsync(timeStampTime.toISOString()+':bme280'
+			redisHmsetHashAsync(timeStamp.toISOString()+':bme280'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'temperature', results.bme280.temperature
 				, 'pressure', results.bme280.pressure
 				, 'rHum', results.bme280.rHum
 			  ).then(function(res) {
 					var _res = res;
-					redisSaddAsync('bme280', timeStampTime.toISOString()+':bme280')
+					redisSaddAsync('bme280', timeStamp.toISOString()+':bme280')
 						.then(function(res2) {
 							var _res2 = res2;
-							redisSaddAsync('bme280', timeStampTime.toISOString()+':bme280')
-							console.log('bme280 ', timeStampTime.toISOString()+':bme280'+ _res2);
+							redisSaddAsync('bme280', timeStamp.toISOString()+':bme280')
+							console.log('bme280 ', timeStamp.toISOString()+':bme280'+ _res2);
 						});
-		    	console.log(timeStampTime.toISOString()+':bme280'+_res);
+		    	console.log(timeStamp.toISOString()+':bme280'+_res);
 			});
 		}
 		if (results.ds18b20.nrOfMeas > 0) {
-			redisHmsetHashAsync(timeStampTime.toISOString()+':ds18b20'
+			redisHmsetHashAsync(timeStamp.toISOString()+':ds18b20'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'temperature', results.ds18b20.temperature
 			  ).then(function(res) {
 					var _res = res;
-					redisSaddAsync('ds18b20', timeStampTime.toISOString()+':ds18b20')
+					redisSaddAsync('ds18b20', timeStamp.toISOString()+':ds18b20')
 						.then(function(res2) {
 							var _res2 = res2;
-							redisSaddAsync('ds18b20', timeStampTime.toISOString()+':ds18b20')
-			    		console.log('ds18b20 ', timeStampTime.toISOString()+':ds18b20'+ _res2);
+							redisSaddAsync('ds18b20', timeStamp.toISOString()+':ds18b20')
+			    		console.log('ds18b20 ', timeStamp.toISOString()+':ds18b20'+ _res2);
 						});
-				console.log(timeStampTime.toISOString()+':ds18b20'+_res);
+				console.log(timeStamp.toISOString()+':ds18b20'+_res);
 			});
 		}
 

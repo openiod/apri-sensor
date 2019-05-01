@@ -478,12 +478,14 @@ var sendData = function() {
 				, 'raw5_0', results.pms.part5_0
 				, 'raw10_0', results.pms.part10_0
 			  ).then(function(res) {
+					var _res = res;
 					redisSaddAsync('pmsa003', timeStampTime.toString()+':pmsa003')
-						.then(function(res) {
+						.then(function(res2) {
+							var _res2=res2;
 							redisSaddAsync('pmsa003', timeStampTime.toString()+':pmsa003')
-							console.log('pmsa003 ', timeStampTime.toString()+':pmsa003'+ res);
+							console.log('pmsa003 ', timeStampTime.toString()+':pmsa003'+ _res2);
 						});
-		    	console.log(res);
+		    	console.log(timeStampTime.toString()+':pmsa003'+_res);
 			});
 		}
 		if (results.bme280.nrOfMeas > 0) {
@@ -497,12 +499,14 @@ var sendData = function() {
 				, 'pressure', results.bme280.pressure
 				, 'rHum', results.bme280.rHum
 			  ).then(function(res) {
+					var _res = res;
 					redisSaddAsync('bme280', timeStampTime.toString()+':bme280')
-						.then(function(res) {
+						.then(function(res2) {
+							var _res2 = res2;
 							redisSaddAsync('bme280', timeStampTime.toString()+':bme280')
-							console.log('bme280 ', timeStampTime.toString()+':bme280'+ res);
+							console.log('bme280 ', timeStampTime.toString()+':bme280'+ _res2);
 						});
-		    	console.log(res);
+		    	console.log(timeStampTime.toString()+':bme280'+_res);
 			});
 		}
 		if (results.ds18b20.nrOfMeas > 0) {
@@ -510,12 +514,14 @@ var sendData = function() {
 			  , 'foi', 'SCRP' + unit.id
 			  , 'temperature', results.ds18b20.temperature
 			  ).then(function(res) {
+					var _res = res;
 					redisSaddAsync('ds18b20', timeStampTime.toString()+':ds18b20')
-						.then(function(res) {
+						.then(function(res2) {
+							var _res2 = res2;
 							redisSaddAsync('ds18b20', timeStampTime.toString()+':ds18b20')
-			    		console.log('ds18b20 ', timeStampTime.toString()+':ds18b20'+ res);
+			    		console.log('ds18b20 ', timeStampTime.toString()+':ds18b20'+ _res2);
 						});
-				console.log(timeStampTime.toString()+':ds18b20'+res);
+				console.log(timeStampTime.toString()+':ds18b20'+_res);
 			});
 		}
 

@@ -74,7 +74,7 @@ console.log('web-socket url: '+socketUrl+socketPath);
 var secureSite 			= true;
 var siteProtocol 		= secureSite?'https://':'http://';
 var openiodUrl			= siteProtocol + 'aprisensor-in.openiod.org';
-var loopTimeCycle		= 1000; //ms, 20000=20 sec
+var loopTimeCycle		= 5000; //ms, 20000=20 sec
 
 var usbPorts			= [];
 
@@ -113,7 +113,7 @@ var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today
 //var resultsFileName = resultsFolder + sensorFileName + '_' + dateString;
 
 var processDataCycle	= function(parm) {
-  if (parm.repeat == true) {
+  if (parm == undefined or parm.repeat == true) {
     setTimeout(processDataCycle, loopTimeCycle);
   }
   redisSortAsync('new', 'alpha','limit',0,1,'asc')

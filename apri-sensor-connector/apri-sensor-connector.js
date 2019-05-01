@@ -45,6 +45,7 @@ const redisHmsetHashAsync 	= promisify(redisClient.hmset).bind(redisClient);
 const redisSaddAsync 				= promisify(redisClient.sadd).bind(redisClient);
 const redisSortAsync 				= promisify(redisClient.sort).bind(redisClient);
 const redisDelAsync         = promisify(redisClient.del).bind(redisClient);
+const redisSmoveAsync       = promisify(redisClient.smove).bind(redisClient);
 
 redisClient.on("error", function (err) {
     console.log("Redis client Error " + err);
@@ -121,7 +122,7 @@ var processDataCycle	= function() {
     //	redisSaddAsync('ds18b20', timeStamp.toISOString()+':ds18b20')
       console.log(_res);
       console.log(_res[0]);
-      redisDelAsync(_res[0]).then(function(e){console.log('Redis delete success')});
+      redisSmoveAsync('new','old',_res[0]).then(function(e){console.log('Redis smove(d) from new to old-set success')});
     });
 /*
 	counters.busy = true;

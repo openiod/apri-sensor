@@ -72,7 +72,7 @@ console.log('web-socket url: '+socketUrl+socketPath);
 var secureSite 			= true;
 var siteProtocol 		= secureSite?'https://':'http://';
 var openiodUrl			= siteProtocol + 'aprisensor-in.openiod.org';
-var loopTimeCycle		= 20000; //ms, 20000=20 sec
+var loopTimeCycle		= 1000; //ms, 20000=20 sec
 
 var usbPorts			= [];
 
@@ -113,7 +113,7 @@ var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today
 var processDataCycle	= function() {
 	setTimeout(processDataCycle, loopTimeCycle);
 
-  redisSortAsync('new', 'alpha','asc')  //'limit 0 5', 
+  redisSortAsync('new', 'alpha','limit',0,5,'asc')  
     .then(function(res) {
       var _res = res;
     //	redisSaddAsync('ds18b20', timeStamp.toISOString()+':ds18b20')

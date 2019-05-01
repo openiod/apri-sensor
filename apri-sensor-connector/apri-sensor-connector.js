@@ -121,12 +121,14 @@ var processDataCycle	= function(parm) {
       var _res = res;
       var  result = res;
     //	redisSaddAsync('ds18b20', timeStamp.toISOString()+':ds18b20')
-      console.log(_res);
-      console.log(_res[0]);
-      redisSmoveAsync('new','old',_res[0]).then(function(e){
-        processDataCycle({repeat:false}); // continue with next measurement if available
-        //console.log('Redis smove(d) from new to old-set success')
-      });
+      if (_res.length>0) {
+        console.log(_res);
+        console.log(_res[0]);
+        redisSmoveAsync('new','old',_res[0]).then(function(e){
+          processDataCycle({repeat:false}); // continue with next measurement if available
+          //console.log('Redis smove(d) from new to old-set success')
+        });        
+      }
     });
 /*
 	counters.busy = true;

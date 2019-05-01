@@ -47,7 +47,8 @@ var redisClient 						= redis.createClient();
 const {promisify} 					= require('util');
 //const redisGetAsync 				= promisify(redisClient.get).bind(redisClient);
 //const redisSetAsync 				= promisify(redisClient.set).bind(redisClient);
-const redisHmsetHashAsync 				= promisify(redisClient.hmset).bind(redisClient);
+const redisHmsetHashAsync 	= promisify(redisClient.hmset).bind(redisClient);
+const redisSaddAsync 				= promisify(redisClient.sadd).bind(redisClient);
 
 redisClient.on("error", function (err) {
     console.log("Redis client Error " + err);
@@ -499,7 +500,12 @@ var sendData = function() {
 			  , 'foi', 'SCRP' + unit.id
 			  , 'temperature', results.ds18b20.temperature
 			  ).then(function(res) {
-		    	console.log(res);
+					redisSaddAsync('ds18b20', timeStampTime.toString()+':ds18b20')
+						.then(function(res) {
+							redisSaddAsync('ds18b20', timeStampTime.toString()+':ds18b20')
+			    		console.log('ds18b20 ', timeStampTime.toString()+':ds18b20'+ res);
+						});
+				console.log(timeStampTime.toString()+':ds18b20'+res);
 			});
 		}
 

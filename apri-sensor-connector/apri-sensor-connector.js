@@ -203,12 +203,6 @@ var getRedisData = function(redisKey) {
           break;
         case 'pmsa003':
           url = pmsa003Attributes(res);
-/*          openiodUrl + '/pmsa003'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
-      						'pm1:'+results.pms.pm1CF1+',pm25:'+results.pms.pm25CF1+',pm10:'+results.pms.pm10CF1 +
-      			 			',pm1amb:'+results.pms.pm1amb+',pm25amb:'+results.pms.pm25amb+',pm10amb:'+results.pms.pm10amb +
-      						',raw0_3:'+results.pms.part0_3+',raw0_5:'+results.pms.part0_5+',raw1_0:'+results.pms.part1_0 +
-      						',raw2_5:'+results.pms.part2_5+',raw5_0:'+results.pms.part5_0+',raw10_0:'+results.pms.part10_0;
-*/
           break;
         case 'ds18b20':
           url = ds18b20Attributes(res);
@@ -228,25 +222,17 @@ var bme280Attributes = function(res) {
 }
 var pmsa003Attributes = function(res) {
   console.dir(res);
-  return openiodUrl + '/pmsa003'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation=';
-//  'pm1:'+_res.pm1CF1+',pm25:'+results.pms.pm25CF1+',pm10:'+results.pms.pm10CF1 +
-//  ',pm1amb:'+results.pms.pm1amb+',pm25amb:'+results.pms.pm25amb+',pm10amb:'+results.pms.pm10amb +
-//  ',raw0_3:'+results.pms.part0_3+',raw0_5:'+results.pms.part0_5+',raw1_0:'+results.pms.part1_0 +
-//  ',raw2_5:'+results.pms.part2_5+',raw5_0:'+results.pms.part5_0+',raw10_0:'+results.pms.part10_0;
+  return openiodUrl + '/pmsa003'+ '/v1/m?foi=' + res.foi + '&observation=';
+/*  +
+    'pm1:'+res.pm1CF1+',pm25:'+results.pms.pm25CF1+',pm10:'+results.pms.pm10CF1 +
+    ',pm1amb:'+results.pms.pm1amb+',pm25amb:'+results.pms.pm25amb+',pm10amb:'+results.pms.pm10amb +
+    ',raw0_3:'+results.pms.part0_3+',raw0_5:'+results.pms.part0_5+',raw1_0:'+results.pms.part1_0 +
+    ',raw2_5:'+results.pms.part2_5+',raw5_0:'+results.pms.part5_0+',raw10_0:'+results.pms.part10_0;
+*/
 }
-var ds12b18Attributes = function(res) {
-  var _res = res;
-  var url = openiodUrl + '/ds12b18'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation=';
-  for (var i=0;i<_res.length;i=i+2) {
-    switch (_res[i]) {
-      case 'temperature':
-        url+=_res[i]+':'+_res[i+1];
-        break;
-      default:
-        console.log('ERROR unkown attribute: ' + _res[i]+':'+_res[i+1]);
-    }
-  }
-  return url;
+var ds18b20Attributes = function(res) {
+  return openiodUrl + '/ds18b20'+ '/v1/m?foi=' + res.foi + '&observation='+
+    'temperature:'+res.temperature;
 }
 
 // send data to service

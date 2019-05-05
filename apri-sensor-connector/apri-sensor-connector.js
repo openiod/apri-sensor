@@ -46,7 +46,7 @@ const redisSaddAsync 				= promisify(redisClient.sadd).bind(redisClient);
 const redisSortAsync 				= promisify(redisClient.sort).bind(redisClient);
 const redisDelAsync         = promisify(redisClient.del).bind(redisClient);
 const redisSmoveAsync       = promisify(redisClient.smove).bind(redisClient);
-const redisHgetallAsync     = promisify(redisClient.smove).bind(redisClient);
+const redisHgetallAsync     = promisify(redisClient.hgetall).bind(redisClient);
 
 redisClient.on("error", function (err) {
     console.log("Redis client Error " + err);

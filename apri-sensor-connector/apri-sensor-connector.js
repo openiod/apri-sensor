@@ -247,7 +247,6 @@ var sendData = function(redisKey,url) {
             //console.log('Redis smove(d) from new to old-set success')
           });
         } else {
-          console.dir(response);
           console.log(response.statusCode + ' / ' + response.headers['content-type'] + ' / ' +response.body);
         }
       })

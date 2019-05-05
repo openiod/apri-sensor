@@ -225,6 +225,8 @@ var bme280Attributes = function(res) {
   var _res = res;
   var url = openiodUrl + '/bme280'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation=';
   console.dir(_res);
+  url = url+'temperature:'+_res.temperature+';'+'pressure:'+_res.pressure+';'+'rHum:'+_res.rHum+';';
+/*
   for (var i=0;i<_res.length;i=i+2) {
     switch (_res[i]) {
       case 'temperature':
@@ -240,6 +242,7 @@ var bme280Attributes = function(res) {
         console.log('ERROR unkown attribute: ' + _res[i]+':'+_res[i+1]);
     }
   }
+*/
   return url;
 }
 var pmsa003Attributes = function(res) {

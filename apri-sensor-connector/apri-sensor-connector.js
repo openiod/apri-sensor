@@ -41,11 +41,12 @@ var redisClient 						= redis.createClient();
 const {promisify} 					= require('util');
 //const redisGetAsync 				= promisify(redisClient.get).bind(redisClient);
 //const redisSetAsync 				= promisify(redisClient.set).bind(redisClient);
-const redisHmsetHashAsync 	= promisify(redisClient.hmset).bind(redisClient);
+const redisHmsetAsync 	    = promisify(redisClient.hmset).bind(redisClient);
 const redisSaddAsync 				= promisify(redisClient.sadd).bind(redisClient);
 const redisSortAsync 				= promisify(redisClient.sort).bind(redisClient);
 const redisDelAsync         = promisify(redisClient.del).bind(redisClient);
 const redisSmoveAsync       = promisify(redisClient.smove).bind(redisClient);
+const redisHgetallAsync     = promisify(redisClient.smove).bind(redisClient);
 
 redisClient.on("error", function (err) {
     console.log("Redis client Error " + err);
@@ -124,10 +125,7 @@ var processDataCycle	= function(parm) {
       if (_res.length>0) {
         console.log(_res);
         console.log(_res[0]);
-        redisSmoveAsync('new','old',_res[0]).then(function(e){
-          processDataCycle({repeat:false}); // continue with next measurement if available
-          //console.log('Redis smove(d) from new to old-set success')
-        });        
+        sendData(_res[0]);
       }
     });
 /*
@@ -188,80 +186,116 @@ var sendRequest = function(url) {
 	;
 
 }
-// send data to service
-var sendData = function() {
-/*
-		var timeStamp = new Date();
-		var url = '';
-		if (results.pms.nrOfMeas > 0) {
-			url = openiodUrl + '/pmsa003'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
-						'pm1:'+results.pms.pm1CF1+',pm25:'+results.pms.pm25CF1+',pm10:'+results.pms.pm10CF1 +
-			 			',pm1amb:'+results.pms.pm1amb+',pm25amb:'+results.pms.pm25amb+',pm10amb:'+results.pms.pm10amb +
-						',raw0_3:'+results.pms.part0_3+',raw0_5:'+results.pms.part0_5+',raw1_0:'+results.pms.part1_0 +
-						',raw2_5:'+results.pms.part2_5+',raw5_0:'+results.pms.part5_0+',raw10_0:'+results.pms.part10_0;
-			console.log(url);
-			sendRequest(url);
-			redisHmsetHashAsync(timeStamp.toISOString()+':pmsa003'
-			  , 'foi', 'SCRP' + unit.id
-			  , 'pm1', results.pms.pm1CF1
-				, 'pm25', results.pms.pm25CF1
-				, 'pm10', results.pms.pm10CF1
-				, 'pm1', results.pms.pm1amb
-				, 'pm25', results.pms.pm25amb
-				, 'raw0_3', results.pms.part0_3
-				, 'raw0_5', results.pms.part0_5
-				, 'raw1_0', results.pms.part1_0
-				, 'raw2_5', results.pms.part2_5
-				, 'raw5_0', results.pms.part5_0
-				, 'raw10_0', results.pms.part10_0
-			  ).then(function(res) {
-					var _res = res;
-					redisSaddAsync('pmsa003', timeStamp.toISOString()+':pmsa003')
-						.then(function(res2) {
-							var _res2=res2;
-							redisSaddAsync('pmsa003', timeStamp.toISOString()+':pmsa003')
-							console.log('pmsa003 ', timeStamp.toISOString()+':pmsa003'+ _res2);
-						});
-		    	console.log(timeStamp.toString()+':pmsa003'+_res);
-			});
-		}
-		if (results.bme280.nrOfMeas > 0) {
-			url = openiodUrl + '/bme280'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
-						'temperature:'+results.bme280.temperature+',pressure:'+results.bme280.pressure+',rHum:'+results.bme280.rHum ;
-			console.log(url);
-			sendRequest(url);
-			redisHmsetHashAsync(timeStamp.toISOString()+':bme280'
-			  , 'foi', 'SCRP' + unit.id
-			  , 'temperature', results.bme280.temperature
-				, 'pressure', results.bme280.pressure
-				, 'rHum', results.bme280.rHum
-			  ).then(function(res) {
-					var _res = res;
-					redisSaddAsync('bme280', timeStamp.toISOString()+':bme280')
-						.then(function(res2) {
-							var _res2 = res2;
-							redisSaddAsync('bme280', timeStamp.toISOString()+':bme280')
-							console.log('bme280 ', timeStamp.toISOString()+':bme280'+ _res2);
-						});
-		    	console.log(timeStamp.toISOString()+':bme280'+_res);
-			});
-		}
-		if (results.ds18b20.nrOfMeas > 0) {
-			redisHmsetHashAsync(timeStamp.toISOString()+':ds18b20'
-			  , 'foi', 'SCRP' + unit.id
-			  , 'temperature', results.ds18b20.temperature
-			  ).then(function(res) {
-					var _res = res;
-					redisSaddAsync('ds18b20', timeStamp.toISOString()+':ds18b20')
-						.then(function(res2) {
-							var _res2 = res2;
-							redisSaddAsync('ds18b20', timeStamp.toISOString()+':ds18b20')
-			    		console.log('ds18b20 ', timeStamp.toISOString()+':ds18b20'+ _res2);
-						});
-				console.log(timeStamp.toISOString()+':ds18b20'+_res);
-			});
-		}
+
+var getRedisData = function(redisKey) {
+  var _redisKey = redisKey;
+  var keySplit = redisKey.split(':');
+  var lastEntry = keySplit.length-1;
+  var url = '';
+
+  redisHgetallAsync(redisKey)
+    .then(function(res) {
+      var _res = res;
+      switch (keySplit[lastEntry]) {
+        case 'bme280':
+          url = bme280Attributes(res);
+          break;
+        case 'pmsa003':
+          url = pmsa003Attributes(res);
+/*          openiodUrl + '/pmsa003'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
+      						'pm1:'+results.pms.pm1CF1+',pm25:'+results.pms.pm25CF1+',pm10:'+results.pms.pm10CF1 +
+      			 			',pm1amb:'+results.pms.pm1amb+',pm25amb:'+results.pms.pm25amb+',pm10amb:'+results.pms.pm10amb +
+      						',raw0_3:'+results.pms.part0_3+',raw0_5:'+results.pms.part0_5+',raw1_0:'+results.pms.part1_0 +
+      						',raw2_5:'+results.pms.part2_5+',raw5_0:'+results.pms.part5_0+',raw10_0:'+results.pms.part10_0;
 */
+          break;
+        case 'ds18b20':
+          url = ds18b20Attributes(res);
+          break;
+        default:
+          console.log('ERROR: redis entry unknown: '+ redisKey);
+      };
+      console.log(_res[0]);
+      sendData(_redisKey,url);
+    });
+}
+
+var bme280Attributes = function(res) {
+  var _res = res;
+  var url = openiodUrl + '/bme280'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation=';
+  for (var i=0;i<_res.length;i=i+2) {
+    switch (_res[i]) {
+      case 'temperature':
+        url+=_res[i]+':'+_res[i+1];
+        break;
+      case 'pressure':
+        url+=_res[i]+':'+_res[i+1];
+        break;
+      case 'rHum':
+        url+=_res[i]+':'+_res[i+1];
+        break;
+      default:
+        console.log('ERROR unkown attribute: ' + _res[i]+':'+_res[i+1]);
+    }
+  }
+  return url;
+}
+var pmsa003Attributes = function(res) {
+  var _res = res;
+  var url = openiodUrl + '/pmsa003'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation=';
+  for (var i=0;i<_res.length;i=i+2) {
+    switch (_res[i]) {
+      case 'pm1':
+        url+=_res[i]+':'+_res[i+1];
+        break;
+      case 'pm25':
+        url+=_res[i]+':'+_res[i+1];
+        break;
+      case 'pm10':
+        url+=_res[i]+':'+_res[i+1];
+        break;
+      default:
+        console.log('ERROR unkown attribute: ' + _res[i]+':'+_res[i+1]);
+    }
+  }
+  return url;
+}
+var ds12b18Attributes = function(res) {
+  var _res = res;
+  var url = openiodUrl + '/ds12b18'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation=';
+  for (var i=0;i<_res.length;i=i+2) {
+    switch (_res[i]) {
+      case 'temperature':
+        url+=_res[i]+':'+_res[i+1];
+        break;
+      default:
+        console.log('ERROR unkown attribute: ' + _res[i]+':'+_res[i+1]);
+    }
+  }
+  return url;
+}
+
+// send data to service
+var sendData = function(redisKey,url) {
+  if (url=='') {
+    // todo: problem with this redis hash so wath to do with it?
+  } else {
+    console.log(url);
+    return;
+    request.get(url)
+      .on('response', function(response) {
+        console.log(response.statusCode + ' / ' + response.headers['content-type']) // 200
+        redisSmoveAsync('new','archive',_res[0])
+        .then(function(e){
+          processDataCycle({repeat:false}); // continue with next measurement if available
+          //console.log('Redis smove(d) from new to old-set success')
+        });
+        })
+      .on('error', function(err) {
+        console.log(err)
+      })
+    ;
+  }
 };
 
 var socket = io(socketUrl, {path:socketPath});

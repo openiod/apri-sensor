@@ -278,6 +278,7 @@ var ds12b18Attributes = function(res) {
 
 // send data to service
 var sendData = function(redisKey,url) {
+  var _redisKey = redisKey;
   if (url=='') {
     // todo: problem with this redis hash so wath to do with it?
   } else {
@@ -286,7 +287,7 @@ var sendData = function(redisKey,url) {
     request.get(url)
       .on('response', function(response) {
         console.log(response.statusCode + ' / ' + response.headers['content-type']) // 200
-        redisSmoveAsync('new','archive',_res[0])
+        redisSmoveAsync('new','archive',_redisKey)
         .then(function(e){
           processDataCycle({repeat:false}); // continue with next measurement if available
           //console.log('Redis smove(d) from new to old-set success')

@@ -439,6 +439,7 @@ function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
+/*
 var sendRequest = function(url) {
 	var _url			= url;
 	request.get(_url)
@@ -449,20 +450,20 @@ var sendRequest = function(url) {
 			console.log(err)
 		})
 	;
-
 }
+*/
 // send data to service
 var sendData = function() {
 		var timeStamp = new Date();
 		var url = '';
 		if (results.pms.nrOfMeas > 0) {
-			url = openiodUrl + '/pmsa003'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
-						'pm1:'+results.pms.pm1CF1+',pm25:'+results.pms.pm25CF1+',pm10:'+results.pms.pm10CF1 +
-			 			',pm1amb:'+results.pms.pm1amb+',pm25amb:'+results.pms.pm25amb+',pm10amb:'+results.pms.pm10amb +
-						',raw0_3:'+results.pms.part0_3+',raw0_5:'+results.pms.part0_5+',raw1_0:'+results.pms.part1_0 +
-						',raw2_5:'+results.pms.part2_5+',raw5_0:'+results.pms.part5_0+',raw10_0:'+results.pms.part10_0;
-			console.log(url);
-			sendRequest(url);
+//			url = openiodUrl + '/pmsa003'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
+//						'pm1:'+results.pms.pm1CF1+',pm25:'+results.pms.pm25CF1+',pm10:'+results.pms.pm10CF1 +
+//			 			',pm1amb:'+results.pms.pm1amb+',pm25amb:'+results.pms.pm25amb+',pm10amb:'+results.pms.pm10amb +
+//						',raw0_3:'+results.pms.part0_3+',raw0_5:'+results.pms.part0_5+',raw1_0:'+results.pms.part1_0 +
+//						',raw2_5:'+results.pms.part2_5+',raw5_0:'+results.pms.part5_0+',raw10_0:'+results.pms.part10_0;
+//			console.log(url);
+//			sendRequest(url);
 			redisHmsetHashAsync(timeStamp.toISOString()+':pmsa003'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'pm1', results.pms.pm1CF1
@@ -489,10 +490,10 @@ var sendData = function() {
 			});
 		}
 		if (results.bme280.nrOfMeas > 0) {
-			url = openiodUrl + '/bme280'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
-						'temperature:'+results.bme280.temperature+',pressure:'+results.bme280.pressure+',rHum:'+results.bme280.rHum ;
-			console.log(url);
-			sendRequest(url);
+//			url = openiodUrl + '/bme280'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
+//						'temperature:'+results.bme280.temperature+',pressure:'+results.bme280.pressure+',rHum:'+results.bme280.rHum ;
+//			console.log(url);
+//			sendRequest(url);
 			redisHmsetHashAsync(timeStamp.toISOString()+':bme280'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'temperature', results.bme280.temperature

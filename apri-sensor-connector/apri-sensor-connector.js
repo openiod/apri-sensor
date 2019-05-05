@@ -192,7 +192,7 @@ var getRedisData = function(redisKey) {
   var _redisKey = redisKey;
   var keySplit = redisKey.split(':');
   var lastEntry = keySplit.length-1;
-  var measurementDateTime = _redisKey.substring(0,_redisKey.length - keySplit[lastEntry].length+3);
+  var measurementDateTime = _redisKey.substring(0,_redisKey.length - keySplit[lastEntry].length-1);
   console.log(measurementDateTime);
   var url = '';
 

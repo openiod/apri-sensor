@@ -468,8 +468,9 @@ var sendData = function() {
 			  , 'pm1', results.pms.pm1CF1
 				, 'pm25', results.pms.pm25CF1
 				, 'pm10', results.pms.pm10CF1
-				, 'pm1', results.pms.pm1amb
-				, 'pm25', results.pms.pm25amb
+				, 'pm1amb', results.pms.pm1amb
+				, 'pm25amb', results.pms.pm25amb
+        , 'pm10amb', results.pms.pm10amb
 				, 'raw0_3', results.pms.part0_3
 				, 'raw0_5', results.pms.part0_5
 				, 'raw1_0', results.pms.part1_0

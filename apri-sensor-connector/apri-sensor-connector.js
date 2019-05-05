@@ -210,18 +210,15 @@ var getRedisData = function(redisKey) {
         default:
           console.log('ERROR: redis entry unknown: '+ redisKey);
       };
-      console.log(_res);
       sendData(_redisKey,url);
     });
 }
 
 var bme280Attributes = function(res) {
-  console.dir(res);
   return openiodUrl + '/bme280'+ '/v1/m?foi=' + res.foi + '&observation='+
     'temperature:'+res.temperature+','+'pressure:'+res.pressure+','+'rHum:'+res.rHum;
 }
 var pmsa003Attributes = function(res) {
-  console.dir(res);
   return openiodUrl + '/pmsa003'+ '/v1/m?foi=' + res.foi + '&observation=' +
     'pm1:'+res.pm1+',pm25:'+res.pm25+',pm10:'+res.pm10 +
     ',pm1amb:'+res.pm1amb+',pm25amb:'+res.pm25amb+',pm10amb:'+res.pm10amb +
@@ -243,12 +240,16 @@ var sendData = function(redisKey,url) {
     request.get(url)
       .on('response', function(response) {
         console.log(response.statusCode + ' / ' + response.headers['content-type']) // 200
-        redisSmoveAsync('new','archive',_redisKey)
-        .then(function(e){
-          processDataCycle({repeat:false}); // continue with next measurement if available
-          //console.log('Redis smove(d) from new to old-set success')
-        });
-        })
+        if (response.statusCode=='200') {
+          redisSmoveAsync('new','archive',_redisKey)
+          .then(function(e){
+            processDataCycle({repeat:false}); // continue with next measurement if available
+            //console.log('Redis smove(d) from new to old-set success')
+          });
+        } else {
+          console.log(response.statusCode + ' / ' + response.headers['content-type'] + ' / ' +response.body);
+        }
+      })
       .on('error', function(err) {
         console.log(err)
       })

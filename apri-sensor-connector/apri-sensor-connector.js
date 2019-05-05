@@ -125,7 +125,8 @@ var processDataCycle	= function(parm) {
       if (_res.length>0) {
         console.log(_res);
         console.log(_res[0]);
-        sendData(_res[0]);
+        getRedisData(_res[0]);
+//        sendData(_res[0]);
       }
     });
 /*

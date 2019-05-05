@@ -222,48 +222,17 @@ var getRedisData = function(redisKey) {
 }
 
 var bme280Attributes = function(res) {
-  var _res = res;
-  var url = openiodUrl + '/bme280'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation=';
-  console.dir(_res);
-  url = url+'temperature:'+_res.temperature+';'+'pressure:'+_res.pressure+';'+'rHum:'+_res.rHum+';';
-/*
-  for (var i=0;i<_res.length;i=i+2) {
-    switch (_res[i]) {
-      case 'temperature':
-        url+=_res[i]+':'+_res[i+1];
-        break;
-      case 'pressure':
-        url+=_res[i]+':'+_res[i+1];
-        break;
-      case 'rHum':
-        url+=_res[i]+':'+_res[i+1];
-        break;
-      default:
-        console.log('ERROR unkown attribute: ' + _res[i]+':'+_res[i+1]);
-    }
-  }
-*/
-  return url;
+  console.dir(res);
+  return openiodUrl + '/bme280'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
+    'temperature:'+res.temperature+','+'pressure:'+res.pressure+','+'rHum:'+res.rHum;
 }
 var pmsa003Attributes = function(res) {
-  var _res = res;
-  var url = openiodUrl + '/pmsa003'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation=';
-  for (var i=0;i<_res.length;i=i+2) {
-    switch (_res[i]) {
-      case 'pm1':
-        url+=_res[i]+':'+_res[i+1];
-        break;
-      case 'pm25':
-        url+=_res[i]+':'+_res[i+1];
-        break;
-      case 'pm10':
-        url+=_res[i]+':'+_res[i+1];
-        break;
-      default:
-        console.log('ERROR unkown attribute: ' + _res[i]+':'+_res[i+1]);
-    }
-  }
-  return url;
+  console.dir(res);
+  return openiodUrl + '/pmsa003'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation=';
+//  'pm1:'+_res.pm1CF1+',pm25:'+results.pms.pm25CF1+',pm10:'+results.pms.pm10CF1 +
+//  ',pm1amb:'+results.pms.pm1amb+',pm25amb:'+results.pms.pm25amb+',pm10amb:'+results.pms.pm10amb +
+//  ',raw0_3:'+results.pms.part0_3+',raw0_5:'+results.pms.part0_5+',raw1_0:'+results.pms.part1_0 +
+//  ',raw2_5:'+results.pms.part2_5+',raw5_0:'+results.pms.part5_0+',raw10_0:'+results.pms.part10_0;
 }
 var ds12b18Attributes = function(res) {
   var _res = res;

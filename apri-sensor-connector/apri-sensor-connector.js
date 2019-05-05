@@ -201,13 +201,13 @@ var getRedisData = function(redisKey) {
       var _res = res;
       switch (keySplit[lastEntry]) {
         case 'bme280':
-          url = bme280Attributes(res);
+          url = bme280Attributes(res)+'&measurementDateTime='+measurementDateTime;
           break;
         case 'pmsa003':
-          url = pmsa003Attributes(res);
+          url = pmsa003Attributes(res)+'&measurementDateTime='+measurementDateTime;
           break;
         case 'ds18b20':
-          url = ds18b20Attributes(res);
+          url = ds18b20Attributes(res)+'&measurementDateTime='+measurementDateTime;
           break;
         default:
           console.log('ERROR: redis entry unknown: '+ redisKey);

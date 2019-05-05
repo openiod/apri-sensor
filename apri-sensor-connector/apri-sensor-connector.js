@@ -223,7 +223,7 @@ var getRedisData = function(redisKey) {
 
 var bme280Attributes = function(res) {
   console.dir(res);
-  return openiodUrl + '/bme280'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
+  return openiodUrl + '/bme280'+ '/v1/m?foi=' + res.foi + '&observation='+
     'temperature:'+res.temperature+','+'pressure:'+res.pressure+','+'rHum:'+res.rHum;
 }
 var pmsa003Attributes = function(res) {
@@ -256,7 +256,6 @@ var sendData = function(redisKey,url) {
     // todo: problem with this redis hash so wath to do with it?
   } else {
     console.log(url);
-    return;
     request.get(url)
       .on('response', function(response) {
         console.log(response.statusCode + ' / ' + response.headers['content-type']) // 200

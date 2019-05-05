@@ -216,7 +216,7 @@ var getRedisData = function(redisKey) {
         default:
           console.log('ERROR: redis entry unknown: '+ redisKey);
       };
-      console.log(_res[0]);
+      console.log(_res);
       sendData(_redisKey,url);
     });
 }
@@ -224,6 +224,7 @@ var getRedisData = function(redisKey) {
 var bme280Attributes = function(res) {
   var _res = res;
   var url = openiodUrl + '/bme280'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation=';
+  console.dir(_res);
   for (var i=0;i<_res.length;i=i+2) {
     switch (_res[i]) {
       case 'temperature':

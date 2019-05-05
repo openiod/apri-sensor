@@ -192,8 +192,8 @@ var getRedisData = function(redisKey) {
   var _redisKey = redisKey;
   var keySplit = redisKey.split(':');
   var lastEntry = keySplit.length-1;
-  var measurementDateTime = _redisKey.substring(0,_redisKey.length - keySplit[lastEntry].length-1);
-  console.log(measurementDateTime);
+  var dateObserved = _redisKey.substring(0,_redisKey.length - keySplit[lastEntry].length-1);
+  console.log(dateObserved);
   var url = '';
 
   redisHgetallAsync(redisKey)
@@ -201,13 +201,13 @@ var getRedisData = function(redisKey) {
       var _res = res;
       switch (keySplit[lastEntry]) {
         case 'bme280':
-          url = bme280Attributes(res)+'&measurementDateTime='+measurementDateTime;
+          url = bme280Attributes(res)+'&dateObserved='+dateObserved;
           break;
         case 'pmsa003':
-          url = pmsa003Attributes(res)+'&measurementDateTime='+measurementDateTime;
+          url = pmsa003Attributes(res)+'&dateObserved='+dateObserved;
           break;
         case 'ds18b20':
-          url = ds18b20Attributes(res)+'&measurementDateTime='+measurementDateTime;
+          url = ds18b20Attributes(res)+'&dateObserved='+dateObserved;
           break;
         default:
           console.log('ERROR: redis entry unknown: '+ redisKey);

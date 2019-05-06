@@ -69,6 +69,7 @@ var loopTimeCycle		= 5000; //ms, 20000=20 sec
 var lastSend        = new Date().getTime();
 var lastResponse    = lastSend;
 var minTimeBetween  = 1000;
+var minTimeBetweenLastResponse = 1000;
 
 var unit				= {};
 
@@ -80,11 +81,19 @@ var processDataCycle	= function(parm) {
   if (parm == undefined || parm.repeat == true) {
     setTimeout(processDataCycle, loopTimeCycle);
   }
+
   var now = new Date().getTime();
-  if (now-lastSend < minTimeBetween ) {
+  if (lastSend > lastResponse) {
     var timeBetween = now-lastSend;
+    var waitTime = now-lastSend;
+    log('Waiting for service to respond. Waiting: '+waitTime)
+    return;  // wait till next cycle process data, previous action to close.
+  }
+
+  if (now-lastResponse < minTimeBetween ) {
+    var timeBetween = now-lastResponse;
     var latency = lastResponse-lastSend;
-    log('Time since previous send: '+timeBetween+' latency: '+latency)
+    log('Time since previous send: '+timeBetween+' latency previous send: '+latency)
     return;  // wait till next cycle process data, previous action to close.
   }
 

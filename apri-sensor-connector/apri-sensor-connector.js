@@ -188,7 +188,8 @@ var sendData = function(redisKey,url) {
       redisSmoveAsync('new','archive',_redisKey)
       .then(function(e){
         console.log('next');
-        processDataCycle({repeat:false}); // continue with next measurement if available
+        setTimeout(waitBeforeNext, waitTimeBeforeNext);
+        //processDataCycle({repeat:false}); // continue with next measurement if available
         //console.log('Redis smove(d) from new to old-set success')
       });
     } else {

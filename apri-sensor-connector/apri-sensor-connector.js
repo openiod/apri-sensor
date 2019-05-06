@@ -68,8 +68,7 @@ var openiodUrl			= siteProtocol + 'aprisensor-in.openiod.org';
 var loopTimeCycle		= 5000; //ms, 20000=20 sec
 var lastSend        = new Date().getTime();
 var lastResponse    = lastSend;
-var minTimeBetween  = 1000;
-var minTimeBetweenLastResponse = 1000;
+var minTimeBetweenLastResponse = 100;
 
 var unit				= {};
 
@@ -90,7 +89,7 @@ var processDataCycle	= function(parm) {
     return;  // wait till next cycle process data, previous action to close.
   }
 
-  if (now-lastResponse < minTimeBetween ) {
+  if (now-lastResponse < minTimeBetweenLastResponse ) {
     var timeBetween = now-lastResponse;
     var latency = lastResponse-lastSend;
     log('Time since previous send: '+timeBetween+' latency previous send: '+latency)

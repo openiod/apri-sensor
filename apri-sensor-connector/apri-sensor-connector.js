@@ -104,7 +104,7 @@ var getRedisData = function(redisKey) {
   var keySplit = redisKey.split(':');
   var lastEntry = keySplit.length-1;
   var dateObserved = _redisKey.substring(0,_redisKey.length - keySplit[lastEntry].length-1);
-  console.log(dateObserved);
+//  console.log(dateObserved);
   var url = '';
 
   redisHgetallAsync(redisKey)

@@ -66,15 +66,22 @@ var secureSite 			= true;
 var siteProtocol 		= secureSite?'https://':'http://';
 var openiodUrl			= siteProtocol + 'aprisensor-in.openiod.org';
 var loopTimeCycle		= 5000; //ms, 20000=20 sec
+var waitTimeBeforeNext = 50;
 var lastSend        = new Date().getTime();
 var lastResponse    = lastSend;
 var minTimeBetweenLastResponse = 100;
+var latencyPreviousSend = 100;
 
 var unit				= {};
 
 var today				= new Date();
 var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today.getDate() + "_" + today.getHours(); // + ":" + today.getMinutes();
 //var resultsFileName = resultsFolder + sensorFileName + '_' + dateString;
+
+
+var waitBeforeNext = function() {
+  processDataCycle({repeat:false});
+}
 
 var processDataCycle	= function(parm) {
   if (parm == undefined || parm.repeat == true) {
@@ -86,15 +93,17 @@ var processDataCycle	= function(parm) {
     var timeBetween = now-lastSend;
     var waitTime = now-lastSend;
     log('Waiting for service to respond. Waiting: '+waitTime);
-    processDataCycle({repeat:false});
+    setTimeout(waitBeforeNext, waitTimeBeforeNext);
+//    processDataCycle({repeat:false});
     return;  // wait till next cycle process data, previous action to close.
   }
 
   if (now-lastResponse < minTimeBetweenLastResponse ) {
     var timeBetween = now-lastResponse;
-    var latency = lastResponse-lastSend;
-    log('Time since previous send: '+timeBetween+' latency previous send: '+latency)
-    processDataCycle({repeat:false});
+    latencyPreviousSend = lastResponse-lastSend;
+    log('Time since previous send: '+timeBetween+' latency previous send: '+latencyPreviousSend);
+    setTimeout(waitBeforeNext, waitTimeBeforeNext);
+//    processDataCycle({repeat:false});
     return;  // wait till next cycle process data, previous action to close.
   }
 

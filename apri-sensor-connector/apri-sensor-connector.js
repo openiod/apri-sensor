@@ -28,8 +28,9 @@ var initResult 							= apriConfig.init(systemModuleFolderName+"/"+systemModuleN
 // **********************************************************************************
 
 // add module specific requires
-var request 								= require('request');
+//var request 								= require('request');
 //var express 								= require('express');
+var axios 						  		= require('axios');
 var fs 											= require('fs');
 var redis										= require("redis");
 //const ByteLength 						= require('@serialport/parser-byte-length')
@@ -47,6 +48,13 @@ const redisSortAsync 				= promisify(redisClient.sort).bind(redisClient);
 const redisDelAsync         = promisify(redisClient.del).bind(redisClient);
 const redisSmoveAsync       = promisify(redisClient.smove).bind(redisClient);
 const redisHgetallAsync     = promisify(redisClient.hgetall).bind(redisClient);
+
+var log 										= function(message){
+	console.log(new Date().toISOString()+' | '+message);
+}
+var logDir 									= function(object){
+	console.log(object);
+}
 
 redisClient.on("error", function (err) {
     console.log("Redis client Error " + err);
@@ -175,19 +183,6 @@ function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-var sendRequest = function(url) {
-	var _url			= url;
-	request.get(_url)
-		.on('response', function(response) {
-			console.log(response.statusCode + ' / ' + response.headers['content-type']) // 200
-			})
-		.on('error', function(err) {
-			console.log(err)
-		})
-	;
-
-}
-
 var getRedisData = function(redisKey) {
   var _redisKey = redisKey;
   var keySplit = redisKey.split(':');
@@ -232,6 +227,7 @@ var ds18b20Attributes = function(res) {
     'temperature:'+res.temperature;
 }
 
+/*
 // send data to service
 var sendData = function(redisKey,url) {
   var _redisKey = redisKey;
@@ -259,6 +255,37 @@ var sendData = function(redisKey,url) {
     ;
   }
 };
+*/
+
+// send data to service
+var sendData = function(redisKey,url) {
+  var _redisKey = redisKey;
+  if (url=='') {
+    return;  // todo: problem with this redis hash so wath to do with it?
+  }
+  var headers = {};
+  axios.get(url,{ headers: headers })
+  .then(response => {
+    console.log(response.statusCode + ' / ' + response.headers['content-type']) // 200
+    if (response.statusCode=='200') {
+      redisSmoveAsync('new','archive',_redisKey)
+      .then(function(e){
+        console.log('next');
+        processDataCycle({repeat:false}); // continue with next measurement if available
+        //console.log('Redis smove(d) from new to old-set success')
+      });
+    } else {
+      console.log(response.statusCode + ' / ' + response.headers['content-type'] + ' / ' +response.body);
+    }
+   })
+   .catch(error => {
+     log(error);
+   });
+  //	return axios.get(url,{ headers: headers });
+
+
+};
+
 
 var socket = io(socketUrl, {path:socketPath});
 

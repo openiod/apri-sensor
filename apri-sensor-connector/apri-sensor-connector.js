@@ -266,7 +266,7 @@ var sendData = function(redisKey,url) {
   var headers = {};
   axios.get(url,{ headers: headers })
   .then(response => {
-    if (response.statusCode=='200') {
+    if (response.status=='200') {
       redisSmoveAsync('new','archive',_redisKey)
       .then(function(e){
         console.log('next');

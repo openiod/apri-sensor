@@ -266,6 +266,7 @@ var sendData = function(redisKey,url) {
   var headers = {};
   axios.get(url,{ headers: headers })
   .then(response => {
+    logDir(response);
     console.log(response.statusCode + ' / ' + response.headers['content-type']) // 200
     if (response.statusCode=='200') {
       redisSmoveAsync('new','archive',_redisKey)
@@ -275,7 +276,7 @@ var sendData = function(redisKey,url) {
         //console.log('Redis smove(d) from new to old-set success')
       });
     } else {
-      console.log(response.statusCode + ' / ' + response.headers['content-type'] + ' / ' +response.body);
+      console.log(response.statusCode + ' / ' + response.headers['content-type'] + ' / ' +response.data);
     }
    })
    .catch(error => {

@@ -66,6 +66,9 @@ var secureSite 			= true;
 var siteProtocol 		= secureSite?'https://':'http://';
 var openiodUrl			= siteProtocol + 'aprisensor-in.openiod.org';
 var loopTimeCycle		= 5000; //ms, 20000=20 sec
+var lastSend        = new Date().getTime();
+var lastResponse    = lastSend;
+var minTimeBetween  = 1000;
 
 var unit				= {};
 
@@ -77,6 +80,14 @@ var processDataCycle	= function(parm) {
   if (parm == undefined || parm.repeat == true) {
     setTimeout(processDataCycle, loopTimeCycle);
   }
+  var now = new Date().getTime();
+  if (now-lastSend < minTimeBetween ) {
+    var timeBetween = now-lastSend;
+    var latency = lastResponse-lastSend;
+    log('Time since previous send: '+timeBetween+' latency: '+latency)
+    return;  // wait till next cycle process data, previous action to close.
+  }
+
   redisSortAsync('new', 'alpha','limit',0,1,'asc')
   .then(function(res) {
     var _res = res;
@@ -150,8 +161,10 @@ var sendData = function(redisKey,url) {
     return;  // todo: problem with this redis hash so wath to do with it?
   }
   var headers = {};
+  lastSend = new Date().getTime();
   axios.get(url,{ headers: headers })
   .then(response => {
+    lastResponse = new Date().getTime();
     if (response.status=='200') {
       redisSmoveAsync('new','archive',_redisKey)
       .then(function(e){
@@ -165,6 +178,7 @@ var sendData = function(redisKey,url) {
     }
    })
    .catch(error => {
+     lastResponse = new Date().getTime();
      log(error);
    });
 };

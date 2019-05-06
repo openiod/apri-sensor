@@ -85,7 +85,8 @@ var processDataCycle	= function(parm) {
   if (lastSend > lastResponse) {
     var timeBetween = now-lastSend;
     var waitTime = now-lastSend;
-    log('Waiting for service to respond. Waiting: '+waitTime)
+    log('Waiting for service to respond. Waiting: '+waitTime);
+    processDataCycle({repeat:false});
     return;  // wait till next cycle process data, previous action to close.
   }
 
@@ -93,6 +94,7 @@ var processDataCycle	= function(parm) {
     var timeBetween = now-lastResponse;
     var latency = lastResponse-lastSend;
     log('Time since previous send: '+timeBetween+' latency previous send: '+latency)
+    processDataCycle({repeat:false});
     return;  // wait till next cycle process data, previous action to close.
   }
 

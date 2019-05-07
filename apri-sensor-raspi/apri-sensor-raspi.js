@@ -329,6 +329,7 @@ const readSensorData = () => {
 				counters.bme280.temperature				+= data.temperature_C;
 				counters.bme280.pressure					+= data.pressure_hPa;
 				counters.bme280.rHum							+= data.humidity;
+        console.log(' ' + data.temperature_C+ ' ' + data.pressure_hPa + ' ' + data.humidity + ' ' + counters.bme280.nrOfMeas);
 			} else {
 				console.log('Raspi-i2c processing is busy, measurement BME280 skipped');
 			}
@@ -360,6 +361,8 @@ var processDeviceData	= function(err,temperatureData) {
 		if (counters.busy == false) {
 			counters.ds18b20.nrOfMeas++;
 			counters.ds18b20.temperature			+= temperature;
+      console.log(' ' + temperature + ' ' + counters.ds18b20.nrOfMeas);
+
 		}
 	};
 };

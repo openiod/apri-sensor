@@ -28,7 +28,7 @@ var initResult 							= apriConfig.init(systemModuleFolderName+"/"+systemModuleN
 // **********************************************************************************
 
 // add module specific requires
-var request 								= require('request');
+//var request 								= require('request');
 //var express 								= require('express');
 var fs 											= require('fs');
 //var SerialPort 							= require("serialport");

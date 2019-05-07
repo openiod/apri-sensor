@@ -18,9 +18,11 @@
   },
   "homepage": "https://github.com/openiod/apri-sensor#readme",
   "dependencies": {
+    "axios": "^0.18.0",
+    "raspi": "^6.0.1",
+    "raspi-i2c": "^6.2.2",
+    "raspi-serial": "^5.1.1",
     "redis": "^2.8.0",
-    "request": "^2.81.0",
-    "serialport": "^4.0.7",
     "socketio": "^1.0.0"
   }
 }

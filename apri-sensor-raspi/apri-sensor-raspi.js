@@ -325,11 +325,15 @@ const readSensorData = () => {
       //data.pressure_inHg = BME280.convertHectopascalToInchesOfMercury(data.pressure_hPa);
 
 			if (counters.busy == false) {
-				counters.bme280.nrOfMeas++;
-				counters.bme280.temperature				+= data.temperature_C;
-				counters.bme280.pressure					+= data.pressure_hPa;
-				counters.bme280.rHum							+= data.humidity;
-        console.log(' ' + data.temperature_C+ ' ' + data.pressure_hPa + ' ' + data.humidity + ' ' + counters.bme280.nrOfMeas);
+        if (data.pressure_hPa<900) {
+          console.log('BME280 pressure below 900. Less than 3.3V power? Measure skipped');          
+        } else {
+          counters.bme280.nrOfMeas++;
+  				counters.bme280.temperature				+= data.temperature_C;
+  				counters.bme280.pressure					+= data.pressure_hPa;
+  				counters.bme280.rHum							+= data.humidity;
+          console.log(' ' + data.temperature_C+ ' ' + data.pressure_hPa + ' ' + data.humidity + ' ' + counters.bme280.nrOfMeas);
+        }
 			} else {
 				console.log('Raspi-i2c processing is busy, measurement BME280 skipped');
 			}

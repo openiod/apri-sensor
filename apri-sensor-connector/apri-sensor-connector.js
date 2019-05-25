@@ -87,7 +87,7 @@ var repeatProcessDataCycle = function() {
 }
 
 var processDataCycle	= function(parm) {
-	console.log('processDataCycle ' + param);
+	console.log('processDataCycle ' + parm);
 //  if (parm == undefined || parm.repeat == true) {
 //		console.log('Initiate new loopcycle');
 //    setTimeout(repeatProcessDataCycle, loopTimeCycle);

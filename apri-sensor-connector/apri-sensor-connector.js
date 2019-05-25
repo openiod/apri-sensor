@@ -69,8 +69,8 @@ var loopTimeCycle		= 5000; //ms, 20000=20 sec
 var waitTimeBeforeNext = 500;
 var lastSend        = new Date().getTime();
 var lastResponse    = lastSend;
-var minTimeBetweenLastResponse = 100;
-var latencyPreviousSend = 100;
+var minTimeBetweenLastResponse = 500;
+var latencyPreviousSend = 500;
 
 var unit				= {};
 

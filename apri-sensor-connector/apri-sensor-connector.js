@@ -65,7 +65,7 @@ console.log('web-socket url: '+socketUrl+socketPath);
 var secureSite 			= true;
 var siteProtocol 		= secureSite?'https://':'http://';
 var openiodUrl			= siteProtocol + 'aprisensor-in.openiod.org';
-var loopTimeCycle		= 1000; //ms, 20000=20 sec
+var loopTimeCycle		= 500; //ms, 20000=20 sec
 var waitTimeBeforeNext = 1000;
 var lastSend        = new Date().getTime();
 var lastResponse    = lastSend;
@@ -87,7 +87,7 @@ var repeatProcessDataCycle = function() {
 }
 
 var processDataCycle	= function(parm) {
-	console.log('processDataCycle ' + parm);
+//	console.log('processDataCycle ' + parm);
 //  if (parm == undefined || parm.repeat == true) {
 //		console.log('Initiate new loopcycle');
 //    setTimeout(repeatProcessDataCycle, loopTimeCycle);

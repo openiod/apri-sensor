@@ -85,6 +85,7 @@ var waitBeforeNext = function() {
 
 var processDataCycle	= function(parm) {
   if (parm == undefined || parm.repeat == true) {
+		console.log('Initiate new loopcycle');
     setTimeout(processDataCycle, loopTimeCycle);
   }
 
@@ -107,11 +108,12 @@ var processDataCycle	= function(parm) {
     return;  // wait till next cycle process data, previous action to close.
   }
 
+	console.log('Find new record');
   redisSortAsync('new', 'alpha','limit',0,1,'asc')
   .then(function(res) {
     var _res = res;
     if (_res.length>0) {
-      console.log(_res[0]);
+      console.log('New record available: '_res[0]);
       getRedisData(_res[0]);
     }
   });
@@ -183,14 +185,15 @@ var sendData = function(redisKey,url) {
   lastSend = new Date().getTime();
   axios.get(url,{ headers: headers })
   .then(response => {
-    lastResponse = new Date().getTime();
+		console.log('Response recieved');
     if (response.status=='200') {
       redisSmoveAsync('new','archive',_redisKey)
       .then(function(e){
-        console.log('status 200, next');
-        setTimeout(waitBeforeNext, waitTimeBeforeNext);
+        console.log('status 200');
+				lastResponse = new Date().getTime();
+        //setTimeout(waitBeforeNext, waitTimeBeforeNext);
         //processDataCycle({repeat:false}); // continue with next measurement if available
-        //console.log('Redis smove(d) from new to old-set success')
+        //console.log('Redis smove(d) from new to old-set success');
       });
     } else {
 //      console.log(response.status + ' / ' + response.headers['content-type'] + ' / ' +response.data);

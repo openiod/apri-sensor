@@ -65,11 +65,11 @@ console.log('web-socket url: '+socketUrl+socketPath);
 var secureSite 			= true;
 var siteProtocol 		= secureSite?'https://':'http://';
 var openiodUrl			= siteProtocol + 'aprisensor-in.openiod.org';
-var loopTimeCycle		= 5000; //ms, 20000=20 sec
+var loopTimeCycle		= 1000; //ms, 20000=20 sec
 var waitTimeBeforeNext = 1000;
 var lastSend        = new Date().getTime();
 var lastResponse    = lastSend;
-var minTimeBetweenLastResponse = 500;
+var minTimeBetweenLastResponse = 100;
 var latencyPreviousSend = 500;
 
 var unit				= {};
@@ -82,12 +82,17 @@ var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today
 var waitBeforeNext = function() {
   processDataCycle({repeat:false});
 }
+var repeatProcessDataCycle = function() {
+  processDataCycle({repeat:true});
+}
 
 var processDataCycle	= function(parm) {
-  if (parm == undefined || parm.repeat == true) {
-		console.log('Initiate new loopcycle');
-    setTimeout(processDataCycle, loopTimeCycle);
-  }
+	console.log('processDataCycle ' + param);
+//  if (parm == undefined || parm.repeat == true) {
+//		console.log('Initiate new loopcycle');
+//    setTimeout(repeatProcessDataCycle, loopTimeCycle);
+//  }
+	setTimeout(processDataCycle, loopTimeCycle);
 
   var now = new Date().getTime();
   if (lastSend > lastResponse) {

@@ -66,7 +66,7 @@ var secureSite 			= true;
 var siteProtocol 		= secureSite?'https://':'http://';
 var openiodUrl			= siteProtocol + 'aprisensor-in.openiod.org';
 var loopTimeCycle		= 5000; //ms, 20000=20 sec
-var waitTimeBeforeNext = 500;
+var waitTimeBeforeNext = 1000;
 var lastSend        = new Date().getTime();
 var lastResponse    = lastSend;
 var minTimeBetweenLastResponse = 500;
@@ -187,7 +187,7 @@ var sendData = function(redisKey,url) {
     if (response.status=='200') {
       redisSmoveAsync('new','archive',_redisKey)
       .then(function(e){
-        console.log('next');
+        console.log('status 200, next');
         setTimeout(waitBeforeNext, waitTimeBeforeNext);
         //processDataCycle({repeat:false}); // continue with next measurement if available
         //console.log('Redis smove(d) from new to old-set success')

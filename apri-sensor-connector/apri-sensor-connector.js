@@ -102,7 +102,7 @@ var processDataCycle	= function(parm) {
     var timeBetween = now-lastResponse;
     latencyPreviousSend = lastResponse-lastSend;
     log('Time since previous send: '+timeBetween+' latency previous send: '+latencyPreviousSend);
-    setTimeout(waitBeforeNext, waitTimeBeforeNext);
+    //setTimeout(waitBeforeNext, waitTimeBeforeNext);
 //    processDataCycle({repeat:false});
     return;  // wait till next cycle process data, previous action to close.
   }

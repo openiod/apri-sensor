@@ -93,7 +93,7 @@ var processDataCycle	= function(parm) {
     var timeBetween = now-lastSend;
     var waitTime = now-lastSend;
     log('Waiting for service to respond. Waiting: '+waitTime);
-    setTimeout(waitBeforeNext, waitTimeBeforeNext);
+    //setTimeout(waitBeforeNext, waitTimeBeforeNext);
 //    processDataCycle({repeat:false});
     return;  // wait till next cycle process data, previous action to close.
   }

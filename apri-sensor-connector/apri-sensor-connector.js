@@ -66,7 +66,7 @@ var secureSite 			= true;
 var siteProtocol 		= secureSite?'https://':'http://';
 var openiodUrl			= siteProtocol + 'aprisensor-in.openiod.org';
 var loopTimeCycle		= 5000; //ms, 20000=20 sec
-var waitTimeBeforeNext = 100;
+var waitTimeBeforeNext = 500;
 var lastSend        = new Date().getTime();
 var lastResponse    = lastSend;
 var minTimeBetweenLastResponse = 100;

@@ -194,6 +194,7 @@ var sendData = function(redisKey,url) {
     if (response.status=='200') {
       redisSmoveAsync('new','archive',_redisKey)
       .then(function(e){
+				logdir(response.data);
         log('status 200 ' + response.data);
 				lastResponse = new Date().getTime();
         //setTimeout(waitBeforeNext, waitTimeBeforeNext);

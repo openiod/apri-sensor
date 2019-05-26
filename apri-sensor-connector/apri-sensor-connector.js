@@ -113,7 +113,7 @@ var processDataCycle	= function(parm) {
     return;  // wait till next cycle process data, previous action to close.
   }
 
-	console.log('Find new record');
+	//log('Find new record');
   redisSortAsync('new', 'alpha','limit',0,1,'asc')
   .then(function(res) {
     var _res = res;
@@ -190,11 +190,11 @@ var sendData = function(redisKey,url) {
   lastSend = new Date().getTime();
   axios.get(url,{ headers: headers,timeout: 5000 })
   .then(response => {
-		console.log('Response recieved');
+		log('Response recieved');
     if (response.status=='200') {
       redisSmoveAsync('new','archive',_redisKey)
       .then(function(e){
-        console.log('status 200');
+        log('status 200');
 				lastResponse = new Date().getTime();
         //setTimeout(waitBeforeNext, waitTimeBeforeNext);
         //processDataCycle({repeat:false}); // continue with next measurement if available
@@ -202,7 +202,7 @@ var sendData = function(redisKey,url) {
       });
     } else {
 //      console.log(response.status + ' / ' + response.headers['content-type'] + ' / ' +response.data);
-      console.log(response.status + ' / ' + response.statusText + ' / ' + response.headers['content-type']) // 200
+      log(response.status + ' / ' + response.statusText + ' / ' + response.headers['content-type']) // 200
     }
    })
    .catch(error => {

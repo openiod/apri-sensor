@@ -206,6 +206,9 @@ var sendData = function(redisKey,url) {
       });
     } else {
 //      console.log(response.status + ' / ' + response.headers['content-type'] + ' / ' +response.data);
+			lastResponse = new Date().getTime();
+			latencyPreviousSend = lastResponse-lastSend;
+			log('Transaction duration: '+latencyPreviousSend+' msec');
       log(response.status + ' / ' + response.statusText + ' / ' + response.headers['content-type'] + ', service status: ' + response.data.statusCode);
     }
    })

@@ -194,8 +194,8 @@ var sendData = function(redisKey,url) {
     if (response.status=='200') {
       redisSmoveAsync('new','archive',_redisKey)
       .then(function(e){
-				logDir(response.data);
-        log('status 200 ' + response.data);
+//				logDir(response.data);
+        log('status 200 and service status: ' + response.data.statusCode);
 				lastResponse = new Date().getTime();
         //setTimeout(waitBeforeNext, waitTimeBeforeNext);
         //processDataCycle({repeat:false}); // continue with next measurement if available

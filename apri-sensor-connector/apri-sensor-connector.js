@@ -98,16 +98,17 @@ var processDataCycle	= function(parm) {
   if (lastSend > lastResponse) {
     var timeBetween = now-lastSend;
     var waitTime = now-lastSend;
-    log('Waiting for service to respond. Waiting: '+waitTime);
+    log('Waiting for service to respond. Waiting: '+waitTime + ' msec');
     //setTimeout(waitBeforeNext, waitTimeBeforeNext);
 //    processDataCycle({repeat:false});
     return;  // wait till next cycle process data, previous action to close.
   }
 
+	// give service some time to breath
   if (now-lastResponse < minTimeBetweenLastResponse ) {
-    var timeBetween = now-lastResponse;
-    latencyPreviousSend = lastResponse-lastSend;
-    log('Time since previous send: '+timeBetween+' latency previous send: '+latencyPreviousSend);
+//    var timeBetween = now-lastResponse;
+//    latencyPreviousSend = lastResponse-lastSend;
+//    log('Time since previous send: '+timeBetween+' msec, latency previous send: '+latencyPreviousSend+' msec');
     //setTimeout(waitBeforeNext, waitTimeBeforeNext);
 //    processDataCycle({repeat:false});
     return;  // wait till next cycle process data, previous action to close.
@@ -197,6 +198,8 @@ var sendData = function(redisKey,url) {
 //				logDir(response.data);
         log('status 200 and service status: ' + response.data.statusCode);
 				lastResponse = new Date().getTime();
+				latencyPreviousSend = lastResponse-lastSend;
+				log('Transaction duration: '+latencyPreviousSend+' msec');
         //setTimeout(waitBeforeNext, waitTimeBeforeNext);
         //processDataCycle({repeat:false}); // continue with next measurement if available
         //console.log('Redis smove(d) from new to old-set success');

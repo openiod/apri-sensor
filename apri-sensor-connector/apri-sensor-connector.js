@@ -190,11 +190,11 @@ var sendData = function(redisKey,url) {
   lastSend = new Date().getTime();
   axios.get(url,{ headers: headers,timeout: 5000 })
   .then(response => {
-		log('Response recieved');
+		//log('Response recieved');
     if (response.status=='200') {
       redisSmoveAsync('new','archive',_redisKey)
       .then(function(e){
-        log('status 200');
+        log('status 200 ' + response.data);
 				lastResponse = new Date().getTime();
         //setTimeout(waitBeforeNext, waitTimeBeforeNext);
         //processDataCycle({repeat:false}); // continue with next measurement if available

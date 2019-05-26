@@ -189,7 +189,9 @@ var sendData = function(redisKey,url) {
   }
   var headers = {};
   lastSend = new Date().getTime();
-  axios.get(url,{ headers: headers,timeout: 5000 })
+  axios.get(url,{ headers: headers
+		//,timeout: 5000
+	})
   .then(response => {
 		//log('Response recieved');
     if (response.status=='200' && response.data.statusCode != '422') {

@@ -234,7 +234,7 @@ var sendData = function(redisKey,url) {
 				 log('Error', error.message);
 		 }
 		 log(error.config);
-		 log('Error config code: '+ error.config.code);
+		 log('Error config code: '+ error.code);
    });
 };
 

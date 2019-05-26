@@ -206,12 +206,29 @@ var sendData = function(redisKey,url) {
       });
     } else {
 //      console.log(response.status + ' / ' + response.headers['content-type'] + ' / ' +response.data);
-      log(response.status + ' / ' + response.statusText + ' / ' + response.headers['content-type'] + ', service status: ' + response.data.statusCode); 
+      log(response.status + ' / ' + response.statusText + ' / ' + response.headers['content-type'] + ', service status: ' + response.data.statusCode);
     }
    })
    .catch(error => {
      lastResponse = new Date().getTime();
      log(error);
+		 // Error
+		 if (error.response) {
+				 // The request was made and the server responded with a status code
+				 // that falls out of the range of 2xx
+				 log(error.response.data);
+				 log(error.response.status);
+				 log(error.response.headers);
+		 } else if (error.request) {
+				 // The request was made but no response was received
+				 // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+				 // http.ClientRequest in node.js
+				 log(error.request);
+		 } else {
+				 // Something happened in setting up the request that triggered an Error
+				 log('Error', error.message);
+		 }
+		 log(error.config);		 
    });
 };
 

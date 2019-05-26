@@ -118,7 +118,7 @@ var processDataCycle	= function(parm) {
   .then(function(res) {
     var _res = res;
     if (_res.length>0) {
-      console.log('New record available: '+_res[0]);
+      log('New record available: '+_res[0]);
       getRedisData(_res[0]);
     }
   });

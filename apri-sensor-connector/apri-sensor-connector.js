@@ -192,7 +192,7 @@ var sendData = function(redisKey,url) {
   axios.get(url,{ headers: headers,timeout: 5000 })
   .then(response => {
 		//log('Response recieved');
-    if (response.status=='200') {
+    if (response.status=='200' && response.data.statusCode != '422') {
       redisSmoveAsync('new','archive',_redisKey)
       .then(function(e){
 //				logDir(response.data);
@@ -206,7 +206,7 @@ var sendData = function(redisKey,url) {
       });
     } else {
 //      console.log(response.status + ' / ' + response.headers['content-type'] + ' / ' +response.data);
-      log(response.status + ' / ' + response.statusText + ' / ' + response.headers['content-type']) // 200
+      log(response.status + ' / ' + response.statusText + ' / ' + response.headers['content-type'] + ', service status: ' + response.data.statusCode); 
     }
    })
    .catch(error => {

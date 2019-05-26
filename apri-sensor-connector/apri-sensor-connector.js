@@ -211,24 +211,26 @@ var sendData = function(redisKey,url) {
    })
    .catch(error => {
      lastResponse = new Date().getTime();
-     log(error);
+     logDir(error);
 		 // Error
 		 if (error.response) {
 				 // The request was made and the server responded with a status code
 				 // that falls out of the range of 2xx
-				 log(error.response.data);
-				 log(error.response.status);
-				 log(error.response.headers);
+				 log('error.response');
+				 logDir(error.response.data);
+				 logDir(error.response.status);
+				 logDir(error.response.headers);
 		 } else if (error.request) {
+			 log('error.request');
 				 // The request was made but no response was received
 				 // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
 				 // http.ClientRequest in node.js
-				 log(error.request);
+				 logDir(error.request);
 		 } else {
 				 // Something happened in setting up the request that triggered an Error
 				 log('Error', error.message);
 		 }
-		 log(error.config);		 
+		 log(error.config);
    });
 };
 

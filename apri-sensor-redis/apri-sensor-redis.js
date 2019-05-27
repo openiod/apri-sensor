@@ -92,18 +92,20 @@ var selectOldestRecords = function() {
   log('start selectOldestRecords');
   redisSort('archive','alpha','limit','0','50','asc')
   .then(function(res) {
-    if (res.length==0) {
+    var _res = res;
+    if (_res.length==0) {
       log('client quit 1');
       redisClient.quit();
     } else {
-      log(res.length);
-      logDir(res);
-      for (var i=0;i<res.lenght;i++) {
+      log(_res.length);
+      logDir(_res);
+      log(_res[0]);
+      for (var i=0;i<_res.length;i++) {
         log('rec: '+i);
-        if (i==res.lengh-1){
-          removeHash(res[i],true);
+        if (i==_res.length-1){
+          removeHash(_res[i],true);
         } else {
-          removeHash(res[i],false);
+          removeHash(_res[i],false);
         }
       }
     }

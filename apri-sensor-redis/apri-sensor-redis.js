@@ -84,32 +84,39 @@ var removeHash = function(key,lastKey) {
       redisClient.quit();
     };
   });
+};
+
+var selectOldestRecords = function() {
+  return redisSort('archive','alpha','limit','0','50','asc')
+  .then(function(res) {
+    if (res.length==0) {
+      redisClient.quit();
+    } else {
+      log(res.length);
+      for (var i=0;i<res.lenght;i++) {
+        log('rec: '+i);
+        if (i==res.lengh-1){
+          removeHash(res[i],true);
+        } else {
+          removeHash(res[i],false);
+        }
+      }
+    }
+  })
+  .catch((error) => {
+    log(error);
+    redisClient.quit();
+  });
+
 }
+
 var selectKeys = function() {
   return redisSCard('archive')
   .then(function(res) {
       var nrOfArchiveRecords = res;
       log(nrOfArchiveRecords);
       if (nrOfArchiveRecords > maxNrOfArchiveRecords) { // 38.880 per 3 days
-        return redisSort('archive','alpha','limit','0','50','asc')
-        .then(function(res) {
-          if (res.length==0) {
-            redisClient.quit();
-          } else {
-            log(res);
-            for (var i=0;i<res.lenght;i++) {
-              if (i==res.lengh-1){
-                removeHash(res[i],true);
-              } else {
-                removeHash(res[i],false);
-              }
-            }
-          }
-        })
-        .catch((error) => {
-          log(error);
-          redisClient.quit();
-        });
+        selectOldestRecords();
       }
   })
   .catch((error) => {

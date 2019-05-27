@@ -65,7 +65,10 @@ redisSCard('archive')
       .then(function(res) {
         logDir(res);
         return;
-      });
+      })
+      .catch(error){
+        log(error);
+      };
     }
 });
 return;

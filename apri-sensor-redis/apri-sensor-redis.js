@@ -61,10 +61,10 @@ log('start Redis clean-up archive');
 var removeHash = function(key,lastKey) {
   var _key = key;
   var _lastKey = lastKey;
-  redisDel(_key)
+  return redisDel(_key)
   .then(function(res) {
     log('key deleted '+_key+ ' ' + res);
-      redisSRem('archive',_key)
+      return redisSRem('archive',_key)
       .then(function(res) {
         log('key remove from archive set '+_key+ ' ' + res);
         if (_lastKey) {
@@ -86,17 +86,17 @@ var removeHash = function(key,lastKey) {
   });
 }
 var selectKeys = function() {
-  redisSCard('archive')
+  return edisSCard('archive')
   .then(function(res) {
       var nrOfArchiveRecords = res;
       log(nrOfArchiveRecords);
       if (nrOfArchiveRecords > maxNrOfArchiveRecords) { // 38.880 per 3 days
-        redisSort('archive','alpha','limit','0','50','asc')
+        return redisSort('archive','alpha','limit','0','50','asc')
         .then(function(res) {
-          logDir(res);
           if (res.length==0) {
             redisClient.quit();
           } else {
+            log(res);
             for (var i=0;i<res.lenght;i++) {
               if (i==res.lengh-1){
                 removeHash(res[i],true);

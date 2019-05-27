@@ -91,7 +91,7 @@ var removeHash = function(key,lastKey) {
 
 var selectOldestRecords = function() {
   // log('start selectOldestRecords');
-  redisSort('archive','alpha','limit','0','200','asc')  // select max 200 records 
+  redisSort('archive','alpha','limit','0','200','asc')  // select max 200 records
   .then(function(res) {
     var _res = res;
     if (_res.length==0) {
@@ -125,6 +125,9 @@ var selectKeys = function() {
       log(nrOfArchiveRecords);
       if (nrOfArchiveRecords > maxNrOfArchiveRecords) { // 38.880 per 3 days
         selectOldestRecords();
+      } else {
+        log('No removeable records available');
+        redisClient.quit();
       }
   })
   .catch((error) => {

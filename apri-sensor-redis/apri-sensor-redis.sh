@@ -12,6 +12,6 @@ mkdir -p $SYSTEMPATH/$SYSTEMCODE/log
 
 cd  $SYSTEMPATH/$SYSTEMCODE/apri-sensor
 
-/usr/bin/node apri-sensor-redis/apri-sensor-redis.js >>$LOGFILE 2>>$LOGFILE
+/usr/local/bin/node apri-sensor-redis/apri-sensor-redis.js >>$LOGFILE 2>>$LOGFILE
 
 exit

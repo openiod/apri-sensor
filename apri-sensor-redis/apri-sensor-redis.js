@@ -86,7 +86,7 @@ var removeHash = function(key,lastKey) {
   });
 }
 var selectKeys = function() {
-  return edisSCard('archive')
+  return redisSCard('archive')
   .then(function(res) {
       var nrOfArchiveRecords = res;
       log(nrOfArchiveRecords);

@@ -60,7 +60,7 @@ log('start Redis clean-up archive');
 
 var removeHash = function(key) {
   var _key = key;
-  redisDel(_key);
+  redisDel(_key)
   .then(function(res) {
     log('key deleted '+_key+ ' ' + res);
       redisSRem('archive',_key)

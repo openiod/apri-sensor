@@ -55,7 +55,7 @@ var logDir = function(object){
 
 // **********************************************************************************
 
-var maxNrOfArchiveRecords = 28000; //40000;
+var maxNrOfArchiveRecords = 40000;  // +- 3 days?
 log('start Redis clean-up archive');
 
 var removeHash = function(key,lastKey) {
@@ -70,7 +70,7 @@ var removeHash = function(key,lastKey) {
         // log('key remove from archive set '+_key+ ' ' + res);
         if (_lastKey) {
           redisClient.quit();
-          log('last key deleted and removed from set');
+          log('last key deleted and removed from set: '+_key);
         };
       })
       .catch((error) => {
@@ -91,7 +91,7 @@ var removeHash = function(key,lastKey) {
 
 var selectOldestRecords = function() {
   // log('start selectOldestRecords');
-  redisSort('archive','alpha','limit','0','50','asc')
+  redisSort('archive','alpha','limit','0','200','asc')  // select max 200 records 
   .then(function(res) {
     var _res = res;
     if (_res.length==0) {

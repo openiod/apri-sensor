@@ -59,9 +59,10 @@ var maxNrOfArchiveRecords = 28000; //40000;
 log('start Redis clean-up archive');
 
 var removeHash = function(key,lastKey) {
+  log('start removeHash');
   var _key = key;
   var _lastKey = lastKey;
-  return redisDel(_key)
+  redisDel(_key)
   .then(function(res) {
     log('key deleted '+_key+ ' ' + res);
       return redisSRem('archive',_key)
@@ -84,12 +85,15 @@ var removeHash = function(key,lastKey) {
       redisClient.quit();
     };
   });
+  log('end removeHash');
 };
 
 var selectOldestRecords = function() {
+  log('start selectOldestRecords');
   return redisSort('archive','alpha','limit','0','50','asc')
   .then(function(res) {
     if (res.length==0) {
+      log('client quit 1');
       redisClient.quit();
     } else {
       log(res.length);
@@ -105,13 +109,15 @@ var selectOldestRecords = function() {
   })
   .catch((error) => {
     log(error);
+    log('client quit 2');
     redisClient.quit();
   });
-
+  log('end selectOldestRecords');
 }
 
 var selectKeys = function() {
-  return redisSCard('archive')
+  log('start selectKeys');
+  redisSCard('archive')
   .then(function(res) {
       var nrOfArchiveRecords = res;
       log(nrOfArchiveRecords);
@@ -121,8 +127,11 @@ var selectKeys = function() {
   })
   .catch((error) => {
     log(error);
+    log('client quit 3');
     redisClient.quit();
   });
+  log('end selectKeys');
+
 }
 
 selectKeys();

@@ -61,7 +61,7 @@ redisSCard('archive')
     var nrOfArchiveRecords = res;
     log(nrOfArchiveRecords);
     if (nrOfArchiveRecords > maxNrOfArchiveRecords) { // 38.880 per 3 days
-      redisSort('archive','archive','alpha','limit 0 50','asc')
+      redisSort('archive','alpha','limit','0','50','asc')
       .then(function(res) {
         logDir(res);
         return;
@@ -70,5 +70,9 @@ redisSCard('archive')
         log(error);
       });
     }
+})
+.catch((error) => {
+  log(error);
 });
+
 return;

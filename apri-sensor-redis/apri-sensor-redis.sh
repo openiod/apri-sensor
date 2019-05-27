@@ -14,4 +14,4 @@ cd  $SYSTEMPATH/$SYSTEMCODE/apri-sensor
 
 /usr/bin/node apri-sensor-redis/apri-sensor-redis.js >>$LOGFILE 2>>$LOGFILE
 
-exit -1
+exit

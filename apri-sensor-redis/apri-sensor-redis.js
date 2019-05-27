@@ -38,6 +38,7 @@ const {promisify} 					= require('util');
 const redisHmsetHashAsync 	= promisify(redisClient.hmset).bind(redisClient);
 const redisSaddAsync 				= promisify(redisClient.sadd).bind(redisClient);
 const redisSCard     				= promisify(redisClient.scard).bind(redisClient);
+const redisSort     				= promisify(redisClient.sort).bind(redisClient);
 
 redisClient.on("error", function (err) {
     console.log("Redis client Error " + err);
@@ -52,10 +53,18 @@ var logDir = function(object){
 
 // **********************************************************************************
 
+var maxNrOfArchiveRecords = 28000; //40000;
 log('start Redis clean-up archive');
 
 redisSCard('archive')
 .then(function(res) {
-    var _res=res;
-    log(res);
+    var nrOfArchiveRecords = res;
+    log(nrOfArchiveRecords);
+    if (nrOfArchiveRecords > maxNrOfArchiveRecords) { // 38.880 per 3 days
+      redisSort('archive','archive','alpha','limit','0','50','asc')
+      .then(function(res) {
+        logDir(res);
+      });
+    }
 });
+return;

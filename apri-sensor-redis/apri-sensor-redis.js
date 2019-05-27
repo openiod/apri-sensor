@@ -90,13 +90,14 @@ var removeHash = function(key,lastKey) {
 
 var selectOldestRecords = function() {
   log('start selectOldestRecords');
-  return redisSort('archive','alpha','limit','0','50','asc')
+  redisSort('archive','alpha','limit','0','50','asc')
   .then(function(res) {
     if (res.length==0) {
       log('client quit 1');
       redisClient.quit();
     } else {
       log(res.length);
+      logDir(res);
       for (var i=0;i<res.lenght;i++) {
         log('rec: '+i);
         if (i==res.lengh-1){

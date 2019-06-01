@@ -189,6 +189,7 @@ var sendData = function(redisKey,url) {
   }
   var headers = {};
   lastSend = new Date().getTime();
+	console.log(url);
   axios.get(url,{ headers: headers
 		//,timeout: 5000
 	})

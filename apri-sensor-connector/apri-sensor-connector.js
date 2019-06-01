@@ -194,12 +194,13 @@ var sendData = function(redisKey,url) {
 		//log('Response recieved');
 		var removeRecord = false;
 		if (response.status=='200') removeRecord=true;
-		if (response.data.serviceStatus == '422') {
-			if (response.data.serviceStatusData.description=='Already Exists') {
+		if (response.data.status == '422') {
+			if (response.data.statusDesc=='Already Exists') {
 				console.log('Already Exists');
 				removeRecord=true;
 			} else {
-				console.log(response.data.serviceStatusData.description)
+				console.log(response.data.statusDesc)
+				console.log(response.data.statusData)
 				removeRecord=false;
 			}
 		}
@@ -209,7 +210,7 @@ var sendData = function(redisKey,url) {
       redisSmoveAsync('new','archive',_redisKey)
       .then(function(e){
 //				logDir(response.data);
-        log('status '+response.status+' and service status: ' + response.data.statusCode +'/'+response.data.serviceStatus);
+        log('status '+response.status+' and service status: ' + response.data.status);
 				lastResponse = new Date().getTime();
 				latencyPreviousSend = lastResponse-lastSend;
 				log('Transaction duration: '+latencyPreviousSend+' msec');
@@ -222,7 +223,7 @@ var sendData = function(redisKey,url) {
 			lastResponse = new Date().getTime();
 			latencyPreviousSend = lastResponse-lastSend;
 			log('Transaction duration: '+latencyPreviousSend+' msec');
-      log(response.status + ' / ' + response.statusText + ' / ' + response.headers['content-type'] + ', service status: ' + response.data.serviceStatus);
+      log(response.status + ' / ' + response.statusText + ' / ' + response.headers['content-type'] + ', service status: ' + response.data.status);
     }
 		setTimeout(processDataCycle, loopTimeCycle);
    })

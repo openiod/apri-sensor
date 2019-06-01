@@ -114,10 +114,10 @@ var processDataCycle	= function(parm) {
     }
 		setTimeout(processDataCycle, loopTimeCycle);
 	})
-	.else(function(e) {
-		setTimeout(processDataCycle, loopTimeCycle);
-		log('Axios else');
-	})
+//	.else(function(e) {
+//		setTimeout(processDataCycle, loopTimeCycle);
+//		log('Axios else');
+//	})
 	.catch(function(error) {
 		setTimeout(processDataCycle, loopTimeCycle);
 		log('Axios catch');

@@ -65,7 +65,7 @@ console.log('web-socket url: '+socketUrl+socketPath);
 var secureSite 			= true;
 var siteProtocol 		= secureSite?'https://':'http://';
 var openiodUrl			= siteProtocol + 'aprisensor-in.openiod.org';
-var loopTimeCycle		= 500; //ms, 20000=20 sec
+var loopTimeCycle		= 1000; //ms, 20000=20 sec
 var waitTimeBeforeNext = 1000;
 var lastSend        = new Date().getTime();
 var lastResponse    = lastSend;
@@ -81,7 +81,6 @@ var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today
 
 var processDataCycle	= function(parm) {
 //	console.log('processDataCycle ' + parm);
-	setTimeout(processDataCycle, loopTimeCycle);
 
   var now = new Date().getTime();
   if (lastSend > lastResponse) {
@@ -90,6 +89,7 @@ var processDataCycle	= function(parm) {
     log('Waiting for service to respond. Waiting: '+waitTime + ' msec');
     //setTimeout(waitBeforeNext, waitTimeBeforeNext);
 //    processDataCycle({repeat:false});
+		setTimeout(processDataCycle, loopTimeCycle);
     return;  // wait till next cycle process data, previous action to close.
   }
 
@@ -100,7 +100,8 @@ var processDataCycle	= function(parm) {
 //    log('Time since previous send: '+timeBetween+' msec, latency previous send: '+latencyPreviousSend+' msec');
     //setTimeout(waitBeforeNext, waitTimeBeforeNext);
 //    processDataCycle({repeat:false});
-    return;  // wait till next cycle process data, previous action to close.
+		setTimeout(processDataCycle, loopTimeCycle);
+		return;  // wait till next cycle process data, previous action to close.
   }
 
 	//log('Find new record');
@@ -111,7 +112,20 @@ var processDataCycle	= function(parm) {
       log('New record available: '+_res[0]);
       getRedisData(_res[0]);
     }
+		setTimeout(processDataCycle, loopTimeCycle);
+	})
+	.else(function(e)) {
+		setTimeout(processDataCycle, loopTimeCycle);
+		log('Axios else');
+	})
+	catch(function(error)) {
+		setTimeout(processDataCycle, loopTimeCycle);
+		log('Axios catch');
+	}
   });
+
+	setTimeout(processDataCycle, loopTimeCycle);
+
 }
 
 var printHex = function(buffer, tekst) {

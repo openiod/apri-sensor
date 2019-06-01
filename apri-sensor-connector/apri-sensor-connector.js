@@ -65,11 +65,11 @@ console.log('web-socket url: '+socketUrl+socketPath);
 var secureSite 			= true;
 var siteProtocol 		= secureSite?'https://':'http://';
 var openiodUrl			= siteProtocol + 'aprisensor-in.openiod.org';
-var loopTimeCycle		= 200; //ms, 20000=20 sec
-var waitTimeBeforeNext = 1000;
+var loopTimeCycle		= 100; //ms, 20000=20 sec
+//var waitTimeBeforeNext = 1000;
 var lastSend        = new Date().getTime();
 var lastResponse    = lastSend;
-var minTimeBetweenLastResponse = 100;
+var minTimeBetweenLastResponse = 50;
 var latencyPreviousSend = 500;
 
 var unit				= {};

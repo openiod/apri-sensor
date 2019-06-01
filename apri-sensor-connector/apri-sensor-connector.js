@@ -200,7 +200,7 @@ var sendData = function(redisKey,url) {
       redisSmoveAsync('new','archive',_redisKey)
       .then(function(e){
 //				logDir(response.data);
-        log('status 200 and service status: ' + response.data.serviceStatus);
+        log('status 200 and service status: ' + response.data.statusCode);
 				lastResponse = new Date().getTime();
 				latencyPreviousSend = lastResponse-lastSend;
 				log('Transaction duration: '+latencyPreviousSend+' msec');

@@ -79,19 +79,8 @@ var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today
 //var resultsFileName = resultsFolder + sensorFileName + '_' + dateString;
 
 
-//var waitBeforeNext = function() {
-//  processDataCycle({repeat:false});
-//}
-//var repeatProcessDataCycle = function() {
-//  processDataCycle({repeat:true});
-//}
-
 var processDataCycle	= function(parm) {
 //	console.log('processDataCycle ' + parm);
-//  if (parm == undefined || parm.repeat == true) {
-//		console.log('Initiate new loopcycle');
-//    setTimeout(repeatProcessDataCycle, loopTimeCycle);
-//  }
 	setTimeout(processDataCycle, loopTimeCycle);
 
   var now = new Date().getTime();
@@ -195,7 +184,19 @@ var sendData = function(redisKey,url) {
 	})
   .then(response => {
 		//log('Response recieved');
-    if (response.status=='200' && response.data.statusCode != '422') {
+		var removeRecord = false;
+		if (response.status=='200') removeRecord=false;
+		if (response.data.serviceStatus == '422') {
+			if (response.data.serviceStatusData.description=='Already Exists') {
+				console.log('Already Exists');
+				removeRecord=true;
+			} else {
+				console.log(response.data.serviceStatusData.description)
+				removeRecord=false;
+			}
+		}
+
+    if (removeRecord==true) {
       redisSmoveAsync('new','archive',_redisKey)
       .then(function(e){
 //				logDir(response.data);

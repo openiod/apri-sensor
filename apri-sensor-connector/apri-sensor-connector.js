@@ -203,6 +203,7 @@ var sendData = function(redisKey,url) {
 				removeRecord=false;
 			}
 		}
+		console.log(response.data)
 
     if (removeRecord==true) {
       redisSmoveAsync('new','archive',_redisKey)

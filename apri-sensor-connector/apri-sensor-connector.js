@@ -185,7 +185,7 @@ var sendData = function(redisKey,url) {
   .then(response => {
 		//log('Response recieved');
 		var removeRecord = false;
-		if (response.status=='200') removeRecord=false;
+		if (response.status=='200') removeRecord=true;
 		if (response.data.serviceStatus == '422') {
 			if (response.data.serviceStatusData.description=='Already Exists') {
 				console.log('Already Exists');
@@ -200,7 +200,7 @@ var sendData = function(redisKey,url) {
       redisSmoveAsync('new','archive',_redisKey)
       .then(function(e){
 //				logDir(response.data);
-        log('status 200 and service status: ' + response.data.statusCode);
+        log('status 200 and service status: ' + response.data.serviceStatus);
 				lastResponse = new Date().getTime();
 				latencyPreviousSend = lastResponse-lastSend;
 				log('Transaction duration: '+latencyPreviousSend+' msec');
@@ -213,7 +213,7 @@ var sendData = function(redisKey,url) {
 			lastResponse = new Date().getTime();
 			latencyPreviousSend = lastResponse-lastSend;
 			log('Transaction duration: '+latencyPreviousSend+' msec');
-      log(response.status + ' / ' + response.statusText + ' / ' + response.headers['content-type'] + ', service status: ' + response.data.statusCode);
+      log(response.status + ' / ' + response.statusText + ' / ' + response.headers['content-type'] + ', service status: ' + response.data.serviceStatus);
     }
    })
    .catch(error => {

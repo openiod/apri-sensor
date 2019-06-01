@@ -111,12 +111,7 @@ var processDataCycle	= function(parm) {
     if (_res.length>0) {
       log('New record available: '+_res[0]);
       getRedisData(_res[0]);
-    }
-		setTimeout(processDataCycle, loopTimeCycle);
-	})
-	.else(function(e) {
-		setTimeout(processDataCycle, loopTimeCycle);
-		log('Axios else');
+    } else setTimeout(processDataCycle, loopTimeCycle);
 	})
 	.catch(function(error) {
 		setTimeout(processDataCycle, loopTimeCycle);
@@ -228,6 +223,7 @@ var sendData = function(redisKey,url) {
 			log('Transaction duration: '+latencyPreviousSend+' msec');
       log(response.status + ' / ' + response.statusText + ' / ' + response.headers['content-type'] + ', service status: ' + response.data.serviceStatus);
     }
+		setTimeout(processDataCycle, loopTimeCycle);
    })
    .catch(error => {
      lastResponse = new Date().getTime();
@@ -252,6 +248,7 @@ var sendData = function(redisKey,url) {
 		 }
 		 //log(error.config);
 		 log('Error config code: '+ error.code);
+		 setTimeout(processDataCycle, loopTimeCycle);
    });
 };
 

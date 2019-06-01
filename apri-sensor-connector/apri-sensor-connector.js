@@ -79,12 +79,12 @@ var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today
 //var resultsFileName = resultsFolder + sensorFileName + '_' + dateString;
 
 
-var waitBeforeNext = function() {
-  processDataCycle({repeat:false});
-}
-var repeatProcessDataCycle = function() {
-  processDataCycle({repeat:true});
-}
+//var waitBeforeNext = function() {
+//  processDataCycle({repeat:false});
+//}
+//var repeatProcessDataCycle = function() {
+//  processDataCycle({repeat:true});
+//}
 
 var processDataCycle	= function(parm) {
 //	console.log('processDataCycle ' + parm);

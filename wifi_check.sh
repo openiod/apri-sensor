@@ -19,6 +19,8 @@ ifconfig wlan0 |awk '/inet /{print substr($2,1)}' >>$LOGFILE
 GATEWAY="$(route | awk '/default /{print substr($2,1)}')"
 echo 'Gateway: ' $GATEWAY >>$LOGFILE
 
+[ $GATEWAY = "0.0.0.0" ];echo 'gateway' $GATEWAY 'equal to 0.0.0.0?' $? >>$LOGFILE
+
 # test gateway connection
 ping -c4 $GATEWAY > /dev/null
 if [ $? != 0 ]

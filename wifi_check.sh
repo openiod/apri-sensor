@@ -27,5 +27,8 @@ else
   echo "Connected to gateway " $GATEWAY >>$LOGFILE
 fi
 
+# always power of wlan0 will reduce problems with wifi
+iwconfig wlan0 power off
+
 echo "End   procedure on: " `date` >>$LOGFILE
 exit 0

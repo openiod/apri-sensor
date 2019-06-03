@@ -1,4 +1,8 @@
 #!/bin/sh
+
+
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
 SYSTEMCODE="SCAPE604"
 SYSTEMPATH="/opt"
 

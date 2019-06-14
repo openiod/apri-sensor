@@ -600,7 +600,7 @@ var sendClientLsUsbvInfo	= function(stdout) {
 	socket.emit('apriClientActionResponse',
 		{"action":"getClientLsUsbvInfo"
 		, "unit": unit
-		, "usbInfo": stdout
+		, "usbInfo": 'test response' // stdout
 		}
 	);
 }

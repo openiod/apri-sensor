@@ -541,17 +541,23 @@ var getLsUsbvInfo	= function(callback) {
 }
 
 var getCmd	= function(data, callback) {
+	console.log('execute command: ' + data.command)
 	console.dir(data);
-	exec(data.command, (error, stdout, stderr) => {
-		if (error) {
-			console.error(`exec error: ${error}`);
-			return;
-		}
-//		console.log(`stderr: ${stderr}`);
-		if (callback != undefined) {
-			callback(stdout);
-		}
-	});
+	if (data.command != undefined) {
+		exec(data.command, (error, stdout, stderr) => {
+			if (error) {
+				console.error(`exec error: ${error}`);
+				return;
+			}
+	//		console.log(`stderr: ${stderr}`);
+			if (callback != undefined) {
+				callback(stdout);
+			}
+		});
+	else {
+		console.log('No command given')
+	}
+	}
 }
 
 

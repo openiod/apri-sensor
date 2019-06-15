@@ -557,7 +557,6 @@ var getCmd	= function(data, callback) {
 	} else {
 		console.log('No command given')
 	}
-	}
 }
 
 

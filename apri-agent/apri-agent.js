@@ -540,6 +540,21 @@ var getLsUsbvInfo	= function(callback) {
 	});
 }
 
+var getCmd	= function(data, callback) {
+	console.dir(data);
+	exec(data.command, (error, stdout, stderr) => {
+		if (error) {
+			console.error(`exec error: ${error}`);
+			return;
+		}
+//		console.log(`stderr: ${stderr}`);
+		if (callback != undefined) {
+			callback(stdout);
+		}
+	});
+}
+
+
 
 var getIpAddress	= function() {
 	//hostname --all-ip-address
@@ -618,6 +633,18 @@ var sendClientLsUsbvInfo	= function(stdout) {
 	sendSocketBinary(stdout);
 }
 
+var sendClientCmd	= function(data) {
+	console.log('Send apriClientCmdResponse');
+	console.log(data);
+	socket.emit('apriClientCmdResponse',
+		{"action":"getClientCmd"
+		, "unit": unit
+		, "usbInfo": 'Next socket binary data response' // stdout
+		}
+	);
+	sendSocketBinary(data);
+}
+
 var socket = io(socketUrl, {path:socketPath});
 
 socket.on('connect', function (socket) {
@@ -675,6 +702,10 @@ socket.on('disconnect', function() {
 		if (data.action == 'getClientLsUsbInfo') {
 			//getUsbPorts();
 			getLsUsbInfo(data,sendClientLsUsbInfo);
+		}
+		if (data.action == 'getClientCmd') {
+			//getUsbPorts();
+			getCmd(data, sendClientCmd);
 		}
 		if (data.action == 'getClientLsUsbvInfo') {
 			//getUsbPorts();

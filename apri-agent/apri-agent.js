@@ -594,15 +594,28 @@ var sendClientLsUsbInfo	= function(stdout) {
 		}
 	);
 }
+var sendSocketBinary	= function(data) {
+	console.log('Send socket binary');
+	console.log(data);
+	console.log(data.length)
+	var bufArr = new ArrayBuffer(data.length);
+	var bufView = new Uint8Array(bufArr);
+	for (var i = 0; i<data.length;i++) {
+		bufView[i]=data[i];
+	}
+	socket.emit('apriSocketBinary', bufArr);
+}
+
 var sendClientLsUsbvInfo	= function(stdout) {
 	console.log('Send apriClientActionResponse');
 	console.log(stdout);
 	socket.emit('apriClientActionResponse',
 		{"action":"getClientLsUsbvInfo"
 		, "unit": unit
-		, "usbInfo": 'test response' // stdout
+		, "usbInfo": 'Next socket binary data response' // stdout
 		}
 	);
+	sendSocketBinary(stdout);
 }
 
 var socket = io(socketUrl, {path:socketPath});

@@ -601,7 +601,7 @@ var sendSocketBinary	= function(data) {
 	var bufArr = new ArrayBuffer(data.length);
 	var bufView = new Uint8Array(bufArr);
 	for (var i = 0; i<data.length;i++) {
-		bufView[i]=data[i];
+		bufView[i]=data.charCodeAt(i);
 	}
 	socket.emit('apriSocketBinary', bufArr);
 }

@@ -289,6 +289,7 @@ var getCpuInfo	= function() {
 
 getCpuInfo();
 
+/*
 SerialPort.list(function(err, ports) {
 	console.log(ports);
 	console.log('Find usb comport:');
@@ -306,6 +307,7 @@ SerialPort.list(function(err, ports) {
 	}
 	mainProcess();
 });
+*/
 
 var socket = io(socketUrl, {path:socketPath});
 

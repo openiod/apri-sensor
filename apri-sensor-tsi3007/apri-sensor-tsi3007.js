@@ -36,6 +36,7 @@ var io	 				= require('socket.io-client');
 const exec 				= require('child_process').exec;
 const execFile			= require('child_process').execFile;
 const raspi									= require('raspi');
+const Serial								= require('raspi-serial').Serial;
 var redis										= require("redis");
 
 var redisClient 						= redis.createClient();

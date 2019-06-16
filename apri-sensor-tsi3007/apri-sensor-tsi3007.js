@@ -29,12 +29,13 @@ var initResult = apriConfig.init(systemModuleFolderName+"/"+systemModuleName);
 // add module specific requires
 // var request 			= require('request');
 //var express 			= require('express');
-
 // var fs 					= require('fs');
-var SerialPort 			= require("serialport");
+// var SerialPort 			= require("serialport");
+
 var io	 				= require('socket.io-client');
 const exec 				= require('child_process').exec;
 const execFile			= require('child_process').execFile;
+const raspi									= require('raspi');
 var redis										= require("redis");
 
 var redisClient 						= redis.createClient();
@@ -131,8 +132,66 @@ var initCounters	= function () {
 	counters.tsi3007.part				= 0;
 	counters.tsi3007.nrOfMeas				= 0;
 }
+//-------------- raspi-serial
+var byteArray 			= new ArrayBuffer(32);
+var view8 					= new Uint8Array(byteArray);
+var view16 					= new Uint16Array(byteArray);
+var pos 						= 0;
+var checksum 				= 0;
 
-var processTsi3007SerialRecord = function(data) {
+var resetRaspiSerialArray = function() {
+	pos = 0;
+	checksum=0;
+}
+
+var processRaspiSerialData = function (data) {
+  var byte = data;
+
+  if (pos>=4 & pos <32) {
+    view8[pos] = byte;
+    if (pos<30 ) checksum=checksum+byte;
+    pos++;
+  }
+  if (pos==32) {
+//		console.log('Raspi-serial processing.');
+		if (checksum == ((view8[30]<<8)+view8[31])) {
+			processRaspiSerialRecord();
+		} else {
+			console.log('Raspi-serial checksum error');
+		}
+    resetRaspiSerialArray();
+  }
+  if (pos==3) {
+    if (byte == 0x1c) {
+      view8[pos] = byte;
+      checksum=checksum+byte;
+      pos++;
+    } else {
+			resetRaspiSerialArray();
+    }
+  }
+  if (pos==2) {
+    if (byte == 0x00) {
+      view8[pos] = byte;
+      checksum=checksum+byte;
+      pos++;
+    } else resetRaspiSerialArray();
+  }
+  if (pos==1) {
+    if (byte == 0x4D) {
+      view8[pos] = byte;
+      checksum=checksum+byte;
+      pos++;
+    } else resetRaspiSerialArray();
+  }
+  if (pos==0 & byte == 0x42) {
+    view8[pos] = byte;
+    checksum=checksum+byte;
+    pos = 1;
+  }
+}
+//  end-of raspi-serial variables and functions
+var processRaspiSerialRecord = function(data) {
 	if (counters.busy==true) {
 		console.log('Counters busy, measurement ignored *******************************');
 		return;
@@ -141,7 +200,7 @@ var processTsi3007SerialRecord = function(data) {
 	counters.tsi3007.part				+= data[1];
 	console.log(counters.tsi3007.nrOfMeas+' '+counters.tsi3007.part)
 }
-
+/*
 var mainProcess = function() {
 	console.log('Found usb comname: ' + serialPortPath );
 
@@ -167,7 +226,7 @@ var mainProcess = function() {
 function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
-
+*/
 var processDataCycle	= function() {
 	setTimeout(processDataCycle, loopTimeCycle);
 	counters.busy = true;
@@ -272,6 +331,19 @@ socket.on('info', function(data) {
 
 	//io.sockets.emit('aireassignal', { data: data } );
 	//socket.broadcast.emit('aireassignal', { data: data } );
+});
+
+raspi.init(() => {
+  var serial = new Serial({portId:'/dev/ttyS0',baudRate:9600});
+  serial.open(() => {
+    serial.on('data', (data) => {
+      //printHex(data,'T');
+			for (var i=0;i<data.length;i++) {
+				processRaspiSerialData(data[i]);
+			}
+    });
+    serial.write('Hello from raspi-serial');
+  });
 });
 
 setTimeout(processDataCycle, loopTimeCycle);

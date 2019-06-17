@@ -344,7 +344,7 @@ var printHex = function(buffer, tekst) {
 }
 
 raspi.init(() => {
-  serial = new Serial({portId:serialPortPath, baudRate:9600});
+  var serial = new Serial({portId:serialPortPath, baudRate:9600});
   serial.open(() => {
     serial.on('data', (data) => {
       printHex(data,'T');
@@ -352,14 +352,13 @@ raspi.init(() => {
 				processRaspiSerialData(data[i]);
 			}
     });
-		askSerialData(serial)
-		console.log('ask serial data first time')
+		setInterval(askSerialData,1000,serial)
+		console.log('ask serial data init')
     //serial.write('Hello from raspi-serial');
   });
 });
 
 var askSerialData = function(serial){
-	setTimeout(askSerialData, 1000);
 	console.log('ask serial data')
 	serial.write('RD\r\n')
 }

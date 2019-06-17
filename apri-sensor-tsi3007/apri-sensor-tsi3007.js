@@ -79,18 +79,17 @@ var openiodUrl			= siteProtocol + 'openiod.org/' + apriConfig.systemCode; //SCAP
 
 var usbPorts			= [];
 
+var sensorKey			= '';
 var serialPortPath;
+serialPortPath		= "/dev/ttyUSB0"; // default port
 
 var deviceParam			= process.argv[2];
 console.log('Param for serial device is ' + deviceParam);
-var sensorKey			= '';
 if (deviceParam != undefined) {
 	serialPortPath		= deviceParam;
-	sensorKey			= serialPortPath.substring(8);  // minus '/dev/tty'
-	console.log('SensorKey = ' + sensorKey);
-} else {
-	serialPortPath		= "/dev/ttyUSB0";
 }
+sensorKey			= serialPortPath.substring(8);  // minus '/dev/tty'
+console.log('SensorKey = ' + sensorKey);
 
 //var serialPortPath		= "/dev/cu.usbmodem1411";
 //var serialPortPath		= "/dev/cu.usbserial-A1056661";

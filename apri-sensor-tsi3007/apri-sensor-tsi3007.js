@@ -82,7 +82,6 @@ var usbPorts			= [];
 var sensorKey			= '';
 var serialPortPath;
 serialPortPath		= "/dev/ttyUSB0"; // default port
-
 var deviceParam			= process.argv[2];
 console.log('Param for serial device is ' + deviceParam);
 if (deviceParam != undefined) {

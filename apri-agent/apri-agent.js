@@ -344,9 +344,11 @@ var saveSystemServices	= function() {
 	if (unit.id == '00000000b7e92a99' || unit.id == '00000000ac35e5d3') {  //'s-Gravenpolder  2e is voor test
 		disableServices('apri-sensor-dylos','');  // met de tweede parameter kan een extra filter worden toegepast bijv. '_' om alleen dylos_DCxxx te selecteren
 		disableServices('apri-sensor-combi2','');
+		disableServices('apri-sensor-tsi3007','');
 		createService('apri-sensor-combi2','ACM0'); // ArduinoMega werkt hier (nog) niet, in Aalten wel! ?
 		createService('apri-sensor-dylos','DC1100');
 		createService('apri-sensor-dylos','DC1700');
+		createService('apri-sensor-tsi3007','TSI3007');
 
 /*
 		sensorKey	= 'DC1700';

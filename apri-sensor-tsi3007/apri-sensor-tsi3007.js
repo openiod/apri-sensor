@@ -335,11 +335,19 @@ socket.on('info', function(data) {
 	//socket.broadcast.emit('aireassignal', { data: data } );
 });
 
+var printHex = function(buffer, tekst) {
+	var str="";
+  for (var i=0;i<buffer.length;i++) {
+	  str = str+ buffer[i].toString(16)+' ';
+  }
+  console.log('log: ' + tekst +'  lengte:'+buffer.length+ " "+ str); // + data);
+}
+
 raspi.init(() => {
-  var serial = new Serial({portId:'/dev/ttyS0',baudRate:9600});
+  var serial = new Serial({portId:serialPortPath, baudRate:9600});
   serial.open(() => {
     serial.on('data', (data) => {
-      //printHex(data,'T');
+      printHex(data,'T');
 			for (var i=0;i<data.length;i++) {
 				processRaspiSerialData(data[i]);
 			}

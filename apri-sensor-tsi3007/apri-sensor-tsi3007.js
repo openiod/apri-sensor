@@ -352,14 +352,16 @@ raspi.init(() => {
 				processRaspiSerialData(data[i]);
 			}
     });
-    serial.write('Hello from raspi-serial');
+		askSerialData(serial)
+		console.log('ask serial data first time')
+    //serial.write('Hello from raspi-serial');
   });
 });
 
-var askSerialData = function(){
+var askSerialData = function(serial){
 	setTimeout(askSerialData, 1000);
+	console.log('ask serial data')
 	serial.write('RD\r\n')
 }
 
-askSerialData()
 setTimeout(processDataCycle, loopTimeCycle);

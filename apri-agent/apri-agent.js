@@ -250,6 +250,7 @@ var save99UsbSerialRules	= function() {
 			'SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="AL02V14T", SYMLINK+="ttyDC1100", MODE:="0666" \n' +
 		 	'SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="AJ03KNV9", SYMLINK+="ttyDC1700", MODE:="0666" \n' +
  			'SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="ttyCOMBI1", MODE:="0666" \n';
+//			'SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="AL00DIQS", SYMLINK+="ttyTSI3007", MODE:="0666" \n' +
 		fs.writeFileSync(file, content);
 		try {
 			console.log('Activate usb rules');

@@ -50,7 +50,7 @@ redisClient.on("error", function (err) {
     console.log("Redis client Error " + err);
 });
 
-
+var serial;
 //var app = express();
 
 // **********************************************************************************
@@ -344,7 +344,7 @@ var printHex = function(buffer, tekst) {
 }
 
 raspi.init(() => {
-  var serial = new Serial({portId:serialPortPath, baudRate:9600});
+  serial = new Serial({portId:serialPortPath, baudRate:9600});
   serial.open(() => {
     serial.on('data', (data) => {
       printHex(data,'T');
@@ -356,4 +356,10 @@ raspi.init(() => {
   });
 });
 
+var askSerialData = function(){
+	setTimeout(askSerialData, 1000);
+	serial.write('RD\r\n')
+}
+
+askSerialData()
 setTimeout(processDataCycle, loopTimeCycle);

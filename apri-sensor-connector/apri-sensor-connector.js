@@ -206,11 +206,11 @@ var sendData = function(redisKey,url) {
 				console.log('Already Exists');
 				removeRecord=true;
 		}
-		if (response.data.statuse == 201) removeRecord=true;
-		if (response.data.status == 422 && response.data.description=='Already Exists') {
+		if (response.status == 201) removeRecord=true;
+		if (response.status == 422 && response.statusData.description=='Already Exists') {
 			// if (response.data.statusDesc=='Already Exists') {
 			// if (response.data.description=='Already Exists') {
-				console.log('Already Exists');
+				console.log('Already Exists 2');
 				removeRecord=true;
 		}
 //		 else {

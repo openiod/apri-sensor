@@ -65,11 +65,11 @@ console.log('web-socket url: '+socketUrl+socketPath);
 var secureSite 			= true;
 var siteProtocol 		= secureSite?'https://':'http://';
 var openiodUrl			= siteProtocol + 'aprisensor-in.openiod.org';
-var loopTimeCycle		= 100; //ms, 20000=20 sec
+var loopTimeCycle		= 10000; //ms, 20000=20 sec
 //var waitTimeBeforeNext = 1000;
 var lastSend        = new Date().getTime();
 var lastResponse    = lastSend;
-var minTimeBetweenLastResponse = 20;
+var minTimeBetweenLastResponse = 50;
 var latencyPreviousSend = 500;
 
 var unit				= {};
@@ -105,12 +105,17 @@ var processDataCycle	= function(parm) {
   }
 
 	//log('Find new record');
-  redisSortAsync('new', 'alpha','limit',0,1,'asc')
+  redisSortAsync('new', 'alpha','limit',0,18,'asc')
   .then(function(res) {
     var _res = res;
     if (_res.length>0) {
       log('New record available: '+_res[0]);
-      getRedisData(_res[0]);
+      // getRedisData(_res[0]);
+			for (var j=0;j<_res.length;j++) {
+        // getRedisData(_res[j]);
+      	setTimeout(getRedisData, j*20,_res[j]);
+      }
+      setTimeout(processDataCycle, loopTimeCycle);
     } else setTimeout(processDataCycle, loopTimeCycle);
 	})
 	.catch(function(error) {
@@ -193,17 +198,27 @@ var sendData = function(redisKey,url) {
   .then(response => {
 		//log('Response recieved');
 		var removeRecord = false;
-		if (response.status=='200') removeRecord=true;
-		if (response.data.status == '422') {
-			if (response.data.statusDesc=='Already Exists') {
+//		if (response.status==200) removeRecord=true;
+		if (response.data.statusCode == '201') removeRecord=true;
+		if (response.data.statusCode == '422' && response.data.statusDesc=='Already Exists') {
+			// if (response.data.statusDesc=='Already Exists') {
+//			if (response.data.description=='Already Exists') {
 				console.log('Already Exists');
 				removeRecord=true;
-			} else {
-				console.log(response.data.statusDesc)
-				console.log(response.data.statusData)
-				removeRecord=false;
-			}
 		}
+		if (response.data.statuse == 201) removeRecord=true;
+		if (response.data.status == 422 && response.data.description=='Already Exists') {
+			// if (response.data.statusDesc=='Already Exists') {
+			// if (response.data.description=='Already Exists') {
+				console.log('Already Exists');
+				removeRecord=true;
+		}
+//		 else {
+//				console.log(response.data.statusDesc)
+//				console.log(response.data.statusData)
+//				removeRecord=false;
+//			}
+//		}
 		console.log(response.data)
 
     if (removeRecord==true) {
@@ -225,7 +240,7 @@ var sendData = function(redisKey,url) {
 			log('Transaction duration: '+latencyPreviousSend+' msec');
       log(response.status + ' / ' + response.statusText + ' / ' + response.headers['content-type'] + ', service status: ' + response.data.status);
     }
-		setTimeout(processDataCycle, loopTimeCycle);
+//		setTimeout(processDataCycle, loopTimeCycle);
    })
    .catch(error => {
      lastResponse = new Date().getTime();
@@ -250,7 +265,7 @@ var sendData = function(redisKey,url) {
 		 }
 		 //log(error.config);
 		 log('Error config code: '+ error.code);
-		 setTimeout(processDataCycle, loopTimeCycle);
+//		 setTimeout(processDataCycle, loopTimeCycle);
    });
 };
 

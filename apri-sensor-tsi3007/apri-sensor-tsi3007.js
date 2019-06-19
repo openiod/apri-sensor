@@ -132,7 +132,7 @@ var initCounters	= function () {
 	counters.tsi3007.nrOfMeas				= 0;
 }
 //-------------- raspi-serial
-var byteArray 			= new ArrayBuffer(32);
+var byteArray 			= new ArrayBuffer(10);
 var view8 					= new Uint8Array(byteArray);
 var view16 					= new Uint16Array(byteArray);
 var pos 						= 0;
@@ -391,21 +391,35 @@ var byte8 = 0x36
 var byte9 = 0x37
 var dataTest = ''+byte0+byte1+byte2+byte3+byte4+byte5+byte6+byte7+byte8+byte9
 
+var byteArray 			= new ArrayBuffer(10);
+var view8 					= new Uint8Array(byteArray);
+var view8[0] = 0x52
+var view8[1] = 0x44
+var view8[2] = 0x30
+var view8[3] = 0x31
+var view8[4] = 0x32
+var view8[5] = 0x33
+var view8[6] = 0x34
+var view8[7] = 0x35
+var view8[8] = 0x0D
+var view8[9] = 0x0A
+
+
 var testSerial = function() {
 	console.log(testIndex)
 
 	var data = 'RD012345da'
-	if (testIndex == 0 ) data = dataTest
-	if (testIndex == 1 ) data = 'RD012'
-	if (testIndex == 2 ) data = '346da'
-	if (testIndex == 3 ) data = 'R'
-	if (testIndex == 4 ) data = 'D'
-	if (testIndex == 5 ) data = '0'
-	if (testIndex == 6 ) data = '01'
-	if (testIndex == 7 ) data = '2'
-	if (testIndex == 8 ) data = '346'
-	if (testIndex == 9 ) data = 'da'
-	if (testIndex == 10 ) data = 'RD012346da'
+	if (testIndex == 0 ) data = view8
+	if (testIndex == 1 ) data = view8
+	if (testIndex == 2 ) data = view8
+	if (testIndex == 3 ) data = view8
+	if (testIndex == 4 ) data = view8
+	if (testIndex == 5 ) data = view8
+	if (testIndex == 6 ) data = view8
+	if (testIndex == 7 ) data = view8
+	if (testIndex == 8 ) data = view8
+	if (testIndex == 9 ) data = view8
+	if (testIndex == 10 ) data = view8
 	printHex(data,'T');
 	for (var i=0;i<data.length;i++) {
 		processRaspiSerialData(data[i]);

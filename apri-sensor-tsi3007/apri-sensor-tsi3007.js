@@ -393,16 +393,16 @@ var dataTest = ''+byte0+byte1+byte2+byte3+byte4+byte5+byte6+byte7+byte8+byte9
 
 var byteArray 			= new ArrayBuffer(10);
 var view8 					= new Uint8Array(byteArray);
-var view8[0] = 0x52
-var view8[1] = 0x44
-var view8[2] = 0x30
-var view8[3] = 0x31
-var view8[4] = 0x32
-var view8[5] = 0x33
-var view8[6] = 0x34
-var view8[7] = 0x35
-var view8[8] = 0x0D
-var view8[9] = 0x0A
+view8[0] = 0x52
+view8[1] = 0x44
+view8[2] = 0x30
+view8[3] = 0x31
+view8[4] = 0x32
+view8[5] = 0x33
+view8[6] = 0x34
+view8[7] = 0x35
+view8[8] = 0x0D
+view8[9] = 0x0A
 
 
 var testSerial = function() {

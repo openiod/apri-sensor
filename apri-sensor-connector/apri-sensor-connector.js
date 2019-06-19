@@ -1,7 +1,7 @@
 /*
 ** Module: apri-sensor-connector
 **
-** Main system module for handling sensor measurement data for DS18B20, PMSA003/PMS7003, BME280 in Redis to send to cloud service OpenIoD
+** Main system module for handling sensor measurement data for DS18B20, PMSA003/PMS7003, BME280, tsi3007 in Redis to send to cloud service OpenIoD
 **
 */
 
@@ -160,6 +160,9 @@ var getRedisData = function(redisKey) {
         case 'ds18b20':
           url = ds18b20Attributes(res)+'&dateObserved='+dateObserved;
           break;
+				case 'tsi3007':
+	          url = tsi3007Attributes(res)+'&dateObserved='+dateObserved;
+	          break;
         default:
           console.log('ERROR: redis entry unknown: '+ redisKey);
       };
@@ -181,6 +184,10 @@ var pmsa003Attributes = function(res) {
 var ds18b20Attributes = function(res) {
   return openiodUrl + '/ds18b20'+ '/v1/m?foi=' + res.foi + '&observation='+
     'temperature:'+res.temperature;
+}
+var tsi3007Attributes = function(res) {
+  return openiodUrl + '/tsi3007'+ '/v1/m?foi=' + res.foi + '&observation='+
+    'part:'+res.part;
 }
 
 // send data to service

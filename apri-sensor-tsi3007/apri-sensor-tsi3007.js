@@ -164,34 +164,34 @@ var processRaspiSerialData = function (data) {
 	if (pos==7) {
     view8[pos] = byte;
 		console.log('dit moet 6 zijn: ' + byte)
-    part = part + (byte - 30)
+    part = part + (byte - 0x30)
     pos++;
   }
 	if (pos==6) {
     view8[pos] = byte;
 		console.log('dit moet 5 zijn: ' + byte)
-    part = part + (byte - 30) * 10
+    part = part + (byte - 0x30) * 10
     pos++;
   }
 	if (pos==5) {
     view8[pos] = byte;
 		console.log('dit moet 4 zijn: ' + byte)
-    part = part + (byte - 30) * 100
+    part = part + (byte - 0x30) * 100
     pos++;
   }
 	if (pos==4) {
     view8[pos] = byte;
-    part = part + (byte - 30) * 1000
+    part = part + (byte - 0x30) * 1000
     pos++;
   }
 	if (pos==3) {
     view8[pos] = byte;
-    part = part + (byte - 30) * 10000
+    part = part + (byte - 0x30) * 10000
     pos++;
   }
   if (pos==2) {
     view8[pos] = byte;
-    part = (byte - 30) * 100000;
+    part = (byte - 0x30) * 100000;
     pos++;
   }
   if (pos==1) {

@@ -396,7 +396,7 @@ var testSerial = function() {
 	}
 	testIndex++
 	if (testIndex>10) testIndex=0
-	setTimeOut(testSerial,5)
+	setTimeout(testSerial,5)
 }
 setTimeout(testSerial,5)
 

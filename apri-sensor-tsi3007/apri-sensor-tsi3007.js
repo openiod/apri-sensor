@@ -413,10 +413,10 @@ var testSerial = function() {
 
 	var data = 'RD012345da'
 	if (testIndex == 0 ) data = view8
-	if (testIndex == 1 ) data = view8
-	if (testIndex == 2 ) data = view8
-	if (testIndex == 3 ) data = view8
-	if (testIndex == 4 ) data = view8
+	if (testIndex == 1 ) data = view8[0]+view8[1]+view8[2]+view8[3]+view8[5]+view8[6]+view8[7]+view8[8]+view8[9]
+	if (testIndex == 2 ) data = view8[0]+view8[1]+view8[2]+view8[3]+view8[5]+view8[6]+view8[7]+view8[8]+view8[9]
+	if (testIndex == 3 ) data = view8[0]+view8[1]+view8[2]+view8[3]+view8[5]+view8[6]+view8[7]+view8[8]+view8[9]
+	if (testIndex == 4 ) data = view8[0]+view8[1]+view8[2]+view8[3]+view8[5]+view8[6]+view8[7]+view8[8]+view8[9]
 	if (testIndex == 5 ) data = view8
 	if (testIndex == 6 ) data = view8
 	if (testIndex == 7 ) data = view8

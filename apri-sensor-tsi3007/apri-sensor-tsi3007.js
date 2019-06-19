@@ -393,7 +393,7 @@ var testSerial = function() {
 	if (testIndex == 8 ) data = '346'
 	if (testIndex == 9 ) data = 'da'
 	if (testIndex == 10 ) data = 'RD012346da'
-	console.log(data.length)
+	printHex(data,'T');
 	for (var i=0;i<data.length;i++) {
 		processRaspiSerialData(data[i]);
 	}

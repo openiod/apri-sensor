@@ -145,7 +145,7 @@ var resetRaspiSerialArray = function() {
 
 var processRaspiSerialData = function (data) {
   var byte = data;
-
+	console.log(pos)
   if (pos==9) {
 //		console.log('Raspi-serial processing.');
 		if (byte == 0x0A) {

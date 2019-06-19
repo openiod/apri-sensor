@@ -415,7 +415,8 @@ view9[2] = 0x30
 view9[3] = 0x31
 view9[4] = 0x32
 
-var view7 					= new Uint8Array(byteArray5);
+var byteArray5_2 			= new ArrayBuffer(5);
+var view7 					= new Uint8Array(byteArray5_2);
 view7[0] = 0x33
 view7[1] = 0x34
 view7[2] = 0x35

@@ -202,7 +202,7 @@ var processRaspiSerialData = function (data) {
     part = 0;
     pos = 1;
   }
-	console.log('byte': byte)
+	console.log('byte: ' + byte)
 }
 //  end-of raspi-serial variables and functions
 var processRaspiSerialRecord = function() {

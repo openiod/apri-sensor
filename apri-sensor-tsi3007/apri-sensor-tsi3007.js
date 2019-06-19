@@ -136,67 +136,82 @@ var byteArray 			= new ArrayBuffer(32);
 var view8 					= new Uint8Array(byteArray);
 var view16 					= new Uint16Array(byteArray);
 var pos 						= 0;
-var checksum 				= 0;
+var part = 0
 
 var resetRaspiSerialArray = function() {
 	pos = 0;
-	checksum=0;
+	part = 0;
 }
 
 var processRaspiSerialData = function (data) {
   var byte = data;
 
-  if (pos>=4 & pos <32) {
-    view8[pos] = byte;
-    if (pos<30 ) checksum=checksum+byte;
-    pos++;
-  }
-  if (pos==32) {
+  if (pos==9) {
 //		console.log('Raspi-serial processing.');
-		if (checksum == ((view8[30]<<8)+view8[31])) {
+		if (byte == 0x0A) {
 			processRaspiSerialRecord();
-		} else {
-			console.log('Raspi-serial checksum error');
 		}
     resetRaspiSerialArray();
   }
-  if (pos==3) {
-    if (byte == 0x1c) {
+  if (pos==8) {
+    if (byte == 0x0D) {
       view8[pos] = byte;
-      checksum=checksum+byte;
       pos++;
     } else {
 			resetRaspiSerialArray();
     }
   }
+	if (pos==7) {
+    view8[pos] = byte;
+    part = part + (byte - 30)
+    pos++;
+  }
+	if (pos==6) {
+    view8[pos] = byte;
+    part = part + (byte - 30) * 10
+    pos++;
+  }
+	if (pos==5) {
+    view8[pos] = byte;
+    part = part + (byte - 30) * 100
+    pos++;
+  }
+	if (pos==4) {
+    view8[pos] = byte;
+    part = part + (byte - 30) * 1000
+    pos++;
+  }
+	if (pos==3) {
+    view8[pos] = byte;
+    part = part + (byte - 30) * 10000
+    pos++;
+  }
   if (pos==2) {
-    if (byte == 0x00) {
-      view8[pos] = byte;
-      checksum=checksum+byte;
-      pos++;
-    } else resetRaspiSerialArray();
+    // if (byte == 0x00) {				52 44 30 31 32 33 34 35 0D 0A
+    view8[pos] = byte;					0	1		2		3		4	5		6	7	8		9
+    part = (byte - 30) * 100000;
+    pos++;
   }
   if (pos==1) {
-    if (byte == 0x4D) {
+    if (byte == 0x44) {
       view8[pos] = byte;
-      checksum=checksum+byte;
       pos++;
     } else resetRaspiSerialArray();
   }
-  if (pos==0 & byte == 0x42) {
+  if (pos==0 & byte == 0x52) {
     view8[pos] = byte;
-    checksum=checksum+byte;
+    part = 0;
     pos = 1;
   }
 }
 //  end-of raspi-serial variables and functions
-var processRaspiSerialRecord = function(data) {
+var processRaspiSerialRecord = function() {
 	if (counters.busy==true) {
 		console.log('Counters busy, measurement ignored *******************************');
 		return;
 	}
 	counters.tsi3007.nrOfMeas++;
-	counters.tsi3007.part				+= data[1];
+	counters.tsi3007.part				+= part;
 	console.log(counters.tsi3007.nrOfMeas+' '+counters.tsi3007.part)
 }
 /*
@@ -245,6 +260,8 @@ var sendData = function() {
 		var timeStamp = new Date();
 		var url = '';
 		if (results.tsi3007.nrOfMeas > 0) {
+			console.dir(results.tsi3007)
+			return;
 			redisHmsetHashAsync(timeStamp.toISOString()+':tsi3007'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'part', results.tsi3007.part
@@ -361,5 +378,27 @@ var askSerialData = function(serial){
 	console.log('ask serial data')
 	serial.write('RD\r\n')
 }
+var testIndex = 0
+var testSerial() {
+	var data = 'RD012345da'
+	if (testIndex == 0 ) data = 'RD012346da'
+	if (testIndex == 1 ) data = 'RD012'
+	if (testIndex == 2 ) data = '346da'
+	if (testIndex == 3 ) data = 'R'
+	if (testIndex == 4 ) data = 'D'
+	if (testIndex == 5 ) data = '0'
+	if (testIndex == 6 ) data = '01'
+	if (testIndex == 7 ) data = '2'
+	if (testIndex == 8 ) data = '346'
+	if (testIndex == 9 ) data = 'da'
+	if (testIndex == 10 ) data = 'RD012346da'
+	for (var i=0;i<data.length;i++) {
+		processRaspiSerialData(data[i]);
+	}
+	testIndex++
+	if (testIndex>10) testIndex=0
+	setTimeOut(testSerial,5)
+}
+setTimeOut(testSerial,5)
 
 setTimeout(processDataCycle, loopTimeCycle);

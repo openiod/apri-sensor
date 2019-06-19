@@ -378,7 +378,7 @@ var askSerialData = function(serial){
 	serial.write('RD\r\n')
 }
 var testIndex = 0
-var testSerial() {
+var testSerial = function() {
 	var data = 'RD012345da'
 	if (testIndex == 0 ) data = 'RD012346da'
 	if (testIndex == 1 ) data = 'RD012'

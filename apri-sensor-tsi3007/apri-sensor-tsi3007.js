@@ -392,13 +392,14 @@ var testSerial = function() {
 	if (testIndex == 8 ) data = '346'
 	if (testIndex == 9 ) data = 'da'
 	if (testIndex == 10 ) data = 'RD012346da'
+	console.log(data.length)
 	for (var i=0;i<data.length;i++) {
 		processRaspiSerialData(data[i]);
 	}
 	testIndex++
 	if (testIndex>10) testIndex=0
-	setTimeout(testSerial,5000)
+	setTimeout(testSerial,2000)
 }
-setTimeout(testSerial,5000)
+setTimeout(testSerial,2000)
 
 setTimeout(processDataCycle, loopTimeCycle);

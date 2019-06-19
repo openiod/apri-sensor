@@ -163,6 +163,7 @@ var processRaspiSerialData = function (data) {
   }
 	if (pos==7) {
     view8[pos] = byte;
+		console.log('dit moet 6 zijn: ' + byte)
     part = part + (byte - 30)
     pos++;
   }
@@ -212,7 +213,7 @@ var processRaspiSerialRecord = function() {
 	}
 	counters.tsi3007.nrOfMeas++;
 	counters.tsi3007.part				+= part;
-	console.log(counters.tsi3007.nrOfMeas+' '+counters.tsi3007.part)
+	console.log(counters.tsi3007.nrOfMeas+' '+counters.tsi3007.part+' '+counters.tsi3007.part/counters.tsi3007.nrOfMeas)
 }
 /*
 var mainProcess = function() {

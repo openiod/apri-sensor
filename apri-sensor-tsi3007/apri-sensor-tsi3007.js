@@ -145,7 +145,6 @@ var resetRaspiSerialArray = function() {
 
 var processRaspiSerialData = function (data) {
   var byte = data;
-	console.log(pos)
   if (pos==9) {
 //		console.log('Raspi-serial processing.');
 		if (byte == 0x0A) {
@@ -163,19 +162,19 @@ var processRaspiSerialData = function (data) {
   }
 	if (pos==7) {
     view8[pos] = byte;
-		console.log('dit moet 6 zijn: ' + byte.toString(16))
+		//console.log('dit moet 6 zijn: ' + byte.toString(16))
     part = part + (byte - 0x30)
     pos++;
   }
 	if (pos==6) {
     view8[pos] = byte;
-		console.log('dit moet 5 zijn: ' + byte.toString(16))
+		//console.log('dit moet 5 zijn: ' + byte.toString(16))
     part = part + (byte - 0x30) * 10
     pos++;
   }
 	if (pos==5) {
     view8[pos] = byte;
-		console.log('dit moet 4 zijn: ' + byte.toString(16))
+		//console.log('dit moet 4 zijn: ' + byte.toString(16))
     part = part + (byte - 0x30) * 100
     pos++;
   }
@@ -205,7 +204,6 @@ var processRaspiSerialData = function (data) {
     part = 0;
     pos = 1;
   }
-	console.log('byte: ' + byte)
 }
 //  end-of raspi-serial variables and functions
 var processRaspiSerialRecord = function() {

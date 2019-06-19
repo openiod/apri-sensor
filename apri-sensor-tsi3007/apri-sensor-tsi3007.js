@@ -379,10 +379,23 @@ var askSerialData = function(serial){
 	serial.write('RD\r\n')
 }
 var testIndex = 0
+var byte0 = 0x52
+var byte1 = 0x44
+var byte2 = 0x30
+var byte3 = 0x31
+var byte4 = 0x32
+var byte5 = 0x33
+var byte6 = 0x34
+var byte7 = 0x35
+var byte8 = 0x36
+var byte9 = 0x37
+var dataTest = ''+byte0+byte1+byte2+byte3+byte4+byte5+byte6+byte7+byte8+byte9
+
 var testSerial = function() {
 	console.log(testIndex)
+
 	var data = 'RD012345da'
-	if (testIndex == 0 ) data = 'RD012346da'
+	if (testIndex == 0 ) data = dataTest
 	if (testIndex == 1 ) data = 'RD012'
 	if (testIndex == 2 ) data = '346da'
 	if (testIndex == 3 ) data = 'R'

@@ -407,21 +407,36 @@ view8[7] = 0x35
 view8[8] = 0x0D
 view8[9] = 0x0A
 
+var byteArray5 			= new ArrayBuffer(5);
+var view9 					= new Uint8Array(byteArray5;
+view9[0] = 0x52
+view9[1] = 0x44
+view9[2] = 0x30
+view9[3] = 0x31
+view9[4] = 0x32
+
+var view7 					= new Uint8Array(byteArray5);
+view7[0] = 0x33
+view7[1] = 0x34
+view7[2] = 0x35
+view7[3] = 0x0D
+view7[4] = 0x0A
+
 
 var testSerial = function() {
 	console.log(testIndex)
 
 	var data = 'RD012345da'
 	if (testIndex == 0 ) data = view8
-	if (testIndex == 1 ) data = view8[0]+view8[1]+view8[2]+view8[3]+view8[5]+view8[6]+view8[7]+view8[8]+view8[9]
-	if (testIndex == 2 ) data = view8[0]+view8[1]+view8[2]+view8[3]+view8[5]+view8[6]+view8[7]+view8[8]+view8[9]
-	if (testIndex == 3 ) data = view8[0]+view8[1]+view8[2]+view8[3]+view8[5]+view8[6]+view8[7]+view8[8]+view8[9]
-	if (testIndex == 4 ) data = view8[0]+view8[1]+view8[2]+view8[3]+view8[5]+view8[6]+view8[7]+view8[8]+view8[9]
+	if (testIndex == 1 ) data = view9
+	if (testIndex == 2 ) data = view7
+	if (testIndex == 3 ) data = view8
+	if (testIndex == 4 ) data = view8
 	if (testIndex == 5 ) data = view8
-	if (testIndex == 6 ) data = view8
-	if (testIndex == 7 ) data = view8
-	if (testIndex == 8 ) data = view8
-	if (testIndex == 9 ) data = view8
+	if (testIndex == 6 ) data = view9
+	if (testIndex == 7 ) data = view7
+	if (testIndex == 8 ) data = view9
+	if (testIndex == 9 ) data = view7
 	if (testIndex == 10 ) data = view8
 	printHex(data,'T');
 	for (var i=0;i<data.length;i++) {

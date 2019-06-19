@@ -261,8 +261,7 @@ var sendData = function() {
 		var timeStamp = new Date();
 		var url = '';
 		if (results.tsi3007.nrOfMeas > 0) {
-			console.dir(results.tsi3007)
-			return;
+			// console.dir(results.tsi3007)
 			redisHmsetHashAsync(timeStamp.toISOString()+':tsi3007'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'part', results.tsi3007.part

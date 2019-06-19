@@ -187,8 +187,7 @@ var processRaspiSerialData = function (data) {
     pos++;
   }
   if (pos==2) {
-    // if (byte == 0x00) {				52 44 30 31 32 33 34 35 0D 0A
-    view8[pos] = byte;					0	1		2		3		4	5		6	7	8		9
+    view8[pos] = byte;
     part = (byte - 30) * 100000;
     pos++;
   }

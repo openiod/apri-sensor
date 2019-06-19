@@ -379,6 +379,7 @@ var askSerialData = function(serial){
 }
 var testIndex = 0
 var testSerial = function() {
+	console.log(testIndex)
 	var data = 'RD012345da'
 	if (testIndex == 0 ) data = 'RD012346da'
 	if (testIndex == 1 ) data = 'RD012'
@@ -396,8 +397,8 @@ var testSerial = function() {
 	}
 	testIndex++
 	if (testIndex>10) testIndex=0
-	setTimeout(testSerial,5)
+	setTimeout(testSerial,5000)
 }
-setTimeout(testSerial,5)
+setTimeout(testSerial,5000)
 
 setTimeout(processDataCycle, loopTimeCycle);

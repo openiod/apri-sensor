@@ -378,6 +378,8 @@ var askSerialData = function(serial){
 	console.log('ask serial data')
 	serial.write('RD\r\n')
 }
+
+/*
 var testIndex = 0
 var byte0 = 0x52
 var byte1 = 0x44
@@ -445,5 +447,6 @@ var testSerial = function() {
 	setTimeout(testSerial,2000)
 }
 setTimeout(testSerial,2000)
+*/
 
 setTimeout(processDataCycle, loopTimeCycle);

@@ -1,0 +1,9 @@
+[Unit]
+Desription=SCAPE604-apri-sensor-tsi3007 - start or restart apri-sensor-tsi3007 service, respawn
+After=network.target
+[Service]
+ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-tsi3007/apri-sensor-tsi3007.sh /opt/SCAPE604/log/SCAPE604-apri-sensor-tsi3007.log
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

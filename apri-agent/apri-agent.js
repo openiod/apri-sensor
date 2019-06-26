@@ -349,10 +349,12 @@ var saveSystemServices	= function() {
 		disableServices('apri-sensor-dylos','');  // met de tweede parameter kan een extra filter worden toegepast bijv. '_' om alleen dylos_DCxxx te selecteren
 		disableServices('apri-sensor-combi2','');
 		disableServices('apri-sensor-tsi3007','');
+		disableServices('apri-sensor-connector','');
 		createService('apri-sensor-combi2','ACM0'); // ArduinoMega werkt hier (nog) niet, in Aalten wel! ?
 		createService('apri-sensor-dylos','DC1100');
 		createService('apri-sensor-dylos','DC1700');
 		createService('apri-sensor-tsi3007','TSI3007');
+		createService('apri-sensor-connector','');
 
 /*
 		sensorKey	= 'DC1700';

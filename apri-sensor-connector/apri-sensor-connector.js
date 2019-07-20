@@ -219,7 +219,7 @@ var sendData = function(redisKey,url) {
 		}
 		if (response.data.status == 201) removeRecord=true;
 		if (response.data.status == '422') {
-			console.log('Status 422 and '+ response.response.data.statusData.description);
+			console.log('Status 422 and '+ response.data.statusData.description);
 		}
 		if (response.data.status == 422 && response.data.statusData.description=='Already Exists') {
 			// if (response.data.statusDesc=='Already Exists') {

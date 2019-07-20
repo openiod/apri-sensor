@@ -207,6 +207,9 @@ var sendData = function(redisKey,url) {
 		var removeRecord = false;
 //		if (response.status==200) removeRecord=true;
 		if (response.data.statusCode == '201') removeRecord=true;
+		if (response.data.statusCode == '422') {
+			console.log('Statuscode 422 and '+ response.data.statusDesc);
+		}
 		if (response.data.statusCode == '422' && response.data.statusDesc=='Already Exists') {
 			// if (response.data.statusDesc=='Already Exists') {
 //			if (response.data.description=='Already Exists') {
@@ -214,6 +217,9 @@ var sendData = function(redisKey,url) {
 				removeRecord=true;
 		}
 		if (response.data.status == 201) removeRecord=true;
+		if (response.data.status == '422') {
+			console.log('Status 422 and '+ response.response.data.statusData.description);
+		}
 		if (response.data.status == 422 && response.data.statusData.description=='Already Exists') {
 			// if (response.data.statusDesc=='Already Exists') {
 			// if (response.data.description=='Already Exists') {

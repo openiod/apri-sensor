@@ -279,6 +279,7 @@ var sendData = function(redisKey,url) {
 		 }
 		 //log(error.config);
 		 log('Error config code: '+ error.code);
+		 logDir(error)
 //		 setTimeout(processDataCycle, loopTimeCycle);
    });
 };

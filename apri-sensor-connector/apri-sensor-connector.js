@@ -209,6 +209,7 @@ var sendData = function(redisKey,url) {
 		if (response.data.statusCode == '201') removeRecord=true;
 		if (response.data.statusCode == '422') {
 			console.log('Statuscode 422 and '+ response.data.statusDesc);
+			console.dir(response.data)
 		}
 		if (response.data.statusCode == '422' && response.data.statusDesc=='Already Exists') {
 			// if (response.data.statusDesc=='Already Exists') {

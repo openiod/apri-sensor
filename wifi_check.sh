@@ -26,9 +26,12 @@ ping -c4 $GATEWAY > /dev/null
 if [ $? != 0 ]
 then
   echo "No network connection, restarting wlan0" >>$LOGFILE
-  /sbin/ifdown 'wlan0' >>$LOGFILE
+  #/sbin/ifdown 'wlan0' >>$LOGFILE
+  #sleep 5
+  #/sbin/ifup --force 'wlan0' >>$LOGFILE
+  ip link set wlan0 down
   sleep 5
-  /sbin/ifup --force 'wlan0' >>$LOGFILE
+  ip link set wlan0 up
 else
   echo "Connected to gateway " $GATEWAY >>$LOGFILE
 fi

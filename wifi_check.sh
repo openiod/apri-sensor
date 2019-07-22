@@ -19,7 +19,17 @@ ifconfig wlan0 |awk '/inet /{print substr($2,1)}' >>$LOGFILE
 GATEWAY="$(route | awk '/default /{print substr($2,1)}')"
 echo 'Gateway: ' $GATEWAY >>$LOGFILE
 
-[ $GATEWAY = "0.0.0.0" ];echo 'gateway' $GATEWAY 'equal to 0.0.0.0?' $? >>$LOGFILE
+if [ $GATEWAY = "0.0.0.0" ]
+then
+  echo 'gateway' $GATEWAY 'equal to 0.0.0.0?' $? >>$LOGFILE
+  echo "No gateway so restarting wlan0" >>$LOGFILE
+  #/sbin/ifdown 'wlan0' >>$LOGFILE
+  #sleep 5
+  #/sbin/ifup --force 'wlan0' >>$LOGFILE
+  ip link set wlan0 down
+  sleep 5
+  ip link set wlan0 up
+fi
 
 # test gateway connection
 ping -c4 $GATEWAY > /dev/null

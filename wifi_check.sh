@@ -40,14 +40,18 @@ then
   #sleep 5
   #/sbin/ifup --force 'wlan0' >>$LOGFILE
   ip link set wlan0 down
-  sleep 5
+  sleep 2
+  iw reg set NL
+  iwconfig wlan0 power off
+  sleep 2
   ip link set wlan0 up
 else
   echo "Connected to gateway " $GATEWAY >>$LOGFILE
 fi
 
 # always power of wlan0 will reduce problems with wifi
-iwconfig wlan0 power off
+sleep 2
+iw reg get
 
 echo "End   procedure on: " `date` >>$LOGFILE
 exit 0

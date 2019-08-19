@@ -326,7 +326,7 @@ const readSensorData = () => {
 
 			if (counters.busy == false) {
         if (data.pressure_hPa<900) {
-          console.log('BME280 pressure below 900. Less than 3.3V power? Measure skipped');          
+          console.log('BME280 pressure below 900. Less than 3.3V power? Measure skipped');
         } else {
           counters.bme280.nrOfMeas++;
   				counters.bme280.temperature				+= data.temperature_C;
@@ -363,10 +363,13 @@ var processDeviceData	= function(err,temperatureData) {
 	if (isNumeric(_temperature) ) {
 		var temperature = Math.round(parseFloat(_temperature)/10)/100; // round to 2 decimals
 		if (counters.busy == false) {
-			counters.ds18b20.nrOfMeas++;
-			counters.ds18b20.temperature			+= temperature;
-      console.log(' ' + temperature + ' ' + counters.ds18b20.nrOfMeas);
-
+      if (temperature>50 | temperature < -15) {
+        console.log('Error, temerature value our of range: ' + temperature);  
+      } else {
+        counters.ds18b20.nrOfMeas++;
+  			counters.ds18b20.temperature			+= temperature;
+        console.log(' ' + temperature + ' ' + counters.ds18b20.nrOfMeas);
+      }
 		}
 	};
 };

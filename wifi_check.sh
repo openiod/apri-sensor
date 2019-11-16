@@ -14,6 +14,14 @@ iwgetid >>$LOGFILE
 
 # find ip-address:
 ifconfig wlan0 |awk '/inet /{print substr($2,1)}' >>$LOGFILE
+IP="$(ifconfig wlan0 |awk '/inet /{print substr($2,1)}')"
+echo 'IP-address: ' $IP >>$LOGFILE
+if [ $IP = "10.42.0.1" ]
+then
+  echo 'IP is comitup-IP so stop wifi-check: ' >>$LOGFILE
+  echo "End   procedure on: " `date` >>$LOGFILE
+  exit 0
+fi
 
 # find default router:
 GATEWAY="$(route | awk '/default /{print substr($2,1)}')"

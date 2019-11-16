@@ -35,6 +35,7 @@ then
 fi
 
 # test gateway connection
+echo 'ping to gateway ' $GATEWAY >>$LOGFILE
 ping -c4 $GATEWAY > /dev/null
 if [ $? != 0 ]
 then

@@ -24,7 +24,7 @@ then
 fi
 
 # find default router:
-GATEWAY="$(route | awk '/default /{print substr($2,1)}')"
+GATEWAY="$(route | awk '/default /{print substr($2,1)}' | awk 'NR==1 {print substr($1,1)}' )"
 echo 'Gateway: ' $GATEWAY >>$LOGFILE
 
 if [ $GATEWAY = "0.0.0.0" ]

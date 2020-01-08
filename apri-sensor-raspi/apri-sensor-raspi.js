@@ -385,13 +385,14 @@ var processDeviceData	= function(err,temperatureData) {
 };
 
 const readSensorDataDs18b20 = () => {
-	for (var i=0;i<devicesFolder.length;i++) {
-    console.log(devicesFolder)
+	console.dir(devicesFolder  )
+  for (var i=0;i<devicesFolder.length;i++) {
+
 		if (devicesFolder[i].split('-')[0] == '28' | devicesFolder[i].split('-')[0] == '00') {  // 00 for GPIO
 //			console.log('DS18B20 device: ' +  devicesFolder[i]);
 			var path = '/sys/bus/w1/devices/'+devicesFolder[i];
 			try {
-//				console.log(path+ '/w1_slave');
+				console.log('try read ' + path+ '/w1_slave');
 				fs.readFile(path+'/w1_slave',processDeviceData);  // start process
 			} catch (err) {
 //			  console.log('Directory or file for DS18B20 not found. ('+path+ '/w1_slave'+')');

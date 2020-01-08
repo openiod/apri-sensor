@@ -40,6 +40,8 @@ var io	 										= require('socket.io-client');
 const exec 									= require('child_process').exec;
 const execFile							= require('child_process').execFile;
 const BME280 								= require('./BME280.js');
+const gpio = require('onoff').Gpio
+var gpioDs18b20 = new gpio(22, 'out'); //use GPIO-25 pin 22, and specify that it is output
 //const port = new SerialPort('/dev/ttyAMA0')
 //var app = express();
 
@@ -364,7 +366,7 @@ var processDeviceData	= function(err,temperatureData) {
 		var temperature = Math.round(parseFloat(_temperature)/10)/100; // round to 2 decimals
 		if (counters.busy == false) {
       if (temperature>50 | temperature < -15) {
-        console.log('Error, temerature value our of range: ' + temperature);  
+        console.log('Error, temerature value our of range: ' + temperature);
       } else {
         counters.ds18b20.nrOfMeas++;
   			counters.ds18b20.temperature			+= temperature;
@@ -384,7 +386,7 @@ const readSensorDataDs18b20 = () => {
 				fs.readFile(path+'/w1_slave',processDeviceData);  // start process
 			} catch (err) {
 //			  console.log('Directory or file for DS18B20 not found. ('+path+ '/w1_slave'+')');
-				setTimeout(readSensorDataDs18b20, 60000); // retry after 1 minute
+        reset_w1_device()
 			  return;
 			}
 		}
@@ -418,6 +420,9 @@ var processDataCycle	= function() {
 	results.bme280.rHum							= Math.round((counters.bme280.rHum/counters.bme280.nrOfMeas)*100)/100;
 	results.bme280.nrOfMeas					= counters.bme280.nrOfMeas;
 
+  if (counters.ds18b20.nrOfMeas==0) {
+
+  }
 	results.ds18b20.temperature			= Math.round((counters.ds18b20.temperature/counters.ds18b20.nrOfMeas)*100)/100;
 	results.ds18b20.nrOfMeas				= counters.ds18b20.nrOfMeas;
 
@@ -567,17 +572,32 @@ var getCpuInfo	= function() {
 
 getCpuInfo();
 
-
-
-try {
-	devicesFolder = fs.readdirSync('/sys/bus/w1/devices');
-	readSensorDataDs18b20();
-} catch (err) {
-	devicesFolder = undefined;
-  console.log('Directory or file for DS18B20 not found. (/sys/bus/w1/devices/28-*/w1_slave)');
-  //return;
+var reset_w1_device = function() {
+  if (gpioDs18b20.readSync() === 0) { //check the pin state, if the state is 0 (or off)
+    console.log('set DS18B20 GPIO on')
+    gpioDs18b20.writeSync(1); //set pin state to 1 (power DS18B20 on)
+    setTimeout(readSensorDataDs18b20, 5000); // retry after 1 minute, 3000)
+  } else {
+    if (gpioDs18b20.readSync() === 1) {
+      console.log('set DS18B20 GPIO off')
+      gpioDs18b20.writeSync(0); //set pin state to 0 (turn off / reset)
+      setTimeout(reset_w1_device, 3000)
+    }
 }
 
+var check_w1_device = function() {
+  try {
+  	devicesFolder = fs.readdirSync('/sys/bus/w1/devices');
+  	readSensorDataDs18b20();
+  } catch (err) {
+  	devicesFolder = undefined;
+    console.log('Directory or file for DS18B20 not found. (/sys/bus/w1/devices/28-*/w1_slave)');
+    reset_w1_devices()
+    //return;
+  }
+}
+
+check_w1_device()  // check w1 device for DS18B20
 
 var socket = io(socketUrl, {path:socketPath});
 

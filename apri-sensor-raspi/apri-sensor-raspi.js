@@ -583,6 +583,7 @@ var reset_w1_device = function() {
       gpioDs18b20.writeSync(0); //set pin state to 0 (turn off / reset)
       setTimeout(reset_w1_device, 3000)
     }
+  }
 }
 
 var check_w1_device = function() {

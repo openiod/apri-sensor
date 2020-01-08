@@ -386,7 +386,7 @@ var processDeviceData	= function(err,temperatureData) {
 
 const readSensorDataDs18b20 = () => {
 	for (var i=0;i<devicesFolder.length;i++) {
-		if (devicesFolder[i].split('-')[0] == '28') {
+		if (devicesFolder[i].split('-')[0] == '28' | devicesFolder[i].split('-')[0] == '00') {  // 00 for GPIO
 //			console.log('DS18B20 device: ' +  devicesFolder[i]);
 			var path = '/sys/bus/w1/devices/'+devicesFolder[i];
 			try {
@@ -602,7 +602,7 @@ var check_w1_device = function() {
   	readSensorDataDs18b20();
   } catch (err) {
   	devicesFolder = undefined;
-    console.log('Directory or file for DS18B20 not found. (/sys/bus/w1/devices/28-*/w1_slave)');
+    console.log('Directory or file for DS18B20 not found. (/sys/bus/w1/devices/28-*/w1_slave or 00-*..)');
     reset_w1_devices()
     //return;
   }

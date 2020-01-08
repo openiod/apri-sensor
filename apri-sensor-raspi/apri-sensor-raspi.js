@@ -581,15 +581,17 @@ var getCpuInfo	= function() {
 getCpuInfo();
 
 var reset_w1_device = function() {
-  if (gpioDs18b20.readSync() === 0) { //check the pin state, if the state is 0 (or off)
-    console.log('set DS18B20 GPIO on')
-    gpioDs18b20.writeSync(1); //set pin state to 1 (power DS18B20 on)
-    setTimeout(readSensorDataDs18b20, 5000); // retry after 1 minute, 3000)
-  } else {
-    if (gpioDs18b20.readSync() === 1) {
-      console.log('set DS18B20 GPIO off')
-      gpioDs18b20.writeSync(0); //set pin state to 0 (turn off / reset)
-      setTimeout(reset_w1_device, 3000)
+  if (gpioDs18b20 != undefined) {  // only try to reset when gpio module available
+    if (gpioDs18b20.readSync() === 0) { //check the pin state, if the state is 0 (or off)
+      console.log('set DS18B20 GPIO on')
+      gpioDs18b20.writeSync(1); //set pin state to 1 (power DS18B20 on)
+      setTimeout(readSensorDataDs18b20, 5000); // retry after 1 minute, 3000)
+    } else {
+      if (gpioDs18b20.readSync() === 1) {
+        console.log('set DS18B20 GPIO off')
+        gpioDs18b20.writeSync(0); //set pin state to 0 (turn off / reset)
+        setTimeout(reset_w1_device, 3000)
+      }
     }
   }
 }

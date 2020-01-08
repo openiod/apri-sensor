@@ -40,8 +40,16 @@ var io	 										= require('socket.io-client');
 const exec 									= require('child_process').exec;
 const execFile							= require('child_process').execFile;
 const BME280 								= require('./BME280.js');
-const gpio = require('onoff').Gpio
-var gpioDs18b20 = new gpio(22, 'out'); //use GPIO-25 pin 22, and specify that it is output
+
+const gpio
+var gpioDs18b20
+try {
+  gpio = require('onoff').Gpio
+  var gpioDs18b20 = new gpio(22, 'out'); //use GPIO-25 pin 22, and specify that it is output
+}
+catch (err) {
+  console.log('GPIO module onoff not installed');
+}
 //const port = new SerialPort('/dev/ttyAMA0')
 //var app = express();
 

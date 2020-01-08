@@ -19,6 +19,8 @@
   "homepage": "https://github.com/openiod/apri-sensor#readme",
   "dependencies": {
     "axios": "^0.19.0",
+    "express": "^4.17.1",
+    "request": "^2.88.0",
     "onoff": "^5.0.1",
     "raspi": "^6.0.1",
     "raspi-i2c": "^6.2.2",

@@ -386,6 +386,7 @@ var processDeviceData	= function(err,temperatureData) {
 
 const readSensorDataDs18b20 = () => {
 	for (var i=0;i<devicesFolder.length;i++) {
+    console.log(devicesFolder)
 		if (devicesFolder[i].split('-')[0] == '28' | devicesFolder[i].split('-')[0] == '00') {  // 00 for GPIO
 //			console.log('DS18B20 device: ' +  devicesFolder[i]);
 			var path = '/sys/bus/w1/devices/'+devicesFolder[i];
@@ -581,6 +582,7 @@ var getCpuInfo	= function() {
 getCpuInfo();
 
 var reset_w1_device = function() {
+  console.log('reset_w1_device')
   if (gpioDs18b20 != undefined) {  // only try to reset when gpio module available
     if (gpioDs18b20.readSync() === 0) { //check the pin state, if the state is 0 (or off)
       console.log('set DS18B20 GPIO on')
@@ -597,6 +599,7 @@ var reset_w1_device = function() {
 }
 
 var check_w1_device = function() {
+  console.log('check_w1_device')
   try {
   	devicesFolder = fs.readdirSync('/sys/bus/w1/devices');
   	readSensorDataDs18b20();

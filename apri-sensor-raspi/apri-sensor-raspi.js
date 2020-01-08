@@ -41,7 +41,7 @@ const exec 									= require('child_process').exec;
 const execFile							= require('child_process').execFile;
 const BME280 								= require('./BME280.js');
 
-const gpio
+var gpio
 var gpioDs18b20
 try {
   gpio = require('onoff').Gpio

@@ -598,7 +598,7 @@ var reset_w1_device = function() {
     if (gpioDs18b20.readSync() === 0) { //check the pin state, if the state is 0 (or off)
       console.log('set DS18B20 GPIO on')
       gpioDs18b20.writeSync(1); //set pin state to 1 (power DS18B20 on)
-      setTimeout(readSensorDataDs18b20, 5000); // retry after 1 minute, 3000)
+      setTimeout(check_w1_device, 5000); // retry after 1 minute, 3000)
     } else {
       if (gpioDs18b20.readSync() === 1) {
         console.log('set DS18B20 GPIO off')

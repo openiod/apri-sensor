@@ -398,7 +398,7 @@ const readSensorDataDs18b20 = () => {
 			var path = '/sys/bus/w1/devices/'+devicesFolder[i];
 			try {
 				console.log('try read ' + path+ '/w1_slave');
-				fs.readFile(path+'/w1_slave',processDeviceData);  // start process
+				fs.readFileSync(path+'/w1_slave',processDeviceData);  // start process
         found = true
 			} catch (err) {
 			  console.log('Directory or file for DS18B20 not found. ('+path+ '/w1_slave'+')');
@@ -410,7 +410,7 @@ const readSensorDataDs18b20 = () => {
   if (found == true) {
     setTimeout(readSensorDataDs18b20, 1000);  // repeat every second
   } else {
-    setTimeout(check_w1_device,5000)
+    reset_w1_device()
   }
 };
 

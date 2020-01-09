@@ -387,7 +387,11 @@ var processDeviceData	= function(err,temperatureData) {
       }
 		}
 	};
+
+  setTimeout(readSensorDataDs18b20, 1000);
 };
+
+
 
 const readSensorDataDs18b20 = () => {
 	console.dir(devicesFolder  )
@@ -403,7 +407,7 @@ const readSensorDataDs18b20 = () => {
 		}
 	}
   if (found == false) {
-    reset_w1_device()
+    setTimeout(reset_w1_devices, 60000);
   }
 };
 
@@ -585,20 +589,32 @@ var getCpuInfo	= function() {
 
 getCpuInfo();
 
+var setGpioOn = function() {
+  console.log('set DS18B20 GPIO on')
+  gpioDs18b20.writeSync(1); //set pin state to 1 (power DS18B20 on)
+  setTimeout(check_w1_device, 5000);
+}
+var setGpioOff = function() {
+  console.log('set DS18B20 GPIO off')
+  gpioDs18b20.writeSync(0); //set pin state to 0 (power DS18B20 off)
+  setTimeout(setGpioOn, 5000);
+}
+
 var reset_w1_device = function() {
   console.log('reset_w1_device')
   if (gpioDs18b20 != undefined) {  // only try to reset when gpio module available
-    if (gpioDs18b20.readSync() === 0) { //check the pin state, if the state is 0 (or off)
-      console.log('set DS18B20 GPIO on')
-      gpioDs18b20.writeSync(1); //set pin state to 1 (power DS18B20 on)
-      setTimeout(check_w1_device, 5000); // retry after 1 minute, 3000)
-    } else {
-      if (gpioDs18b20.readSync() === 1) {
-        console.log('set DS18B20 GPIO off')
-        gpioDs18b20.writeSync(0); //set pin state to 0 (turn off / reset)
-        setTimeout(reset_w1_device, 10000)
-      }
-    }
+    setGpioOff()
+
+//    if (gpioDs18b20.readSync() === 0) { //check the pin state, if the state is 0 (or off)
+//      setGpioOn()
+//      setTimeout(check_w1_device, 5000); // retry after 1 minute, 3000)
+//    } else {
+//      if (gpioDs18b20.readSync() === 1) {
+//        console.log('set DS18B20 GPIO off')
+//        gpioDs18b20.writeSync(0); //set pin state to 0 (turn off / reset)
+//        setTimeout(reset_w1_device, 5000)
+//      }
+//    }
   }
 }
 
@@ -609,13 +625,13 @@ var check_w1_device = function() {
   	readSensorDataDs18b20();
   } catch (err) {
   	devicesFolder = undefined;
-    console.log('Directory or file for DS18B20 not found. (/sys/bus/w1/devices/28-*/w1_slave or 00-*..)');
-    reset_w1_devices()
+    console.log('Directory for W1 not found. No GPIO available? (/sys/bus/w1/devices');
+    setTimeout(reset_w1_devices, 60000);
     //return;
   }
 }
 
-check_w1_device()  // check w1 device for DS18B20
+reset_w1_device()  // check w1 device for DS18B20
 
 var socket = io(socketUrl, {path:socketPath});
 

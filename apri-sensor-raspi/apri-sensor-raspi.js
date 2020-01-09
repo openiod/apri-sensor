@@ -603,7 +603,7 @@ var reset_w1_device = function() {
       if (gpioDs18b20.readSync() === 1) {
         console.log('set DS18B20 GPIO off')
         gpioDs18b20.writeSync(0); //set pin state to 0 (turn off / reset)
-        setTimeout(reset_w1_device, 3000)
+        setTimeout(reset_w1_device, 10000)
       }
     }
   }

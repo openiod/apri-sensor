@@ -45,7 +45,7 @@ var gpio
 var gpioDs18b20
 try {
   gpio = require('onoff').Gpio
-  var gpioDs18b20 = new gpio(22, 'out'); //use GPIO-25 pin 22, and specify that it is output
+  var gpioDs18b20 = new gpio(25, 'out'); //use GPIO-25 pin 22, and specify that it is output
 }
 catch (err) {
   console.log('GPIO module onoff not installed');

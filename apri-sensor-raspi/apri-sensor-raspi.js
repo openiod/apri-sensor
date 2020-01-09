@@ -399,6 +399,7 @@ const readSensorDataDs18b20 = () => {
 			var path = '/sys/bus/w1/devices/'+devicesFolder[i];
 			console.log('try read ' + path+ '/w1_slave');
 			fs.readFile(path+'/w1_slave',processDeviceData);  // start process
+      found=true
 		}
 	}
   if (found == false) {

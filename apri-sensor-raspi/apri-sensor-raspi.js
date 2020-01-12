@@ -394,14 +394,14 @@ var processDeviceData	= function(err,temperatureData) {
 
 
 const readSensorDataDs18b20 = () => {
-	console.dir(devicesFolder  )
+	//console.dir(devicesFolder  )
   var found=false
   for (var i=0;i<devicesFolder.length;i++) {
 
 		if (devicesFolder[i].split('-')[0] == '28') {  // 00 for GPIO
 //			console.log('DS18B20 device: ' +  devicesFolder[i]);
 			var path = '/sys/bus/w1/devices/'+devicesFolder[i];
-			console.log('try read ' + path+ '/w1_slave');
+			//console.log('try read ' + path+ '/w1_slave');
 			fs.readFile(path+'/w1_slave',processDeviceData);  // start process
       found=true
 		}
@@ -451,12 +451,6 @@ var processDataCycle	= function() {
 }
 
 
-
-
-
-
-
-
 var printHex = function(buffer, tekst) {
 	var str="";
   for (var i=0;i<buffer.length;i++) {
@@ -464,8 +458,6 @@ var printHex = function(buffer, tekst) {
   }
   console.log('log: ' + tekst +'  lengte:'+buffer.length+ " "+ str); // + data);
 }
-
-
 
 function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
@@ -638,7 +630,6 @@ var socket = io(socketUrl, {path:socketPath});
 socket.on('connection', function (socket) {
 	var currTime = new Date();
 	console.log(currTime +': connect from '+ socket.request.connection.remoteAddress + ' / '+ socket.handshake.headers['x-forwarded-for'] || socket.handshake.address.address);
-
 });
 
 socket.on('disconnect', function() {

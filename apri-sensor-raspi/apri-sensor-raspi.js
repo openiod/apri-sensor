@@ -407,7 +407,7 @@ const readSensorDataDs18b20 = () => {
 		}
 	}
   if (found == false) {
-    setTimeout(reset_w1_devices, 60000);
+    setTimeout(reset_w1_device, 60000);
   }
 };
 
@@ -618,7 +618,7 @@ var check_w1_device = function() {
   } catch (err) {
   	devicesFolder = undefined;
     console.log('Directory for W1 not found. No GPIO available? (/sys/bus/w1/devices');
-    setTimeout(reset_w1_devices, 60000);
+    setTimeout(reset_w1_device, 60000);
     //return;
   }
 }

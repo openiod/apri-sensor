@@ -166,8 +166,9 @@ var getRedisData = function(redisKey) {
         default:
           console.log('ERROR: redis entry unknown: '+ redisKey);
       };
+			var sensorId = res.foi
 			var measurements = url
-      sendDataWebSocket(_redisKey,measurements);
+      sendDataWebSocket(_redisKey,sensorId,measurements);
 			//sendData(_redisKey,url);
     });
 }
@@ -193,10 +194,10 @@ var tsi3007Attributes = function(res) {
 }
 
 // send data to websocket service
-var sendDataWebSocket = function(redisKey,measurements) {
+var sendDataWebSocket = function(redisKey,sensorId,measurements) {
 	var _redisKey = redisKey;
 	socket.emit('apriAgentPing', measurements );
-	socket.emit('apriSensorMeasurementUrl', {"key": _redisKey, "url": measurements} );
+	socket.emit('apriSensorMeasurementUrl', {"key": _redisKey, "sensorId": sensorId, "url": measurements} );
 	console.log(redisKey)
 	console.dir(measurements)
 }
@@ -307,7 +308,14 @@ socket.on('disconnect', function() {
 });
 
 socket.on('measurementReturnStatus', function(data) {
-	console.log('Websocket service returned status '+ data + ' on measurement send request');
+	console.log('Websocket service returned status '+ data.statusCode + ' on measurement send request');
+	console.log(data.key)
+	if (data.statuscode == '200') {
+		console.log("statis is ok, key should be removed from Redis db")
+		// todo remove from Redis
+	} else {
+		console.log("statis is "+ data.statuscode +", try again for these measurements")
+	}
 });
 
 socket.on('info', function(data) {

@@ -196,7 +196,7 @@ var tsi3007Attributes = function(res) {
 var sendDataWebSocket = function(redisKey,measurements) {
 	var _redisKey = redisKey;
 	socket.emit('apriAgentPing', measurements );
-	socket.emit('apriSensorMeasurementUrl', measurements );
+	socket.emit('apriSensorMeasurementUrl', {"key": _redisKey, "url": measurements} );
 	console.log(redisKey)
 	console.dir(measurements)
 }

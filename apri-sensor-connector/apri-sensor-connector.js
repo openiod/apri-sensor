@@ -160,7 +160,7 @@ var getRedisData = function(redisArray, redisArrayIndex) {
 //  console.log(dateObserved);
   var url = '';
 
-  redisHgetallAsync(redisKey)
+  redisHgetallAsync(_redisKey)
   .then(function(res) {
     var _res = res;
     switch (keySplit[lastEntry]) {

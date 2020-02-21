@@ -106,7 +106,7 @@ var processDataCycle	= function(parm) {
   }
 
 	//log('Find new record');
-  redisSortAsync('new', 'alpha','limit',0,10,'asc')
+  redisSortAsync('new', 'alpha','limit',0,50,'asc')
   .then(function(res) {
     var _res = res;
     if (_res.length>0) {

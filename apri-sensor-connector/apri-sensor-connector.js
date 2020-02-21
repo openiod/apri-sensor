@@ -273,6 +273,8 @@ var sendData = function(redisArray, redisArrayIndex, redisKey,url) {
 		if (_redisArrayIndex<_redisArray.length-1) {
 			_redisArrayIndex++
 			getRedisData(_redisArray, _redisArrayIndex)
+		} else {
+			setTimeout(processDataCycle, loopTimeCycle);
 		}
 //		setTimeout(processDataCycle, loopTimeCycle);
    })

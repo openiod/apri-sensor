@@ -114,10 +114,10 @@ var processDataCycle	= function(parm) {
 			self.processRedisData(_res)
     } else setTimeout(processDataCycle, loopTimeCycle);
 	})
-	.catch(function(error) {
-		setTimeout(processDataCycle, loopTimeCycle);
-		log('Axios catch');
-  });
+//	.catch(function(error) {
+//		setTimeout(processDataCycle, loopTimeCycle);
+//		log('Axios catch');
+//  });
 
 //	setTimeout(processDataCycle, loopTimeCycle);
 

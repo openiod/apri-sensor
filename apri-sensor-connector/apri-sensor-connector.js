@@ -262,10 +262,6 @@ var sendData = function(redisArray, redisArrayIndex, redisKey,url) {
         //processDataCycle({repeat:false}); // continue with next measurement if available
         //console.log('Redis smove(d) from new to old-set success');
       });
-			if (_redisArrayIndex<_redisArray.length-1) {
-				_redisArrayIndex++
-				getRedisData(_redisArray, _redisArrayIndex)
-			}
     } else {
 //      console.log(response.status + ' / ' + response.headers['content-type'] + ' / ' +response.data);
 			lastResponse = new Date().getTime();
@@ -273,6 +269,10 @@ var sendData = function(redisArray, redisArrayIndex, redisKey,url) {
 			log('Transaction duration: '+latencyPreviousSend+' msec');
       log(response.status + ' / ' + response.statusText + ' / ' + response.headers['content-type'] + ', service status: ' + response.data.status);
     }
+		if (_redisArrayIndex<_redisArray.length-1) {
+			_redisArrayIndex++
+			getRedisData(_redisArray, _redisArrayIndex)
+		}
 //		setTimeout(processDataCycle, loopTimeCycle);
    })
    .catch(error => {

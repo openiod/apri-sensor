@@ -111,7 +111,7 @@ var processDataCycle	= function(parm) {
     var _res = res;
     if (_res.length>0) {
       log('New record available: '+_res[0]);
-			self.processRedisData(_res)
+			processRedisData(_res)
     } else setTimeout(processDataCycle, loopTimeCycle);
 	})
 //	.catch(function(error) {

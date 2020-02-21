@@ -42,6 +42,7 @@ const redisSortAsync 				= promisify(redisClient.sort).bind(redisClient);
 const redisDelAsync         = promisify(redisClient.del).bind(redisClient);
 const redisSmoveAsync       = promisify(redisClient.smove).bind(redisClient);
 const redisHgetallAsync     = promisify(redisClient.hgetall).bind(redisClient);
+var self = this
 
 var log 										= function(message){
 	console.log(new Date().toISOString()+' | '+message);
@@ -110,7 +111,7 @@ var processDataCycle	= function(parm) {
     var _res = res;
     if (_res.length>0) {
       log('New record available: '+_res[0]);
-			processRedisData(_res)
+			self.processRedisData(_res)
     } else setTimeout(processDataCycle, loopTimeCycle);
 	})
 	.catch(function(error) {

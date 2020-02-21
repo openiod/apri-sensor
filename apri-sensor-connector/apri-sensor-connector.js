@@ -179,9 +179,6 @@ var getRedisData = function(redisArray, redisArrayIndex) {
         console.log('ERROR: redis entry unknown: '+ redisKey);
     };
     sendData(_redisArray, _redisArrayIndex, _redisKey,url);
-		if (){
-
-		}
   });
 }
 

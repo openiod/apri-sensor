@@ -105,17 +105,12 @@ var processDataCycle	= function(parm) {
   }
 
 	//log('Find new record');
-  redisSortAsync('new', 'alpha','limit',0,18,'asc')
+  redisSortAsync('new', 'alpha','limit',0,10,'asc')
   .then(function(res) {
     var _res = res;
     if (_res.length>0) {
       log('New record available: '+_res[0]);
-      // getRedisData(_res[0]);
-			for (var j=0;j<_res.length;j++) {
-        // getRedisData(_res[j]);
-      	setTimeout(getRedisData, j*20,_res[j]);
-      }
-      setTimeout(processDataCycle, loopTimeCycle);
+			processRedisData(_res)
     } else setTimeout(processDataCycle, loopTimeCycle);
 	})
 	.catch(function(error) {
@@ -139,35 +134,55 @@ function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-var getRedisData = function(redisKey) {
-  var _redisKey = redisKey;
-  var keySplit = redisKey.split(':');
+var processRedisData = function(redisArray) {
+
+	var redisArrayIndex=0
+	var _redisArray=redisArray
+	// getRedisData(_res[0]);
+//	for (var j=0;j<_res.length;j++) {
+		// getRedisData(_res[j]);
+	getRedisData(_redisArray, redisArrayIndex)
+//	}
+	//setTimeout(processDataCycle, loopTimeCycle);
+
+}
+
+var getRedisData = function(redisArray, redisArrayIndex) {
+	var _redisArrayIndex=redisArrayIndex
+	var _redisArray=redisArray
+
+  var _redisKey = _redisArray[_redisArrayIndex];
+	console.log('Proces RedisData '+_redisKey+ ' Index: ' + _redisArrayIndex )
+  var keySplit = _redisKey.split(':');
   var lastEntry = keySplit.length-1;
   var dateObserved = _redisKey.substring(0,_redisKey.length - keySplit[lastEntry].length-1);
 //  console.log(dateObserved);
   var url = '';
 
   redisHgetallAsync(redisKey)
-    .then(function(res) {
-      var _res = res;
-      switch (keySplit[lastEntry]) {
-        case 'bme280':
-          url = bme280Attributes(res)+'&dateObserved='+dateObserved;
-          break;
-        case 'pmsa003':
-          url = pmsa003Attributes(res)+'&dateObserved='+dateObserved;
-          break;
-        case 'ds18b20':
-          url = ds18b20Attributes(res)+'&dateObserved='+dateObserved;
-          break;
-				case 'tsi3007':
-	          url = tsi3007Attributes(res)+'&dateObserved='+dateObserved;
-	          break;
-        default:
-          console.log('ERROR: redis entry unknown: '+ redisKey);
-      };
-      sendData(_redisKey,url);
-    });
+  .then(function(res) {
+    var _res = res;
+    switch (keySplit[lastEntry]) {
+      case 'bme280':
+        url = bme280Attributes(res)+'&dateObserved='+dateObserved;
+        break;
+      case 'pmsa003':
+        url = pmsa003Attributes(res)+'&dateObserved='+dateObserved;
+        break;
+      case 'ds18b20':
+        url = ds18b20Attributes(res)+'&dateObserved='+dateObserved;
+        break;
+			case 'tsi3007':
+	         url = tsi3007Attributes(res)+'&dateObserved='+dateObserved;
+	         break;
+      default:
+        console.log('ERROR: redis entry unknown: '+ redisKey);
+    };
+    sendData(_redisArray, _redisArrayIndex, _redisKey,url);
+		if (){
+
+		}
+  });
 }
 
 var bme280Attributes = function(res) {
@@ -191,7 +206,10 @@ var tsi3007Attributes = function(res) {
 }
 
 // send data to service
-var sendData = function(redisKey,url) {
+var sendData = function(redisArray, redisArrayIndex, redisKey,url) {
+	var _redisArrayIndex=redisArrayIndex
+	var _redisArray=redisArray
+
   var _redisKey = redisKey;
   if (url=='') {
     return;  // todo: problem with this redis hash so wath to do with it?
@@ -247,6 +265,10 @@ var sendData = function(redisKey,url) {
         //processDataCycle({repeat:false}); // continue with next measurement if available
         //console.log('Redis smove(d) from new to old-set success');
       });
+			if (_redisArrayIndex<_redisArray.length-1) {
+				_redisArrayIndex++
+				getRedisData(_redisArray, _redisArrayIndex)
+			}
     } else {
 //      console.log(response.status + ' / ' + response.headers['content-type'] + ' / ' +response.data);
 			lastResponse = new Date().getTime();

@@ -106,7 +106,7 @@ var processDataCycle	= function(parm) {
   }
 
 	//log('Find new record');
-  redisSortAsync('new', 'alpha','limit',0,50,'asc')
+  redisSortAsync('new', 'alpha','limit',0,30,'asc')
   .then(function(res) {
     var _res = res;
     if (_res.length>0) {
@@ -301,8 +301,8 @@ var sendData = function(redisArray, redisArrayIndex, redisKey,url) {
 		 }
 		 //log(error.config);
 		 log('Error config code: '+ error.code);
-		 logDir(error)
-//		 setTimeout(processDataCycle, loopTimeCycle);
+		 setTimeout(processDataCycle, loopTimeCycle);
+//		 logDir(error)
    });
 };
 

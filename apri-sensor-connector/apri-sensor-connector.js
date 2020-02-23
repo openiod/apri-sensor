@@ -106,7 +106,7 @@ var processDataCycle	= function(parm) {
   }
 
 	//log('Find new record');
-  redisSortAsync('new', 'alpha','limit',0,30,'asc')
+  redisSortAsync('new', 'alpha','limit',0,60,'asc')
   .then(function(res) {
     var _res = res;
     if (_res.length>0) {
@@ -215,8 +215,9 @@ var sendData = function(redisArray, redisArrayIndex, redisKey,url) {
   var headers = {};
   lastSend = new Date().getTime();
 	console.log(url);
-  axios.get(url,{ headers: headers
-		//,timeout: 5000
+  axios.get(url,{
+		headers: headers
+		,timeout: 1500
 	})
   .then(response => {
 		//log('Response recieved');

@@ -66,7 +66,7 @@ console.log('web-socket url: '+socketUrl+socketPath);
 var secureSite 			= true;
 var siteProtocol 		= secureSite?'https://':'http://';
 var openiodUrl			= siteProtocol + 'aprisensor-in.openiod.org';
-var loopTimeCycle		= 10000; //ms, 20000=20 sec
+var loopTimeCycle		= 5000; //ms, 20000=20 sec
 //var waitTimeBeforeNext = 1000;
 var lastSend        = new Date().getTime();
 var lastResponse    = lastSend;
@@ -217,7 +217,7 @@ var sendData = function(redisArray, redisArrayIndex, redisKey,url) {
 	console.log(url);
   axios.get(url,{
 		headers: headers
-		,timeout: 1500
+		,timeout: 2000
 	})
   .then(response => {
 		//log('Response recieved');
@@ -275,7 +275,7 @@ var sendData = function(redisArray, redisArrayIndex, redisKey,url) {
 			_redisArrayIndex++
 			getRedisData(_redisArray, _redisArrayIndex)
 		} else {
-			setTimeout(processDataCycle, loopTimeCycle);
+			setTimeout(processDataCycle, 1000);
 		}
 //		setTimeout(processDataCycle, loopTimeCycle);
    })

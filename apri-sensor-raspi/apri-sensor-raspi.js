@@ -42,10 +42,11 @@ const execFile							= require('child_process').execFile;
 const BME280 								= require('./BME280.js');
 
 const I2C = require('raspi-i2c').I2C;
+var ADS1x15
 
 var ads1115Available = false
 try {
-  const ADS1x15 = require('raspi-kit-ads1x15');
+  ADS1x15 = require('raspi-kit-ads1x15');
   ads1115Available = true
 }
 catch (err) {

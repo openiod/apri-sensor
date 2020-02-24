@@ -41,6 +41,53 @@ const exec 									= require('child_process').exec;
 const execFile							= require('child_process').execFile;
 const BME280 								= require('./BME280.js');
 
+const I2C = require('raspi-i2c').I2C;
+
+var ads1115Avaliable = false
+try {
+  const ADS1x15 = require('raspi-kit-ads1x15');
+  ads1115Avaliable = true
+}
+catch (err) {
+  console.log('ADS1115 module not installed');
+}
+var adc
+
+var getAds1115Tgs5042 = function() {
+  setTimeout(getAds1115Tgs5042, 1000);
+  adc.readChannel(ADS1x15.channel.CHANNEL_0, (err, value, volts) => {
+    if (err) {
+      console.error('Failed to fetch value from ADC', err);
+      ads1115Avaliable=false;
+    } else {
+      // volgens Dieter:
+      //   1 ppm = 1 ml/m3 CO = (1/22.4) = 0.04464 mmol CO/m3 = 0.04464 * 28 = 1,25 mg/m3
+      //   Er van uitgaande dat CO een zogenaamd ideaal gas is en dan geldt het standaard molair volume van 22,4 liter gas per mol gas
+      var mgM3 = co * 1.25
+      console.log(' * CO ppm:', co, ' ',mgM3, ' mg/m3');
+    }
+  });
+}
+if (ads1115Available==true) {
+  // Init Raspi
+  raspi.init(() => {
+    // Init Raspi-I2c
+    const i2c = new I2C();
+    // Init the ADC
+    adc = new ADS1x15({
+      i2c,                                    // i2c interface
+      //chip: ADS1x15.chips.IC_ADS1015,         // chip model
+      chip: ADS1x15.chips.IC_ADS1115,         // chip model
+      address: ADS1x15.address.ADDRESS_0x48,  // i2c address on the bus
+
+      // Defaults for future readings
+//        pga: ADS1x15.pga.PGA_4_096V,            // power-gain-amplifier range
+      pga: ADS1x15.pga.PGA_2_048V,            // power-gain-amplifier range
+      sps: ADS1x15.spsADS1015.SPS_250         // data rate (samples per second)
+    });
+  });
+}
+
 var gpio
 var gpioDs18b20
 try {
@@ -169,6 +216,10 @@ var counters	= {
 		, pressure		: 0
 		, rHum				: 0
 		, nrOfMeas		: 0
+	},
+	tgs5042: {
+		co		: 0
+		, nrOfMeas		: 0
 	}
 };
 var results			= {
@@ -196,6 +247,10 @@ var results			= {
 		, pressure		: 0
 		, rHum				: 0
 		, nrOfMeas		: 0
+	},
+	tgs5042: {
+		co		: 0
+		, nrOfMeas		: 0
 	}
 };
 
@@ -221,6 +276,9 @@ var initCounters	= function () {
 	counters.bme280.pressure		= 0;
 	counters.bme280.rHum				= 0;
 	counters.bme280.nrOfMeas		= 0;
+
+  counters.tgs5042.co= 0;
+	counters.tgs5042.nrOfMeas		= 0;
 }
 
 //-------------- raspi-serial
@@ -416,7 +474,7 @@ const readSensorDataDs18b20 = () => {
 var processDataCycle	= function() {
 	setTimeout(processDataCycle, loopTimeCycle);
 	counters.busy = true;
-	console.log('Counters pms: '+ counters.pms.nrOfMeas + '; bme280: '+ counters.bme280.nrOfMeas + '; ds18b20: '+ counters.ds18b20.nrOfMeas );
+	console.log('Counters pms: '+ counters.pms.nrOfMeas + '; bme280: '+ counters.bme280.nrOfMeas + '; ds18b20: '+ counters.ds18b20.nrOfMeas + '; tgs5042: '+ counters.tgs5042.nrOfMeas );
 
   results.pms.pm1CF1							= Math.round((counters.pms.pm1CF1/counters.pms.nrOfMeas)*100)/100;
 	results.pms.pm25CF1							= Math.round((counters.pms.pm25CF1/counters.pms.nrOfMeas)*100)/100;
@@ -437,11 +495,11 @@ var processDataCycle	= function() {
 	results.bme280.rHum							= Math.round((counters.bme280.rHum/counters.bme280.nrOfMeas)*100)/100;
 	results.bme280.nrOfMeas					= counters.bme280.nrOfMeas;
 
-  if (counters.ds18b20.nrOfMeas==0) {
-
-  }
 	results.ds18b20.temperature			= Math.round((counters.ds18b20.temperature/counters.ds18b20.nrOfMeas)*100)/100;
 	results.ds18b20.nrOfMeas				= counters.ds18b20.nrOfMeas;
+
+  results.tgs5042.co			= Math.round((counters.tgs5042.co/counters.tgs5042.nrOfMeas)*100)/100;
+	results.tgs5042.nrOfMeas				= counters.tgs5042.nrOfMeas;
 
 	initCounters();
 	counters.busy = false;
@@ -549,7 +607,23 @@ var sendData = function() {
 				console.log(timeStamp.toISOString()+':ds18b20'+_res);
 			});
 		}
-
+/*
+    if (results.tgs5042.nrOfMeas > 0) {
+			redisHmsetHashAsync(timeStamp.toISOString()+':tgs5042'
+			  , 'foi', 'SCRP' + unit.id
+			  , 'co', results.tgs5042.co
+			  ).then(function(res) {
+					var _res = res;
+					redisSaddAsync('new', timeStamp.toISOString()+':tgs5042')
+						.then(function(res2) {
+							var _res2 = res2;
+						//	redisSaddAsync('tgs5042', timeStamp.toISOString()+':tgs5042')
+			    		console.log('tgs5042 ', timeStamp.toISOString()+':tgs5042'+ _res2);
+						});
+				console.log(timeStamp.toISOString()+':tgs5042'+_res);
+			});
+		}
+*/
 };
 
 
@@ -624,6 +698,12 @@ var check_w1_device = function() {
 }
 
 reset_w1_device()  // check w1 device for DS18B20
+
+// start processing TGS5042 CO sensor if available
+if (ads1115Available==true) {
+  setTimeout(getAds1115Tgs5042, 1000);
+}
+
 
 var socket = io(socketUrl, {path:socketPath});
 

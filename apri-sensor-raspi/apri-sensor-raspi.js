@@ -43,10 +43,10 @@ const BME280 								= require('./BME280.js');
 
 const I2C = require('raspi-i2c').I2C;
 
-var ads1115Avaliable = false
+var ads1115Available = false
 try {
   const ADS1x15 = require('raspi-kit-ads1x15');
-  ads1115Avaliable = true
+  ads1115Available = true
 }
 catch (err) {
   console.log('ADS1115 module not installed');
@@ -58,7 +58,7 @@ var getAds1115Tgs5042 = function() {
   adc.readChannel(ADS1x15.channel.CHANNEL_0, (err, value, volts) => {
     if (err) {
       console.error('Failed to fetch value from ADC', err);
-      ads1115Avaliable=false;
+      ads1115Available=false;
     } else {
       // volgens Dieter:
       //   1 ppm = 1 ml/m3 CO = (1/22.4) = 0.04464 mmol CO/m3 = 0.04464 * 28 = 1,25 mg/m3

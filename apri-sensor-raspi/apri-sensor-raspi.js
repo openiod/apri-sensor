@@ -67,6 +67,10 @@ var getAds1115Tgs5042 = function() {
       var co = (Math.round(1000000*(2.004-volts)*400))/1000000
       var mgM3 = co * 1.25
       console.log(' * CO ppm:', co, ' ',mgM3, ' mg/m3');
+      if (counters.busy == false) {
+        counters.tgs5042.nrOfMeas++;
+        counters.tgs5042.co			+= mgM3;
+      }
     }
   });
 }

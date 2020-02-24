@@ -64,6 +64,7 @@ var getAds1115Tgs5042 = function() {
       // volgens Dieter:
       //   1 ppm = 1 ml/m3 CO = (1/22.4) = 0.04464 mmol CO/m3 = 0.04464 * 28 = 1,25 mg/m3
       //   Er van uitgaande dat CO een zogenaamd ideaal gas is en dan geldt het standaard molair volume van 22,4 liter gas per mol gas
+      var co = (Math.round(1000000*(2.004-volts)*400))/1000000
       var mgM3 = co * 1.25
       console.log(' * CO ppm:', co, ' ',mgM3, ' mg/m3');
     }

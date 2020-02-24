@@ -613,6 +613,9 @@ var sendData = function() {
 				console.log(timeStamp.toISOString()+':ds18b20'+_res);
 			});
 		}
+    if (results.tgs5042.nrOfMeas > 0) {
+      console.log(results.tgs5042.co)
+    }
 /*
     if (results.tgs5042.nrOfMeas > 0) {
 			redisHmsetHashAsync(timeStamp.toISOString()+':tgs5042'

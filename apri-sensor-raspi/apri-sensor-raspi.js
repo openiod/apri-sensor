@@ -614,10 +614,6 @@ var sendData = function() {
 			});
 		}
     if (results.tgs5042.nrOfMeas > 0) {
-      console.log(results.tgs5042.co)
-    }
-/*
-    if (results.tgs5042.nrOfMeas > 0) {
 			redisHmsetHashAsync(timeStamp.toISOString()+':tgs5042'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'co', results.tgs5042.co
@@ -632,7 +628,6 @@ var sendData = function() {
 				console.log(timeStamp.toISOString()+':tgs5042'+_res);
 			});
 		}
-*/
 };
 
 

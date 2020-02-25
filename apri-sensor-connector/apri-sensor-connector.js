@@ -207,7 +207,7 @@ var tsi3007Attributes = function(res) {
 }
 var tgs5042Attributes = function(res) {
   return openiodUrl + '/tgs5042'+ '/v1/m?foi=' + res.foi + '&observation='+
-    'part:'+res.co;
+    'co:'+res.co;
 }
 
 // send data to service

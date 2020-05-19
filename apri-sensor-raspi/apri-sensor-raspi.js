@@ -733,7 +733,7 @@ raspi.init(() => {
     console.log('serial open')
     serial.on('data', (data) => {
       console.log('serial on data')
-      //printHex(data,'T');
+      printHex(data,'T');
 			for (var i=0;i<data.length;i++) {
 				processRaspiSerialData(data[i]);
 			}

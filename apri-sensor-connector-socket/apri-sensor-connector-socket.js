@@ -59,7 +59,7 @@ redisClient.on("error", function (err) {
 var socketUrl, socketPath;
 
 //prod:
-socketUrl 									= 'https://openiod.org'; socketPath	= '/'+apriConfig.systemCode + '/socket.io';
+socketUrl 									= 'https://openiod.org'; socketPath	= '/'+apriConfig.systemCode + '/aprisensor/measurements/socket.io';
 console.log('web-socket url: '+socketUrl+socketPath);
 
 var secureSite 			= true;

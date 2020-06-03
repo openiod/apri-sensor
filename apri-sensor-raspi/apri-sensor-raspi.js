@@ -730,10 +730,10 @@ socket.on('info', function(data) {
 raspi.init(() => {
   var serial = new Serial({portId:'/dev/ttyS0',baudRate:9600});
   serial.open(() => {
-    console.log('serial open')
+    //console.log('serial open')
     serial.on('data', (data) => {
-      console.log('serial on data')
-      printHex(data,'T');
+      //console.log('serial on data')
+      //printHex(data,'T');
 			for (var i=0;i<data.length;i++) {
 				processRaspiSerialData(data[i]);
 			}

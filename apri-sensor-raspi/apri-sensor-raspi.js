@@ -481,7 +481,7 @@ if (bme680 != undefined) {
             counters.bme680.pressure					+= data.pressure;
             counters.bme680.rHum							+= data.humidity;
             counters.bme680.gasResistance  		+= data.gas_resistance;
-            console.log(' ' + data.temperature_C+ ' ' + data.pressure_hPa + ' ' + data.humidity + ' ' +data.gas_resistance+' ' + counters.bme680.nrOfMeas);
+            console.log(' ' + data.temperature+ ' ' + data.pressure + ' ' + data.humidity + ' ' +data.gas_resistance+' ' + counters.bme680.nrOfMeas);
           }
         } else {
           console.log('Raspi-i2c processing is busy, measurement BME680 skipped');

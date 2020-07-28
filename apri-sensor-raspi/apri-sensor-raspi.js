@@ -431,6 +431,7 @@ const readSensorData = () => {
 };
 // Initialize the BME280 sensor
 //
+/*
 bme280.init()
   .then(() => {
     console.log('BME280 initialization succeeded');
@@ -438,6 +439,7 @@ bme280.init()
   })
   .catch((err) => console.error(`BME280 initialization failed: ${err} `));
 //  end-of raspi-i2c variables and functions
+*/
 
 if (bme680 != undefined) {
   bme680.initialize()

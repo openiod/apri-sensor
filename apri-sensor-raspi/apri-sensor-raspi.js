@@ -471,7 +471,7 @@ if (bme680 != undefined) {
 //        console.info(bme680Data)
 //        console.info(bme680Data.data)
         var data = bme680Data.data;
-        console.dir(data)
+        //console.dir(data)
         if (counters.busy == false) {
           if (data.pressure<900) {
             console.log('BME680 pressure below 900. Less than 3.3V power? Measure skipped');

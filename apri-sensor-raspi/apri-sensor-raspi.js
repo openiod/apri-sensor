@@ -103,6 +103,17 @@ try {
 catch (err) {
   console.log('GPIO module onoff not installed');
 }
+
+var Bme680
+var bme680
+try {
+  {Bme680 } = require('bme680-sensor');
+  bme680 = new Bme680(1, 0x76);
+}
+catch(err) {
+  console.log('module BME680-sensor not installed')
+}
+
 //const port = new SerialPort('/dev/ttyAMA0')
 //var app = express();
 
@@ -428,7 +439,14 @@ bme280.init()
   .catch((err) => console.error(`BME280 initialization failed: ${err} `));
 //  end-of raspi-i2c variables and functions
 
-
+if (bme680 != undefined) {
+  bme680.initialize().then(async () => {
+    console.info('BME680 sensor initialized');
+    setInterval(async () => {
+        console.info(await bme680.getSensorData());
+    }, 3000);
+  });
+}
 
 
 var processDeviceData	= function(err,temperatureData) {

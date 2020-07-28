@@ -1,7 +1,7 @@
 /*
 ** Module: apri-sensor-raspi
 **
-** Main system module for handling sensor measurement data for DS18B20, PMSA003/PMS7003, BME280
+** Main system module for handling sensor measurement data for DS18B20, PMSA003/PMS7003, BME280, BME680, TGS5042
 **
 */
 
@@ -234,6 +234,13 @@ var counters	= {
 		, rHum				: 0
 		, nrOfMeas		: 0
 	},
+  bme680: {
+		  temperature	: 0
+		, pressure		: 0
+		, rHum				: 0
+    , gasResistance	: 0
+		, nrOfMeas		: 0
+	},
 	tgs5042: {
 		co		: 0
 		, nrOfMeas		: 0
@@ -265,6 +272,13 @@ var results			= {
 		, rHum				: 0
 		, nrOfMeas		: 0
 	},
+  bme680: {
+		  temperature	: 0
+		, pressure		: 0
+		, rHum				: 0
+    , gasResistance	: 0
+		, nrOfMeas		: 0
+	},
 	tgs5042: {
 		co		: 0
 		, nrOfMeas		: 0
@@ -293,6 +307,12 @@ var initCounters	= function () {
 	counters.bme280.pressure		= 0;
 	counters.bme280.rHum				= 0;
 	counters.bme280.nrOfMeas		= 0;
+
+  counters.bme680.temperature	= 0;
+	counters.bme680.pressure		= 0;
+	counters.bme680.rHum				= 0;
+  counters.bme680.gasResistance	= 0;
+	counters.bme680.nrOfMeas		= 0;
 
   counters.tgs5042.co= 0;
 	counters.tgs5042.nrOfMeas		= 0;
@@ -450,6 +470,21 @@ if (bme680 != undefined) {
         var bme680Data = await bme680.getSensorData();
         console.info(bme680Data)
         console.info(bme680Data.data)
+        var data = bme680Data.data.FieldData;
+        if (counters.busy == false) {
+          if (data.pressure<900) {
+            console.log('BME680 pressure below 900. Less than 3.3V power? Measure skipped');
+          } else {
+            counters.bme680.nrOfMeas++;
+            counters.bme680.temperature				+= data.temperature;
+            counters.bme680.pressure					+= data.pressure;
+            counters.bme680.rHum							+= data.humidity;
+            counters.bme680.gasResistance  		+= data.gas_resistance;
+            console.log(' ' + data.temperature_C+ ' ' + data.pressure_hPa + ' ' + data.humidity + ' ' +data.gas_resistance+' ' + counters.bme680.nrOfMeas);
+          }
+        } else {
+          console.log('Raspi-i2c processing is busy, measurement BME680 skipped');
+        }
     }, 3000);
   })
   .catch((err) => console.error(`BME680 initialization failed: ${err} `));
@@ -507,7 +542,7 @@ const readSensorDataDs18b20 = () => {
 var processDataCycle	= function() {
 	setTimeout(processDataCycle, loopTimeCycle);
 	counters.busy = true;
-	console.log('Counters pms: '+ counters.pms.nrOfMeas + '; bme280: '+ counters.bme280.nrOfMeas + '; ds18b20: '+ counters.ds18b20.nrOfMeas + '; tgs5042: '+ counters.tgs5042.nrOfMeas );
+	console.log('Counters pms: '+ counters.pms.nrOfMeas + '; bme280: '+ counters.bme280.nrOfMeas + '; bme680: '+ counters.bme680.nrOfMeas  + '; ds18b20: '+ counters.ds18b20.nrOfMeas + '; tgs5042: '+ counters.tgs5042.nrOfMeas );
 
   results.pms.pm1CF1							= Math.round((counters.pms.pm1CF1/counters.pms.nrOfMeas)*100)/100;
 	results.pms.pm25CF1							= Math.round((counters.pms.pm25CF1/counters.pms.nrOfMeas)*100)/100;
@@ -527,6 +562,12 @@ var processDataCycle	= function() {
 	results.bme280.pressure					= Math.round((counters.bme280.pressure/counters.bme280.nrOfMeas)*100)/100;
 	results.bme280.rHum							= Math.round((counters.bme280.rHum/counters.bme280.nrOfMeas)*100)/100;
 	results.bme280.nrOfMeas					= counters.bme280.nrOfMeas;
+
+  results.bme680.temperature			= Math.round((counters.bme680.temperature/counters.bme680.nrOfMeas)*100)/100;
+	results.bme680.pressure					= Math.round((counters.bme680.pressure/counters.bme680.nrOfMeas)*100)/100;
+	results.bme680.rHum							= Math.round((counters.bme680.rHum/counters.bme680.nrOfMeas)*100)/100;
+  results.bme680.gasResistance		= Math.round((counters.bme680.gasResistance/counters.bme680.nrOfMeas)*100)/100;
+	results.bme680.nrOfMeas					= counters.bme680.nrOfMeas;
 
 	results.ds18b20.temperature			= Math.round((counters.ds18b20.temperature/counters.ds18b20.nrOfMeas)*100)/100;
 	results.ds18b20.nrOfMeas				= counters.ds18b20.nrOfMeas;
@@ -623,6 +664,29 @@ var sendData = function() {
 							console.log('bme280 ', timeStamp.toISOString()+':bme280'+ _res2);
 						});
 		    	console.log(timeStamp.toISOString()+':bme280'+_res);
+			});
+		}
+    if (results.bme680.nrOfMeas > 0) {
+//			url = openiodUrl + '/bme680'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
+//						'temperature:'+results.bme680.temperature+',pressure:'+results.bme680.pressure+
+//            ',rHum:'+results.bme680.rHum+',gasResistance:'+results.bme680.gasResistance ;
+//			console.log(url);
+//			sendRequest(url);
+			redisHmsetHashAsync(timeStamp.toISOString()+':bme680'
+			  , 'foi', 'SCRP' + unit.id
+			  , 'temperature', results.bme680.temperature
+				, 'pressure', results.bme680.pressure
+				, 'rHum', results.bme680.rHum
+        , 'gasResistance', results.bme680.gasResistance
+			  ).then(function(res) {
+					var _res = res;
+					redisSaddAsync('new', timeStamp.toISOString()+':bme680')
+						.then(function(res2) {
+							var _res2 = res2;
+						//	redisSaddAsync('bme680', timeStamp.toISOString()+':bme680')
+							console.log('bme680 ', timeStamp.toISOString()+':bme680'+ _res2);
+						});
+		    	console.log(timeStamp.toISOString()+':bme680'+_res);
 			});
 		}
 		if (results.ds18b20.nrOfMeas > 0) {

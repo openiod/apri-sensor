@@ -13,7 +13,7 @@ class BME280 {
   constructor(options) {
     const i2c = require('i2c-bus');
 
-    this.i2cBusNo = (options && options.hasOwnProperty('i2cBusNo')) ? options.i2cBusNo : 1;    
+    this.i2cBusNo = (options && options.hasOwnProperty('i2cBusNo')) ? options.i2cBusNo : 1;
     this.i2cBus = i2c.openSync(this.i2cBusNo);
     this.i2cAddress = (options && options.hasOwnProperty('i2cAddress')) ? options.i2cAddress : BME280.BME280_DEFAULT_I2C_ADDRESS();
 
@@ -56,18 +56,19 @@ class BME280 {
     return new Promise((resolve, reject) => {
       this.i2cBus.writeByte(this.i2cAddress, this.REGISTER_CHIPID, 0, (err) => {
         if(err) {
-          return reject(err);
+          return reject(err + ' first writeByte in BME280.js, address: '+this.i2cAddress);
         }
         this.i2cBus.readByte(this.i2cAddress, this.REGISTER_CHIPID, (err, chipId) => {
           if(err) {
-            return reject(err);
+            return reject(err + ' first readByte in BME280.js, address: '+ this.i2cAddress);
           }
 
           else if(chipId !== BME280.CHIP_ID_BME280() &&
                   chipId !== BME280.CHIP_ID1_BMP280() &&
                   chipId !== BME280.CHIP_ID2_BMP280() &&
-                  chipId !== BME280.CHIP_ID3_BMP280()) {
-            return reject(`Unexpected BMx280 chip ID: 0x${chipId.toString(16)}`);
+                  chipId !== BME280.CHIP_ID3_BMP280() &&
+                  chipId !== BME280.CHIP_ID3_BMP680()) {
+            return reject(`Unexpected BMx280/BME680 chip ID: 0x${chipId.toString(16)}`);
           }
 
           else {
@@ -232,6 +233,10 @@ class BME280 {
     return 0x60;
   }
 
+  static CHIP_ID_BME680() {
+    return 0x61;
+  }
+
   static int16(msb, lsb) {
     let val = BME280.uint16(msb, lsb);
     return val > 32767 ? (val - 65536) : val;
@@ -245,7 +250,7 @@ class BME280 {
     return ((msb << 8 | lsb) << 8 | xlsb) >> 4;
   }
 
-  static convertCelciusToFahrenheit(c) { 
+  static convertCelciusToFahrenheit(c) {
     return c * 9 / 5 + 32;
   }
 
@@ -266,7 +271,7 @@ class BME280 {
   }
 
   static calculateDewPointCelcius(temperature_C, humidity) {
-    return 243.04 * (Math.log(humidity/100.0) + ((17.625 * temperature_C)/(243.04 + temperature_C))) / 
+    return 243.04 * (Math.log(humidity/100.0) + ((17.625 * temperature_C)/(243.04 + temperature_C))) /
            (17.625 - Math.log(humidity/100.0) - ((17.625 * temperature_C)/(243.04 + temperature_C)));
   }
 

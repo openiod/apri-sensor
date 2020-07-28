@@ -428,6 +428,10 @@ bme280.init()
   .catch((err) => console.error(`BME280 initialization failed: ${err} `));
 //  end-of raspi-i2c variables and functions
 
+const bme680 = new BME680(options);
+
+
+
 
 var processDeviceData	= function(err,temperatureData) {
 	if (err) {

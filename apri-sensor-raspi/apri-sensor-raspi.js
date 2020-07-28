@@ -468,9 +468,9 @@ if (bme680 != undefined) {
     setInterval(async () => {
         //console.info(await bme680.getSensorData());
         var bme680Data = await bme680.getSensorData();
-        console.info(bme680Data)
-        console.info(bme680Data.data)
-        var data = bme680Data.data.FieldData;
+//        console.info(bme680Data)
+//        console.info(bme680Data.data)
+        var data = bme680Data.data;
         console.dir(data)
         if (counters.busy == false) {
           if (data.pressure<900) {

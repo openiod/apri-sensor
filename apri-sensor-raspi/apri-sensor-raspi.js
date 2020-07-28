@@ -440,12 +440,14 @@ bme280.init()
 //  end-of raspi-i2c variables and functions
 
 if (bme680 != undefined) {
-  bme680.initialize().then(async () => {
+  bme680.initialize()
+  .then(async () => {
     console.info('BME680 sensor initialized');
     setInterval(async () => {
         console.info(await bme680.getSensorData());
     }, 3000);
-  });
+  })
+  .catch((err) => console.error(`BME680 initialization failed: ${err} `));
 }
 
 

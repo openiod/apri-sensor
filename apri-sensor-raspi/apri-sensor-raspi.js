@@ -446,7 +446,10 @@ if (bme680 != undefined) {
   .then(async () => {
     console.info('BME680 sensor initialized');
     setInterval(async () => {
-        console.info(await bme680.getSensorData());
+        //console.info(await bme680.getSensorData());
+        var bme680Data = await bme680.getSensorData();
+        console.info(bme680Data)
+        console.info(bme680Data.data)
     }, 3000);
   })
   .catch((err) => console.error(`BME680 initialization failed: ${err} `));

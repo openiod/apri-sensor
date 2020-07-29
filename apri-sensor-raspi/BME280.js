@@ -56,19 +56,18 @@ class BME280 {
     return new Promise((resolve, reject) => {
       this.i2cBus.writeByte(this.i2cAddress, this.REGISTER_CHIPID, 0, (err) => {
         if(err) {
-          return reject(err + ' first writeByte in BME280.js, address: '+this.i2cAddress);
+          return reject(err);
         }
         this.i2cBus.readByte(this.i2cAddress, this.REGISTER_CHIPID, (err, chipId) => {
           if(err) {
-            return reject(err + ' first readByte in BME280.js, address: '+ this.i2cAddress);
+            return reject(err);
           }
 
           else if(chipId !== BME280.CHIP_ID_BME280() &&
                   chipId !== BME280.CHIP_ID1_BMP280() &&
                   chipId !== BME280.CHIP_ID2_BMP280() &&
-                  chipId !== BME280.CHIP_ID3_BMP280() &&
-                  chipId !== BME280.CHIP_ID3_BMP680()) {
-            return reject(`Unexpected BMx280/BME680 chip ID: 0x${chipId.toString(16)}`);
+                  chipId !== BME280.CHIP_ID3_BMP280()) {
+            return reject(`Unexpected BMx280 chip ID: 0x${chipId.toString(16)}`);
           }
 
           else {
@@ -227,14 +226,6 @@ class BME280 {
 
   static CHIP_ID3_BMP280() {
     return 0x58;
-  }
-
-  static CHIP_ID_BME280() {
-    return 0x60;
-  }
-
-  static CHIP_ID_BME680() {
-    return 0x61;
   }
 
   static int16(msb, lsb) {

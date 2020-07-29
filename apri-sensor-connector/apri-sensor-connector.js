@@ -1,7 +1,7 @@
 /*
 ** Module: apri-sensor-connector
 **
-** Main system module for handling sensor measurement data for DS18B20, PMSA003/PMS7003, BME280, tsi3007, tgs5042 in Redis to send to cloud service OpenIoD
+** Main system module for handling sensor measurement data for DS18B20, PMSA003/PMS7003, BME280, BME680, tsi3007, tgs5042 in Redis to send to cloud service OpenIoD
 **
 */
 
@@ -167,6 +167,9 @@ var getRedisData = function(redisArray, redisArrayIndex) {
       case 'bme280':
         url = bme280Attributes(res)+'&dateObserved='+dateObserved;
         break;
+			case 'bme680':
+        url = bme680Attributes(res)+'&dateObserved='+dateObserved;
+        break;
       case 'pmsa003':
         url = pmsa003Attributes(res)+'&dateObserved='+dateObserved;
         break;
@@ -189,6 +192,10 @@ var getRedisData = function(redisArray, redisArrayIndex) {
 var bme280Attributes = function(res) {
   return openiodUrl + '/bme280'+ '/v1/m?foi=' + res.foi + '&observation='+
     'temperature:'+res.temperature+','+'pressure:'+res.pressure+','+'rHum:'+res.rHum;
+}
+var bme680Attributes = function(res) {
+  return openiodUrl + '/bme680'+ '/v1/m?foi=' + res.foi + '&observation='+
+    'temperature:'+res.temperature+','+'pressure:'+res.pressure+','+'rHum:'+res.rHum+','+'gasResistance:'+res.gasResistance;
 }
 var pmsa003Attributes = function(res) {
   return openiodUrl + '/pmsa003'+ '/v1/m?foi=' + res.foi + '&observation=' +

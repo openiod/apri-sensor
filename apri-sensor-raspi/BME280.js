@@ -63,7 +63,7 @@ class BME280 {
             return reject(err);
           }
 
-          else if(chipId !== BME280.CHIP_ID_BME280() &&
+          else if(//chipId !== BME280.CHIP_ID_BME280() &&
                   chipId !== BME280.CHIP_ID1_BMP280() &&
                   chipId !== BME280.CHIP_ID2_BMP280() &&
                   chipId !== BME280.CHIP_ID3_BMP280()) {

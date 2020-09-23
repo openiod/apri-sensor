@@ -450,12 +450,15 @@ const readSensorData = () => {
     })
     .catch((err) => {
       console.log(`BME280 read error: ${err}`);
-      setTimeout(readSensorData, 1000);
+      // setTimeout(readSensorData, 1000);
+      setTimeout(checkBmeDevice, 5000);
+
     });
 };
 // Initialize the BME280 sensor
 //
 
+/*
 bme280.init()
   .then(() => {
     console.log('BME280 initialization succeeded');
@@ -463,7 +466,7 @@ bme280.init()
   })
   .catch((err) => console.error(`BME280 initialization failed: ${err} `));
 //  end-of bme280 raspi-i2c variables and functions
-
+*/
 
 if (bme680 != undefined) {
   bme680.initialize()
@@ -769,7 +772,14 @@ setGpioFanOff() // fan always on but first set gpio to off
 var initBmeDevice = function(){
   console.log('initBmeDevice')
   bme280.init()
-  setTimeout(checkBmeDevice, 5000);
+    .then(() => {
+      console.log('BME280 initialization succeeded');
+      readSensorData();
+    })
+    .catch((err) => console.error(`BME280 initialization failed: ${err} `));
+  //  end-of bme280 raspi-i2c variables and functions
+
+  setTimeout(checkBmeDevice, 10000);
 }
 var setGpioBmeOn = function() {
   console.log('set BME280/BME680 GPIO on')

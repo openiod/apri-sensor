@@ -95,13 +95,17 @@ if (ads1115Available==true) {
 }
 
 var gpio
-var gpioDs18b20
+var gpioDs18b20, gpioBme, gpioFan
 try {
   gpio = require('onoff').Gpio
-  var gpioDs18b20 = new gpio(25, 'out'); //use GPIO-25 pin 22, and specify that it is output
 }
 catch (err) {
   console.log('GPIO module onoff not installed');
+}
+if (gpio != undefined) {
+  gpioDs18b20 = new gpio(25, 'out'); //use GPIO-25 pin 22, and specify that it is output
+  gpioFan = new gpio(26, 'out'); //use GPIO-26 pin 37, and specify that it is output
+  gpioBme = new gpio(27, 'out'); //use GPIO-27 pin 13, and specify that it is output
 }
 
 var Bme680
@@ -751,21 +755,59 @@ var getCpuInfo	= function() {
 
 getCpuInfo();
 
-var setGpioOn = function() {
+var setGpioFanOn = function() {
+  console.log('set fan GPIO on')
+  gpioFan.writeSync(1); //set pin state to 1 (power DS18B20 on)
+}
+setGpioFanOn() // fan always on
+
+var setGpioBmeOn = function() {
+  console.log('set BME280/BME680 GPIO on')
+  gpioBme.writeSync(1); //set pin state to 1 (power DS18B20 on)
+  setTimeout(check_bme_device, 5000);
+}
+var setGpioBmeOff = function() {
+  console.log('set BME280/BME680 GPIO off')
+  gpioBme.writeSync(0); //set pin state to 0 (power DS18B20 off)
+  setTimeout(setGpioBmeOn, 5000);
+}
+var reset_bme_device = function() {
+  console.log('reset_bme_device')
+  if (gpioBme != undefined) {  // only try to reset when gpio module available
+    setGpioBmeOff()
+  }
+}
+var check_bme_device = function() {
+  console.log('check_bme_device')
+/*
+  try {
+  	devicesFolder = fs.readdirSync('/sys/bus/w1/devices');
+  	readSensorDataDs18b20();
+  } catch (err) {
+  	devicesFolder = undefined;
+    console.log('Directory for W1 not found. No GPIO available? (/sys/bus/w1/devices');
+    setTimeout(reset_w1_device, 60000);
+    //return;
+  }
+*/
+}
+
+
+var setGpioDs18b20On = function() {
   console.log('set DS18B20 GPIO on')
   gpioDs18b20.writeSync(1); //set pin state to 1 (power DS18B20 on)
   setTimeout(check_w1_device, 5000);
 }
-var setGpioOff = function() {
+var setGpioDs18b20Off = function() {
   console.log('set DS18B20 GPIO off')
   gpioDs18b20.writeSync(0); //set pin state to 0 (power DS18B20 off)
-  setTimeout(setGpioOn, 5000);
+  setTimeout(setGpioDs18b20On, 5000);
 }
 
 var reset_w1_device = function() {
   console.log('reset_w1_device')
   if (gpioDs18b20 != undefined) {  // only try to reset when gpio module available
-    setGpioOff()
+    setGpioDs18b20Off()
 
 //    if (gpioDs18b20.readSync() === 0) { //check the pin state, if the state is 0 (or off)
 //      setGpioOn()
@@ -794,6 +836,7 @@ var check_w1_device = function() {
 }
 
 reset_w1_device()  // check w1 device for DS18B20
+reset_bme_device()  // check w1 device for DS18B20
 
 // start processing TGS5042 CO sensor if available
 if (ads1115Available==true) {

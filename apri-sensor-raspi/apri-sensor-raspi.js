@@ -846,7 +846,7 @@ var check_w1_device = function() {
 }
 
 reset_w1_device()  // check w1 device for DS18B20
-reset_bme_device()  // check w1 device for DS18B20
+resetBmeDevice()  // check w1 device for DS18B20
 
 // start processing TGS5042 CO sensor if available
 if (ads1115Available==true) {

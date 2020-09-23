@@ -759,26 +759,36 @@ var setGpioFanOn = function() {
   console.log('set fan GPIO on')
   gpioFan.writeSync(1); //set pin state to 1 (power DS18B20 on)
 }
-setGpioFanOn() // fan always on
+var setGpioFanOff = function() {
+  console.log('set fan GPIO off')
+  gpioFan.writeSync(0); //set pin state to 0 (power DS18B20 off)
+  setTimeout(setGpioFanOn, 5000);
+}
+setGpioFanOff() // fan always on but first set gpio to off
 
+var initBmeDevice = function(){
+  console.log('initBmeDevice')
+  bme280.init()
+  setTimeout(checkBmeDevice, 5000);
+}
 var setGpioBmeOn = function() {
   console.log('set BME280/BME680 GPIO on')
   gpioBme.writeSync(1); //set pin state to 1 (power DS18B20 on)
-  setTimeout(check_bme_device, 5000);
+  setTimeout(initBmeDevice, 5000);
 }
 var setGpioBmeOff = function() {
   console.log('set BME280/BME680 GPIO off')
   gpioBme.writeSync(0); //set pin state to 0 (power DS18B20 off)
   setTimeout(setGpioBmeOn, 5000);
 }
-var reset_bme_device = function() {
-  console.log('reset_bme_device')
+var resetBmeDevice = function() {
+  console.log('resetBmeDevice')
   if (gpioBme != undefined) {  // only try to reset when gpio module available
     setGpioBmeOff()
   }
 }
-var check_bme_device = function() {
-  console.log('check_bme_device')
+var checkBmeDevice = function() {
+  console.log('checkBmeDevice')
 /*
   try {
   	devicesFolder = fs.readdirSync('/sys/bus/w1/devices');

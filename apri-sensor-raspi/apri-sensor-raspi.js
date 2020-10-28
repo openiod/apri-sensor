@@ -781,7 +781,7 @@ var initBmeDevice = function(){
       console.error(`BME280 initialization failed: ${err} `);
       console.log('BME680 init') //
       initBme680()
-    }
+    })
   //  end-of bme280 raspi-i2c variables and functions
 
   setTimeout(checkBmeDevice, 10000);

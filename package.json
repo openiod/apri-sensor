@@ -24,8 +24,8 @@
     "request": "^2.88.0",
     "onoff": "^5.0.1",
     "raspi": "^6.0.1",
-    "raspi-i2c": "^6.2.2",
-    "raspi-serial": "^5.1.1",
+    "raspi-i2c": "^6.2.4",
+    "raspi-serial": "^6.0.0",
     "redis": "^2.8.0",
     "socket.io-client": "^2.2.0"
   }

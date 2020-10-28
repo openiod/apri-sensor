@@ -467,35 +467,36 @@ bme280.init()
   .catch((err) => console.error(`BME280 initialization failed: ${err} `));
 //  end-of bme280 raspi-i2c variables and functions
 */
-
-if (bme680 != undefined) {
-  bme680.initialize()
-  .then(async () => {
-    console.info('BME680 sensor initialized');
-    setInterval(async () => {
-        //console.info(await bme680.getSensorData());
-        var bme680Data = await bme680.getSensorData();
-//        console.info(bme680Data)
-//        console.info(bme680Data.data)
-        var data = bme680Data.data;
-        //console.dir(data)
-        if (counters.busy == false) {
-          if (data.pressure<900) {
-            console.log('BME680 pressure below 900. Less than 3.3V power? Measure skipped');
+var initBme680	= function() {
+  if (bme680 != undefined) {
+    bme680.initialize()
+    .then(async () => {
+      console.info('BME680 sensor initialized');
+      setInterval(async () => {
+          //console.info(await bme680.getSensorData());
+          var bme680Data = await bme680.getSensorData();
+  //        console.info(bme680Data)
+  //        console.info(bme680Data.data)
+          var data = bme680Data.data;
+          //console.dir(data)
+          if (counters.busy == false) {
+            if (data.pressure<900) {
+              console.log('BME680 pressure below 900. Less than 3.3V power? Measure skipped');
+            } else {
+              counters.bme680.nrOfMeas++;
+              counters.bme680.temperature				+= data.temperature;
+              counters.bme680.pressure					+= data.pressure;
+              counters.bme680.rHum							+= data.humidity;
+              counters.bme680.gasResistance  		+= data.gas_resistance;
+              console.log(' ' + data.temperature+ ' ' + data.pressure + ' ' + data.humidity + ' ' +data.gas_resistance+' ' + counters.bme680.nrOfMeas);
+            }
           } else {
-            counters.bme680.nrOfMeas++;
-            counters.bme680.temperature				+= data.temperature;
-            counters.bme680.pressure					+= data.pressure;
-            counters.bme680.rHum							+= data.humidity;
-            counters.bme680.gasResistance  		+= data.gas_resistance;
-            console.log(' ' + data.temperature+ ' ' + data.pressure + ' ' + data.humidity + ' ' +data.gas_resistance+' ' + counters.bme680.nrOfMeas);
+            console.log('Raspi-i2c processing is busy, measurement BME680 skipped');
           }
-        } else {
-          console.log('Raspi-i2c processing is busy, measurement BME680 skipped');
-        }
-    }, 3000);
-  })
-  .catch((err) => console.error(`BME680 initialization failed: ${err} `));
+      }, 3000);
+    })
+    .catch((err) => console.error(`BME680 initialization failed: ${err} `));
+  }
 }
 
 
@@ -776,7 +777,11 @@ var initBmeDevice = function(){
       console.log('BME280 initialization succeeded');
       readSensorData();
     })
-    .catch((err) => console.error(`BME280 initialization failed: ${err} `));
+    .catch((err) => {
+      console.error(`BME280 initialization failed: ${err} `));
+      console.log('BME680 init') //
+      initBme680()
+    }
   //  end-of bme280 raspi-i2c variables and functions
 
   setTimeout(checkBmeDevice, 10000);

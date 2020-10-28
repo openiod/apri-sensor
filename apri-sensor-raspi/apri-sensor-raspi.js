@@ -778,7 +778,7 @@ var initBmeDevice = function(){
       readSensorData();
     })
     .catch((err) => {
-      console.error(`BME280 initialization failed: ${err} `));
+      console.error(`BME280 initialization failed: ${err} `);
       console.log('BME680 init') //
       initBme680()
     }

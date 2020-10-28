@@ -497,7 +497,7 @@ var initBme680	= function() {
             console.log('Raspi-i2c processing is busy, measurement BME680 skipped');
           }
       }, 3000)
-      .catch((err)=> console.error('setInterval async error'));
+      //.catch((err)=> console.error('setInterval async error'));
     })
     .catch((err) => console.error(`BME680 initialization failed: ${err} `));
   } else (

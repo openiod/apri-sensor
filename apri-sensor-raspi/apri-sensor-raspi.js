@@ -473,9 +473,10 @@ var initBme680	= function() {
     bme680.initialize()
     .then(async () => {
       console.info('BME680 sensor initialized');
-      setInterval(async () => {
+      setInterval( ( async () => {
           console.info('before await bme680.getSensorData()');
-          var bme680Data = await bme680.getSensorData();
+          var bme680Data = await bme680.getSensorData()
+          .then()
           console.info('after await bme680.getSensorData()');
   //        console.info(bme680Data)
   //        console.info(bme680Data.data)
@@ -495,7 +496,7 @@ var initBme680	= function() {
           } else {
             console.log('Raspi-i2c processing is busy, measurement BME680 skipped');
           }
-      }, 3000)
+      }, 3000).catch(() => {})   )
       .catch((err)=> console.error('setInterval async error'));
     })
     .catch((err) => console.error(`BME680 initialization failed: ${err} `));

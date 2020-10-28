@@ -95,7 +95,8 @@ if (ads1115Available==true) {
 }
 
 var gpio
-var gpioDs18b20, gpioBme, gpioFan
+var gpioDs18b20, gpioBme
+//, gpioFan
 try {
   gpio = require('onoff').Gpio
 }
@@ -104,7 +105,7 @@ catch (err) {
 }
 if (gpio != undefined) {
   gpioDs18b20 = new gpio(25, 'out'); //use GPIO-25 pin 22, and specify that it is output
-  gpioFan = new gpio(26, 'out'); //use GPIO-26 pin 37, and specify that it is output
+  //gpioFan = new gpio(26, 'out'); //use GPIO-26 pin 37, and specify that it is output
   gpioBme = new gpio(27, 'out'); //use GPIO-27 pin 13, and specify that it is output
 }
 
@@ -473,8 +474,9 @@ var initBme680	= function() {
     .then(async () => {
       console.info('BME680 sensor initialized');
       setInterval(async () => {
-          //console.info(await bme680.getSensorData());
+          console.info('before await bme680.getSensorData()');
           var bme680Data = await bme680.getSensorData();
+          console.info('after await bme680.getSensorData()');
   //        console.info(bme680Data)
   //        console.info(bme680Data.data)
           var data = bme680Data.data;
@@ -493,10 +495,13 @@ var initBme680	= function() {
           } else {
             console.log('Raspi-i2c processing is busy, measurement BME680 skipped');
           }
-      }, 3000);
+      }, 3000)
+      .catch((err)=> console.error('setInterval async error'));
     })
     .catch((err) => console.error(`BME680 initialization failed: ${err} `));
-  }
+  } else (
+    console.log('BME680 module not installed')
+  )
 }
 
 
@@ -759,6 +764,7 @@ var getCpuInfo	= function() {
 
 getCpuInfo();
 
+/*
 var setGpioFanOn = function() {
   console.log('set fan GPIO on')
   gpioFan.writeSync(1); //set pin state to 1 (power DS18B20 on)
@@ -769,6 +775,7 @@ var setGpioFanOff = function() {
   setTimeout(setGpioFanOn, 5000);
 }
 setGpioFanOff() // fan always on but first set gpio to off
+*/
 
 var initBmeDevice = function(){
   console.log('initBmeDevice')

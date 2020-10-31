@@ -813,7 +813,7 @@ var resetBmeDevice = function() {
 var checkBmeDevice = function() {
   console.log('checkBmeDevice')
   if (results.bme680.nrOfMeas==0) {
-    setTimeout(resetBmeDevice, 10000);
+    setTimeout(resetBmeDevice, 60000);
   }
 /*
   try {

@@ -474,7 +474,7 @@ const readSensorDataBme680 = async function(){
   var bme680Data = await bme680.getSensorData()
   .catch((err) => { console.error(err); return});
   console.info('after await bme680.getSensorData()');
-  console.dir(bme680Data)
+  //console.dir(bme680Data)
   var data = bme680Data.data;
   //console.dir(data)
   if (counters.busy == false) {

@@ -771,7 +771,7 @@ var sendData = function() {
 				console.log(timeStamp.toISOString()+':tgs5042'+_res);
 			});
 		}
-    if (results.bme280.nrOfMeas == 0 && results.bme680.nrOfMeas == 0) {
+    if (results.bme280.nrOfMeas == 0 & results.bme680.nrOfMeas == 0) {
       console.log('Both bmw280/bme680 counters zero, looks like error, next time initdevices ')
       if (bmeInitCounter <3) {
         bmeInitCounter++
@@ -874,7 +874,7 @@ var resetBmeDevice = function() {
 var setGpioDs18b20On = function() {
   console.log('set DS18B20 GPIO on')
   gpioDs18b20.writeSync(1); //set pin state to 1 (power DS18B20 on)
-  setTimeout(check_w1_device, 10000);
+  setTimeout(check_w1_device, 5000);
 }
 var setGpioDs18b20Off = function() {
   console.log('set DS18B20 GPIO off')

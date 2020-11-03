@@ -470,13 +470,9 @@ bme280.init()
 */
 
 const readSensorDataBme680 = async function(){
-  console.info('before await bme680.getSensorData()');
   var bme680Data = await bme680.getSensorData()
   .catch((err) => { console.error(err); return});
-  console.info('after await bme680.getSensorData()');
-  //console.dir(bme680Data)
   var data = bme680Data.data;
-  //console.dir(data)
   if (counters.busy == false) {
     if (data.pressure<900) {
       console.log('BME680 pressure below 900. Less than 3.3V power? Measure skipped');

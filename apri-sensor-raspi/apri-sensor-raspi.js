@@ -773,7 +773,7 @@ var sendData = function() {
 		}
     if (results.bme280.nrOfMeas == 0 && results.bme680.nrOfMeas == 0) {
       console.log('Both bmw280/bme680 counters zero, looks like error, next time initdevices ')
-      if (bmeInitCounter <3 0) {
+      if (bmeInitCounter <3) {
         bmeInitCounter++
       } else {
         bmeInitCounter = 0
@@ -784,7 +784,7 @@ var sendData = function() {
     }
     if (results.ds18b20.nrOfMeas == 0) {
       console.log('ds18b20 counters zero, looks like error, next time initdevices ')
-      if (ds18b20InitCounter <3 0) {
+      if (ds18b20InitCounter <3) {
         ds18b20InitCounter++
       } else {
         ds18b20InitCounter = 0

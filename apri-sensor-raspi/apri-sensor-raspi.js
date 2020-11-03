@@ -469,9 +469,10 @@ bme280.init()
 //  end-of bme280 raspi-i2c variables and functions
 */
 
-const readSensorDataBme680 = function(){
+const readSensorDataBme680 = async function(){
   console.info('before await bme680.getSensorData()');
-  var bme680Data = bme680.getSensorData()
+  var bme680Data = await bme680.getSensorData()
+  .catch((err) => { console.error(err); return});
   console.info('after await bme680.getSensorData()');
   console.dir(bme680Data)
   var data = bme680Data.data;

@@ -470,33 +470,28 @@ bme280.init()
 */
 
 const readSensorDataBme680 = function(){
-  async () => {
     console.info('before await bme680.getSensorData()');
-    var bme680Data = await bme680.getSensorData()
-    .then((data)=> {
-      console.info('after await bme680.getSensorData()');
-      var data = bme680Data.data;
-      //console.dir(data)
-      if (counters.busy == false) {
-        if (data.pressure<900) {
-          console.log('BME680 pressure below 900. Less than 3.3V power? Measure skipped');
-        } else {
-          counters.bme680.nrOfMeas++;
-          counters.bme680.temperature				+= data.temperature;
-          counters.bme680.pressure					+= data.pressure;
-          counters.bme680.rHum							+= data.humidity;
-          counters.bme680.gasResistance  		+= data.gas_resistance;
-          console.log(' ' + data.temperature+ ' ' + data.pressure + ' ' + data.humidity + ' ' +data.gas_resistance+' ' + counters.bme680.nrOfMeas);
-        }
+    var bme680Data = bme680.getSensorData()
+    console.info('after await bme680.getSensorData()');
+    console.dir(bme680Data)
+    var data = bme680Data.data;
+    //console.dir(data)
+    if (counters.busy == false) {
+      if (data.pressure<900) {
+        console.log('BME680 pressure below 900. Less than 3.3V power? Measure skipped');
       } else {
-        console.log('Raspi-i2c processing is busy, measurement BME680 skipped');
+        counters.bme680.nrOfMeas++;
+        counters.bme680.temperature				+= data.temperature;
+        counters.bme680.pressure					+= data.pressure;
+        counters.bme680.rHum							+= data.humidity;
+        counters.bme680.gasResistance  		+= data.gas_resistance;
+        console.log(' ' + data.temperature+ ' ' + data.pressure + ' ' + data.humidity + ' ' +data.gas_resistance+' ' + counters.bme680.nrOfMeas);
       }
-      setTimeout(readSensorDataBme680, 1000);
-    })
-    .catch((err) => {
-      console.log(`BME680 read error: ${err}`);
-    });
-  }
+    } else {
+      console.log('Raspi-i2c processing is busy, measurement BME680 skipped');
+    }
+    setTimeout(readSensorDataBme680, 1000);
+  })
 }
 var initBme680	= function() {
   if (bme680 != undefined) {

@@ -771,7 +771,7 @@ var sendData = function() {
 				console.log(timeStamp.toISOString()+':tgs5042'+_res);
 			});
 		}
-    if (results.bme280.nrOfMeas = 0 && results.bme680.nrOfMeas = 0) {
+    if (results.bme280.nrOfMeas == 0 && results.bme680.nrOfMeas == 0) {
       console.log('Both bmw280/bme680 counters zero, looks like error, next time initdevices ')
       if (bmeInitCounter <3 0) {
         bmeInitCounter++
@@ -782,7 +782,7 @@ var sendData = function() {
     } else {
       bmeInitCounter=0
     }
-    if (results.ds18b20.nrOfMeas = 0) {
+    if (results.ds18b20.nrOfMeas == 0) {
       console.log('ds18b20 counters zero, looks like error, next time initdevices ')
       if (ds18b20InitCounter <3 0) {
         ds18b20InitCounter++

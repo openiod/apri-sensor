@@ -793,7 +793,7 @@ var sendData = function() {
 //    if (results.pmsa003.nrOfMeas == 0 & process.argv[2]=='test') {
     if (process.argv[2]=='test') {
       console.log('pmsa003 counters zero, looks like error, next time switch active/passive mode ')
-      if (pmsa003InitCounter <2) {
+      if (pmsa003InitCounter <1) {
         pmsa003InitCounter++
       } else {
         pmsa003InitCounter = 0
@@ -803,6 +803,7 @@ var sendData = function() {
         // switch active / passive mode
         var cmdByteArray 		= new ArrayBuffer(7);
         var cmdView8 				= new Uint8Array(cmdByteArray);
+        var cmdCheckSum=0
         cmdView8[0] = 0x42
         cmdView8[1] = 0x4D
         cmdView8[2] = 0xE4
@@ -816,9 +817,9 @@ var sendData = function() {
           console.log('set pmsa003 to wakeup')
           sleepMode=1
         }
-        checksum = cmdView8[0]+cmdView8[1]+cmdView8[2]+cmdView8[3]+cmdView8[4]
-        cmdView8[5]=checksum>>8
-        cmdView8[6]=checksum-(cmdView8[5]<<8)
+        cmdCheckSum = cmdView8[0]+cmdView8[1]+cmdView8[2]+cmdView8[3]+cmdView8[4]
+        cmdView8[5]=cmdCheckSum>>8
+        cmdView8[6]=cmdCheckSum-(cmdView8[5]<<8)
 
         console.log(cmdView8[0])
         console.log(cmdView8[1])

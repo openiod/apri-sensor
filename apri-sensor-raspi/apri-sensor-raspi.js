@@ -979,7 +979,6 @@ raspi.init(() => {
       console.log(data)
       //printHex(data,'T');
 			for (var i=0;i<data.length;i++) {
-        console.log(data)
 				processRaspiSerialData(data[i]);
 			}
     });

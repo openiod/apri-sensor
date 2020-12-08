@@ -807,7 +807,7 @@ var sendData = function() {
         cmdView8[1] = 0x4D
         cmdView8[2] = 0xE4
         cmdView8[3] = 0x00
-        id (sleepMode==1) {
+        if (sleepMode==1) {
           cmdView8[4] = 0x00 // set to sleep
           console.log('set pmsa003 to sleep')
           sleepmode=0

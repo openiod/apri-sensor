@@ -790,7 +790,7 @@ var sendData = function() {
       ds18b20InitCounter=0
     }
 
-//    if (results.pmsa003.nrOfMeas == 0 & process.argv[2]=='test') {
+//    if (results.pmsa003.nrOfMeas == 0) {
     if (process.argv[2]=='test') {
       console.log('pmsa003 counters zero, looks like error, next time switch active/passive mode ')
       if (pmsa003InitCounter <1) {
@@ -806,7 +806,8 @@ var sendData = function() {
         var cmdCheckSum=0
         cmdView8[0] = 0x42
         cmdView8[1] = 0x4D
-        cmdView8[2] = 0xE4
+        //cmdView8[2] = 0xE4  // set sleep/wakeup
+        cmdView8[2] = 0xE1  // set passive/active
         cmdView8[3] = 0x00
         if (sleepMode==1) {
           cmdView8[4] = 0x00 // set to sleep

@@ -94,6 +94,10 @@ if (ads1115Available==true) {
   });
 }
 
+var pmsa003InitCounter = 0
+var serial
+var sleepMode = 0
+
 var ds18b20InitCounter = 0
 var gpio
 var gpioDs18b20, gpioBme
@@ -786,6 +790,42 @@ var sendData = function() {
       ds18b20InitCounter=0
     }
 
+//    if (results.pmsa003.nrOfMeas == 0 & process.argv[2]=='test') {
+    if (process.argv[2]=='test') {
+      console.log('pmsa003 counters zero, looks like error, next time switch active/passive mode ')
+      if (pmsa003InitCounter <2) {
+        pmsa003InitCounter++
+      } else {
+        pmsa003InitCounter = 0
+        if (serial != undefined) {
+          console.log('No serial port defined')
+        }
+        // switch active / passive mode
+        var cmdByteArray 		= new ArrayBuffer(7);
+        var cmdView8 				= new Uint8Array(cmdByteArray);
+        cmdView8[0] = 0x42
+        cmdView8[1] = 0x4D
+        cmdView8[2] = 0xE4
+        cmdView8[3] = 0x00
+        id (sleepMode==1) {
+          cmdView8[4] = 0x00 // set to sleep
+          console.log('set pmsa003 to sleep')
+          sleepmode=0
+        } else {
+          cmdView8[4] = 0x01 // set to wakeup
+          console.log('set pmsa003 to wakeup')
+          sleepmode=1
+        }
+        checksum = cmdView8[0]+cmdView8[1]+cmdView8[2]+cmdView8[3]+cmdView8[4]
+        cmdView8[5]=checksum>>8
+        cmdView8[6]=checksum-(cmdView8[5]<<8)
+
+        serial.write(cmdView8);
+      }
+    } else {
+      pmsa003InitCounter=0
+    }
+
 
 };
 
@@ -922,7 +962,7 @@ socket.on('info', function(data) {
 });
 
 raspi.init(() => {
-  var serial = new Serial({portId:'/dev/ttyS0',baudRate:9600});
+  serial = new Serial({portId:'/dev/ttyS0',baudRate:9600});
   serial.open(() => {
     //console.log('serial open')
     serial.on('data', (data) => {

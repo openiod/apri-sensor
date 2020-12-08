@@ -790,7 +790,7 @@ var sendData = function() {
       ds18b20InitCounter=0
     }
 
-    if (results.pmsa003.nrOfMeas == 0) {
+    if (results.pmsa003.nrOfMeas == 0) { 
 //    if (process.argv[2]=='test') {
       if (pmsa003InitCounter <1) {
         console.log('pmsa003 counters zero, looks like error, next time try active mode ')

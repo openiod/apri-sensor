@@ -790,16 +790,16 @@ var sendData = function() {
       ds18b20InitCounter=0
     }
 
-//    if (results.pmsa003.nrOfMeas == 0) {
-    if (process.argv[2]=='test') {
-      console.log('pmsa003 counters zero, looks like error, next time switch active/passive mode ')
+    if (results.pmsa003.nrOfMeas == 0) {
+//    if (process.argv[2]=='test') {
       if (pmsa003InitCounter <1) {
+        console.log('pmsa003 counters zero, looks like error, next time try active mode ')
         pmsa003InitCounter++
       } else {
         pmsa003InitCounter = 0
-        if (serial != undefined) {
-          console.log('Serial port defined')
-        }
+//        if (serial != undefined) {
+//          console.log('Serial port defined')
+//        }
         // switch active / passive mode
         var cmdByteArray 		= new ArrayBuffer(7);
         var cmdView8 				= new Uint8Array(cmdByteArray);
@@ -809,19 +809,22 @@ var sendData = function() {
         //cmdView8[2] = 0xE4  // set sleep/wakeup
         cmdView8[2] = 0xE1  // set passive/active
         cmdView8[3] = 0x00
-        if (sleepMode==1) {
-          cmdView8[4] = 0x00 // set to sleep
-          console.log('set pmsa003 to sleep')
-          sleepMode=0
-        } else {
+//        if (sleepMode==1) {
+//          cmdView8[4] = 0x00 // set to sleep
+////          console.log('set pmsa003 to sleep')
+//          console.log('set pmsa003 to passive')
+//          sleepMode=0
+//        } else {
           cmdView8[4] = 0x01 // set to wakeup
-          console.log('set pmsa003 to wakeup')
-          sleepMode=1
-        }
+////          console.log('set pmsa003 to wakeup')
+          console.log('set pmsa003 to active')
+//          sleepMode=1
+//        }
         cmdCheckSum = cmdView8[0]+cmdView8[1]+cmdView8[2]+cmdView8[3]+cmdView8[4]
         cmdView8[5]=cmdCheckSum>>8
         cmdView8[6]=cmdCheckSum-(cmdView8[5]<<8)
 
+/*
         console.log(cmdView8[0])
         console.log(cmdView8[1])
         console.log(cmdView8[2])
@@ -830,7 +833,7 @@ var sendData = function() {
         console.log(cmdView8[5])
         console.log(cmdView8[6])
         console.log(cmdView8)
-
+*/
         serial.write(cmdView8);
       }
     } else {

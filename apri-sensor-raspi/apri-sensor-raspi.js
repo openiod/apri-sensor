@@ -820,6 +820,15 @@ var sendData = function() {
         cmdView8[5]=checksum>>8
         cmdView8[6]=checksum-(cmdView8[5]<<8)
 
+        console.log(cmdView8[0])
+        console.log(cmdView8[1])
+        console.log(cmdView8[2])
+        console.log(cmdView8[3])
+        console.log(cmdView8[4])
+        console.log(cmdView8[5])
+        console.log(cmdView8[6])
+        console.log(cmdView8)
+
         serial.write(cmdView8);
       }
     } else {

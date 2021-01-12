@@ -238,7 +238,7 @@ const deleteMethodHandler = ( url, req, res) => {
 			return
 		}
 		if (stderr) {
-			console.error(`exec stderror: ${stderror}`);
+			console.error(`exec stderr: ${stderr}`);
 			return callback(resultJson, req,res);
 		}
 //		var resultJson = columnsToJsonArray(stdout)
@@ -282,7 +282,7 @@ const postDeviceConnect = ( url, req, res) => {
         res.writeHead(401);
     		res.write(stderr);
     	  res.end(`The connection has stderr error`);
-  			console.error(`exec stderror: ${stderror}`);
+  			console.error(`exec stderr: ${stderr}`);
   			return callback(resultJson, req,res);
   		}
   //		var resultJson = columnsToJsonArray(stdout)
@@ -310,7 +310,7 @@ const createHotspot = function() {
       processStatus.hotspot.message=error
     }
     if (stderr) {
-      console.error(`exec stderror: ${stderror}`);
+      console.error(`exec stderr: ${stderr}`);
       processStatus.hotspot.code=400
       processStatus.hotspot.message=error
     }

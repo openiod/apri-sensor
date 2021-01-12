@@ -26,7 +26,6 @@ const defaultPassword = 'scapeler'
 var processStatus = []
 processStatus.hotspot = {
   code:-1  // -1=init; 100=error creating hotspot connection
-  , msg:'Hotspot not activated'
   , status:''
   , statusSince: new Date()
 }
@@ -303,7 +302,7 @@ const postDeviceConnect = ( url, req, res) => {
 const createHotspot = function() {
   console.log(`Create hotspot for ssid ${unit.ssid}`)
   console.log('1. Delete existing hotspot connection')
-  exec("LC_ALL=C nmcli connection delete 'hotspot'  ", (error, stdout, stderr) => {
+  exec("LC_ALL=C nmcli connection delete '"+unit.ssid+"'  ", (error, stdout, stderr) => {
     if (error) {
       console.error(`exec error: ${error}`);
       processStatus.hotspot.code=400
@@ -315,7 +314,7 @@ const createHotspot = function() {
       processStatus.hotspot.message=error
     }
     console.log('2. Create hotspot connection')
-    var hotspotCommand= "LC_ALL=C nmcli connection add type wifi ifname '"+unit.ifname+"' con-name hotspot autoconnect yes wifi.mode ap \
+    var hotspotCommand= "LC_ALL=C nmcli connection add type wifi ifname '"+unit.ifname+"' con-name '"+unit.ssid+"' autoconnect yes wifi.mode ap \
        ssid '"+unit.ssid+"' \
        ipv4.method shared 802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk 'iam@Home' \
        ipv6.method shared"
@@ -712,7 +711,7 @@ var getCmd	= function(data, callback) {
 
 const checkHotspotActivation= async function() {
   if (unit.serial.substr(0,4) == 'SCRP') {
-    console.log(`ApriSensor unit, starting hotspot ${unit.serial} with ssid ${unit.serial}`)
+    console.log(`ApriSensor unit, starting hotspot for ${unit.serial} with ssid ${unit.ssid}`)
     await getGateway()
     if (unit.gateway!='') {
       console.log(`gateway: ${unit.gateway}`)

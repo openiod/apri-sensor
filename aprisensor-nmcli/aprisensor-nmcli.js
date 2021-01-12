@@ -400,7 +400,7 @@ actions.push(function() {
   			unit.serial='SCRP'+serial
   		}
       unit.ssid = unit.serial.substr(unit.serial.length-4,unit.serial.length-1).toUpperCase()
-      unit.ifname= 'wlp7s0'
+//      unit.ifname= 'wlp7s0'
   		//sudo hostnamectl set-hostname raspberrypi2
     }
     nextAction()

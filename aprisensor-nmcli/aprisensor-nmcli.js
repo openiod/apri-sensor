@@ -728,7 +728,7 @@ const checkHotspotActivation= async function() {
 // when online no automatic activation of the hotspot necessary
 const getGateway = async function() {
   unit.gateway=''
-  var result = await execPromise('ip route | grep default')
+  var result = await execPromise('ip route | grep "default via" ')
   .then((result)=>{
     var stdoutArray	= result.stdout.split(' ');
     unit.gateway=stdoutArray[2]

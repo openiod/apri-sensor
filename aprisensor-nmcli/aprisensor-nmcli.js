@@ -24,10 +24,14 @@ const ACCEPT_ENCODING_2 = '*/*';
 const defaultPassword = 'scapeler'
 
 var processStatus = []
+processStatus.main = {
+  startDate :new Date()
+  ,checkDate : new Date()
+}
 processStatus.hotspot = {
   code:-1  // -1=init; 100=error creating hotspot connection
-  , status:''
-  , statusSince: new Date()
+  ,status:''
+  ,statusSince: new Date()
 }
 processStatus.gateway = {
   status:''
@@ -517,12 +521,12 @@ actions.push(async function() {
   await getGateway()
   nextAction()
 });
-actions.push(async function() {
-  await checkHotspotActivation()
-  nextAction()
-});
 actions.push(function() {
   checkTimeSync()
+  nextAction()
+});
+actions.push(async function() {
+  await checkHotspotActivation()
   nextAction()
 });
 
@@ -710,15 +714,16 @@ var getCmd	= function(data, callback) {
 }
 
 const checkHotspotActivation= async function() {
+  // hotspot only for ApriSensor (SCRP*)
   if (unit.serial.substr(0,4) == 'SCRP') {
     console.log(`ApriSensor unit, starting hotspot for ${unit.serial} with ssid ${unit.ssid}`)
     await getGateway()
     if (unit.gateway!='') {
       console.log(`gateway: ${unit.gateway}`)
-      createHotspot()
     } else {
-      console.log(`ping gateway: ${unit.gateway}`)
+      createHotspot()
     }
+
   } else {
     console.log(`Not an ApriSensor unit, no automatic start as hotspot for ${unit.serial}`)
   }
@@ -747,7 +752,7 @@ const getGateway = async function() {
 }
 
 const checkTimeSync = function() {
-  // get file attributes for last time synchronization datetime
+  // get file attributes for last time synchronization date & time
   fs.stat("/var/lib/systemd/timesync/clock", (err, stat) => {
     if (err) {
       if (processStatus.timeSync.status!='ERROR') {
@@ -760,7 +765,7 @@ const checkTimeSync = function() {
         processStatus.timeSync.status='OK'
         processStatus.timeSync.statusSince=new Date()
       }
-      processStatus.timeSync.syncDatetime=new Date(stat.atime)
+      processStatus.timeSync.syncDate=new Date(stat.atime)
     }
   });
 
@@ -787,6 +792,12 @@ const statusCheck = function() {
   console.dir(processStatus)
   getGateway()
   checkTimeSync()
+  console.log(new Date().getTime() - processStatus.timeSync.syncDate.getTime())
+  if (new Date().getTime() - processStatus.timeSync.syncDate.getTime() > 3600000) {
+      console.log('maybe a problem, timesync. Or just mobile use')
+  }
+//  processStatus.main(startDate
+//  if (unit.)
 }
 
 var statusCheckTimer = setInterval(statusCheck, 10000);

@@ -28,6 +28,11 @@ processStatus.main = {
   startDate :new Date()
   ,checkDate : new Date()
 }
+processStatus.connection = {
+  code:-1  // -1=init; 100=error creating hotspot connection
+  ,status:''
+  ,statusSince: new Date()
+}
 processStatus.hotspot = {
   code:-1  // -1=init; 100=error creating hotspot connection
   ,status:''
@@ -40,6 +45,7 @@ processStatus.gateway = {
 processStatus.timeSync = {
   status:''
   ,statusSince:new Date()
+  ,packetCount:-1
 }
 
 const entryCheck = function (req) {
@@ -276,12 +282,24 @@ const postDeviceConnect = ( url, req, res) => {
       //exec("LC_ALL=C nmcli connection delete  "+result.data.TYPE, (error, stdout, stderr) => {
   		if (error) {
   			console.error(`exec error: ${error}`);
+        if (processStatus.connection.status!='ERROR') {
+          processStatus.connection.status='ERROR'
+          processStatus.connection.statusSince=new Date()
+        }
+        processStatus.connection.code=400
+        processStatus.connection.message=error
   			res.writeHead(400);
   			res.write(`{error:400,message: '${error}'}`);
   			res.end();
   			return
   		}
   		if (stderr) {
+        if (processStatus.connection.status!='ERROR') {
+          processStatus.connection.status='ERROR'
+          processStatus.connection.statusSince=new Date()
+        }
+        processStatus.connection.code=400
+        processStatus.connection.message=stderr
         res.writeHead(401);
     		res.write(stderr);
     	  res.end(`The connection has stderr error`);
@@ -289,6 +307,12 @@ const postDeviceConnect = ( url, req, res) => {
   			return callback(resultJson, req,res);
   		}
   //		var resultJson = columnsToJsonArray(stdout)
+      if (processStatus.connection.status!='OK') {
+        processStatus.connection.status='OK'
+        processStatus.connection.statusSince=new Date()
+      }
+      processStatus.connection.code=200
+      processStatus.connection.message=''
   		res.writeHead(200);
   		res.write(stdout);
   	  res.end(`The connection is connected to the device`);
@@ -303,19 +327,59 @@ const postDeviceConnect = ( url, req, res) => {
 //  console.log('einde ')
 }
 
+const connectStandard = function() {
+  console.log(`Connect to standard connection`)
+  exec("LC_ALL=C nmcli connection up ifname '"+unit.ifname+"'  ", (error, stdout, stderr) => {
+    if (error) {
+//      console.error(`exec error: ${error}`);
+      if (processStatus.connection.status!='ERROR') {
+        processStatus.connection.status='ERROR'
+        processStatus.connection.statusSince=new Date()
+      }
+      processStatus.connection.code=400
+      processStatus.connection.message=error
+    } else {
+      if (stderr) {
+  //      console.error(`exec stderr: ${stderr}`);
+        if (processStatus.connection.status!='ERROR') {
+          processStatus.connection.status='ERROR'
+          processStatus.connection.statusSince=new Date()
+        }
+        processStatus.connection.code=400
+        processStatus.connection.message=stderr
+      } else {
+        if (processStatus.connection.status!='OK') {
+          processStatus.connection.status='OK'
+          processStatus.connection.statusSince=new Date()
+        }
+        processStatus.connection.code=200
+        processStatus.connection.message=''
+      }
+    }
+  })
+}
+
 const createHotspot = function() {
   console.log(`Create hotspot for ssid ${unit.ssid}`)
   console.log('1. Delete existing hotspot connection')
   exec("LC_ALL=C nmcli connection delete '"+unit.ssid+"'  ", (error, stdout, stderr) => {
     if (error) {
-      console.error(`exec error: ${error}`);
+//      console.error(`exec error: ${error}`);
+      if (processStatus.hotspot.status!='ERROR') {
+        processStatus.hotspot.status='ERROR'
+        processStatus.hotspot.statusSince=new Date()
+      }
       processStatus.hotspot.code=400
       processStatus.hotspot.message=error
     }
     if (stderr) {
-      console.error(`exec stderr: ${stderr}`);
+//      console.error(`exec stderr: ${stderr}`);
+      if (processStatus.hotspot.status!='ERROR') {
+        processStatus.hotspot.status='ERROR'
+        processStatus.hotspot.statusSince=new Date()
+      }
       processStatus.hotspot.code=400
-      processStatus.hotspot.message=error
+      processStatus.hotspot.message=stderr
     }
     console.log('2. Create hotspot connection')
     var hotspotCommand= "LC_ALL=C nmcli connection add type wifi ifname '"+unit.ifname+"' con-name '"+unit.ssid+"' autoconnect yes wifi.mode ap \
@@ -327,23 +391,33 @@ const createHotspot = function() {
   //  nmcli connection up local-ap
   	exec(hotspotCommand, (error, stdout, stderr) => {
   		if (error) {
-        console.error(`exec error: ${error}`);
+        if (processStatus.hotspot.status!='ERROR') {
+          processStatus.hotspot.status='ERROR'
+          processStatus.hotspot.statusSince=new Date()
+        }
         processStatus.hotspot.code=400
         processStatus.hotspot.message=error
   			return
   		}
       processStatus.hotspot.code=200
       processStatus.hotspot.message=stdout
-      console.log(stdout)
       console.log('3. Activate hotspot connection')
       hotspotCommand="LC_ALL=C nmcli connection up hotspot"
       exec(hotspotCommand, (error, stdout, stderr) => {
         if (error) {
-          console.error(`exec error: ${error}`);
+          if (processStatus.hotspot.status!='ERROR') {
+            processStatus.hotspot.status='ERROR'
+            processStatus.hotspot.statusSince=new Date()
+          }
           processStatus.hotspot.code=400
           processStatus.hotspot.message=error
           return
         }
+        if (processStatus.hotspot.status!='OK') {
+          processStatus.hotspot.status='OK'
+          processStatus.hotspot.statusSince=new Date()
+        }
+
         console.log(stdout)
         getIpAddress()
       });
@@ -525,10 +599,10 @@ actions.push(function() {
   checkTimeSync()
   nextAction()
 });
-actions.push(async function() {
-  await checkHotspotActivation()
-  nextAction()
-});
+//actions.push(async function() {
+//  await checkHotspotActivation()
+//  nextAction()
+//});
 
 
 const nextAction=function(){
@@ -718,7 +792,7 @@ const checkHotspotActivation= async function() {
   if (unit.serial.substr(0,4) == 'SCRP') {
     console.log(`ApriSensor unit, starting hotspot for ${unit.serial} with ssid ${unit.ssid}`)
     await getGateway()
-    if (unit.gateway!='') {
+    if (processStatus.gateway.status != 'OK') {
       console.log(`gateway: ${unit.gateway}`)
     } else {
       createHotspot()
@@ -742,8 +816,8 @@ const getGateway = async function() {
     }
   })
   .catch((error)=>{
-    console.log('catch gateway')
-    console.dir(error)
+//    console.log('catch gateway')
+//    console.dir(error)
     if (processStatus.gateway.status!='ERROR') {
       processStatus.gateway.status='ERROR'
       processStatus.gateway.statusSince=new Date()
@@ -751,20 +825,32 @@ const getGateway = async function() {
   })
 }
 
-const checkTimeSync = function() {
+const checkTimeSync = async function() {
   // get file attributes for last time synchronization date & time
-  fs.stat("/var/lib/systemd/timesync/clock", (err, stat) => {
+  fs.stat("/var/lib/systemd/timesync/clock", async (err, stat) => {
     if (err) {
       if (processStatus.timeSync.status!='ERROR') {
         processStatus.timeSync.status='ERROR'
         processStatus.timeSync.statusSince=new Date()
       }
     } else {
-      //console.log(stat);
-      if (processStatus.timeSync.status!='OK') {
-        processStatus.timeSync.status='OK'
-        processStatus.timeSync.statusSince=new Date()
-      }
+      var result = await execPromise('timedatectl timesync-status|grep "Packet count:"')
+      .then((result)=>{
+        var stdoutArray	= result.stdout.split(' ');
+        var packetCount = parseFloat(stdoutArray[3])
+        if (processStatus.timeSync.packetCount != packetCount) {
+          processStatus.timeSync.packetCount = packetCount
+          processStatus.timeSync.status='OK'
+          processStatus.timeSync.statusSince=new Date()
+        }
+      })
+      .catch((error)=>{
+        if (processStatus.timeSync.status!='ERROR') {
+          processStatus.timeSync.status='ERROR'
+          processStatus.timeSync.statusSince=new Date()
+          processStatus.timeSync.packetCount = -1
+        }
+      })
       processStatus.timeSync.syncDate=new Date(stat.atime)
     }
   });
@@ -792,10 +878,27 @@ const statusCheck = function() {
   console.dir(processStatus)
   getGateway()
   checkTimeSync()
-  console.log(new Date().getTime() - processStatus.timeSync.syncDate.getTime())
-  if (new Date().getTime() - processStatus.timeSync.syncDate.getTime() > 3600000) {
-      console.log('maybe a problem, timesync. Or just mobile use')
+
+  if (processStatus.timeSync.status != 'OK') {
+//    if (new Date().getTime() - processStatus.timeSync.syncDate.getTime() > 3600000) {
+        console.log('maybe a problem, timesync or just mobile use')
+//    }
   }
+  if (processStatus.gateway.status != 'OK') {
+    if (new Date().getTime() - processStatus.gateway.statusSince.getTime() > 60000) {
+        console.log('A gateway problem maybe a problem, timesync or just mobile use')
+        checkHotspotActivation()
+    }
+  }
+  if (processStatus.hotspot.status=='OK') {
+     // after 120 sec. stop hotspot and try standard connection
+    if (new Date().getTime() - processStatus.hotspot.statusSince.getTime() >120000){
+      connectStandard()
+    }
+  }
+
+
+
 //  processStatus.main(startDate
 //  if (unit.)
 }

@@ -316,7 +316,7 @@ const createHotspot = function() {
     }
     console.log('2. Create hotspot connection')
     var hotspotCommand= "LC_ALL=C nmcli connection add type wifi ifname '"+unit.ifname+"' con-name hotspot autoconnect yes wifi.mode ap \
-       ssid '"+unit.ssid+"' mode ap \
+       ssid '"+unit.ssid+"' \
        ipv4.method shared 802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk 'iam@Home' \
        ipv6.method shared"
   //  nmcli connection add type wifi ifname wlan0 con-name local-ap autoconnect yes ssid test-ap mode ap

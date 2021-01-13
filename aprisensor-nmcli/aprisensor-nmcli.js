@@ -193,10 +193,17 @@ const getConnectionShow = function(req,res,callback) {
 	});
 }
 const getDeviceHotspot = function(req,res,callback) {
-  createHotspot()
-  res.writeHead(200);
-  res.write(`{oke:200,message: 'creation of hotspot started'}`);
-  res.end();
+  if (new Date().getTime() - processStatus.hotspot.statusSince.getTime() < 10000) {
+    console.log('A gateway problem maybe a problem, timesync or just mobile use')
+    res.writeHead(400);
+    res.write(`{status:400,message: 'Creation of hotspot maybe still busy, check or try again later'}`);
+    res.end();
+  } else {
+    createHotspot()
+    res.writeHead(200);
+    res.write(`{oke:200,message: 'Creation of hotspot started'}`);
+    res.end();
+  }
 
 /*
   var hotspotCommand= "LC_ALL=C nmcli connection add type wifi ifname 'wlp7s0' con-name hotspot autoconnect yes wifi.mode ap \
@@ -362,6 +369,9 @@ const connectStandard = function() {
 const createHotspot = function() {
   console.log(`Create hotspot for ssid ${unit.ssid}`)
   console.log('1. Delete existing hotspot connection')
+  processStatus.hotspot.status='INIT'
+  processStatus.hotspot.statusSince=new Date()
+  processStatus.hotspot.message=''
   exec("LC_ALL=C nmcli connection delete '"+unit.ssid+"'  ", (error, stdout, stderr) => {
     if (error) {
 //      console.error(`exec error: ${error}`);
@@ -790,12 +800,17 @@ var getCmd	= function(data, callback) {
 const checkHotspotActivation= async function() {
   // hotspot only for ApriSensor (SCRP*)
   if (unit.serial.substr(0,4) == 'SCRP') {
-    console.log(`ApriSensor unit, starting hotspot for ${unit.serial} with ssid ${unit.ssid}`)
     await getGateway()
     if (processStatus.gateway.status != 'OK') {
-      console.log(`gateway: ${unit.gateway}`)
-    } else {
+      if (processStatus.timeSync.status!='ERROR') {
+        processStatus.timeSync.status='ERROR'
+        processStatus.timeSync.statusSince=new Date()
+      }
+
+      console.log(`ApriSensor unit, starting hotspot for ${unit.serial} with ssid ${unit.ssid}`)
       createHotspot()
+    } else {
+      console.log(`gateway: ${unit.gateway}`)
     }
 
   } else {
@@ -886,8 +901,10 @@ const statusCheck = function() {
   }
   if (processStatus.gateway.status != 'OK') {
     if (new Date().getTime() - processStatus.gateway.statusSince.getTime() > 60000) {
+      if (new Date().getTime() - processStatus.hotspot.statusSince.getTime() > 20000) {
         console.log('A gateway problem maybe a problem, timesync or just mobile use')
         checkHotspotActivation()
+      }
     }
   }
   if (processStatus.hotspot.status=='OK') {

@@ -616,11 +616,10 @@ actions.push(function() {
   checkTimeSync()
   nextAction()
 });
-//actions.push(async function() {
-//  await checkHotspotActivation()
-//  nextAction()
-//});
-
+actions.push(async function() {
+  await getActiveConnection()
+  nextAction()
+});
 
 const nextAction=function(){
   console.log(`next action ${action+1}/${actions.length}`)
@@ -895,13 +894,16 @@ Raspbian Buster comes with systemd 241.
 }
 
 const getActiveConnection = async function() {
-  unit.connection=''
-  var result = await execPromise('nmcli c show --active ')
+//  var result = await execPromise('nmcli c show --active ')
+  var result = await execPromise('nmcli d show '+unit.ifname+' |grep GENERAL.CONNECTION')
   .then((result)=>{
     var stdoutArray	= result.stdout.split(' ');
-    unit.connection=stdoutArray[0]
+    var tmp=stdoutArray[stdoutArray.length-1]
+    unit.connection=tmp.split('\n')[0]
+    //console.log(unit.connection)
   })
   .catch((error)=>{
+    //console.log("getActiveConnection error")
     unit.connection=''
   })
 }

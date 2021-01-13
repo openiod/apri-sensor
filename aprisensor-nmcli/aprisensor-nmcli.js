@@ -193,6 +193,13 @@ const getConnectionShow = function(req,res,callback) {
 	});
 }
 const getDeviceHotspot = function(req,res,callback) {
+  if (unit.connection==unit.ssid){
+    //console.log('Hotspot connection is active')
+    res.writeHead(400);
+    res.write(`{status:400,message: 'Hotspot ${unit.connection} already active'}`);
+    res.end();
+    return
+  }
   if (new Date().getTime() - processStatus.hotspot.statusSince.getTime() < 10000) {
     console.log('A gateway problem maybe a problem, timesync or just mobile use')
     res.writeHead(400);
@@ -412,7 +419,7 @@ const createHotspot = function() {
       processStatus.hotspot.code=200
       processStatus.hotspot.message=stdout
       console.log('3. Activate hotspot connection')
-      hotspotCommand="LC_ALL=C nmcli connection up hotspot"
+      hotspotCommand="LC_ALL=C nmcli connection up '"+unit.ssid+"'"
       exec(hotspotCommand, (error, stdout, stderr) => {
         if (error) {
           if (processStatus.hotspot.status!='ERROR') {
@@ -806,7 +813,6 @@ const checkHotspotActivation= async function() {
         processStatus.timeSync.status='ERROR'
         processStatus.timeSync.statusSince=new Date()
       }
-
       console.log(`ApriSensor unit, starting hotspot for ${unit.serial} with ssid ${unit.ssid}`)
       createHotspot()
     } else {
@@ -888,11 +894,25 @@ Raspbian Buster comes with systemd 241.
 // https://raspberrypi.stackexchange.com/questions/94635/how-can-i-delay-the-startup-of-systemd-services-until-the-datetime-is-set-no-rt/95195#95195
 }
 
+const getActiveConnection = function() {
+  unit.connection=''
+  var result = await execPromise('nmcli c show --active ')
+  .then((result)=>{
+    var stdoutArray	= result.stdout.split(' ');
+    unit.connection=stdoutArray[0]
+  })
+  .catch((error)=>{
+    unit.connection=''
+  })
+}
+
 const statusCheck = function() {
   console.log('statusCheck')
-  console.dir(processStatus)
+  getActiveConnection()
   getGateway()
   checkTimeSync()
+  console.dir(processStatus)
+  console.dir(unit)
 
   if (processStatus.timeSync.status != 'OK') {
 //    if (new Date().getTime() - processStatus.timeSync.syncDate.getTime() > 3600000) {
@@ -900,10 +920,14 @@ const statusCheck = function() {
 //    }
   }
   if (processStatus.gateway.status != 'OK') {
-    if (new Date().getTime() - processStatus.gateway.statusSince.getTime() > 60000) {
-      if (new Date().getTime() - processStatus.hotspot.statusSince.getTime() > 20000) {
-        console.log('A gateway problem maybe a problem, timesync or just mobile use')
-        checkHotspotActivation()
+    if (unit.connection==unit.ssid){
+      //console.log('Hotspot connection is active')
+    } else {
+      if (new Date().getTime() - processStatus.gateway.statusSince.getTime() > 60000) {
+        if (new Date().getTime() - processStatus.hotspot.statusSince.getTime() > 20000) {
+          console.log('A gateway problem maybe a problem, timesync or just mobile use')
+          checkHotspotActivation()
+        }
       }
     }
   }
@@ -913,11 +937,6 @@ const statusCheck = function() {
       connectStandard()
     }
   }
-
-
-
-//  processStatus.main(startDate
-//  if (unit.)
 }
 
 var statusCheckTimer = setInterval(statusCheck, 10000);

@@ -345,7 +345,7 @@ const connectStandard = function() {
   console.log(`Connect to standard connection`)
   exec("LC_ALL=C nmcli connection up ifname '"+unit.ifname+"'  ", (error, stdout, stderr) => {
     if (error) {
-//      console.error(`exec error: ${error}`);
+      console.error(`exec error: ${error}`);
       if (processStatus.connection.status!='ERROR') {
         processStatus.connection.status='ERROR'
         processStatus.connection.statusSince=new Date()
@@ -354,7 +354,7 @@ const connectStandard = function() {
       processStatus.connection.message=error
     } else {
       if (stderr) {
-  //      console.error(`exec stderr: ${stderr}`);
+        console.error(`exec stderr: ${stderr}`);
         if (processStatus.connection.status!='ERROR') {
           processStatus.connection.status='ERROR'
           processStatus.connection.statusSince=new Date()
@@ -933,7 +933,10 @@ const statusCheck = function() {
       }
     }
   }
-  if (processStatus.hotspot.status=='OK') {
+//  if (processStatus.hotspot.status=='OK') {
+  // hotspot active?
+  if (unit.connection==unit.ssid){
+    //if (processStatus.hotspot.status=='OK') {
      // after 120 sec. stop hotspot and try standard connection
     if (new Date().getTime() - processStatus.hotspot.statusSince.getTime() >120000){
       connectStandard()

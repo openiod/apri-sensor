@@ -894,7 +894,7 @@ Raspbian Buster comes with systemd 241.
 // https://raspberrypi.stackexchange.com/questions/94635/how-can-i-delay-the-startup-of-systemd-services-until-the-datetime-is-set-no-rt/95195#95195
 }
 
-const getActiveConnection = function() {
+const getActiveConnection = async function() {
   unit.connection=''
   var result = await execPromise('nmcli c show --active ')
   .then((result)=>{

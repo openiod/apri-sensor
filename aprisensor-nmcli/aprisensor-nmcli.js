@@ -458,7 +458,8 @@ nmcli connection add type wifi ifname wlp7s0 con-name ap-24 autoconnect no ssid 
     .then((result)=>{console.log('then')})
     .catch((error)=>{console.log(error)})
     console.log('connection up')
-    await execPromise("LC_ALL=C nmcli connection up '"+ssid+ "' passwd-file '"+ssid+".passwd'")
+    await execPromise("LC_ALL=C nmcli connection up '"+ssid+ "'")
+//    await execPromise("LC_ALL=C nmcli connection up '"+ssid+ "' passwd-file '"+ssid+".passwd'")
     .then((result)=>{
       console.log('connection up then')
       console.log(result)
@@ -1095,9 +1096,10 @@ const getAllConnections = async function() {
 }
 
 const statusCheck = function() {
-  if (processStatus.connectionBusy.status==true){
+  if (processStatus.connectionBusy.status==true ||
+    new Date().getTime() - processStatus.connectionBusy.statusSince.getTime() < 10000){
     var tmp = new Date().getTime()-processStatus.connectionBusy.statusSince.getTime();
-    console.log(`No status check because trying to connect for ${tmp} millisecs`)
+    console.log(`No status check because waiting for connection to complete, now ${tmp} millisecs`)
     return
   }
   getAllConnections()
@@ -1141,4 +1143,4 @@ const statusCheck = function() {
   }
 }
 
-var statusCheckTimer = setInterval(statusCheck, 30000);
+var statusCheckTimer = setInterval(statusCheck, 10000);

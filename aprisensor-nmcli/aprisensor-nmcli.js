@@ -119,7 +119,7 @@ const requestListener = function (req, res) {
 					break
 				}
         if (req.url == '/nmcli/api/v1/device/wifilist') {
-			    getDeviceWifiList(req,res,returnResultJson)
+			    getDeviceWifiList(req,res)
 					break
 				}
 				res.writeHead(400);
@@ -281,86 +281,73 @@ const getDeviceHotspot = function(req,res,callback) {
 	});
 */
 }
-const getDeviceWifiList = function(req,res,callback) {
+const getDeviceWifiList = async function(req,res) {
+  console.log(`getDeviceWifiList`)
+  var restartHotspot=false
+  if (unit.ssid==unit.connection) { //hotspot active
+    console.log("deactivate hotspot")
+    processStatus.connectionBusy.status=true
+    processStatus.connectionBusy.statusSince=new Date()
+    await hotspotDown()
+    .then((result)=>{
+      console.log(`hotspot down - then`)
+      restartHotspot=true
+    })
+    .catch((error)=>{
+      console.log(`hotspot down - catch - but no problem`)
+    })
+  }
   console.log(`retrieve Wifi List`)
-  exec("LC_ALL=C nmcli device wifi list", (error, stdout, stderr) => {
-    if (error) {
-			// console.error(`exec error: ${error}`);
-			return callback(resultJson, req,res);
-		}
-    /*
-    var stdoutArray = stdout.split('\n')
-    var indexInUse=stdoutArray[0].indexOf('IN-USE')
-    var indexSsid=stdoutArray[0].indexOf('SSID',0)
-    var indexMode=stdoutArray[0].indexOf('MODE',0)
-    var indexChan=stdoutArray[0].indexOf('CHAN',0)
-    var indexRate=stdoutArray[0].indexOf('RATE',0)
-    var indexSignal=stdoutArray[0].indexOf('SIGNAL',0)
-    var indexBars=stdoutArray[0].indexOf('BARS',0)
-    var indexSecurity=stdoutArray[0].indexOf('SECURITY',0)
-    var result=[]
-    for (var i=1;i<stdoutArray.length-1;i++) {
-      var resultrec={}
-      resultrec.inUse=stdoutArray[i].substr(0,indexSsid).trim()
-      resultrec.ssid=stdoutArray[i].substr(indexSsid,indexMode-indexSsid).trim()
-      resultrec.mode=stdoutArray[i].substr(indexMode,indexChan-indexMode).trim()
-      resultrec.chan=stdoutArray[i].substr(indexChan,indexRate-indexChan).trim()
-      resultrec.rate=stdoutArray[i].substr(indexRate,indexSignal-indexRate).trim()
-      resultrec.signal=stdoutArray[i].substr(indexSignal,indexBars-indexSignal).trim()
-      resultrec.bars=stdoutArray[i].substr(indexBars,indexSecurity-indexBars).trim()
-      resultrec.security=stdoutArray[i].substr(indexSecurity).trim()
-      result.push(resultrec)
+  execPromise("LC_ALL=C nmcli device wifi list")
+  .then((result) => {
+    console.log(`getDeviceWifiList then`)
+    console.log(result)
+    if (restartHotspot==true) {
+      console.log(`getDeviceWifiList reactivate hotspot`)
+      setHotspotUp()
     }
-		return callback(result, req,res)
-    */
-    var resultJson = columnsToJsonArray(stdout)
-		return callback(resultJson, req,res)
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+  	res.write(JSON.stringify(columnsToJsonArray(result.stdout)));
+  	res.end();
+  })
+  .catch((error)=>{
+    console.log(`getDeviceWifiList catch`)
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+  	res.write(JSON.stringify(columnsToJsonArray(error)));
+  	res.end();
   })
 }
 const deleteMethodHandler = ( url, req, res) => {
 	let data = Buffer.alloc(0);
   req.on('data', (datum) => data = Buffer.concat([data, datum]));
-  req.on('end', () => {
+  req.on('end', async () => {
     console.log(data.toString('utf8'));
 		var result = JSON.parse(data.toString('utf8'))
 		var id =result.data.UUID
 		if (result.data.key=='device') id=result.data.DEVICE
 		if (result.data.key=='name') id=result.data.NAME
 		if (result.data.key=='type') id=result.data.TYPE
-		exec("LC_ALL=C nmcli connection delete '"+id+ "'  ", (error, stdout, stderr) => {
-		//exec("LC_ALL=C nmcli connection delete  "+result.data.TYPE, (error, stdout, stderr) => {
-		if (error) {
-			console.error(`exec error: ${error}`);
-			res.writeHead(400);
-			res.write(`{error:400,message: '${error}'}`);
-			res.end();
-			return
-		}
-		if (stderr) {
-			console.error(`exec stderr: ${stderr}`);
-			return callback(resultJson, req,res);
-		}
-//		var resultJson = columnsToJsonArray(stdout)
-		res.writeHead(200);
-		res.write(stdout);
-	  res.end(`The connection is deleted.`);
-		return
-	});
-//  const employeeId = url.substring(1);
-//  const response = deleteEmployee(employeeId);
-//console.dir(res)
-//  res.writeHead(200);
-//  res.end(`The employee with id is deleted.`);
+		execPromise("LC_ALL=C nmcli connection delete '"+id+ "'  ")
+    .then((result) => {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+    	res.write(result.stdout);
+    	res.end();
+    })
+    .catch((error)=>{
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+    	res.write(JSON.stringify(columnsToJsonArray(error)));
+    	res.end();
+    })
 	})
 }
 
 const postDeviceConnect = ( url, req, res) => {
   console.log(url)
   let body = '';
-    req.on('data', chunk => {
-        body += chunk.toString(); // convert Buffer to string
-    });
-    req.on('end', () => {
+  req.on('data', chunk => {
+    body += chunk.toString(); // convert Buffer to string
+  });
+  req.on('end', async () => {
 //        console.log(body);
   //      res.end('ok');
 //    });
@@ -369,35 +356,10 @@ const postDeviceConnect = ( url, req, res) => {
 		//if (result.data.key=='device') id=result.data.DEVICE
 		//if (result.data.key=='name') id=result.data.NAME
 		//if (result.data.key=='type') id=result.data.TYPE
-		exec("LC_ALL=C nmcli device wifi connect '"+id+ "' password '"+result.data.password+"'", (error, stdout, stderr) => {
-      //exec("LC_ALL=C nmcli connection delete  "+result.data.TYPE, (error, stdout, stderr) => {
-  		if (error) {
-  			console.error(`exec error: ${error}`);
-        if (processStatus.connection.status!='ERROR') {
-          processStatus.connection.status='ERROR'
-          processStatus.connection.statusSince=new Date()
-        }
-        processStatus.connection.code=400
-        processStatus.connection.message=error
-  			res.writeHead(400);
-  			res.write(`{error:400,message: '${error}'}`);
-  			res.end();
-  			return
-  		}
-  		if (stderr) {
-        if (processStatus.connection.status!='ERROR') {
-          processStatus.connection.status='ERROR'
-          processStatus.connection.statusSince=new Date()
-        }
-        processStatus.connection.code=400
-        processStatus.connection.message=stderr
-        res.writeHead(401);
-    		res.write(stderr);
-    	  res.end(`The connection has stderr error`);
-  			console.error(`exec stderr: ${stderr}`);
-  			return callback(resultJson, req,res);
-  		}
-  //		var resultJson = columnsToJsonArray(stdout)
+//    exec("LC_ALL=C nmcli device wifi connect '"+id+ "' password '"+result.data.password+"'", (error, stdout, stderr) => {
+
+	  await execPromise("LC_ALL=C nmcli connection up '"+id+"'")
+    .then((result)=> {
       if (processStatus.connection.status!='OK') {
         processStatus.connection.status='OK'
         processStatus.connection.statusSince=new Date()
@@ -405,17 +367,22 @@ const postDeviceConnect = ( url, req, res) => {
       processStatus.connection.code=200
       processStatus.connection.message=''
   		res.writeHead(200);
-  		res.write(stdout);
-  	  res.end(`The connection is connected to the device`);
-  		return
-	   });
-//  const employeeId = url.substring(1);
-//  const response = deleteEmployee(employeeId);
-//console.dir(res)
-//  res.writeHead(200);
-//  res.end(`The employee with id is deleted.`);
+  		res.write(result.stdout);
+  	  res.end(`Device connected`);
+    })
+    .catch((error)=>{
+      console.error(`exec error: ${error}`);
+      if (processStatus.connection.status!='ERROR') {
+        processStatus.connection.status='ERROR'
+        processStatus.connection.statusSince=new Date()
+      }
+      processStatus.connection.code=400
+      processStatus.connection.message=error
+			res.writeHead(400);
+			res.write(`{error:400,message: '${error}'}`);
+			res.end();
+    })
 	})
-//  console.log('einde ')
 }
 
 // connect to accesspoint
@@ -481,33 +448,10 @@ nmcli connection add type wifi ifname wlp7s0 con-name ap-24 autoconnect no ssid 
   })
 }
 
-const connectStandard = async function() {
-  console.log(`Connect to standard connection`)
-  console.log(`Hotspot connection down`)
-  processStatus.connectionBusy.status=true
-  processStatus.connectionBusy.statusSince=new Date()
-  await getAllConnections()
-
+const hotspotDown = function() {
   // down hotspot
-  console.log(`connectStandard exec connection down`)
-  await execPromise("LC_ALL=C nmcli connection down '"+unit.ssid+"'")
-  .then((result)=>{
-    console.log(`connectStandard exec connection down - then`)
-    connectionsIndex=0
-    tryCandidateConnection(connectionsIndex)
-  })
-  .catch((error)=>{
-    console.log(`connectStandard exec connection hotspot down - catch - no problem`)
-    //console.log("getActiveConnection error")
-//    if (processStatus.hotspot.status!='ERROR') {
-//      processStatus.hotspot.status='ERROR'
-//      processStatus.hotspot.statusSince=new Date()
-//    }
-//    processStatus.hotspot.code=400
-//    processStatus.hotspot.message=error
-    connectionsIndex=0
-    tryCandidateConnection(connectionsIndex)
-  })
+  console.log(`set hotspot down`)
+  return execPromise("LC_ALL=C nmcli connection down '"+unit.ssid+"'")
 }
 
 const tryCandidateConnection = async function(index) {
@@ -539,70 +483,60 @@ const tryCandidateConnection = async function(index) {
 const createHotspot = function() {
   console.log(`Create hotspot for ssid ${unit.ssid}`)
   console.log('1. Delete existing hotspot connection')
+  processStatus.connectionBusy.status=true
+  processStatus.connectionBusy.statusSince=new Date()
   processStatus.hotspot.status='INIT'
   processStatus.hotspot.statusSince=new Date()
   processStatus.hotspot.message=''
-  exec("LC_ALL=C nmcli connection delete '"+unit.ssid+"'  ", (error, stdout, stderr) => {
-    if (error) {
-//      console.error(`exec error: ${error}`);
-      if (processStatus.hotspot.status!='ERROR') {
-        processStatus.hotspot.status='ERROR'
-        processStatus.hotspot.statusSince=new Date()
-      }
-      processStatus.hotspot.code=400
-      processStatus.hotspot.message=error
-    }
-    if (stderr) {
-//      console.error(`exec stderr: ${stderr}`);
-      if (processStatus.hotspot.status!='ERROR') {
-        processStatus.hotspot.status='ERROR'
-        processStatus.hotspot.statusSince=new Date()
-      }
-      processStatus.hotspot.code=400
-      processStatus.hotspot.message=stderr
-    }
-    console.log('2. Create hotspot connection')
-    var hotspotCommand= "LC_ALL=C nmcli connection add type wifi ifname '"+unit.ifname+"' con-name '"+unit.ssid+"' autoconnect no wifi.mode ap \
-       ssid '"+unit.ssid+"' \
-       ipv4.method shared 802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk 'iam@Home' \
-       ipv6.method shared"
-  //  nmcli connection add type wifi ifname wlan0 con-name local-ap autoconnect yes ssid test-ap mode ap
-  //  nmcli connection modify local-ap 802-11-wireless.mode ap 802-11-wireless-security.key-mgmt wpa-psk ipv4.method shared 802-11-wireless-security.psk 'PASSWORD'
-  //  nmcli connection up local-ap
-  	exec(hotspotCommand, (error, stdout, stderr) => {
-  		if (error) {
-        if (processStatus.hotspot.status!='ERROR') {
-          processStatus.hotspot.status='ERROR'
-          processStatus.hotspot.statusSince=new Date()
-        }
-        processStatus.hotspot.code=400
-        processStatus.hotspot.message=error
-  			return
-  		}
-      processStatus.hotspot.code=200
-      processStatus.hotspot.message=stdout
-      console.log('3. Activate hotspot connection')
-      hotspotCommand="LC_ALL=C nmcli connection up '"+unit.ssid+"'"
-      exec(hotspotCommand, (error, stdout, stderr) => {
-        if (error) {
-          if (processStatus.hotspot.status!='ERROR') {
-            processStatus.hotspot.status='ERROR'
-            processStatus.hotspot.statusSince=new Date()
-          }
-          processStatus.hotspot.code=400
-          processStatus.hotspot.message=error
-          return
-        }
-        if (processStatus.hotspot.status!='OK') {
-          processStatus.hotspot.status='OK'
-          processStatus.hotspot.statusSince=new Date()
-        }
-
-        console.log(stdout)
-        getIpAddress()
-      });
-  	});
+  execPromise("LC_ALL=C nmcli connection delete '"+unit.ssid+"'")
+  .then((result)=>{
+    createHotspotConnection()
   })
+  .catch((error)=>{
+    createHotspotConnection()
+  })
+}
+const createHotspotConnection=function(){
+  console.log('2. Create hotspot connection')
+  var hotspotCommand= "LC_ALL=C nmcli connection add type wifi ifname '"+unit.ifname+"' con-name '"+unit.ssid+"' autoconnect no wifi.mode ap \
+     ssid '"+unit.ssid+"' \
+     ipv4.method shared 802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk 'iam@Home' \
+     ipv6.method shared"
+  execPromise(hotspotCommand)
+  .then((result)=>{
+    setHotspotStatus('OK',200)
+    setHotspotUp()
+  })
+  .catch((error)=>{
+    setHotspotStatus('ERROR',400,error)
+  })
+}
+
+const setHotspotUp = function() {
+  console.log('3. Activate hotspot connection')
+  execPromise("LC_ALL=C nmcli connection up '"+unit.ssid+"'")
+  .then((result)=>{
+    setHotspotStatus('OK',200)
+    unit.connection=unit.ssid
+    processStatus.connectionBusy.status=false
+    processStatus.connectionBusy.statusSince=new Date()
+    getIpAddress()
+  })
+  .catch((error)=>{
+    unit.connection=''
+    processStatus.connectionBusy.status=false
+    processStatus.connectionBusy.statusSince=new Date()
+    setHotspotStatus('ERROR',400,error)
+  })
+}
+const setHotspotStatus=function(s,code,error){
+  if (processStatus.hotspot.status!=s) {
+    processStatus.hotspot.status=s
+    processStatus.hotspot.statusSince=new Date()
+  }
+  processStatus.hotspot.code=code
+  if (error == undefined) processStatus.hotspot.message=''
+  else processStatus.hotspot.message=error
 }
 
 var startActionReboot = function() {
@@ -781,10 +715,6 @@ actions.push(function() {
 });
 actions.push(async function() {
   await getActiveConnection()
-  nextAction()
-});
-actions.push(async function() {
-  await getAllConnections()
   nextAction()
 });
 
@@ -1075,11 +1005,18 @@ const getActiveConnection = async function() {
   })
 }
 
-const getAllConnections = async function() {
-  console.log('getAllConnections')
-  var result = await execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')
+const statusCheck = async function() {
+  if (processStatus.connectionBusy.status==true ||
+    new Date().getTime() - processStatus.connectionBusy.statusSince.getTime() < 10000){
+    var tmp = new Date().getTime()-processStatus.connectionBusy.statusSince.getTime();
+    console.log(`No status check because waiting for connection to complete, now ${tmp} millisecs`)
+    return
+  }
+
+  console.log('statusCheck')
+  await execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')
   .then((result)=>{
-    console.log('getAllConnections then')
+    //console.log('status check get all connections then')
     var stdoutArray	= result.stdout.split('\n');
     unit.connections=[]
     for (var i=0;i<stdoutArray.length-1;i++) {
@@ -1090,20 +1027,10 @@ const getAllConnections = async function() {
     }
   })
   .catch((error)=>{
-    console.log('getAllConnections catch')
+    console.log('status check get all connections catch')
     unit.connections=[]
   })
-}
 
-const statusCheck = function() {
-  if (processStatus.connectionBusy.status==true ||
-    new Date().getTime() - processStatus.connectionBusy.statusSince.getTime() < 10000){
-    var tmp = new Date().getTime()-processStatus.connectionBusy.statusSince.getTime();
-    console.log(`No status check because waiting for connection to complete, now ${tmp} millisecs`)
-    return
-  }
-  getAllConnections()
-  console.log('statusCheck')
   getActiveConnection()
   getGateway()
   checkTimeSync()
@@ -1136,11 +1063,17 @@ const statusCheck = function() {
     if (new Date().getTime() - processStatus.hotspot.statusSince.getTime() >60000){
       if (processStatus.connectionBusy.status==false) {
         if (new Date().getTime() - processStatus.connectionBusy.statusSince.getTime() >10000){
-          connectStandard()
+          if (unit.connections.length > 0 ){
+            if (unit.connections.length > 1 || unit.ssid != unit.connection){ // not only hotspot
+              connectionsIndex=0
+              tryCandidateConnection(connectionsIndex)
+            }
+          }
         }
       }
     }
   }
 }
+//  nmcli general hostname debian-laptop
 
 var statusCheckTimer = setInterval(statusCheck, 10000);

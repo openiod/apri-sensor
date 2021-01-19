@@ -26,6 +26,7 @@ const defaultPassword = 'scapeler'
 var menuUrl;
 var localServer = {};
 localServer.ConfigMenu = {};
+var apiPort = 4000
 
 var initMenu	= function() {
 	console.log('Init menu');
@@ -35,7 +36,6 @@ var initMenu	= function() {
 
 var unit = {}
 var connectionsIndex=0
-
 
 var processStatus = []
 processStatus.main = {
@@ -110,6 +110,10 @@ const requestListener = function (req, res) {
 			    getGeneral(req,res,returnResultJson)
 					break
 				}
+        if (req.url == '/nmcli/api/v1/ip/avahi') {
+			    getIpAvahi(req,res)
+					break
+				}
 				if (req.url == '/nmcli/api/v1/connection/show') {
 			    getConnectionShow(req,res,returnResultJson)
 					break
@@ -162,7 +166,7 @@ const requestListener = function (req, res) {
 }
 
 const server = http.createServer(requestListener);
-server.listen(8080);
+server.listen(apiPort);
 
 // **********************************************************************************
 
@@ -222,6 +226,12 @@ const getGeneral = function(req,res,callback) {
 	});
 	return 'test'
 }
+const getIpAvahi = function(req,res) {
+  res.writeHead(200);
+  res.write(`{ipAvahi:'${unit.ipAddress}'}`);
+  res.end();
+}
+
 const getConnectionShow = function(req,res,callback) {
 	exec("LC_ALL=C nmcli connection show ", (error, stdout, stderr) => {
 		if (error) {

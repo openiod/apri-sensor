@@ -465,11 +465,21 @@ const hotspotDown = function() {
 }
 
 const tryCandidateConnection = async function(index) {
+	if (processStatus.connectionBusy.status==false) {
+		processStatus.connectionBusy.status=true
+		processStatus.connectionBusy.statusSince=new Date()
+	}
   if (index>unit.connections.length-1) {
     processStatus.connectionBusy.status=false
     processStatus.connectionBusy.statusSince=new Date()
     return
   }
+	// ignore hotspot connection
+	if (unit.connections[index]==unit.ssid) {
+		tryCandidateConnection(index+1)
+		return
+	}
+
   console.log(`tryCandidateConnection ${index} ${unit.connections[index]}`)
   await execPromise("LC_ALL=C nmcli connection up '"+unit.connections[index]+"'")
   .then((result)=>{

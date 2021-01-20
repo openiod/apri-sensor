@@ -228,7 +228,7 @@ const getGeneral = function(req,res,callback) {
 }
 const getIpAvahi = function(req,res) {
   res.writeHead(200);
-  res.write(`{ipAvahi:'${unit.ipAddress}'}`);
+  res.write(`{"ipAvahi":"${unit.ipAddress}"}`);
   res.end();
 }
 

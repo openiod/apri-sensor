@@ -218,7 +218,7 @@ var columnsToJsonArray = function(columns) {
 const getGeneral = function(req,res,callback) {
 	exec("LC_ALL=C nmcli general", (error, stdout, stderr) => {
 		if (error) {
-			// console.error(`exec error: ${error}`);
+			 console.error(`exec error: ${error}`);
 			return callback(resultJson, req,res);
 		}
 		var resultJson = columnsToJsonArray(stdout)
@@ -311,7 +311,7 @@ const getDeviceWifiList = async function(req,res) {
   execPromise("LC_ALL=C nmcli device wifi list")
   .then((result) => {
     console.log(`getDeviceWifiList then`)
-    console.log(result)
+    //console.log(result)
     if (restartHotspot==true) {
       console.log(`getDeviceWifiList reactivate hotspot`)
       setHotspotUp()
@@ -333,10 +333,10 @@ const deleteMethodHandler = ( url, req, res) => {
   req.on('end', async () => {
     console.log(data.toString('utf8'));
 		var result = JSON.parse(data.toString('utf8'))
-		var id =result.data.UUID
-		if (result.data.key=='device') id=result.data.DEVICE
-		if (result.data.key=='name') id=result.data.NAME
-		if (result.data.key=='type') id=result.data.TYPE
+		var id =result.UUID
+		if (result.key=='device') id=result.DEVICE
+		if (result.key=='name') id=result.NAME
+		if (result.key=='type') id=result.TYPE
 		execPromise("LC_ALL=C nmcli connection delete '"+id+ "'  ")
     .then((result) => {
       res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -362,11 +362,11 @@ const postDeviceConnect = ( url, req, res) => {
   //      res.end('ok');
 //    });
 		var result = JSON.parse(body)
-		var id =result.data.NAME
-		//if (result.data.key=='device') id=result.data.DEVICE
-		//if (result.data.key=='name') id=result.data.NAME
-		//if (result.data.key=='type') id=result.data.TYPE
-//    exec("LC_ALL=C nmcli device wifi connect '"+id+ "' password '"+result.data.password+"'", (error, stdout, stderr) => {
+		var id =result.NAME
+		//if (result.key=='device') id=result.DEVICE
+		//if (result.key=='name') id=result.NAME
+		//if (result.key=='type') id=result.TYPE
+//    exec("LC_ALL=C nmcli device wifi connect '"+id+ "' password '"+result.password+"'", (error, stdout, stderr) => {
 
 	  await execPromise("LC_ALL=C nmcli connection up '"+id+"'")
     .then((result)=> {
@@ -408,8 +408,8 @@ const postApConnect = async ( url, req, res) => {
   req.on('end', async () => {
     var result = JSON.parse(body)
     console.dir(result)
-    var ssid =result.data.ssid
-    var passwd=result.data.passwd
+    var ssid =result.ssid
+    var passwd=result.passwd
     console.log('connection down')
     await execPromise("LC_ALL=C nmcli connection down '"+ssid+"'")
     .then((result)=>{console.log('then')})

@@ -712,31 +712,24 @@ actions.push(async function() {
   nextAction()
 })
 
-async function getIpAddress() {
-  unit.ipAddress=[]
-  var result = await execPromise('hostname --all-ip-address')
-  var stdoutArray	= result.stdout.split('\n');
-  for (var i=0;i<stdoutArray.length-1;i++) {
-    var idx = stdoutArray[i].indexOf(' ', 8)
-    if (stdoutArray[i]!='') unit.ipAddress.push(stdoutArray[i].substr(0,idx))
-  }
+function getIpAddress() {
+	console.log('getIpAddress')
+  execPromise('hostname --all-ip-address')
+	.then((result)=> {
+	  var stdoutArray	= result.stdout.split('\n');
+		unit.ipAddress=[]
+	  for (var i=0;i<stdoutArray.length-1;i++) {
+	    var idx = stdoutArray[i].indexOf(' ', 8)
+	    if (stdoutArray[i]!='') {
+				unit.ipAddress.push(stdoutArray[i].substr(0,idx))
+			}
+	  }
+	})
+	.catch((error)=> {
+		consolelog('getIpAddress error')
+	})
+
 }
-actions.push(async function() {
-  await getIpAddress()
-  nextAction()
-});
-actions.push(async function() {
-  await getGateway()
-  nextAction()
-});
-actions.push(function() {
-  checkTimeSync()
-  nextAction()
-});
-actions.push(async function() {
-  await getActiveConnection()
-  nextAction()
-});
 
 const nextAction=function(){
   console.log(`next action ${action+1}/${actions.length}`)
@@ -1010,31 +1003,25 @@ Raspbian Buster comes with systemd 241.
 // https://raspberrypi.stackexchange.com/questions/94635/how-can-i-delay-the-startup-of-systemd-services-until-the-datetime-is-set-no-rt/95195#95195
 }
 
-const getActiveConnection = async function() {
+const getActiveConnection = function() {
 //  var result = await execPromise('LC_ALL=C nmcli c show --active ')
-  var result = await execPromise('LC_ALL=C nmcli d show '+unit.ifname+' |grep GENERAL.CONNECTION')
-  .then((result)=>{
-    var stdoutArray	= result.stdout.split(' ');
-    var tmp=stdoutArray[stdoutArray.length-1]
-    unit.connection=tmp.split('\n')[0]
-    //console.log(unit.connection)
-  })
-  .catch((error)=>{
-    //console.log("getActiveConnection error")
-    unit.connection=''
-  })
+  return execPromise('LC_ALL=C nmcli d show '+unit.ifname+' |grep GENERAL.CONNECTION')
 }
 
 const statusCheck = async function() {
-  if (processStatus.connectionBusy.status==true ||
-    new Date().getTime() - processStatus.connectionBusy.statusSince.getTime() < 10000){
+  if (processStatus.connectionBusy.status==true) {
     var tmp = new Date().getTime()-processStatus.connectionBusy.statusSince.getTime();
     console.log(`No status check because waiting for connection to complete, now ${tmp} millisecs`)
     return
   }
+	if (processStatus.connectionBusy.status != '' && new Date().getTime() - processStatus.connectionBusy.statusSince.getTime() < 4000) {
+    var tmp = new Date().getTime()-processStatus.connectionBusy.statusSince.getTime();
+    console.log(`No status check because to soon after connection completed, now ${tmp} millisecs`)
+    return
+  }
 
   console.log('statusCheck')
-  await execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')
+  execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')
   .then((result)=>{
     //console.log('status check get all connections then')
     var stdoutArray	= result.stdout.split('\n');
@@ -1051,7 +1038,18 @@ const statusCheck = async function() {
     unit.connections=[]
   })
 
-  getActiveConnection()
+  await getActiveConnection()
+	.then((result)=>{
+		var stdoutArray	= result.stdout.split(' ');
+		var tmp=stdoutArray[stdoutArray.length-1]
+		unit.connection=tmp.split('\n')[0]
+		//console.log(unit.connection)
+	})
+	.catch((error)=>{
+		//console.log("getActiveConnection error")
+		unit.connection=''
+	})
+	getIpAddress()
   getGateway()
   checkTimeSync()
   console.dir(processStatus)
@@ -1095,5 +1093,5 @@ const statusCheck = async function() {
   }
 }
 //  nmcli general hostname debian-laptop
-
+statusCheck()
 var statusCheckTimer = setInterval(statusCheck, 10000);

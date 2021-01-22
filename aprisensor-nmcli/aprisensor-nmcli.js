@@ -1009,13 +1009,18 @@ const getActiveConnection = function() {
 }
 
 const statusCheck = async function() {
+	var tmp = new Date().getTime()-processStatus.connectionBusy.statusSince.getTime();
+	if (new Date().getTime() - processStatus.connectionBusy.statusSince.getTime() > 20000){
+		// do not wait too long ;-)
+		// forced reset of Busy state
+		processStatus.connectionBusy.status='interupted'
+		processStatus.connectionBusy.statusSince=new Date()
+	}
   if (processStatus.connectionBusy.status==true) {
-    var tmp = new Date().getTime()-processStatus.connectionBusy.statusSince.getTime();
     console.log(`No status check because waiting for connection to complete, now ${tmp} millisecs`)
     return
   }
 	if (processStatus.connectionBusy.status != '' && new Date().getTime() - processStatus.connectionBusy.statusSince.getTime() < 4000) {
-    var tmp = new Date().getTime()-processStatus.connectionBusy.statusSince.getTime();
     console.log(`No status check because to soon after connection completed, now ${tmp} millisecs`)
     return
   }
@@ -1094,4 +1099,4 @@ const statusCheck = async function() {
 }
 //  nmcli general hostname debian-laptop
 statusCheck()
-var statusCheckTimer = setInterval(statusCheck, 10000);
+var statusCheckTimer = setInterval(statusCheck, 5000);

@@ -1040,7 +1040,8 @@ const statusCheck = async function() {
     var stdoutArray	= result.stdout.split('\n');
     unit.connections=[]
     for (var i=0;i<stdoutArray.length-1;i++) {
-      var tmp=stdoutArray[i].substr(0,20).trim()
+			var pos = stdoutArray[i].indexOf("wifi")
+      var tmp=stdoutArray[i].substr(0,pos-1).trim()
       if (tmp!=unit.ssid) {
         unit.connections.push(tmp)
       }

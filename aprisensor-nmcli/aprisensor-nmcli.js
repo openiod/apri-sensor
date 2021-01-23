@@ -176,7 +176,7 @@ var columnsToJsonArray = function(columns) {
   var keyArray=[]
 	// split record 1 at space(s) (column labels)
 	var keys=records[0].split(/[\s]+/)
-	if (records.length<2) return resultJson  // no data, may be only column labels  
+	if (records.length<2) return resultJson  // no data, may be only column labels
 
   var keyPrev=0
   for (var i=0;i<keys.length-1;i++){
@@ -186,7 +186,7 @@ var columnsToJsonArray = function(columns) {
     keyArray.push(key)
     var keyPrev=key.index+key.name.length
   }
-	console.dir(keyArray)
+//	console.dir(keyArray)
   for (var i=0;i<keyArray.length-1;i++){
     keyArray[i].colWidth=keyArray[i+1].index-keyArray[i].index
   }
@@ -419,12 +419,27 @@ nmcli connection add type wifi ifname wlp7s0 con-name ap-24 autoconnect no ssid 
       802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk '"+passwd+"' \
       wifi-sec.key-mgmt wpa-psk wifi-sec.psk '"+passwd+"' "
     console.log(createCommand)
-    await execPromise(createCommand)
-    .then((result)=>{console.log('then')})
-    .catch((error)=>{console.log(error)})
+    execPromise(createCommand)
+    .then((result)=>{
+			console.log('then')
+//			console.log(result)
+			processStatus.connectionBusy.status=false
+      processStatus.connectionBusy.statusSince=new Date()
+      res.writeHead(200);
+      res.write(result.stdout);
+      res.end(`The accesspoint is connected to the device`);
+		})
+    .catch((error)=>{
+			console.log(error)
+			processStatus.connectionBusy.status=false
+      processStatus.connectionBusy.statusSince=new Date()
+			res.writeHead(400);
+      res.write(`{error:400,message: '${error}'}`);
+      res.end();
+		})
+/*
     console.log('connection up')
     await execPromise("LC_ALL=C nmcli connection up '"+ssid+ "'")
-//    await execPromise("LC_ALL=C nmcli connection up '"+ssid+ "' passwd-file '"+ssid+".passwd'")
     .then((result)=>{
       console.log('connection up then')
       console.log(result)
@@ -443,6 +458,7 @@ nmcli connection add type wifi ifname wlp7s0 con-name ap-24 autoconnect no ssid 
       processStatus.connectionBusy.status=false
       processStatus.connectionBusy.statusSince=new Date()
     });
+		*/
   })
 }
 

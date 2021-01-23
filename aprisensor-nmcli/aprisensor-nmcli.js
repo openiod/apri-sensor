@@ -1015,6 +1015,10 @@ const statusCheck = async function() {
 		// forced reset of Busy state
 		processStatus.connectionBusy.status='interupted'
 		processStatus.connectionBusy.statusSince=new Date()
+		return
+	}
+	if(processStatus.connectionBusy.status=='interupted') {
+		processStatus.connectionBusy.status=''
 	}
   if (processStatus.connectionBusy.status==true) {
     console.log(`No status check because waiting for connection to complete, now ${tmp} millisecs`)

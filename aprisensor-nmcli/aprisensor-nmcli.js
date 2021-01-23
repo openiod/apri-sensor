@@ -174,7 +174,10 @@ var columnsToJsonArray = function(columns) {
 	var records = columns.split('\n')
 	var resultJson=[]
   var keyArray=[]
+	// split record 1 at space(s) (column labels)
 	var keys=records[0].split(/[\s]+/)
+	if (records.length<2) return resultJson  // no data, may be only column labels  
+
   var keyPrev=0
   for (var i=0;i<keys.length-1;i++){
     var key ={}
@@ -183,35 +186,20 @@ var columnsToJsonArray = function(columns) {
     keyArray.push(key)
     var keyPrev=key.index+key.name.length
   }
+	console.dir(keyArray)
   for (var i=0;i<keyArray.length-1;i++){
     keyArray[i].colWidth=keyArray[i+1].index-keyArray[i].index
   }
   keyArray[keyArray.length-1].colWidth=records[0].length-keyArray[keyArray.length-1].index
-  //console.dir(keyArray)
-  //console.log(records[0])
 
   for (var i=1;i<records.length-1;i++) {
     var record = records[i]
     var newRecord={}
     for (var j=0;j<keyArray.length;j++){
       newRecord[keyArray[j].name]=record.substr(keyArray[j].index,keyArray[j].colWidth).trim()
-  //    console.log(record.substr(keyArray[j].index,keyArray[j].colWidth))
     }
-
-///  		if (records[i]=='') continue // skip empty (last) record
-//		var oneRow=records[i]
-//		var values=oneRow.split(/[\s]+/)
-//		var record={}
-//		for (var j=0;j<records[i].length;j++){
-//			if (keys[j]=='' ||keys[j]==undefined ) continue // skip empty (last) column
-//			var key=keys[j]
-//			var value=values[j]
-//			record[key]=value
-//		}
 		resultJson.push(newRecord)
-    //console.dir(newRecord)
 	}
-
 	return resultJson
 }
 

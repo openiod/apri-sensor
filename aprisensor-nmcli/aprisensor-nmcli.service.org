@@ -1,9 +1,0 @@
-[Unit]
-Desription=SCAPE604-apri-agent - start or restart apri-agent service, respawn
-After=network.target
-[Service]
-ExecStart=/opt/SCAPE604/apri-sensor/aprisensor-nmcli/aprisensor-nmcli.sh /opt/SCAPE604/log/SCAPE604-aprisensor-nmcli.log
-Restart=always
-
-[Install]
-WantedBy=multi-user.target

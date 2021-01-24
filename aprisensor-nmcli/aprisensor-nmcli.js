@@ -299,7 +299,7 @@ const getDeviceWifiList = async function(req,res) {
     })
   }
   console.log(`retrieve Wifi List`)
-  await retrieveWifiList()
+  retrieveWifiList()
   .then((result) => {
     console.log(`getDeviceWifiList then`)
     //console.log(result)

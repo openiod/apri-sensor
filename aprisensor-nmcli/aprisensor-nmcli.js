@@ -287,9 +287,11 @@ const getDeviceWifiList = async function(req,res) {
     console.log("deactivate hotspot")
     processStatus.connectionBusy.status=true
     processStatus.connectionBusy.statusSince=new Date()
-		res.writeHead(210, { 'Content-Type': 'application/json' });
-  	res.write(JSON.stringify(localWifiList));
-  	res.end();
+		try {
+			res.writeHead(210, { 'Content-Type': 'application/json' });
+	  	res.write(JSON.stringify(localWifiList));
+	  	res.end();
+		}	catch(e){}
     await hotspotDown()
     .then((result)=>{
       console.log(`hotspot down - then`)

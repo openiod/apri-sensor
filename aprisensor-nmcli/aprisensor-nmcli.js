@@ -36,6 +36,7 @@ var initMenu	= function() {
 
 var unit = {}
 var connectionsIndex=0
+var localWifiList=[]
 
 var processStatus = []
 processStatus.main = {

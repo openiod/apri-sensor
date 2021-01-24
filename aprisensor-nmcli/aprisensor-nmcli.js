@@ -127,6 +127,10 @@ const requestListener = function (req, res) {
 			    getDeviceWifiList(req,res)
 					break
 				}
+				if (req.url == '/nmcli/api/v1/device/wifilistcache') {
+			    getDeviceWifiListCache(req,res)
+					break
+				}
 				res.writeHead(400);
 				res.write(`{error:400,message: 'Invalid API-call: ${methodType} ${url}'}`);
 				res.end();
@@ -280,11 +284,20 @@ const getDeviceHotspot = function(req,res,callback) {
 	});
 */
 }
+function sleep(ms) {
+	console.log(`sleep promise ${ms}ms`)
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+const getDeviceWifiListCache = function(req,res) {
+	res.writeHead(200, { 'Content-Type': 'application/json' });
+	res.write(JSON.stringify(localWifiList));
+	res.end();
+}
 const getDeviceWifiList = async function(req,res) {
-  console.log(`getDeviceWifiList`)
+//  console.log(`getDeviceWifiList`)
   var restartHotspot=false
   if (unit.ssid==unit.connection) { //hotspot active
-    console.log("deactivate hotspot")
+//    console.log("deactivate hotspot")
     processStatus.connectionBusy.status=true
     processStatus.connectionBusy.statusSince=new Date()
 		try {
@@ -292,30 +305,40 @@ const getDeviceWifiList = async function(req,res) {
 	  	res.write(JSON.stringify(localWifiList));
 	  	res.end();
 		}	catch(e){}
+//		await sleep(1000);
     await hotspotDown()
-    .then((result)=>{
-      console.log(`hotspot down - then`)
+    .then( async (result)=>{
+//      console.log(`hotspot down - then`)
       restartHotspot=true
+			await sleep(4000);
     })
-    .catch((error)=>{
-      console.log(`hotspot down - catch - but no problem`)
+    .catch(async (error)=>{
+//      console.log(`hotspot down - catch - but no problem`)
+//			await sleep(1000);
     })
   }
-  console.log(`retrieve Wifi List`)
+//	await sleep(3000);
   retrieveWifiList()
   .then((result) => {
-    console.log(`getDeviceWifiList then`)
-    //console.log(result)
-		localWifiList=columnsToJsonArray(result.stdout)
+//    console.log(`getDeviceWifiList then`)
+//    console.log(result.stdout)
+		var tmpList=columnsToJsonArray(result.stdout)
+		if (tmpList.length!=0) {
+//			console.log('============================')
+			localWifiList=tmpList
+//			console.log(localWifiList)
+		} else {
+//			console.log('----------------------------')
+		}
     if (restartHotspot==true) {
-      console.log(`getDeviceWifiList reactivate hotspot`)
+//      console.log(`getDeviceWifiList reactivate hotspot`)
       setHotspotUp()
 			return
     }
 		// when restarting as hotspot the connection is broken,
 		// writes to res have do not succeed.
     res.writeHead(200, { 'Content-Type': 'application/json' });
-  	res.write(JSON.stringify(columnsToJsonArray(result.stdout)));
+  	res.write(JSON.stringify(localWifiList));
   	res.end();
   })
   .catch((error)=>{
@@ -328,13 +351,14 @@ const getDeviceWifiList = async function(req,res) {
     }
 		// when restarting as hotspot the connection is broken,
 		// writes to res have do not succeed.
-    res.writeHead(400, { 'Content-Type': 'application/json' });
-  	res.write(JSON.stringify(columnsToJsonArray(error)));
+		// return latest known wifi list
+    res.writeHead(201, { 'Content-Type': 'application/json' });
+  	res.write(JSON.stringify(localWifiList));
   	res.end();
   })
 }
 const retrieveWifiList=function(){
-	console.log(`retrieve Wifi List`)
+	console.log(`retrieveWifiList`)
 	return execPromise("LC_ALL=C nmcli device wifi list")
 }
 
@@ -364,21 +388,19 @@ const deleteMethodHandler = ( url, req, res) => {
 
 const postDeviceConnect = ( url, req, res) => {
   console.log(url)
+	processStatus.connectionBusy.status=true
+  processStatus.connectionBusy.statusSince=new Date()
   let body = '';
   req.on('data', chunk => {
     body += chunk.toString(); // convert Buffer to string
   });
   req.on('end', async () => {
-//        console.log(body);
-  //      res.end('ok');
-//    });
 		var result = JSON.parse(body)
 		var id =result.NAME
 		//if (result.key=='device') id=result.DEVICE
 		//if (result.key=='name') id=result.NAME
 		//if (result.key=='type') id=result.TYPE
 //    exec("LC_ALL=C nmcli device wifi connect '"+id+ "' password '"+result.password+"'", (error, stdout, stderr) => {
-
 	  await execPromise("LC_ALL=C nmcli connection up '"+id+"'")
     .then((result)=> {
       if (processStatus.connection.status!='OK') {
@@ -387,6 +409,8 @@ const postDeviceConnect = ( url, req, res) => {
       }
       processStatus.connection.code=200
       processStatus.connection.message=''
+			processStatus.connectionBusy.status=false
+      processStatus.connectionBusy.statusSince=new Date()
   		res.writeHead(200);
   		res.write(result.stdout);
   	  res.end(`Device connected`);
@@ -399,6 +423,8 @@ const postDeviceConnect = ( url, req, res) => {
       }
       processStatus.connection.code=400
       processStatus.connection.message=error
+			processStatus.connectionBusy.status=false
+      processStatus.connectionBusy.statusSince=new Date()
 			res.writeHead(400);
 			res.write(`{error:400,message: '${error}'}`);
 			res.end();
@@ -689,9 +715,11 @@ actions.push(function() {
 	.then((result) => {
 		console.log(`getDeviceWifiList then`)
 		localWifiList=columnsToJsonArray(result.stdout)
+		console.log(localWifiList)
 	})
 	.catch((error)=>{
 		console.log(`getDeviceWifiList catch`)
+		console.log(error)
 	})
 	nextAction()
 }

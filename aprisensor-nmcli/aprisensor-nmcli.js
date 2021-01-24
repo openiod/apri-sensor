@@ -310,6 +310,7 @@ const getDeviceWifiList = async function(req,res) {
     if (restartHotspot==true) {
       console.log(`getDeviceWifiList reactivate hotspot`)
       setHotspotUp()
+			return
     }
 		// when restarting as hotspot the connection is broken,
 		// writes to res have do not succeed.
@@ -319,9 +320,11 @@ const getDeviceWifiList = async function(req,res) {
   })
   .catch((error)=>{
 		console.log(`getDeviceWifiList catch`)
+		console.log(error)
 		if (restartHotspot==true) {
       console.log(`getDeviceWifiList reactivate hotspot`)
       setHotspotUp()
+			return
     }
 		// when restarting as hotspot the connection is broken,
 		// writes to res have do not succeed.

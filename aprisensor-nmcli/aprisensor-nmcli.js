@@ -689,6 +689,7 @@ actions.push(function() {
 	})
 	nextAction()
 }
+)
 
 async function readFile(path) {
     return new Promise((resolve, reject) => {

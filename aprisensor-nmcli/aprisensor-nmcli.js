@@ -288,7 +288,7 @@ const getDeviceWifiList = async function(req,res) {
     processStatus.connectionBusy.status=true
     processStatus.connectionBusy.statusSince=new Date()
 		res.writeHead(210, { 'Content-Type': 'application/json' });
-  	res.write(localWifiList);
+  	res.write(JSON.stringify(localWifiList));
   	res.end();
     await hotspotDown()
     .then((result)=>{

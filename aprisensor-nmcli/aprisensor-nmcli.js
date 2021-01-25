@@ -27,6 +27,7 @@ var menuUrl;
 var localServer = {};
 localServer.ConfigMenu = {};
 var apiPort = 4000
+var hotspotPassword='scapeler'
 
 var initMenu	= function() {
 	console.log('Init menu');
@@ -306,7 +307,8 @@ const getDeviceWifiList = async function(req,res) {
 	  	res.end();
 		}	catch(e){}
 //		await sleep(1000);
-    await hotspotDown()
+		//await hotspotDown()
+    await hotspotDelete()
     .then( async (result)=>{
 //      console.log(`hotspot down - then`)
       restartHotspot=true
@@ -332,7 +334,7 @@ const getDeviceWifiList = async function(req,res) {
 		}
     if (restartHotspot==true) {
 //      console.log(`getDeviceWifiList reactivate hotspot`)
-      setHotspotUp()
+      createHotspotConnection()
 			return
     }
 		// when restarting as hotspot the connection is broken,
@@ -346,7 +348,7 @@ const getDeviceWifiList = async function(req,res) {
 		console.log(error)
 		if (restartHotspot==true) {
       console.log(`getDeviceWifiList reactivate hotspot`)
-      setHotspotUp()
+      createHotspotConnection()
 			return
     }
 		// when restarting as hotspot the connection is broken,
@@ -516,6 +518,11 @@ const hotspotDown = function() {
   console.log(`set hotspot down`)
   return execPromise("LC_ALL=C nmcli connection down '"+unit.ssid+"'")
 }
+const hotspotDelete = function() {
+  // delete hotspot
+  console.log(`delete hotspot`)
+  return execPromise("LC_ALL=C nmcli connection delete '"+unit.ssid+"'")
+}
 
 const tryCandidateConnection = async function(index) {
 	if (processStatus.connectionBusy.status==false) {
@@ -573,7 +580,7 @@ const createHotspotConnection=function(){
   console.log('2. Create hotspot connection')
   var hotspotCommand= "LC_ALL=C nmcli connection add type wifi ifname '"+unit.ifname+"' con-name '"+unit.ssid+"' autoconnect no wifi.mode ap \
      ssid '"+unit.ssid+"' \
-     ipv4.method shared 802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk 'iam@Home' \
+     ipv4.method shared 802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk '"+hotspotPassword+"' \
      ipv6.method shared"
   execPromise(hotspotCommand)
   .then((result)=>{
@@ -713,9 +720,9 @@ actions.push(function() {
 //  console.log('Retrieve wifilist')
 	retrieveWifiList()
 	.then((result) => {
-		console.log(`getDeviceWifiList then`)
+//		console.log(`getDeviceWifiList then`)
 		localWifiList=columnsToJsonArray(result.stdout)
-		console.log(localWifiList)
+//		console.log(localWifiList)
 	})
 	.catch((error)=>{
 		console.log(`getDeviceWifiList catch`)

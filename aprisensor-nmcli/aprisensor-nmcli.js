@@ -310,7 +310,7 @@ const getDeviceWifiList = async function(req,res) {
     .then( async (result)=>{
 //      console.log(`hotspot down - then`)
       restartHotspot=true
-			await sleep(4000);
+			await sleep(6000);
     })
     .catch(async (error)=>{
 //      console.log(`hotspot down - catch - but no problem`)

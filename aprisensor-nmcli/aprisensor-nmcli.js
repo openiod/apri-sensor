@@ -10,6 +10,7 @@
 // activate init process config-main
 const path = require('path');
 const http = require('http');
+const {createHttpTerminator} = require('http-terminator');
 const fs = require('fs');
 const exec = require('child_process').exec;
 const util = require('util');
@@ -171,8 +172,21 @@ const requestListener = function (req, res) {
 	}
 }
 
-const server = http.createServer(requestListener);
-server.listen(apiPort);
+//const server = http.createServer(requestListener);
+//const httpTerminator = createHttpTerminator({
+//  server,
+//});
+var server
+var httpTerminator
+const initHttpServer = function() {
+	server = http.createServer(requestListener)
+	httpTerminator = createHttpTerminator({
+	  server,
+	});
+	server.listen(apiPort);
+}
+initHttpServer()
+
 
 // **********************************************************************************
 
@@ -308,6 +322,14 @@ const getDeviceWifiList = async function(req,res) {
 		}	catch(e){}
 //		await sleep(1000);
 		//await hotspotDown()
+		await httpTerminator.terminate()
+		.then((result) =>{
+			console.log('http server terminated')
+			//console.dir(result)
+		})
+		.catch((error) =>{
+			console.log('http server terminating error')
+		})
     await hotspotDelete()
     .then( async (result)=>{
       console.log(`hotspot delete then`)
@@ -338,6 +360,9 @@ const getDeviceWifiList = async function(req,res) {
     if (restartHotspot==true) {
 //      console.log(`getDeviceWifiList reactivate hotspot`)
       createHotspotConnection()
+			console.log('http server restart')
+			//server.listen(apiPort);
+			initHttpServer()
 			return
     }
 		// when restarting as hotspot the connection is broken,
@@ -352,6 +377,9 @@ const getDeviceWifiList = async function(req,res) {
 		if (restartHotspot==true) {
       console.log(`getDeviceWifiList reactivate hotspot`)
       createHotspotConnection()
+			console.log('http server restart')
+			//server.listen(apiPort);
+			initHttpServer()
 			return
     }
 		// when restarting as hotspot the connection is broken,
@@ -598,15 +626,17 @@ const createHotspotConnection=function(){
 const setHotspotUp = function() {
   console.log('3. Activate hotspot connection')
   execPromise("LC_ALL=C nmcli connection up '"+unit.ssid+"'")
-  .then((result)=>{
+  .then(async (result)=>{
     setHotspotStatus('OK',200)
     unit.connection=unit.ssid
+		await sleep(2000)
     processStatus.connectionBusy.status=false
     processStatus.connectionBusy.statusSince=new Date()
     getIpAddress()
   })
-  .catch((error)=>{
+  .catch(async (error)=>{
     unit.connection=''
+		await sleep(2000)
     processStatus.connectionBusy.status=false
     processStatus.connectionBusy.statusSince=new Date()
     setHotspotStatus('ERROR',400,error)

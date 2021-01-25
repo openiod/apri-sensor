@@ -21,12 +21,13 @@
     "axios": "^0.21.1",
     "bme680-sensor": "^1.0.0",
     "express": "^4.17.1",
-    "request": "^2.88.2",
+    "http-terminator": "^2.0.3",
     "onoff": "^6.0.1",
     "raspi": "^6.0.1",
     "raspi-i2c": "^6.2.4",
     "raspi-serial": "^6.0.0",
     "redis": "^3.0.2",
+    "request": "^2.88.2",
     "socket.io-client": "^2.3.1"
   }
 }

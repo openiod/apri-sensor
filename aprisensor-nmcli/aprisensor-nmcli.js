@@ -310,27 +310,30 @@ const getDeviceWifiList = async function(req,res) {
 		//await hotspotDown()
     await hotspotDelete()
     .then( async (result)=>{
-//      console.log(`hotspot down - then`)
+      console.log(`hotspot delete then`)
       restartHotspot=true
 			await sleep(6000);
     })
     .catch(async (error)=>{
-//      console.log(`hotspot down - catch - but no problem`)
-//			await sleep(1000);
+			console.log(`hotspot delete catch`)
+      restartHotspot=true
+			await sleep(6000);
     })
   }
 //	await sleep(3000);
+	console.log('retrieveWifiList()')
   retrieveWifiList()
   .then((result) => {
-//    console.log(`getDeviceWifiList then`)
+    console.log(`retrieveWifiList then`)
 //    console.log(result.stdout)
 		var tmpList=columnsToJsonArray(result.stdout)
 		if (tmpList.length!=0) {
-//			console.log('============================')
+			console.log('============================')
 			localWifiList=tmpList
-//			console.log(localWifiList)
+			console.log(localWifiList)
 		} else {
-//			console.log('----------------------------')
+			console.log('----------------------------')
+			console.log(result.stdout)
 		}
     if (restartHotspot==true) {
 //      console.log(`getDeviceWifiList reactivate hotspot`)

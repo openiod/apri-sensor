@@ -1139,6 +1139,7 @@ const statusCheck = async function() {
   }
 
   console.log('statusCheck')
+	// retrieve all wifi connections (no await)
   execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')
   .then((result)=>{
     //console.log('status check get all connections then')
@@ -1157,6 +1158,7 @@ const statusCheck = async function() {
     unit.connections=[]
   })
 
+	// retrieve active connection
   await getActiveConnection()
 	.then((result)=>{
 		var stdoutArray	= result.stdout.split(' ');
@@ -1168,6 +1170,7 @@ const statusCheck = async function() {
 		//console.log("getActiveConnection error")
 		unit.connection=''
 	})
+
 	getIpAddress()
   getGateway()
   checkTimeSync()
@@ -1190,6 +1193,7 @@ const statusCheck = async function() {
           }
         }
       }
+			return
     }
 //  }
 //  if (processStatus.hotspot.status=='OK') {
@@ -1198,16 +1202,16 @@ const statusCheck = async function() {
     //if (processStatus.hotspot.status=='OK') {
      // after 120 sec. stop hotspot and try standard connection
     if (new Date().getTime() - processStatus.hotspot.statusSince.getTime() >60000){
-      if (processStatus.connectionBusy.status==false) {
-        if (new Date().getTime() - processStatus.connectionBusy.statusSince.getTime() >10000){
+//      if (processStatus.connectionBusy.status==false) {
+//        if (new Date().getTime() - processStatus.connectionBusy.statusSince.getTime() >10000){
           if (unit.connections.length > 0 ){
-            if (unit.connections.length > 1 || unit.ssid != unit.connection){ // not only hotspot
+            if (unit.ssid != unit.connection){ // do not try hotspot
               connectionsIndex=0
               tryCandidateConnection(connectionsIndex)
             }
           }
-        }
-      }
+//        }
+//      }
     }
   }
 }

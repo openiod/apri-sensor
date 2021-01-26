@@ -577,6 +577,8 @@ const tryCandidateConnection = async function(index) {
     console.log(`tryCandidateConnection then ${index} ${unit.connections[index]}`)
     processStatus.connectionBusy.status=false
     processStatus.connectionBusy.statusSince=new Date()
+		processStatus.gateway.statusSince=new Date()
+		processStatus.gateway.status='OK' // give some time to settle connection (gateway setting etc.) 
   })
   .catch((error)=>{
     console.log(`tryCandidateConnection catch ${index} ${unit.connections[index]}`)
@@ -1044,7 +1046,7 @@ const checkHotspotActivation= async function() {
 
 // when online no automatic activation of the hotspot necessary
 const getGateway = async function() {
-  var result = await execPromise('ip route | grep "default via" ')
+  await execPromise('ip route | grep "default via" ')
   .then((result)=>{
     var stdoutArray	= result.stdout.split(' ');
     unit.gateway=stdoutArray[2]
@@ -1172,8 +1174,8 @@ const statusCheck = async function() {
 	})
 
 	getIpAddress()
-  getGateway()
-  checkTimeSync()
+	checkTimeSync()
+  await getGateway()
   console.dir(processStatus)
   console.dir(unit)
 
@@ -1205,10 +1207,10 @@ const statusCheck = async function() {
 //      if (processStatus.connectionBusy.status==false) {
 //        if (new Date().getTime() - processStatus.connectionBusy.statusSince.getTime() >10000){
           if (unit.connections.length > 0 ){
-            if (unit.ssid != unit.connection){ // do not try hotspot
+        //    if (unit.ssid != unit.connection){ // do not try hotspot
               connectionsIndex=0
               tryCandidateConnection(connectionsIndex)
-            }
+        //    }
           }
 //        }
 //      }

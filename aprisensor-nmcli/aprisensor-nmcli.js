@@ -33,8 +33,8 @@ var apiPort = 4000
 var hotspotPassword='scapeler'
 
 const httpsOptions = {
-  key: fs.readFileSync('../config/tls/aprisensor-key.pem'),
-  cert: fs.readFileSync('../config/tls/aprisensor-cert.pem'),
+  key: fs.readFileSync('../../config/tls/aprisensor-key.pem'),
+  cert: fs.readFileSync('../../config/tls/aprisensor-cert.pem'),
   rejectUnauthorized: false,
 };
 

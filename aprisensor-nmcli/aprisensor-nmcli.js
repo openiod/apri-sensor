@@ -9,7 +9,9 @@
 
 // activate init process config-main
 const path = require('path');
-const http = require('http');
+//const http = require('http');
+const https = require('https');
+//const tls = require('tls')
 const {createHttpTerminator} = require('http-terminator');
 const fs = require('fs');
 const exec = require('child_process').exec;
@@ -30,11 +32,11 @@ localServer.ConfigMenu = {};
 var apiPort = 4000
 var hotspotPassword='scapeler'
 
-var initMenu	= function() {
-	console.log('Init menu');
-	localServer.ConfigMenu["main"] = '<http><body><h1>Hoofdmenu</h1><br/><a href="'+menuUrl+'?menu=wifi">WiFi configuratie</a></body></http>';
-	localServer.ConfigMenu["wifi"] = '<http><body><h1>WiFi menu</h1><br/><a href="'+menuUrl+'?menu=wifi">WiFi configuratie</a></body></http>';
-}
+const httpsOptions = {
+  key: fs.readFileSync('../config/tls/aprisensor-key.pem'),
+  cert: fs.readFileSync('../config/tls/aprisensor-cert.pem'),
+  rejectUnauthorized: false,
+};
 
 var unit = {}
 var connectionsIndex=0
@@ -95,6 +97,7 @@ const returnResultJson=function(result, req, res) {
 }
 
 const requestListener = function (req, res) {
+	//console.dir(req)
 	res.setHeader('Access-Control-Allow-Origin', '*');
 	res.setHeader('Access-Control-Request-Method', '*');
 	res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, DELETE, POST, PUT');
@@ -179,7 +182,8 @@ const requestListener = function (req, res) {
 var server
 var httpTerminator
 const initHttpServer = function() {
-	server = http.createServer(requestListener)
+//	server = http.createServer(requestListener)
+	server = https.createServer(httpsOptions,requestListener)
 	httpTerminator = createHttpTerminator({
 	  server,
 	});
@@ -578,7 +582,7 @@ const tryCandidateConnection = async function(index) {
     processStatus.connectionBusy.status=false
     processStatus.connectionBusy.statusSince=new Date()
 		processStatus.gateway.statusSince=new Date()
-		processStatus.gateway.status='OK' // give some time to settle connection (gateway setting etc.) 
+		processStatus.gateway.status='OK' // give some time to settle connection (gateway setting etc.)
   })
   .catch((error)=>{
     console.log(`tryCandidateConnection catch ${index} ${unit.connections[index]}`)

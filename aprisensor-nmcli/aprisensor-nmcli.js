@@ -306,10 +306,12 @@ const getDeviceHotspot = function(req,res,callback) {
 	});
 */
 }
+
 function sleep(ms) {
 	console.log(`sleep promise ${ms}ms`)
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
 const getDeviceWifiListCache = function(req,res) {
 	res.writeHead(200, { 'Content-Type': 'application/json' });
 	res.write(JSON.stringify(localWifiList));
@@ -1126,7 +1128,11 @@ const getActiveConnection = function() {
   return execPromise('LC_ALL=C nmcli d show '+unit.ifname+' |grep GENERAL.CONNECTION')
 }
 
+var skipStatusCheck = false
+
 const statusCheck = async function() {
+	if (skipStatusCheck==true) return
+
 	//await getGateway()
 	await execPromise('ip route | grep "default via" ')
 	.then( async (result)=>{
@@ -1136,7 +1142,15 @@ const statusCheck = async function() {
 			processStatus.gateway.status='OK'
 			processStatus.gateway.statusSince=new Date()
 		}
+		// gateway oke then rest for one minute
+		skipStatusCheck=true
 		await sleep(60000)
+		.then((result)=> {
+			skipStatusCheck=false
+		})
+		.catch((error)=> {
+			skipStatusCheck=false
+		})
 		return
 	})
 	.catch((error)=>{

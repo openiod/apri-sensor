@@ -9,9 +9,8 @@
 
 // activate init process config-main
 const path = require('path');
-//const http = require('http');
-const https = require('https');
-//const tls = require('tls')
+const http = require('http');
+//const https = require('https');
 const {createHttpTerminator} = require('http-terminator');
 const fs = require('fs');
 const exec = require('child_process').exec;
@@ -32,11 +31,13 @@ localServer.ConfigMenu = {};
 var apiPort = 4000
 var hotspotPassword='scapeler'
 
+/*
 const httpsOptions = {
   key: fs.readFileSync('../../config/tls/aprisensor-key.pem'),
   cert: fs.readFileSync('../../config/tls/aprisensor-cert.pem'),
-  rejectUnauthorized: false,
+  rejectUnauthorized: true,
 };
+*/
 
 var unit = {}
 var connectionsIndex=0
@@ -102,7 +103,9 @@ const requestListener = function (req, res) {
 	res.setHeader('Access-Control-Request-Method', '*');
 	res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, DELETE, POST, PUT');
 //	res.setHeader('Access-Control-Allow-Headers', 'append,delete,entries,foreach,get,has,keys,set,values,Authorization');
+//	res.setHeader('Access-Control-Allow-Headers', 'authorization,content-type');
 	res.setHeader('Access-Control-Allow-Headers', '*');
+//	Access-Control-Allow-Headers: Accept
 	try {
     entryCheck(req);
 		const methodType = req.method.toUpperCase();
@@ -182,8 +185,8 @@ const requestListener = function (req, res) {
 var server
 var httpTerminator
 const initHttpServer = function() {
-//	server = http.createServer(requestListener)
-	server = https.createServer(httpsOptions,requestListener)
+	server = http.createServer(requestListener)
+//	server = https.createServer(httpsOptions,requestListener)
 	httpTerminator = createHttpTerminator({
 	  server,
 	});
@@ -1124,6 +1127,26 @@ const getActiveConnection = function() {
 }
 
 const statusCheck = async function() {
+	//await getGateway()
+	await execPromise('ip route | grep "default via" ')
+	.then((result)=>{
+		var stdoutArray	= result.stdout.split(' ');
+		unit.gateway=stdoutArray[2]
+		if (processStatus.gateway.status!='OK') {
+			processStatus.gateway.status='OK'
+			processStatus.gateway.statusSince=new Date()
+			sleep(60000)
+			return
+		}
+	})
+	.catch((error)=>{
+		unit.gateway=''
+		if (processStatus.gateway.status!='ERROR') {
+			processStatus.gateway.status='ERROR'
+			processStatus.gateway.statusSince=new Date()
+		}
+	})
+
 	var tmp = new Date().getTime()-processStatus.connectionBusy.statusSince.getTime();
 	if (new Date().getTime() - processStatus.connectionBusy.statusSince.getTime() > 20000){
 		// do not wait too long ;-)
@@ -1179,7 +1202,6 @@ const statusCheck = async function() {
 
 	getIpAddress()
 	checkTimeSync()
-  await getGateway()
   console.dir(processStatus)
   console.dir(unit)
 

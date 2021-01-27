@@ -1135,9 +1135,9 @@ const statusCheck = async function() {
 		if (processStatus.gateway.status!='OK') {
 			processStatus.gateway.status='OK'
 			processStatus.gateway.statusSince=new Date()
-			await sleep(60000)
-			return
 		}
+		await sleep(60000)
+		return
 	})
 	.catch((error)=>{
 		unit.gateway=''

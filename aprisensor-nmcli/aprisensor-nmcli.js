@@ -1132,7 +1132,8 @@ var skipStatusCheck = false
 
 const statusCheck = async function() {
 	if (skipStatusCheck==true) return
-
+	getIpAddress()
+	checkTimeSync()
 	//await getGateway()
 	await execPromise('ip route | grep "default via" ')
 	.then( async (result)=>{
@@ -1214,8 +1215,6 @@ const statusCheck = async function() {
 		unit.connection=''
 	})
 
-	getIpAddress()
-	checkTimeSync()
   console.dir(processStatus)
   console.dir(unit)
 

@@ -1129,7 +1129,7 @@ const getActiveConnection = function() {
 const statusCheck = async function() {
 	//await getGateway()
 	await execPromise('ip route | grep "default via" ')
-	.then(( async result)=>{
+	.then( async (result)=>{
 		var stdoutArray	= result.stdout.split(' ');
 		unit.gateway=stdoutArray[2]
 		if (processStatus.gateway.status!='OK') {

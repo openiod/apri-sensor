@@ -1245,4 +1245,4 @@ const statusCheck = async function() {
 }
 //  nmcli general hostname debian-laptop
 statusCheck()
-var statusCheckTimer = setInterval(statusCheck, 5000);
+var statusCheckTimer = setInterval(statusCheck, 10000);

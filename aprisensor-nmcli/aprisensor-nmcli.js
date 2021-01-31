@@ -9,8 +9,8 @@
 
 // activate init process config-main
 const path = require('path');
-const http = require('http');
-//const https = require('https');
+//const http = require('http');
+const https = require('https');
 const {createHttpTerminator} = require('http-terminator');
 const fs = require('fs');
 const exec = require('child_process').exec;
@@ -18,6 +18,16 @@ const util = require('util');
 const execPromise = util.promisify(require('child_process').exec);
 //const execSync			= require('child_process').execSync;
 //const execFile			= require('child_process').execFile;
+const crypto = require('crypto');
+const lzString = require('./lz-string.js')
+//var SimpleCrypto = require("simple-crypto-js").default
+//const cert = require('crypto').Certificate();
+
+//const secret = 'abcdefg';
+//const hash = crypto.createHmac('sha256', secret)
+//                   .update('I love cupcakes')
+//                   .digest('hex');
+//console.log(hash);
 
 const REQUIRED_CONTENT_TYPE = 'application/json';
 const ACCEPT_ENCODING_1 = 'application/json';
@@ -30,16 +40,31 @@ var localServer = {};
 localServer.ConfigMenu = {};
 var apiPort = 4000
 var hotspotPassword='scapeler'
+var skipStatusCheck = false
 
-/*
+
+
 const httpsOptions = {
   key: fs.readFileSync('../../config/tls/aprisensor-key.pem'),
   cert: fs.readFileSync('../../config/tls/aprisensor-cert.pem'),
   rejectUnauthorized: true,
 };
-*/
+
+
+let key
+
+//let cipher = null
+//let decipher = null
+//let iv=null
+//let key=null
+//let resizedIV = new Buffer.allocUnsafe(16)
+//const algoritm="aes-256-cbc"
+//const algoritm="sha256"
+const algoritm="AES-GCM"
 
 var unit = {}
+var unitCrypto={}
+
 var connectionsIndex=0
 var localWifiList=[]
 
@@ -96,6 +121,13 @@ const returnResultJson=function(result, req, res) {
 	//res.write('executed');
 	res.end();
 }
+const returnError=function(error, req, res) {
+	res.writeHead(400)
+	// set response content
+	res.write(error);
+	//res.write('executed');
+	res.end();
+}
 
 const requestListener = function (req, res) {
 	//console.dir(req)
@@ -116,7 +148,7 @@ const requestListener = function (req, res) {
     		break;
   		case 'GET':
 				if (req.url == '/nmcli/api/v1/general') {
-			    getGeneral(req,res,returnResultJson)
+			    getGeneral(req,res)
 					break
 				}
         if (req.url == '/nmcli/api/v1/ip/avahi') {
@@ -144,6 +176,10 @@ const requestListener = function (req, res) {
 				res.end();
     		break;
   		case 'POST':
+				if (req.url == '/nmcli/api/v1/key') {
+					postPublicKey(url,req,res)
+					break
+				}
         if (req.url == '/nmcli/api/v1/device/connect') {
           postDeviceConnect(url,req,res)
           break
@@ -185,8 +221,8 @@ const requestListener = function (req, res) {
 var server
 var httpTerminator
 const initHttpServer = function() {
-	server = http.createServer(requestListener)
-//	server = https.createServer(httpsOptions,requestListener)
+//	server = http.createServer(requestListener)
+	server = https.createServer(httpsOptions,requestListener)
 	httpTerminator = createHttpTerminator({
 	  server,
 	});
@@ -231,15 +267,16 @@ var columnsToJsonArray = function(columns) {
 }
 
 const getGeneral = function(req,res,callback) {
-	exec("LC_ALL=C nmcli general", (error, stdout, stderr) => {
-		if (error) {
-			 console.error(`exec error: ${error}`);
-			return callback(resultJson, req,res);
-		}
-		var resultJson = columnsToJsonArray(stdout)
-		return callback(resultJson[0], req,res) // only one record with info
-	});
-	return 'test'
+	execPromise("LC_ALL=C nmcli general")
+	.then((result)=>{
+		var resultJson = columnsToJsonArray(result.stdout)
+		resultJson[0].iv=unitCrypto.iv
+		resultJson[0].ivDate=unitCrypto.ivDate
+	 	return returnResultJson(resultJson[0], req,res);
+	})
+	.catch((error)=>{
+		return returnError(error, req,res);
+	})
 }
 const getIpAvahi = function(req,res) {
   res.writeHead(200);
@@ -428,6 +465,20 @@ const deleteMethodHandler = ( url, req, res) => {
 	})
 }
 
+const postPublicKey = ( url, req, res) => {
+  console.log(url)
+	let body = '';
+  req.on('data', chunk => {
+    body += chunk.toString(); // convert Buffer to string
+  });
+  req.on('end', async () => {
+		var result = JSON.parse(body)
+		console.dir(result)
+  		res.writeHead(200);
+  	  res.end(`key recieved`);
+	})
+};
+
 const postDeviceConnect = ( url, req, res) => {
   console.log(url)
 	processStatus.connectionBusy.status=true
@@ -485,8 +536,16 @@ const postApConnect = async ( url, req, res) => {
       body += chunk.toString(); // convert Buffer to string
   });
   req.on('end', async () => {
-    var result = JSON.parse(body)
+    var result = JSON.parse(lzString.decompress(body))
     console.dir(result)
+		if (result.ssid==undefined) {
+			processStatus.connectionBusy.status=false
+			processStatus.connectionBusy.statusSince=new Date()
+			res.writeHead(400);
+			res.write(`{error:400,message: 'invalid data'}`);
+			res.end()
+			return
+		}
     var ssid =result.ssid
     var passwd=result.passwd
     console.log('connection down')
@@ -832,6 +891,14 @@ actions.push(async function() {
   nextAction()
 })
 
+actions.push(async function() {
+	setInterval(statusCheck, 10000);
+	statusCheck()
+
+	nextAction()
+})
+
+
 function getIpAddress() {
 	console.log('getIpAddress')
   execPromise('hostname --all-ip-address')
@@ -851,6 +918,18 @@ function getIpAddress() {
 
 }
 
+actions.push(function() {
+	let t=unit.ssid+'ScapelerApriSensor'+"                                "
+	key=t.substr(0,32)
+//	console.log(algoritm)
+//	console.log(inKey)
+//	key=crypto.createHash(algoritm)
+//	.update(inKey)
+//	.digest()
+	updateCrypto()
+	nextAction()
+})
+
 const nextAction=function(){
   console.log(`next action ${action+1}/${actions.length}`)
   if (action<actions.length-1) {
@@ -860,6 +939,7 @@ const nextAction=function(){
     console.dir(unit)
   }
 }
+
 
 // trigger initialization actions
 var action =-1
@@ -968,70 +1048,6 @@ var createService	= function(sensor, sensorKey) {
 	});
 }
 
-var getUsbInfo	= function(device, callback) {
-//sudo udevadm trigger
-
-	//hostname --all-ip-address
-	exec('udevadm info -a -p $(udevadm info -q path -n '+device+')', (error, stdout, stderr) => {
-		if (error) {
-			console.error(`exec error: ${error}`);
-			return;
-		}
-//		console.log(`stderr: ${stderr}`);
-
-		if (callback != undefined) {
-			callback(device,stdout);
-		}
-	});
-}
-
-var getLsUsbInfo	= function(data,callback) {
-		console.dir(data);
-		exec(data.command, (error, stdout, stderr) => {
-//	exec('/bin/sh /opt/SCAPE604/apri-sensor/apri-sensor-combi2/apri-sensor-combi2.sh /opt/SCAPE604/log/SCAPE604-apri-sensor-combi2_ArduinoMega.log /dev/ttyACM0', (error, stdout, stderr) => {
-//	exec('ls -l /opt/SCAPE604/log', (error, stdout, stderr) => {
-//		exec('ls -l /dev/tty*', (error, stdout, stderr) => {
-//	exec('lsusb', (error, stdout, stderr) => {
-		if (error) {
-			console.error(`exec error: ${error}`);
-			return;
-		}
-		if (callback != undefined) {
-			callback(stdout);
-		}
-	});
-}
-var getLsUsbvInfo	= function(callback) {
-	exec('lsusb -v', (error, stdout, stderr) => {
-		if (error) {
-			console.error(`exec error: ${error}`);
-			return;
-		}
-//		console.log(`stderr: ${stderr}`);
-		if (callback != undefined) {
-			callback(stdout);
-		}
-	});
-}
-
-var getCmd	= function(data, callback) {
-	console.log('execute command: ' + data.command)
-	console.dir(data);
-	if (data.command != undefined) {
-		exec(data.command, (error, stdout, stderr) => {
-			if (error) {
-				console.error(`exec error: ${error}`);
-				return;
-			}
-	//		console.log(`stderr: ${stderr}`);
-			if (callback != undefined) {
-				callback(stdout);
-			}
-		});
-	} else {
-		console.log('No command given')
-	}
-}
 
 const checkHotspotActivation= async function() {
   // hotspot only for ApriSensor (SCRP*)
@@ -1128,7 +1144,6 @@ const getActiveConnection = function() {
   return execPromise('LC_ALL=C nmcli d show '+unit.ifname+' |grep GENERAL.CONNECTION')
 }
 
-var skipStatusCheck = false
 
 const statusCheck = async function() {
 	if (skipStatusCheck==true) return
@@ -1256,6 +1271,30 @@ const statusCheck = async function() {
     }
   }
 }
-//  nmcli general hostname debian-laptop
-statusCheck()
-var statusCheckTimer = setInterval(statusCheck, 10000);
+const updateCrypto = function(){
+	unitCrypto.key = 	key
+
+/*
+	unitCrypto.iv = crypto.randomBytes(16);
+	unitCrypto.ivDate=new Date()
+	unitCrypto.cipher = crypto.createCipheriv(algoritm, Buffer.from(key), unitCrypto.iv)
+	unitCrypto.decipher = crypto.createDecipheriv(algoritm, Buffer.from(key), unitCrypto.iv)
+*/
+}
+const encrypt=function(data){
+	var encrypted = unitCrypto.cipher.update(data,'utf8','hex')
+	encrypted += unitCrypto.cipher.final('hex')
+	return encrypted
+}
+const decrypt=function(data){
+	console.log(data)
+	try {
+		var decrypted = unitCrypto.decipher.update(data,'hex','utf8')
+		decrypted += unitCrypto.decipher.final('utf8')
+	} catch(error) {
+		console.log('no valid post data')
+		console.log(error)
+		decrypted='{}'
+	}
+	return decrypted
+}

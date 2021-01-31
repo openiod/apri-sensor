@@ -9,8 +9,8 @@
 
 // activate init process config-main
 const path = require('path');
-//const http = require('http');
-const https = require('https');
+const http = require('http');
+//const https = require('https');
 const {createHttpTerminator} = require('http-terminator');
 const fs = require('fs');
 const exec = require('child_process').exec;
@@ -43,13 +43,13 @@ var hotspotPassword='scapeler'
 var skipStatusCheck = false
 
 
-
+/*
 const httpsOptions = {
   key: fs.readFileSync('../../config/tls/aprisensor-key.pem'),
   cert: fs.readFileSync('../../config/tls/aprisensor-cert.pem'),
   rejectUnauthorized: true,
 };
-
+*/
 
 let key
 
@@ -221,8 +221,8 @@ const requestListener = function (req, res) {
 var server
 var httpTerminator
 const initHttpServer = function() {
-//	server = http.createServer(requestListener)
-	server = https.createServer(httpsOptions,requestListener)
+	server = http.createServer(requestListener)
+//	server = https.createServer(httpsOptions,requestListener)
 	httpTerminator = createHttpTerminator({
 	  server,
 	});

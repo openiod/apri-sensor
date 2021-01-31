@@ -1257,7 +1257,7 @@ const statusCheck = async function() {
   if (unit.connection==unit.ssid){
     //if (processStatus.hotspot.status=='OK') {
      // after 120 sec. stop hotspot and try standard connection
-    if (new Date().getTime() - processStatus.hotspot.statusSince.getTime() >60000){
+    if (new Date().getTime() - processStatus.hotspot.statusSince.getTime() >300000){
 //      if (processStatus.connectionBusy.status==false) {
 //        if (new Date().getTime() - processStatus.connectionBusy.statusSince.getTime() >10000){
           if (unit.connections.length > 0 ){

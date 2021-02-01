@@ -38,7 +38,8 @@ const defaultPassword = 'scapeler'
 var menuUrl;
 var localServer = {};
 localServer.ConfigMenu = {};
-var apiPort = 4000
+var apiPort = process.argv[2] || 4000 // default 4000
+console.log('port: ' + apiPort)
 var hotspotPassword='scapeler'
 var skipStatusCheck = false
 

@@ -9,25 +9,8 @@ apt-get -y install network-manager
 systemctl start NetworkManager.service
 systemctl enable NetworkManager.service
 
-
 #avahi:
 apt-get install avahi-utils
-#avahi-browse -a
-#sudo apt-get install avahi-daemon
-#sudo systemctl enable avahi-daemon.service
-#sudo systemctl start avahi-daemon.service
-
-# to do
-#sudo vi /etc/avahi/avahi-daemon.conf
-## this makes any hostname.local refer to hosts on your lan reachable via mdns
-#domain-name=local
-## they are apparently turned off as default, i'd guess for privacy / security reasons
-## this broadcast your hostname and hostinfo on the lan via mdns
-#publish-hinfo=yes
-#publish-workstation=yes
-#
-#Wijzig /etc/hostname
-#avahi-browse -a
 
 #Install Redis:
 apt -y install redis-server
@@ -45,15 +28,6 @@ apt -y install redis-server
 #!! # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
 
 apt-get install git -y
-
-
-cd /opt/SCAPE604/apri-sensor/install
-
-cp -r /opt/SCAPE604/apri-sensor/aprisensor-netmanager-runtime /var/www/aprisensor-netmanager-runtime-stable
-cp aprisensor-netmanager-nginx-site-default.conf /etc/nginx/sites-available/default
-ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
-#sudo vi /etc/nginx/sites-available/default
-#sudo nginx -t
 
 #reinstall node/npm:
 #sudo apt remove nodered -y
@@ -85,13 +59,27 @@ usermod -a -G dialout pi
 
 mkdir -p /opt/SCAPE604/log
 mkdir /opt/SCAPE604/config/
-/opt/SCAPE604
+cd /opt/SCAPE604
 git clone https://github.com/openiod/apri-sensor.git
 cd /opt/SCAPE604/apri-sensor
 cp apri-config/apri-system-example.json /opt/SCAPE604/config/apri-system.json
 #sudo su -
 cd /opt/SCAPE604/apri-sensor
 npm install
+
+cp /opt/SCAPE604/apri-sensor/install/avahi/avahi-daemon.conf /etc/avahi/avahi-daemon.conf
+
+cd /opt/SCAPE604/apri-sensor/install
+
+cp -r /opt/SCAPE604/apri-sensor/aprisensor-netmanager-runtime /var/www/aprisensor-netmanager-runtime-stable
+
+cp aprisensor-netmanager-nginx-site-default.conf /etc/nginx/sites-available/default
+ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+#sudo vi /etc/nginx/sites-available/default
+#sudo nginx -t
+
+
+
 
 
 service nginx restart

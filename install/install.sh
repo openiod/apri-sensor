@@ -93,10 +93,9 @@ cp /opt/SCAPE604/apri-sensor/apri-config/SCAPE604-aprisensor-nmcli.service.org /
 systemctl enable SCAPE604-aprisensor-nmcli.service
 systemctl start SCAPE604-aprisensor-nmcli.service
 cp /opt/SCAPE604/apri-sensor/apri-config/SCAPE604-aprisensor-nmcli-stable.service.org /etc/systemd/system/SCAPE604-aprisensor-nmcli-stable.service
-systemctl enable SCAPE604-aprisensor-nmcli.service
-systemctl start SCAPE604-aprisensor-nmcli.service
+systemctl enable SCAPE604-aprisensor-nmcli-stable.service
+systemctl start SCAPE604-aprisensor-nmcli-stable.service
 
-SCAPE604-aprisensor-nmcli-stable.service.org
 cp /opt/SCAPE604/apri-sensor/apri-config/SCAPE604-apri-sensor-connector.service.org /etc/systemd/system/SCAPE604-apri-sensor-connector.service
 systemctl enable SCAPE604-apri-sensor-connector.service
 systemctl start SCAPE604-apri-sensor-connector.service

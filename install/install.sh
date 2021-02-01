@@ -71,9 +71,10 @@ cp /opt/SCAPE604/apri-sensor/install/avahi/avahi-daemon.conf /etc/avahi/avahi-da
 
 cd /opt/SCAPE604/apri-sensor/install
 
-cp -r /opt/SCAPE604/apri-sensor/aprisensor-netmanager-runtime /var/www/aprisensor-netmanager-runtime-stable
+rm /opt/SCAPE604/aprisensor-netmanager-runtime-stable
+cp -r /opt/SCAPE604/apri-sensor/aprisensor-netmanager-runtime /opt/SCAPE604/aprisensor-netmanager-runtime-stable
 
-cp aprisensor-netmanager-nginx-site-default.conf /etc/nginx/sites-available/default
+cp /opt/SCAPE604/apri-sensor/install/aprisensor-netmanager/aprisensor-netmanager-nginx-site-default.conf /etc/nginx/sites-available/default
 ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 #sudo vi /etc/nginx/sites-available/default
 #sudo nginx -t

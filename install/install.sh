@@ -71,13 +71,17 @@ cp /opt/SCAPE604/apri-sensor/install/avahi/avahi-daemon.conf /etc/avahi/avahi-da
 
 cd /opt/SCAPE604/apri-sensor/install
 
-rm /opt/SCAPE604/aprisensor-netmanager-runtime-stable
+rm -r /opt/SCAPE604/aprisensor-netmanager-runtime-stable
 cp -r /opt/SCAPE604/apri-sensor/aprisensor-netmanager-runtime /opt/SCAPE604/aprisensor-netmanager-runtime-stable
-
 cp /opt/SCAPE604/apri-sensor/install/aprisensor-netmanager/aprisensor-netmanager-nginx-site-default.conf /etc/nginx/sites-available/default
 ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 #sudo vi /etc/nginx/sites-available/default
 #sudo nginx -t
+
+rm -r /opt/SCAPE604/aprisensor-nmcli-stable
+cp -r /opt/SCAPE604/apri-sensor/aprisensor-nmcli /opt/SCAPE604/aprisensor-nmcli-stable
+cd /opt/SCAPE604/aprisensor-nmcli-stable
+npm install http-terminator
 
 
 
@@ -92,9 +96,10 @@ systemctl start SCAPE604-apri-agent.service
 cp /opt/SCAPE604/apri-sensor/apri-config/SCAPE604-aprisensor-nmcli.service.org /etc/systemd/system/SCAPE604-aprisensor-nmcli.service
 systemctl enable SCAPE604-aprisensor-nmcli.service
 systemctl start SCAPE604-aprisensor-nmcli.service
+# depending on hardware swicth (HW-switch) disable one of these services
 cp /opt/SCAPE604/apri-sensor/apri-config/SCAPE604-aprisensor-nmcli-stable.service.org /etc/systemd/system/SCAPE604-aprisensor-nmcli-stable.service
-systemctl enable SCAPE604-aprisensor-nmcli-stable.service
-systemctl start SCAPE604-aprisensor-nmcli-stable.service
+#systemctl enable SCAPE604-aprisensor-nmcli-stable.service
+#systemctl start SCAPE604-aprisensor-nmcli-stable.service
 
 cp /opt/SCAPE604/apri-sensor/apri-config/SCAPE604-apri-sensor-connector.service.org /etc/systemd/system/SCAPE604-apri-sensor-connector.service
 systemctl enable SCAPE604-apri-sensor-connector.service

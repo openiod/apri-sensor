@@ -548,6 +548,7 @@ var processDeviceData	= function(err,temperatureData) {
   }
 	//console.log(temperatureData);
 	var line2 = temperatureData.toString().split(/\n/)[1];
+  if (line2==undefined) return
 	var _temperature = line2.split('t=')[1];
 	if (isNumeric(_temperature) ) {
 		var temperature = Math.round(parseFloat(_temperature)/10)/100; // round to 2 decimals
@@ -790,7 +791,7 @@ var sendData = function() {
       ds18b20InitCounter=0
     }
 
-    if (results.pms.nrOfMeas == 0) { 
+    if (results.pms.nrOfMeas == 0) {
 //    if (process.argv[2]=='test') {
       if (pmsa003InitCounter <1) {
         console.log('pmsa003 counters zero, looks like error, next time try active mode ')

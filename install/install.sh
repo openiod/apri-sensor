@@ -9,11 +9,25 @@ apt-get -y install network-manager
 systemctl start NetworkManager.service
 systemctl enable NetworkManager.service
 
+
+#vi /etc/hosts:
+# laatste regel: 127.0.1.1		ID## ID##.local
+# nmcli general hostname ID##.local
+
+# voor upgrade oudere installaties
+#systemctl stop comitup
+#systemctl disable comitup
+#apt remove comitup
+
+
 #avahi:
-apt-get install avahi-utils
+apt-get -y install avahi-utils
 
 #Install Redis:
 apt -y install redis-server
+
+#nginx
+apt -y install nginx
 
 #todo
 ## Edit the Redis configuration file to setup caching.
@@ -47,6 +61,8 @@ cd /opt/nodejs
 wget https://nodejs.org/dist/v10.16.2/node-v10.16.2-linux-armv6l.tar.gz
 tar -C /usr/local --strip-components 1 -xzf node-v10.16.2-linux-armv6l.tar.gz
 
+npm install -g npm
+
 node -v
 npm -v
 
@@ -62,19 +78,23 @@ mkdir /opt/SCAPE604/config/
 cd /opt/SCAPE604
 git clone https://github.com/openiod/apri-sensor.git
 cd /opt/SCAPE604/apri-sensor
+#bij upgrade kan deze rm nog wel eens een blockade voorkomen
+#rm package-lock.json
+#git pull
 cp apri-config/apri-system-example.json /opt/SCAPE604/config/apri-system.json
+#onderstaande onder root uitvoeren (sudo is niet voldoende)
 #sudo su -
 cd /opt/SCAPE604/apri-sensor
 npm install
 
 cp /opt/SCAPE604/apri-sensor/install/avahi/avahi-daemon.conf /etc/avahi/avahi-daemon.conf
 
-cd /opt/SCAPE604/apri-sensor/install
+#cd /opt/SCAPE604/apri-sensor/install
 
 rm -r /opt/SCAPE604/aprisensor-netmanager-runtime-stable
 cp -r /opt/SCAPE604/apri-sensor/aprisensor-netmanager-runtime /opt/SCAPE604/aprisensor-netmanager-runtime-stable
 cp /opt/SCAPE604/apri-sensor/install/aprisensor-netmanager/aprisensor-netmanager-nginx-site-default.conf /etc/nginx/sites-available/default
-ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+#ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 #sudo vi /etc/nginx/sites-available/default
 #sudo nginx -t
 
@@ -82,9 +102,6 @@ rm -r /opt/SCAPE604/aprisensor-nmcli-stable
 cp -r /opt/SCAPE604/apri-sensor/aprisensor-nmcli /opt/SCAPE604/aprisensor-nmcli-stable
 cd /opt/SCAPE604/aprisensor-nmcli-stable
 npm install http-terminator
-
-
-
 
 
 service nginx restart

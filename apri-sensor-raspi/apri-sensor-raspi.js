@@ -579,6 +579,7 @@ var processDeviceData	= function(err,temperatureData) {
 
 const readSensorDataDs18b20 = () => {
 	//console.dir(devicesFolder  )
+  if (devicesFolder==undefined) return
   var found=false
   for (var i=0;i<devicesFolder.length;i++) {
 		if (devicesFolder[i].split('-')[0] == '28') {  // 00 for GPIO

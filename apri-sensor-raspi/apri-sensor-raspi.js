@@ -55,7 +55,7 @@ catch (err) {
 var adc
 
 var getAds1115Tgs5042 = function() {
-  setTimeout(getAds1115Tgs5042, 1000);
+//  setTimeout(getAds1115Tgs5042, 1000);
   adc.readChannel(ADS1x15.channel.CHANNEL_0, (err, value, volts) => {
     if (err) {
       console.error('Failed to fetch value from ADC', err);
@@ -115,6 +115,9 @@ if (gpio != undefined) {
 }
 
 var bmeInitCounter = 0
+var indBme280=false
+var indBme680=false
+
 var Bme680
 var bme680
 try {
@@ -432,6 +435,7 @@ const bme280 = new BME280(options);
 // Read BME280 sensor data, repeat
 //
 const readSensorDataBme280 = () => {
+  if (indBme280==false) return
   bme280.readSensorData()
     .then((data) => {
       // temperature_C, pressure_hPa, and humidity are returned by default.
@@ -453,7 +457,7 @@ const readSensorDataBme280 = () => {
 			} else {
 				console.log('Raspi-i2c processing is busy, measurement BME280 skipped');
 			}
-      setTimeout(readSensorDataBme280, 1000);
+      //setTimeout(readSensorDataBme280, 1000);
     })
     .catch((err) => {
       console.log(`BME280 read error: ${err}`);
@@ -474,6 +478,7 @@ bme280.init()
 */
 
 const readSensorDataBme680 = async function(){
+  if (indBme680==false) return
   var bme680Data = await bme680.getSensorData()
   .catch((err) => { console.error(err); return});
   var data = bme680Data.data;
@@ -491,15 +496,20 @@ const readSensorDataBme680 = async function(){
   } else {
     console.log('Raspi-i2c processing is busy, measurement BME680 skipped');
   }
-  setTimeout(readSensorDataBme680, 1000);
+  //setTimeout(readSensorDataBme680, 1000);
 }
 
 var initBme680	= function() {
+  indBme280=false
+  indBme680=false
   if (bme680 != undefined) {
     bme680.initialize()
     .then(async () => {
       console.info('BME680 sensor initialized');
-      readSensorDataBme680()
+      indBme280=false
+      indBme680=true
+
+    //  readSensorDataBme680()
 /*
       setInterval( async () => {
           console.info('before await bme680.getSensorData()');
@@ -534,10 +544,11 @@ var initBme680	= function() {
     })
   }
   else{
+    indBme280=false
+    indBme680=false
     console.log('BME680 module not installed')
   }
 }
-
 
 var processDeviceData	= function(err,temperatureData) {
 	if (err) {
@@ -566,13 +577,10 @@ var processDeviceData	= function(err,temperatureData) {
 //  setTimeout(readSensorDataDs18b20, 1000);
 };
 
-
-
 const readSensorDataDs18b20 = () => {
 	//console.dir(devicesFolder  )
   var found=false
   for (var i=0;i<devicesFolder.length;i++) {
-
 		if (devicesFolder[i].split('-')[0] == '28') {  // 00 for GPIO
 //			console.log('DS18B20 device: ' +  devicesFolder[i]);
 			var path = '/sys/bus/w1/devices/'+devicesFolder[i];
@@ -581,15 +589,15 @@ const readSensorDataDs18b20 = () => {
       found=true
 		}
 	}
-  if (found == true) {
-    setTimeout(readSensorDataDs18b20, 1000);
-  }
+//  if (found == true) {
+//    setTimeout(readSensorDataDs18b20, 1000);
+//  }
 };
 
 
 
 var processDataCycle	= function() {
-	setTimeout(processDataCycle, loopTimeCycle);
+//	setTimeout(processDataCycle, loopTimeCycle);
 	counters.busy = true;
 	console.log('Counters pms: '+ counters.pms.nrOfMeas + '; bme280: '+ counters.bme280.nrOfMeas + '; bme680: '+ counters.bme680.nrOfMeas  + '; ds18b20: '+ counters.ds18b20.nrOfMeas + '; tgs5042: '+ counters.tgs5042.nrOfMeas );
 
@@ -891,11 +899,15 @@ var initBmeDevice = function(){
   bme280.init()
     .then(() => {
       console.log('BME280 initialization succeeded');
-      readSensorDataBme280();
+      indBme280=true
+      indBme680=false
+      //readSensorDataBme280();
     })
     .catch((err) => {
       console.error(`BME280 initialization failed: ${err} `);
       console.log('BME680 init') //
+      indBme280=false
+      indBme680=false
       initBme680()
     })
   //  end-of bme280 raspi-i2c variables and functions
@@ -940,7 +952,7 @@ var check_w1_device = function() {
   console.log('check_w1_device')
   try {
   	devicesFolder = fs.readdirSync('/sys/bus/w1/devices');
-  	readSensorDataDs18b20();
+//  	readSensorDataDs18b20();
   } catch (err) {
   	devicesFolder = undefined;
     console.log('Directory for W1 not found. No GPIO available? (/sys/bus/w1/devices');
@@ -952,10 +964,6 @@ var check_w1_device = function() {
 reset_w1_device()  // check w1 device for DS18B20
 resetBmeDevice()  // check bme280 or bme680
 
-// start processing TGS5042 CO sensor if available
-if (ads1115Available==true) {
-  setTimeout(getAds1115Tgs5042, 1000);
-}
 
 
 var socket = io(socketUrl, {path:socketPath});
@@ -992,5 +1000,15 @@ raspi.init(() => {
   });
 });
 
-
-setTimeout(processDataCycle, loopTimeCycle);
+let timerIdBme280 = setInterval(readSensorDataBme280, 2000)
+//setTimeout(readSensorDataBme280, 1000);
+let timerIdBme680 = setInterval(readSensorDataBme680, 2000)
+//setTimeout(readSensorDataBme680, 1000);
+let timerIdDs18B20 = setInterval(readSensorDataDs18b20, 2000)
+// start processing TGS5042 CO sensor if available
+if (ads1115Available==true) {
+  let timerIdAds1115Tgs5042 = setInterval(getAds1115Tgs5042, 2000)
+  //setTimeout(getAds1115Tgs5042, 1000);
+}
+let timerDataCycle = setInterval(processDataCycle, loopTimeCycle)
+//setTimeout(processDataCycle, loopTimeCycle);

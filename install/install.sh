@@ -17,8 +17,7 @@ systemctl enable NetworkManager.service
 # voor upgrade oudere installaties
 #systemctl stop comitup
 #systemctl disable comitup
-#apt remove comitup
-
+#apt -y remove comitup
 
 #avahi:
 apt-get -y install avahi-utils
@@ -61,7 +60,8 @@ cd /opt/nodejs
 wget https://nodejs.org/dist/v10.16.2/node-v10.16.2-linux-armv6l.tar.gz
 tar -C /usr/local --strip-components 1 -xzf node-v10.16.2-linux-armv6l.tar.gz
 
-npm install -g npm
+# niet echt noodzakelijk
+# npm install -g npm
 
 node -v
 npm -v
@@ -102,7 +102,6 @@ rm -r /opt/SCAPE604/aprisensor-nmcli-stable
 cp -r /opt/SCAPE604/apri-sensor/aprisensor-nmcli /opt/SCAPE604/aprisensor-nmcli-stable
 cd /opt/SCAPE604/aprisensor-nmcli-stable
 npm install http-terminator
-
 
 service nginx restart
 

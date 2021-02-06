@@ -98,7 +98,8 @@ var pmsa003InitCounter = 0
 var serial
 var sleepMode = 0
 
-var ds18b20InitCounter = 0
+//var ds18b20InitCounter = 0
+var ds18b20InitTime = new Date()
 var gpio
 var gpioDs18b20, gpioBme
 //, gpioFan
@@ -557,6 +558,8 @@ var processDeviceData	= function(err,temperatureData) {
 //    reset_w1_device()
     return
   }
+  // warm-up time for ds18b20 also after reset
+  if (new Date().getTime()-ds18b20InitTime.getTime()<30000) return
 	//console.log(temperatureData);
 	var line2 = temperatureData.toString().split(/\n/)[1];
   if (line2==undefined) return
@@ -789,16 +792,19 @@ var sendData = function() {
       bmeInitCounter=0
     }
     if (results.ds18b20.nrOfMeas == 0) {
-      console.log('ds18b20 counters zero, looks like error, next time initdevices ')
-      if (ds18b20InitCounter <3) {
-        ds18b20InitCounter++
-      } else {
-        ds18b20InitCounter = 0
-        reset_w1_device()
+      // warm-up time for ds18b20 also after reset
+      if (new Date().getTime()-ds18b20InitTime.getTime()>=30000){
+        console.log('ds18b20 counters zero, looks like error, next time initdevices ')
+//        if (ds18b20InitCounter <3) {
+//          ds18b20InitCounter++
+//        } else {
+//          ds18b20InitCounter = 0
+          reset_w1_device()
+//        }
       }
-    } else {
-      ds18b20InitCounter=0
-    }
+    } //else {
+      //ds18b20InitCounter=0
+    //}
 
     if (results.pms.nrOfMeas == 0) {
 //    if (process.argv[2]=='test') {
@@ -945,6 +951,7 @@ var setGpioDs18b20Off = function() {
 var reset_w1_device = function() {
   console.log('reset_w1_device')
   if (gpioDs18b20 != undefined) {  // only try to reset when gpio module available
+    ds18b20InitTime=new Date()
     setGpioDs18b20Off()
   }
 }

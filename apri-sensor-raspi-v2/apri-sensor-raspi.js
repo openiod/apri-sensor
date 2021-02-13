@@ -992,10 +992,11 @@ setGpioFanOff() // fan always on but first set gpio to off
 const i2cSps30 = new I2C();
 var sps30ProductType=''
 var sps30SerialNr =''
-var calcCrcSps30=function(data) {
+var calcCrcSps30=function(data1,data2) {
    crc = 0xFF
    for(var i = 0; i < 2; i++) {
-     crc ^= data[i]
+     if (i==0) crc ^= data1
+     else crc ^= data2
      for(var bit = 8; bit > 0; --bit) {
        if(crc & 0x80) {
          crc = (crc << 1) ^ 0x31
@@ -1030,6 +1031,7 @@ var initSps30Device = function() {
       console.log(str12[0])
       console.log(str12[1])
       console.log(str12[2])
+      console.log(calcCrcSps30(str12[0],str12[1]))
       console.log('-----------')
     }
     console.log(`SPS30 producttype: ${sps30ProductType}`)

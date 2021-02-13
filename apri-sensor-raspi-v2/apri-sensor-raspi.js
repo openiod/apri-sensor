@@ -990,7 +990,8 @@ setGpioFanOff() // fan always on but first set gpio to off
 */
 
 const i2cSps30 = new I2C();
-var sps30Serialnr ='';
+var sps30ProductType=''
+var sps30Serialnr =''
 var initSps30Device = function() {
   raspi.init(() => {
     //sps30Serialnr=i2cSps30.readByteSync(addressI2cSps30)

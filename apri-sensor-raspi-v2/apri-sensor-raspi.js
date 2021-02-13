@@ -1014,60 +1014,23 @@ var calcCrcSps30=function(data) {
 
 var initSps30Device = function() {
   raspi.init(() => {
-    //sps30Serialnr=i2cSps30.readByteSync(addressI2cSps30)
     i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0xD0,0x02]))
     var str12=i2cSps30.readSync(addressI2cSps30,12)
     if (Buffer.compare(str12,
       Buffer.from([0x30, 0x30, 0xf6, 0x30, 0x38, 0x4f, 0x30, 0x30, 0xf6, 0x30, 0x30, 0xf6])) ==0) {
-//    if (str12.toString()=="00080000"){
-      console.log('SPS30 producttype found'+str12.toString())
+      console.log('SPS30 producttype found: 00080000')
       indSps30=true
     } else {
-      console.log('SPS30 producttype not found'+str12.toString())
+      console.log('SPS30 producttype not found')
+      indSps30=true
     }
-    console.log(str12)
-    var b1=i2cSps30.readByteSync(addressI2cSps30,0)
-    var b2=i2cSps30.readByteSync(addressI2cSps30,1)
-    var b3=i2cSps30.readByteSync(addressI2cSps30,2)
-    var b4=i2cSps30.readByteSync(addressI2cSps30,3)
-    var b5=i2cSps30.readByteSync(addressI2cSps30,4)
-    var b6=i2cSps30.readByteSync(addressI2cSps30,5)
-    var b7=i2cSps30.readByteSync(addressI2cSps30,6)
-    var b8=i2cSps30.readByteSync(addressI2cSps30,7)
-    var b9=i2cSps30.readByteSync(addressI2cSps30,8)
-    var b10=i2cSps30.readByteSync(addressI2cSps30,9)
-    var b11=i2cSps30.readByteSync(addressI2cSps30,10)
-    var b12=i2cSps30.readByteSync(addressI2cSps30,11)
-    console.log(b1)
-    console.log(b2)
-    console.log(b3)
-    console.log(b4)
-    console.log(b5)
-    console.log(b6)
-    console.log(b7)
-    console.log(b8)
-    console.log(b9)
-    console.log(b10)
-    console.log(b11)
-    console.log(b12)
     i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0xD0,0x33]))
-    var b1=i2cSps30.readByteSync(addressI2cSps30)
-    var b2=i2cSps30.readByteSync(addressI2cSps30)
-    var b3=i2cSps30.readByteSync(addressI2cSps30)
-    var b4=i2cSps30.readByteSync(addressI2cSps30)
-    console.log(b1)
-    console.log(b2)
-    console.log(b3)
-    console.log(b4)
-    i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0xD0,0x02]))
-    var b1=i2cSps30.readByteSync(addressI2cSps30)
-    var b2=i2cSps30.readByteSync(addressI2cSps30)
-    var b3=i2cSps30.readByteSync(addressI2cSps30)
-    var b4=i2cSps30.readByteSync(addressI2cSps30)
-    console.log(b1)
-    console.log(b2)
-    console.log(b3)
-    console.log(b4)
+    for (var i=0;i<10;i++) {
+      var str12=i2cSps30.readSync(addressI2cSps30,3)
+      console.log(str12[0])
+      console.log(str12[1])
+      console.log(str12[2])
+    }
     console.log(`SPS30 producttype: ${sps30ProductType}`)
     console.log(`SPS30 serialnr: ${sps30SerialNr}`)
     // start measuring

@@ -1017,6 +1017,10 @@ var initSps30Device = function() {
     //sps30Serialnr=i2cSps30.readByteSync(addressI2cSps30)
     i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0xD0,0x02]))
     var str12=i2cSps30.readSync(addressI2cSps30,12)
+    if (str12==Buffer.from(["00080000"])){
+      console.log('SPS30 producttype found')
+      indSps30=true
+    } 
     console.log(str12)
     var b1=i2cSps30.readByteSync(addressI2cSps30,0)
     var b2=i2cSps30.readByteSync(addressI2cSps30,1)
@@ -1065,7 +1069,6 @@ var initSps30Device = function() {
     // start measuring
     i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x00,0x10,0x05,0x00,0xF6]))
 
-    indSps30=true
   });
 }
 initSps30Device()

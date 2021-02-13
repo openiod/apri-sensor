@@ -993,7 +993,7 @@ const i2cSps30 = new I2C();
 var sps30ProductType=''
 var sps30SerialNr =''
 var calcCrcSps30=function(data1,data2) {
-   crc = 0xFF
+   var crc = 0xFF
    for(var i = 0; i < 2; i++) {
      if (i==0) crc ^= data1
      else crc ^= data2

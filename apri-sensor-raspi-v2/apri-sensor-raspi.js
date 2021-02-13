@@ -1025,11 +1025,12 @@ var initSps30Device = function() {
       indSps30=true
     }
     i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0xD0,0x33]))
-    for (var i=0;i<10;i++) {
+    for (var i=0;i<20;i++) {
       var str12=i2cSps30.readSync(addressI2cSps30,3)
       console.log(str12[0])
       console.log(str12[1])
       console.log(str12[2])
+      console.log('-----------')
     }
     console.log(`SPS30 producttype: ${sps30ProductType}`)
     console.log(`SPS30 serialnr: ${sps30SerialNr}`)

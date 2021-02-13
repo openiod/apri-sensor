@@ -992,14 +992,34 @@ setGpioFanOff() // fan always on but first set gpio to off
 const i2cSps30 = new I2C();
 var sps30ProductType=''
 var sps30SerialNr =''
+var calcCrcSps30=function(data) {
+   crc = 0xFF
+   for(var i = 0; i < 2; i++) {
+     crc ^= data[i]
+     for(var bit = 8; bit > 0; --bit) {
+       if(crc & 0x80) {
+         crc = (crc << 1) ^ 0x31
+       } else {
+         crc = (crc << 1)
+       }
+       if (crc>255) {
+         var a=crc>>8
+         var b=a<<8
+         crc=crc-b
+       }
+    }
+  }
+  return crc
+}
+
 var initSps30Device = function() {
   raspi.init(() => {
     //sps30Serialnr=i2cSps30.readByteSync(addressI2cSps30)
     i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0xD0,0x02]))
-    var b1=i2cSps30.readByteSync(addressI2cSps30)
-    var b2=i2cSps30.readByteSync(addressI2cSps30)
-    var b3=i2cSps30.readByteSync(addressI2cSps30)
-    var b4=i2cSps30.readByteSync(addressI2cSps30)
+    var b1=i2cSps30.readByteSync(addressI2cSps30,0)
+    var b2=i2cSps30.readByteSync(addressI2cSps30,1)
+    var b3=i2cSps30.readByteSync(addressI2cSps30,2)
+    var b4=i2cSps30.readByteSync(addressI2cSps30,3)
     console.log(b1)
     console.log(b2)
     console.log(b3)
@@ -1024,6 +1044,9 @@ var initSps30Device = function() {
     console.log(b4)
     console.log(`SPS30 producttype: ${sps30ProductType}`)
     console.log(`SPS30 serialnr: ${sps30SerialNr}`)
+    // start measuring
+    i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x00,0x10,0x05,0x00,0xF6]))
+    
     indSps30=true
   });
 }

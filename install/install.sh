@@ -1,13 +1,16 @@
 #
 # start script onder sudo su -
 
-apt-get update -y
-apt-get upgrade -y
-apt-get autoremove -y
+# ID:
+cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2
 
-apt-get -y install network-manager
-systemctl start NetworkManager.service
-systemctl enable NetworkManager.service
+apt update -y
+apt upgrade -y
+apt autoremove -y
+
+apt -y install network-manager
+#systemctl start NetworkManager.service
+#systemctl enable NetworkManager.service
 
 
 #vi /etc/hosts:
@@ -20,11 +23,9 @@ systemctl enable NetworkManager.service
 #apt -y remove comitup
 
 #avahi:
-apt-get -y install avahi-utils
-
+apt -y install avahi-utils
 #Install Redis:
 apt -y install redis-server
-
 #nginx
 apt -y install nginx
 
@@ -40,7 +41,7 @@ apt -y install nginx
 #--> vm.overcommit_memory = 1
 #!! # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
 
-apt-get install git -y
+apt install git -y
 
 #reinstall node/npm:
 #sudo apt remove nodered -y

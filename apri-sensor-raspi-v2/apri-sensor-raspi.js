@@ -998,7 +998,7 @@ var initSps30Device = function() {
     sps30ProductType=i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0xD0,0x02]))
     sps30SerialNr=i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0xD0,0x33]))
     console.log(`SPS30 producttype: ${sps30ProductType}`)
-    console.log(`SPS30 serialnr: ${sps30Serialnr}`)
+    console.log(`SPS30 serialnr: ${sps30SerialNr}`)
     indSps30=true
   });
 }

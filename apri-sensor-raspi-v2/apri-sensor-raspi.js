@@ -995,7 +995,15 @@ var sps30SerialNr =''
 var initSps30Device = function() {
   raspi.init(() => {
     //sps30Serialnr=i2cSps30.readByteSync(addressI2cSps30)
-    sps30ProductType=i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0xD0,0x02]))
+    i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0xD0,0x02]))
+    var b1=i2cSps30.readByteSync(addressI2cSps30)
+    var b2=i2cSps30.readByteSync(addressI2cSps30)
+    var b3=i2cSps30.readByteSync(addressI2cSps30)
+    var b4=i2cSps30.readByteSync(addressI2cSps30)
+    console.log(b1)
+    console.log(b2)
+    console.log(b3)
+    console.log(b4)
     sps30SerialNr=i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0xD0,0x33]))
     console.log(`SPS30 producttype: ${sps30ProductType}`)
     console.log(`SPS30 serialnr: ${sps30SerialNr}`)

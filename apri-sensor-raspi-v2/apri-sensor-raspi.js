@@ -938,7 +938,7 @@ var sendData = function() {
         serial.write(cmdView8);
       }
     } else {
-      spsa003InitCounter=0
+      pmsa003InitCounter=0
     }
 
     if (results.sps.nrOfMeas == 0) {
@@ -1020,10 +1020,26 @@ var initSps30Device = function() {
     var b2=i2cSps30.readByteSync(addressI2cSps30,1)
     var b3=i2cSps30.readByteSync(addressI2cSps30,2)
     var b4=i2cSps30.readByteSync(addressI2cSps30,3)
+    var b5=i2cSps30.readByteSync(addressI2cSps30,4)
+    var b6=i2cSps30.readByteSync(addressI2cSps30,5)
+    var b7=i2cSps30.readByteSync(addressI2cSps30,6)
+    var b8=i2cSps30.readByteSync(addressI2cSps30,7)
+    var b9=i2cSps30.readByteSync(addressI2cSps30,8)
+    var b10=i2cSps30.readByteSync(addressI2cSps30,9)
+    var b11=i2cSps30.readByteSync(addressI2cSps30,10)
+    var b12=i2cSps30.readByteSync(addressI2cSps30,11)
     console.log(b1)
     console.log(b2)
     console.log(b3)
     console.log(b4)
+    console.log(b5)
+    console.log(b6)
+    console.log(b7)
+    console.log(b8)
+    console.log(b9)
+    console.log(b10)
+    console.log(b11)
+    console.log(b12)
     i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0xD0,0x33]))
     var b1=i2cSps30.readByteSync(addressI2cSps30)
     var b2=i2cSps30.readByteSync(addressI2cSps30)
@@ -1046,7 +1062,7 @@ var initSps30Device = function() {
     console.log(`SPS30 serialnr: ${sps30SerialNr}`)
     // start measuring
     i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x00,0x10,0x05,0x00,0xF6]))
-    
+
     indSps30=true
   });
 }

@@ -942,7 +942,7 @@ var sendData = function() {
     }
 
     if (results.sps.nrOfMeas == 0) {
-      # reset sps30 when connected ?
+      // reset sps30 when connected ?
     }
 
 };

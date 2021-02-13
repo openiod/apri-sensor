@@ -1027,9 +1027,14 @@ var initSps30Device = function() {
     }
     i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0xD0,0x33]))
     var buf48=i2cSps30.readSync(addressI2cSps30,48)
+    sps30SerialNr=''
     for (var i=0;i<48;i=i+3) {
 //      var buf48=i2cSps30.readSync(addressI2cSps30,3)
-      console.log(String.fromCharCode(buf48[i],buf48[i+1]));
+      if (buf48[i]==0) break
+      sps30SerialNr+=String.fromCharCode(buf48[i])
+      if (buf48[i+1]==0) break
+      sps30SerialNr+=String.fromCharCode(buf48[i+1])
+//      console.log(String.fromCharCode(buf48[i],buf48[i+1]));
       console.log(buf48[i].toString())
       console.log(buf48[i+1].toString())
       console.log(buf48[i+2])

@@ -1017,37 +1017,51 @@ var initSps30Device = function() {
   raspi.init(() => {
     i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0xD0,0x02]))
     var str12=i2cSps30.readSync(addressI2cSps30,12)
+    sps30ProductType=''
     if (Buffer.compare(str12,
       Buffer.from([0x30, 0x30, 0xf6, 0x30, 0x38, 0x4f, 0x30, 0x30, 0xf6, 0x30, 0x30, 0xf6])) ==0) {
-      console.log('SPS30 producttype found: 00080000')
+      sps30ProductType='00080000'
+      console.log('SPS30 producttype found: '+ sps30ProductType)
       indSps30=true
     } else {
       console.log('SPS30 producttype not found')
-      indSps30=true
+      indSps30=false
+      return
     }
     i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0xD0,0x33]))
     var buf48=i2cSps30.readSync(addressI2cSps30,48)
     sps30SerialNr=''
     for (var i=0;i<48;i=i+3) {
-//      var buf48=i2cSps30.readSync(addressI2cSps30,3)
       if (buf48[i]==0) break
       sps30SerialNr+=String.fromCharCode(buf48[i])
       if (buf48[i+1]==0) break
       sps30SerialNr+=String.fromCharCode(buf48[i+1])
-//      console.log(String.fromCharCode(buf48[i],buf48[i+1]));
-      console.log(buf48[i].toString())
-      console.log(buf48[i+1].toString())
-      console.log(buf48[i+2])
-      console.log(calcCrcSps30(buf48[i],buf48[i+1]))
-      console.log('-----------')
     }
     console.log(`SPS30 producttype: ${sps30ProductType}`)
     console.log(`SPS30 serialnr: ${sps30SerialNr}`)
     // start measuring
     i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x00,0x10,0x05,0x00,0xF6]))
-
   });
 }
+var readSps30Device = function() {
+  if (indSps30==true) {
+    var result=[]
+    i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x03,0x00]))
+    var buf30=i2cSps30.readSync(addressI2cSps30,30)
+    for (var i=0;i<30;i=i+3) {
+      //if (buf30[i]==0) break
+      if (Buffer.compare(buf30[i+2],calcCrcSps30(buf30[i],buf30[i+1]))!=0) {
+        console.log('checksum error')
+        break
+      }
+      var value = buf30[i]<<8
+      value+buf30[i+1]
+      result.push(value)
+    }
+    console.log(result)
+  }
+}
+
 initSps30Device()
 
 var initBmeDevice = function(){
@@ -1167,5 +1181,8 @@ if (ads1115Available==true) {
   let timerIdAds1115Tgs5042 = setInterval(getAds1115Tgs5042, 2000)
   //setTimeout(getAds1115Tgs5042, 1000);
 }
+let timerIdSps30 = setInterval(readSps30Device, 1000)
+
+
 let timerDataCycle = setInterval(processDataCycle, loopTimeCycle)
 //setTimeout(processDataCycle, loopTimeCycle);

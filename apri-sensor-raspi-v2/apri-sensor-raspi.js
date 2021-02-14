@@ -274,6 +274,7 @@ var counters	= {
 		, part2_5			: 0
 		, part4_0			: 0
 		, part10_0		: 0
+    , tps			    : 0
 		, nrOfMeas		: 0
 	}
 };
@@ -324,6 +325,7 @@ var results			= {
 		, part2_5			: 0
 		, part4_0			: 0
 		, part10_0		: 0
+    , tps			    : 0
 		, nrOfMeas		: 0
 	}
 };
@@ -369,6 +371,7 @@ var initCounters	= function () {
 	counters.sps.part2_5				= 0;
 	counters.sps.part4_0				= 0;
 	counters.sps.part10_0				= 0;
+  counters.sps.tps					  = 0;
 	counters.sps.nrOfMeas				= 0;
 }
 
@@ -690,6 +693,7 @@ var processDataCycle	= function() {
 	results.sps.part2_5							= Math.round((counters.sps.part2_5/counters.sps.nrOfMeas)*100)/100;
 	results.sps.part4_0							= Math.round((counters.sps.part4_0/counters.sps.nrOfMeas)*100)/100;
 	results.sps.part10_0						= Math.round((counters.sps.part10_0/counters.sps.nrOfMeas)*100)/100;
+  results.sps.tps							    = Math.round((counters.sps.tps/counters.sps.nrOfMeas)*100)/100;
 	results.sps.nrOfMeas						= counters.sps.nrOfMeas;
 
 	initCounters();
@@ -838,7 +842,8 @@ var sendData = function() {
 //			url = openiodUrl + '/sps30'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
 //						'pm1:'+results.sps.pm1+',pm25:'+results.sps.pm25+',pm4:'+results.sps.pm4+',pm10:'+results.sps.pm10 +
 //						',raw0_5:'+results.sps.part0_5+',raw1_0:'+results.sps.part1_0 +
-//						',raw2_5:'+results.sps.part2_5+',raw4_0:'+results.sps.part4_0+',raw10_0:'+results.sps.part10_0;
+//						',raw2_5:'+results.sps.part2_5+',raw4_0:'+results.sps.part4_0+
+//            ',raw10_0:'+results.sps.part10_0 + ',tps:'+results.sps.tps;
 //			console.log(url);
 //			sendRequest(url);
 			redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
@@ -852,6 +857,7 @@ var sendData = function() {
 				, 'raw2_5', results.sps.part2_5
 				, 'raw4_0', results.sps.part4_0
 				, 'raw10_0', results.sps.part10_0
+        , 'tps', results.sps.tps
 			  ).then(function(res) {
 					var _res = res;
 					redisSaddAsync('new', timeStamp.toISOString()+':sps30')
@@ -992,6 +998,7 @@ setGpioFanOff() // fan always on but first set gpio to off
 const i2cSps30 = new I2C();
 var sps30ProductType=''
 var sps30SerialNr =''
+
 var calcCrcSps30=function(data1,data2) {
    var crc = 0xFF
    for(var i = 0; i < 2; i++) {
@@ -1061,9 +1068,30 @@ var readSps30Device = function() {
       value+=buf30[i+1]
       result.push(value)
     }
-    console.log(result)
+    if (result.length==10) {
+      processRaspiSpsRecord(result)
+    }
   }
 }
+
+var processRaspiSpsRecord = function(result) {
+	if (counters.busy==true) {
+		console.log('Counters busy, sps30 measurement ignored *******************************');
+		return;
+	}
+	counters.sps.nrOfMeas++;
+	counters.sps.pm1			  	+= result[0]
+	counters.sps.pm25			    += result[1]
+  counters.sps.pm4			    += result[2]
+	counters.sps.pm10			    += result[3]
+	counters.sps.part0_5			+= result[4]
+	counters.sps.part1_0			+= result[5]
+	counters.sps.part2_5			+= result[6]
+	counters.sps.part4_0			+= result[7]
+	counters.sps.part10_0			+= result[8]
+  counters.sps.tps			    += result[9]
+}
+
 
 initSps30Device()
 

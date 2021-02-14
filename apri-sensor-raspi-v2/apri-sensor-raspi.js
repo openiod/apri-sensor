@@ -1050,7 +1050,8 @@ var readSps30Device = function() {
     var buf30=i2cSps30.readSync(addressI2cSps30,30)
     for (var i=0;i<30;i=i+3) {
       //if (buf30[i]==0) break
-      if (Buffer.compare(buf30[i+2],calcCrcSps30(buf30[i],buf30[i+1]))!=0) {
+//      if (Buffer.compare(buf30[i+2],calcCrcSps30(buf30[i],buf30[i+1]))!=0) {
+      if (buf30[i+2]!=calcCrcSps30(buf30[i],buf30[i+1])) {
         console.log('checksum error')
         break
       }

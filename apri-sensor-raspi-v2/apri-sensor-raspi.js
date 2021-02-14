@@ -1055,8 +1055,8 @@ var readSps30Device = function() {
         console.log('checksum error')
         break
       }
-      console.log(buf30[i])
-      console.log(buf30[i+1])
+//      console.log(buf30[i])
+//      console.log(buf30[i+1])
       var value = buf30[i]<<8
       value+=buf30[i+1]
       result.push(value)

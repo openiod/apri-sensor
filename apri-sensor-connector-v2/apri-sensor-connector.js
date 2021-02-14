@@ -225,7 +225,7 @@ var sps30Attributes = function(res) {
     'pm1:'+res.pm1+',pm25:'+res.pm25+',pm4:'+res.pm4+',pm10:'+res.pm10 +
     ',raw0_5:'+res.raw0_5+',raw1_0:'+res.raw1_0 +
     ',raw2_5:'+res.raw2_5+',raw4_0:'+res.raw4_0+',raw10_0:'+res.raw10_0 +
-		'tps:'+res.tps
+		',tps:'+res.tps
 }
 
 // send data to service

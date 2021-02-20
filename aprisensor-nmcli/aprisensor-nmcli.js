@@ -63,7 +63,7 @@ let key
 //const algoritm="sha256"
 const algoritm="AES-GCM"
 
-var unit = {}
+var unit = {'connectionStatus':{} }
 var unitCrypto={}
 
 var connectionsIndex=0
@@ -557,6 +557,9 @@ const postApConnect = async ( url, req, res) => {
 		}
     var ssid =result.ssid
     var passwd=result.passwd
+    if (result.passwd.substr(0,3)=='SCP') {
+      passwd=result.passwd.substr(3)
+    }
     console.log('connection down')
     await execPromise("LC_ALL=C nmcli connection down '"+ssid+"'")
     .then((result)=>{console.log('then')})
@@ -647,10 +650,20 @@ const tryCandidateConnection = async function(index) {
 		tryCandidateConnection(index+1)
 		return
 	}
-
+  var tmpConnection = unit.connections[index]
+  // ignore connection already tried less then 5 minutes ago
+	if (unit.connectionStatus[tmpConnection].status=='ERROR') {
+    if (new Date() - unit.connectionStatus[tmpConnection].statusLatest< 300000) {
+		tryCandidateConnection(index+1)
+		return
+	}
+  if (unit.connectionStatus[tmpConnection] ==undefined) unit.connectionStatus[tmpConnection]={}
   console.log(`tryCandidateConnection ${index} ${unit.connections[index]}`)
   await execPromise("LC_ALL=C nmcli connection up '"+unit.connections[index]+"'")
   .then((result)=>{
+    if (unit.connectionStatus[tmpConnection].status!='OK') {
+      unit.connectionStatus[tmpConnection]={status:'OK',statusSince:new Date()}
+    }
     console.log(`tryCandidateConnection then ${index} ${unit.connections[index]}`)
     processStatus.connectionBusy.status=false
     processStatus.connectionBusy.statusSince=new Date()
@@ -660,6 +673,10 @@ const tryCandidateConnection = async function(index) {
   .catch((error)=>{
     console.log(`tryCandidateConnection catch ${index} ${unit.connections[index]}`)
     console.error(`exec error: ${error}`);
+    if (unit.connectionStatus[tmpConnection].status!='ERROR') {
+      unit.connectionStatus[tmpConnection]={status:'ERROR',statusSince:new Date()}
+    }
+    unit.connectionStatus[tmpConnection]={status:'ERROR',statusLatest:new Date()}
     if (processStatus.connection.status!='ERROR') {
       processStatus.connection.status='ERROR'
       processStatus.connection.statusSince=new Date()

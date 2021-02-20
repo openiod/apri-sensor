@@ -537,8 +537,15 @@ const postApConnect = async ( url, req, res) => {
       body += chunk.toString(); // convert Buffer to string
   });
   req.on('end', async () => {
-    var result = JSON.parse(lzString.decompress(body))
-    console.dir(result)
+    var result ={}
+    try {
+      result = JSON.parse(lzString.decompress(body))
+      console.log(result)
+    }
+    catch {
+      console.log('**********************')
+      console.log(body)
+    }
 		if (result.ssid==undefined) {
 			processStatus.connectionBusy.status=false
 			processStatus.connectionBusy.statusSince=new Date()
@@ -680,10 +687,21 @@ const createHotspot = function() {
 }
 const createHotspotConnection=function(){
   console.log('2. Create hotspot connection')
-  var hotspotCommand= "LC_ALL=C nmcli connection add type wifi ifname '"+unit.ifname+"' con-name '"+unit.ssid+"' autoconnect no wifi.mode ap \
-     ssid '"+unit.ssid+"' \
-     ipv4.method shared 802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk '"+hotspotPassword+"' \
-     ipv6.method shared"
+//  var hotspotCommand= "LC_ALL=C nmcli connection add type wifi ifname '"+
+//    unit.ifname+"' con-name '"+unit.ssid+"' autoconnect no wifi.mode ap ssid '"+
+//    unit.ssid+"' ipv4.method shared 802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk '"+
+//    hotspotPassword+"' ipv6.method shared"
+  var hotspotCommand= "LC_ALL=C nmcli connection add type wifi ifname '"+
+    unit.ifname+"' con-name '"+unit.ssid+"' autoconnect yes wifi.mode ap ssid '"+
+    unit.ssid+"' ipv4.method shared" +
+    " 802-11-wireless.mode ap 802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk '"+
+    hotspotPassword+"'"
+
+//nmcli connection
+// add type wifi ifname wlan0 con-name local-ap autoconnect yes ssid test-ap mode ap
+// modify con-name 802-11-wireless.mode ap 802-11-wireless-security.key-mgmt wpa-psk
+//   ipv4.method shared 802-11-wireless-security.psk 'PASSWORD'
+
   execPromise(hotspotCommand)
   .then((result)=>{
     setHotspotStatus('OK',200)

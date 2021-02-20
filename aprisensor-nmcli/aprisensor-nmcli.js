@@ -651,6 +651,9 @@ const tryCandidateConnection = async function(index) {
 		return
 	}
   var tmpConnection = unit.connections[index]
+  if (unit.connectionStatus[tmpConnection]==undefined) {
+    unit.connectionStatus[tmpConnection]={status:null}
+  }
   // ignore connection already tried less then 5 minutes ago
 	if (unit.connectionStatus[tmpConnection].status=='ERROR') {
     if (new Date() - unit.connectionStatus[tmpConnection].statusLatest< 300000) {

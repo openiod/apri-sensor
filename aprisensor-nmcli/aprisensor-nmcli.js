@@ -545,6 +545,7 @@ const postApConnect = async ( url, req, res) => {
     catch {
       console.log('**********************')
       console.log(body)
+      console.log(lzString.decompress(body))
     }
 		if (result.ssid==undefined) {
 			processStatus.connectionBusy.status=false

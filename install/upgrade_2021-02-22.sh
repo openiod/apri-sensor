@@ -11,3 +11,4 @@ rm -r /opt/SCAPE604/aprisensor-nmcli-stable
 cp -r /opt/SCAPE604/apri-sensor/aprisensor-nmcli /opt/SCAPE604/aprisensor-nmcli-stable
 cd /opt/SCAPE604/aprisensor-nmcli-stable
 npm install http-terminator
+systemctl restart SCAPE604-aprisensor-nmcli.service

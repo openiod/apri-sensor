@@ -1,5 +1,5 @@
 [Unit]
-Desription=SCAPE604-apri-sensor-dylos - start or restart apri-sensor-dylos service, respawn
+Description=SCAPE604-apri-sensor-dylos - start or restart apri-sensor-dylos service, respawn
 After=network.target
 [Service]
 ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-dylos/apri-sensor-dylos.sh /opt/SCAPE604/log/SCAPE604-apri-sensor-dylos.log

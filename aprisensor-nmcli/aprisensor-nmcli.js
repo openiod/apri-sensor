@@ -1059,7 +1059,7 @@ var createService	= function(sensor, sensorKey) {
 	console.log('save '+sensor+' service for unit ' + unit.id  + ' and device ' + sensorKey);
 	content =
 		'[Unit]\n' +
-		'Desription='+apriConfig.systemCode+'-'+sensor+' - start or restart '+sensor+' '+ sensorKey + ' service, respawn\n' +
+		'Description='+apriConfig.systemCode+'-'+sensor+' - start or restart '+sensor+' '+ sensorKey + ' service, respawn\n' +
 		'After=network.target\n' +
 		'[Service]\n' +
 		'ExecStart=/opt/'+apriConfig.systemCode+'/apri-sensor/'+sensor+'/'+sensor+'.sh /opt/'+apriConfig.systemCode+'/log/'+apriConfig.systemCode+'-'+sensor+'_' + sensorKey + '.log /dev/tty'+sensorKey+' \n' +

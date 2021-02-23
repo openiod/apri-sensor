@@ -1,9 +1,7 @@
 /*
 ** Module: apri-sensor-connector
 **
-** Main system module for handling sensor measurement data for DS18B20,
-**  PMSA003/PMS7003, BME280, BME680, tsi3007, tgs5042, sps30
-**  in Redis to send to cloud service OpenIoD
+** Main system module for handling sensor measurement data for DS18B20, PMSA003/PMS7003, BME280, BME680, tsi3007, tgs5042 in Redis to send to cloud service OpenIoD
 **
 */
 
@@ -80,6 +78,7 @@ var unit				= {};
 var today				= new Date();
 var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today.getDate() + "_" + today.getHours(); // + ":" + today.getMinutes();
 //var resultsFileName = resultsFolder + sensorFileName + '_' + dateString;
+
 
 var processDataCycle	= function(parm) {
 //	console.log('processDataCycle ' + parm);
@@ -183,9 +182,6 @@ var getRedisData = function(redisArray, redisArrayIndex) {
 			case 'tgs5042':
 	      url = tgs5042Attributes(res)+'&dateObserved='+dateObserved;
 	      break;
-			case 'sps30':
-        url = sps30Attributes(res)+'&dateObserved='+dateObserved;
-        break;
       default:
         console.log('ERROR: redis entry unknown: '+ redisKey);
     };
@@ -219,13 +215,6 @@ var tsi3007Attributes = function(res) {
 var tgs5042Attributes = function(res) {
   return openiodUrl + '/tgs5042'+ '/v1/m?foi=' + res.foi + '&observation='+
     'co:'+res.co;
-}
-var sps30Attributes = function(res) {
-  return openiodUrl + '/sps30'+ '/v1/m?foi=' + res.foi + '&observation=' +
-    'pm1:'+res.pm1+',pm25:'+res.pm25+',pm4:'+res.pm4+',pm10:'+res.pm10 +
-    ',raw0_5:'+res.raw0_5+',raw1_0:'+res.raw1_0 +
-    ',raw2_5:'+res.raw2_5+',raw4_0:'+res.raw4_0+',raw10_0:'+res.raw10_0 +
-		',tps:'+res.tps
 }
 
 // send data to service

@@ -1,8 +1,7 @@
 /*
 ** Module: apri-sensor-raspi
 **
-** Main system module for handling sensor measurement data for:
-**  DS18B20, PMSA003/PMS7003, BME280, BME680, TGS5042, SPS30
+** Main system module for handling sensor measurement data for DS18B20, PMSA003/PMS7003, BME280, BME680, TGS5042
 **
 */
 
@@ -34,7 +33,6 @@ var initResult 							= apriConfig.init(systemModuleFolderName+"/"+systemModuleN
 var fs 											= require('fs');
 //var SerialPort 							= require("serialport");
 const raspi									= require('raspi');
-const I2C = require('raspi-i2c').I2C;
 var redis										= require("redis");
 const Serial								= require('raspi-serial').Serial;
 //const ByteLength 						= require('@serialport/parser-byte-length')
@@ -43,7 +41,9 @@ const exec 									= require('child_process').exec;
 const execFile							= require('child_process').execFile;
 const BME280 								= require('./BME280.js');
 
+const I2C = require('raspi-i2c').I2C;
 var ADS1x15
+
 var ads1115Available = false
 try {
   ADS1x15 = require('raspi-kit-ads1x15');
@@ -52,7 +52,6 @@ try {
 catch (err) {
   console.log('ADS1115 module not installed');
 }
-
 var adc
 
 var getAds1115Tgs5042 = function() {
@@ -129,9 +128,6 @@ try {
 catch(err) {
   console.log('module BME680-sensor not installed')
 }
-
-var indSps30=false
-var addressI2cSps30=0x69
 
 //const port = new SerialPort('/dev/ttyAMA0')
 //var app = express();
@@ -263,19 +259,6 @@ var counters	= {
 	tgs5042: {
 		co		: 0
 		, nrOfMeas		: 0
-	},
-  sps: 	{
-			pm1			    : 0
-		, pm25			  : 0
-    , pm4			    : 0
-		, pm10			  : 0
-		, part0_5			: 0
-		, part1_0			: 0
-		, part2_5			: 0
-		, part4_0			: 0
-		, part10_0		: 0
-    , tps			    : 0
-		, nrOfMeas		: 0
 	}
 };
 var results			= {
@@ -314,19 +297,6 @@ var results			= {
 	tgs5042: {
 		co		: 0
 		, nrOfMeas		: 0
-	},
-  sps: 	{
-			pm1			    : 0
-		, pm25			  : 0
-    , pm4			    : 0
-		, pm10			  : 0
-		, part0_5			: 0
-		, part1_0			: 0
-		, part2_5			: 0
-		, part4_0			: 0
-		, part10_0		: 0
-    , tps			    : 0
-		, nrOfMeas		: 0
 	}
 };
 
@@ -361,18 +331,6 @@ var initCounters	= function () {
 
   counters.tgs5042.co= 0;
 	counters.tgs5042.nrOfMeas		= 0;
-
-	counters.sps.pm1					  = 0;
-	counters.sps.pm25				    = 0;
-  counters.sps.pm4					  = 0;
-	counters.sps.pm10				    = 0;
-	counters.sps.part0_5				= 0;
-	counters.sps.part1_0				= 0;
-	counters.sps.part2_5				= 0;
-	counters.sps.part4_0				= 0;
-	counters.sps.part10_0				= 0;
-  counters.sps.tps					  = 0;
-	counters.sps.nrOfMeas				= 0;
 }
 
 //-------------- raspi-serial
@@ -645,13 +603,7 @@ const readSensorDataDs18b20 = () => {
 var processDataCycle	= function() {
 //	setTimeout(processDataCycle, loopTimeCycle);
 	counters.busy = true;
-	console.log('Counters pms: '+ counters.pms.nrOfMeas +
-    '; bme280: '+ counters.bme280.nrOfMeas +
-    '; bme680: '+ counters.bme680.nrOfMeas  +
-    '; ds18b20: '+ counters.ds18b20.nrOfMeas +
-    '; tgs5042: '+ counters.tgs5042.nrOfMeas +
-    '; sps30: '+ counters.sps.nrOfMeas
-  )
+	console.log('Counters pms: '+ counters.pms.nrOfMeas + '; bme280: '+ counters.bme280.nrOfMeas + '; bme680: '+ counters.bme680.nrOfMeas  + '; ds18b20: '+ counters.ds18b20.nrOfMeas + '; tgs5042: '+ counters.tgs5042.nrOfMeas );
 
   results.pms.pm1CF1							= Math.round((counters.pms.pm1CF1/counters.pms.nrOfMeas)*100)/100;
 	results.pms.pm25CF1							= Math.round((counters.pms.pm25CF1/counters.pms.nrOfMeas)*100)/100;
@@ -684,23 +636,13 @@ var processDataCycle	= function() {
   results.tgs5042.co			= Math.round((counters.tgs5042.co/counters.tgs5042.nrOfMeas)*100)/100;
 	results.tgs5042.nrOfMeas				= counters.tgs5042.nrOfMeas;
 
-  results.sps.pm1							    = Math.round((counters.sps.pm1/counters.sps.nrOfMeas)*100)/100;
-	results.sps.pm25							  = Math.round((counters.sps.pm25/counters.sps.nrOfMeas)*100)/100;
-  results.sps.pm4							    = Math.round((counters.sps.pm4/counters.sps.nrOfMeas)*100)/100;
-	results.sps.pm10							  = Math.round((counters.sps.pm10/counters.sps.nrOfMeas)*100)/100;
-	results.sps.part0_5							= Math.round((counters.sps.part0_5/counters.sps.nrOfMeas)*100)/100;
-	results.sps.part1_0							= Math.round((counters.sps.part1_0/counters.sps.nrOfMeas)*100)/100;
-	results.sps.part2_5							= Math.round((counters.sps.part2_5/counters.sps.nrOfMeas)*100)/100;
-	results.sps.part4_0							= Math.round((counters.sps.part4_0/counters.sps.nrOfMeas)*100)/100;
-	results.sps.part10_0						= Math.round((counters.sps.part10_0/counters.sps.nrOfMeas)*100)/100;
-  results.sps.tps							    = Math.round((counters.sps.tps/counters.sps.nrOfMeas)*100)/100;
-	results.sps.nrOfMeas						= counters.sps.nrOfMeas;
-
 	initCounters();
 	counters.busy = false;
 
   sendData();
+
 }
+
 
 var printHex = function(buffer, tekst) {
 	var str="";
@@ -838,39 +780,6 @@ var sendData = function() {
 				console.log(timeStamp.toISOString()+':tgs5042'+_res);
 			});
 		}
-    if (results.sps.nrOfMeas > 0) {
-//			url = openiodUrl + '/sps30'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
-//						'pm1:'+results.sps.pm1+',pm25:'+results.sps.pm25+',pm4:'+results.sps.pm4+',pm10:'+results.sps.pm10 +
-//						',raw0_5:'+results.sps.part0_5+',raw1_0:'+results.sps.part1_0 +
-//						',raw2_5:'+results.sps.part2_5+',raw4_0:'+results.sps.part4_0+
-//            ',raw10_0:'+results.sps.part10_0 + ',tps:'+results.sps.tps;
-//			console.log(url);
-//			sendRequest(url);
-			redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
-			  , 'foi', 'SCRP' + unit.id
-			  , 'pm1', results.sps.pm1
-				, 'pm25', results.sps.pm25
-        , 'pm4', results.sps.pm4
-				, 'pm10', results.sps.pm10
-				, 'raw0_5', results.sps.part0_5
-				, 'raw1_0', results.sps.part1_0
-				, 'raw2_5', results.sps.part2_5
-				, 'raw4_0', results.sps.part4_0
-				, 'raw10_0', results.sps.part10_0
-        , 'tps', results.sps.tps
-			  ).then(function(res) {
-					var _res = res;
-					redisSaddAsync('new', timeStamp.toISOString()+':sps30')
-						.then(function(res2) {
-							var _res2=res2;
-						//	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
-							console.log('sps30 ', timeStamp.toISOString()+':sps30'+ _res2);
-						});
-		    	console.log(timeStamp.toString()+':sps30'+_res);
-			});
-		}
-
-
     if (results.bme280.nrOfMeas == 0 & results.bme680.nrOfMeas == 0) {
       console.log('Both bmw280/bme680 counters zero, looks like error, next time initdevices ')
       if (bmeInitCounter <3) {
@@ -947,9 +856,6 @@ var sendData = function() {
       pmsa003InitCounter=0
     }
 
-    if (results.sps.nrOfMeas == 0) {
-      // reset sps30 when connected ?
-    }
 
 };
 
@@ -994,106 +900,6 @@ var setGpioFanOff = function() {
 }
 setGpioFanOff() // fan always on but first set gpio to off
 */
-
-const i2cSps30 = new I2C();
-var sps30ProductType=''
-var sps30SerialNr =''
-
-var calcCrcSps30=function(data1,data2) {
-   var crc = 0xFF
-   for(var i = 0; i < 2; i++) {
-     if (i==0) crc ^= data1
-     else crc ^= data2
-     for(var bit = 8; bit > 0; --bit) {
-       if(crc & 0x80) {
-         crc = (crc << 1) ^ 0x31
-       } else {
-         crc = (crc << 1)
-       }
-       if (crc>255) {
-         var a=crc>>8
-         var b=a<<8
-         crc=crc-b
-       }
-    }
-  }
-  return crc
-}
-
-var initSps30Device = function() {
-  raspi.init(() => {
-    i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0xD0,0x02]))
-    var str12=i2cSps30.readSync(addressI2cSps30,12)
-    sps30ProductType=''
-    if (Buffer.compare(str12,
-      Buffer.from([0x30, 0x30, 0xf6, 0x30, 0x38, 0x4f, 0x30, 0x30, 0xf6, 0x30, 0x30, 0xf6])) ==0) {
-      sps30ProductType='00080000'
-      console.log('SPS30 producttype found: '+ sps30ProductType)
-      indSps30=true
-    } else {
-      console.log('SPS30 producttype not found')
-      indSps30=false
-      return
-    }
-    i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0xD0,0x33]))
-    var buf48=i2cSps30.readSync(addressI2cSps30,48)
-    sps30SerialNr=''
-    for (var i=0;i<48;i=i+3) {
-      if (buf48[i]==0) break
-      sps30SerialNr+=String.fromCharCode(buf48[i])
-      if (buf48[i+1]==0) break
-      sps30SerialNr+=String.fromCharCode(buf48[i+1])
-    }
-    console.log(`SPS30 producttype: ${sps30ProductType}`)
-    console.log(`SPS30 serialnr: ${sps30SerialNr}`)
-    // start measuring
-    i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x00,0x10,0x05,0x00,0xF6]))
-  });
-}
-var readSps30Device = function() {
-  if (indSps30==true) {
-    var result=[]
-    i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x03,0x00]))
-    var buf30=i2cSps30.readSync(addressI2cSps30,30)
-    for (var i=0;i<30;i=i+3) {
-      //if (buf30[i]==0) break
-//      if (Buffer.compare(buf30[i+2],calcCrcSps30(buf30[i],buf30[i+1]))!=0) {
-      if (buf30[i+2]!=calcCrcSps30(buf30[i],buf30[i+1])) {
-        console.log('checksum error')
-        break
-      }
-//      console.log(buf30[i])
-//      console.log(buf30[i+1])
-      var value = buf30[i]<<8
-      value+=buf30[i+1]
-      result.push(value)
-    }
-    if (result.length==10) {
-      processRaspiSpsRecord(result)
-    }
-  }
-}
-
-var processRaspiSpsRecord = function(result) {
-	if (counters.busy==true) {
-		console.log('Counters busy, sps30 measurement ignored *******************************');
-		return;
-	}
-	counters.sps.nrOfMeas++;
-	counters.sps.pm1			  	+= result[0]
-	counters.sps.pm25			    += result[1]
-  counters.sps.pm4			    += result[2]
-	counters.sps.pm10			    += result[3]
-	counters.sps.part0_5			+= result[4]
-	counters.sps.part1_0			+= result[5]
-	counters.sps.part2_5			+= result[6]
-	counters.sps.part4_0			+= result[7]
-	counters.sps.part10_0			+= result[8]
-  counters.sps.tps			    += result[9]
-}
-
-
-initSps30Device()
 
 var initBmeDevice = function(){
   console.log('initBmeDevice')
@@ -1212,8 +1018,5 @@ if (ads1115Available==true) {
   let timerIdAds1115Tgs5042 = setInterval(getAds1115Tgs5042, 2000)
   //setTimeout(getAds1115Tgs5042, 1000);
 }
-let timerIdSps30 = setInterval(readSps30Device, 1000)
-
-
 let timerDataCycle = setInterval(processDataCycle, loopTimeCycle)
 //setTimeout(processDataCycle, loopTimeCycle);

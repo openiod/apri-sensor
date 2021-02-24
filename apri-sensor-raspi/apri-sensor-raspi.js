@@ -1022,7 +1022,14 @@ var calcCrcSps30=function(data1,data2) {
 
 var initSps30Device = function() {
   raspi.init(() => {
-    i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0xD0,0x02]))
+    try {
+      i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0xD0,0x02]))
+    }
+    catch {
+      console.log('error initializing SPS30, possibly not available')
+      indSps30=false
+      return
+    }
     var str12=i2cSps30.readSync(addressI2cSps30,12)
     sps30ProductType=''
     if (Buffer.compare(str12,

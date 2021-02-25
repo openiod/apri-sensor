@@ -22,11 +22,9 @@ apt -y install network-manager
 #systemctl disable comitup
 #apt -y remove comitup
 
-#avahi:
+#avahi, redis, nginx
 apt -y install avahi-utils
-#Install Redis:
 apt -y install redis-server
-#nginx
 apt -y install nginx
 
 #todo
@@ -106,13 +104,25 @@ npm install http-terminator
 
 service nginx restart
 
+#Voor opschonen Redis archive set and wifi check:
+sudo crontab -e
+#-->
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# cleanup redis archive
+*/15 * * * * /opt/SCAPE604/apri-sensor/apri-sensor-redis/apri-sensor-redis.sh
+# wifi check
+# no more since aprisensor-nmcli
+# */5 * * * * /opt/SCAPE604/apri-sensor/wifi_check.sh
+#<--
+
 cp /opt/SCAPE604/apri-sensor/apri-config/SCAPE604-apri-agent.service.org /etc/systemd/system/SCAPE604-apri-agent.service
 systemctl enable SCAPE604-apri-agent.service
-systemctl start SCAPE604-apri-agent.service
+#systemctl start SCAPE604-apri-agent.service
 
 cp /opt/SCAPE604/apri-sensor/apri-config/SCAPE604-aprisensor-nmcli.service.org /etc/systemd/system/SCAPE604-aprisensor-nmcli.service
 systemctl enable SCAPE604-aprisensor-nmcli.service
-systemctl start SCAPE604-aprisensor-nmcli.service
+#systemctl start SCAPE604-aprisensor-nmcli.service
 # depending on hardware swicth (HW-switch) disable one of these services
 cp /opt/SCAPE604/apri-sensor/apri-config/SCAPE604-aprisensor-nmcli-stable.service.org /etc/systemd/system/SCAPE604-aprisensor-nmcli-stable.service
 #systemctl enable SCAPE604-aprisensor-nmcli-stable.service
@@ -120,12 +130,15 @@ cp /opt/SCAPE604/apri-sensor/apri-config/SCAPE604-aprisensor-nmcli-stable.servic
 
 cp /opt/SCAPE604/apri-sensor/apri-config/SCAPE604-apri-sensor-connector.service.org /etc/systemd/system/SCAPE604-apri-sensor-connector.service
 systemctl enable SCAPE604-apri-sensor-connector.service
-systemctl start SCAPE604-apri-sensor-connector.service
+#systemctl start SCAPE604-apri-sensor-connector.service
 
 cp /opt/SCAPE604/apri-sensor/apri-config/SCAPE604-apri-sensor-raspi.service.org /etc/systemd/system/SCAPE604-apri-sensor-raspi.service
 systemctl enable SCAPE604-apri-sensor-raspi.service
-systemctl start SCAPE604-apri-sensor-raspi.service
+#systemctl start SCAPE604-apri-sensor-raspi.service
 
 #cp /opt/SCAPE604/apri-sensor/apri-config/SCAPE604-apri-sensor-tsi3007.service.org /etc/systemd/system/SCAPE604-apri-sensor-tsi3007.service
 #systemctl enable SCAPE604-apri-sensor-tsi3007.service
 #systemctl start SCAPE604-apri-sensor-tsi3007.service
+
+# when installed via eth0 this file will block nmcli from connecting to wifi 
+rm /etc/wpa_supplicant/wpa_supplicant.conf

@@ -1067,7 +1067,7 @@ var readSps30Device = function() {
     // floats
     var buf60=i2cSps30.readSync(addressI2cSps30,60)
     for (var i=0;i<60;i=i+6) {
-      console.log(i)
+//      console.log(i)
       if (buf60[i+2]!=calcCrcSps30(buf60[i],buf60[i+1])) {
         console.log('checksum error')
         break
@@ -1077,7 +1077,7 @@ var readSps30Device = function() {
         break
       }
       var data=[buf60[i],buf60[i+1],buf60[i+3],buf60[i+4]]
-      console.dir(data)
+//      console.dir(data)
 //      console.log(buf30[i])
 //      console.log(buf30[i+1])
       // Create a buffer
@@ -1114,7 +1114,7 @@ var readSps30Device = function() {
       // converting it from a 32-bit float into JavaScript's native 64-bit double
 //      var value = view.getFloat32(0);
       // Done
-      console.log(value);
+//      console.log(value);
 
 //      var buffer = new ArrayBuffer(4);
 //      var intView = new Int32Array(buffer);

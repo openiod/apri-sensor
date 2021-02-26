@@ -1083,7 +1083,8 @@ var readSps30Device = function() {
       // Create a buffer
       var buf = new ArrayBuffer(4);
       // Create a data view of it
-      var view = new DataView(buf);
+      //var view = new DataView(buf);
+      var view = new Float32Array(buf);
 
       // set bytes
       data.forEach(function (b, i) {

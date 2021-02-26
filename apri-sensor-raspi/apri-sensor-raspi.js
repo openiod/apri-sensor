@@ -1094,12 +1094,14 @@ var readSps30Device = function() {
           view8[i]=b;
       });
       console.dir(view)
+      var value= view[0]   
+      console.log(view[0])
 
       // Read the bits as a float; note that by doing this, we're implicitly
       // converting it from a 32-bit float into JavaScript's native 64-bit double
-      var value = view.getFloat32(0);
+//      var value = view.getFloat32(0);
       // Done
-      console.log(value);
+//      console.log(value);
 
       var buffer = new ArrayBuffer(4);
       var intView = new Int32Array(buffer);

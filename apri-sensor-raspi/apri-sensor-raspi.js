@@ -1089,6 +1089,7 @@ var readSps30Device = function() {
       data.forEach(function (b, i) {
           view.setUint8(i, b);
       });
+      console.dir(view)
 
       // Read the bits as a float; note that by doing this, we're implicitly
       // converting it from a 32-bit float into JavaScript's native 64-bit double

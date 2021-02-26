@@ -1088,15 +1088,28 @@ var readSps30Device = function() {
       var view8 = new Uint8Array(buf);
       var view16 = new Uint16Array(buf);
 
+//      function bytesToFloat(bytes) {
+      // JavaScript bitwise operators yield a 32 bits integer, not a float.
+      // Assume LSB (least significant byte first).
+      var bits = buf60[i]<<24 | buf60[i+1]<<16 | buf60[i+3]<<8 | buf60[i+4]
+//      var bits = bytes[3]<<24 | bytes[2]<<16 | bytes[1]<<8 | bytes[0];
+      var sign = (bits>>>31 === 0) ? 1.0 : -1.0;
+      var e = bits>>>23 & 0xff;
+      var m = (e === 0) ? (bits & 0x7fffff)<<1 : (bits & 0x7fffff) | 0x800000;
+      var value = sign * m * Math.pow(2, e - 150);
+//        return f;
+//      }
 
+/*
       // set bytes
       data.forEach(function (b, i) {
           view8[i]=b;
       });
       console.dir(view)
-      var value= view[0]   
-      console.log(view[0])
 
+      var value= view[0]
+      console.log(view[0])
+*/
       // Read the bits as a float; note that by doing this, we're implicitly
       // converting it from a 32-bit float into JavaScript's native 64-bit double
 //      var value = view.getFloat32(0);
@@ -1108,8 +1121,8 @@ var readSps30Device = function() {
       var floatView = new Float32Array(buffer);
 
       floatView[0] = Math.PI
-      console.log(intView[0].toString(2)); //bits of the 32 bit float
-      console.log(floatView[0])
+//      console.log(intView[0].toString(2)); //bits of the 32 bit float
+//      console.log(floatView[0])
       result.push(value)
     }
 /* integer

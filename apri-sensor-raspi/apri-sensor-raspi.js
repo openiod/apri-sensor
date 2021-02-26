@@ -1054,6 +1054,9 @@ var initSps30Device = function() {
     console.log(`SPS30 producttype: ${sps30ProductType}`)
     console.log(`SPS30 serialnr: ${sps30SerialNr}`)
     // start measuring
+      // float
+    i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x00,0x10,0x03,0x00,calcCrcSps30(0x03,0x00))]))
+      // integer
     i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x00,0x10,0x05,0x00,0xF6]))
   });
 }
@@ -1061,10 +1064,41 @@ var readSps30Device = function() {
   if (indSps30==true) {
     var result=[]
     i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x03,0x00]))
+    // floats
+    var buf60=i2cSps30.readSync(addressI2cSps30,60)
+    for (var i=0;i<60;i=i+6) {
+      if (buf60[i+2]!=calcCrcSps30(buf60[i],buf60[i+1])) {
+        console.log('checksum error')
+        break
+      }
+      if (buf60[i+5]!=calcCrcSps30(buf60[i+3],buf60[i+4])) {
+        console.log('checksum error')
+        break
+      }
+      var data=[buf60[i],buf60[i+1],buf60[i+3],buf60[i+4]]
+//      console.log(buf30[i])
+//      console.log(buf30[i+1])
+      // Create a buffer
+      var buf = new ArrayBuffer(4);
+      // Create a data view of it
+      var view = new DataView(buf);
+
+      // set bytes
+      data.forEach(function (b, i) {
+          view.setUint8(i, b);
+      });
+
+      // Read the bits as a float; note that by doing this, we're implicitly
+      // converting it from a 32-bit float into JavaScript's native 64-bit double
+      var value = view.getFloat32(0);
+      // Done
+      console.log(num);
+
+      result.push(value)
+    }
+/* integer
     var buf30=i2cSps30.readSync(addressI2cSps30,30)
     for (var i=0;i<30;i=i+3) {
-      //if (buf30[i]==0) break
-//      if (Buffer.compare(buf30[i+2],calcCrcSps30(buf30[i],buf30[i+1]))!=0) {
       if (buf30[i+2]!=calcCrcSps30(buf30[i],buf30[i+1])) {
         console.log('checksum error')
         break
@@ -1075,6 +1109,7 @@ var readSps30Device = function() {
       value+=buf30[i+1]
       result.push(value)
     }
+*/
     if (result.length==10) {
       processRaspiSpsRecord(result)
     }

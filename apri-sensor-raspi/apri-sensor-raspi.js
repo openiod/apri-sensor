@@ -1097,6 +1097,13 @@ var readSps30Device = function() {
       // Done
       console.log(value);
 
+      var buffer = new ArrayBuffer(4);
+      var intView = new Int32Array(buffer);
+      var floatView = new Float32Array(buffer);
+
+      floatView[0] = Math.PI
+      console.log(intView[0].toString(2)); //bits of the 32 bit float
+
       result.push(value)
     }
 /* integer

@@ -1114,13 +1114,13 @@ var readSps30Device = function() {
       // converting it from a 32-bit float into JavaScript's native 64-bit double
 //      var value = view.getFloat32(0);
       // Done
-//      console.log(value);
+      console.log(value);
 
-      var buffer = new ArrayBuffer(4);
-      var intView = new Int32Array(buffer);
-      var floatView = new Float32Array(buffer);
+//      var buffer = new ArrayBuffer(4);
+//      var intView = new Int32Array(buffer);
+//      var floatView = new Float32Array(buffer);
 
-      floatView[0] = Math.PI
+//      floatView[0] = Math.PI
 //      console.log(intView[0].toString(2)); //bits of the 32 bit float
 //      console.log(floatView[0])
       result.push(value)

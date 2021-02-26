@@ -1085,10 +1085,13 @@ var readSps30Device = function() {
       // Create a data view of it
       //var view = new DataView(buf);
       var view = new Float32Array(buf);
+      var view8 = new Uint8Array(buf);
+      var view16 = new Uint16Array(buf);
+
 
       // set bytes
       data.forEach(function (b, i) {
-          view.setUint8(i, b);
+          view8[i]=b;
       });
       console.dir(view)
 

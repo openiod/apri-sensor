@@ -410,21 +410,21 @@ var initCounters	= function () {
   counters.sps.tps					  = 0;
 	counters.sps.nrOfMeas				= 0;
 
-  counters.ips1700.pm01					  = 0;
-  counters.ips1700.pm03					  = 0;
-  counters.ips1700.pm05					  = 0;
-  counters.ips1700.pm1					  = 0;
-	counters.ips1700.pm25				    = 0;
-  counters.ips1700.pm5					  = 0;
-	counters.ips1700.pm10				    = 0;
-  counters.ips1700.part0_1				= 0;
-  counters.ips1700.part0_3				= 0;
-  counters.ips1700.part0_5				= 0;
-	counters.ips1700.part1_0				= 0;
-	counters.ips1700.part2_5				= 0;
-	counters.ips1700.part5_0				= 0;
-	counters.ips1700.part10_0				= 0;
-	counters.ips1700.nrOfMeas				= 0;
+  counters.ips7100.pm01					  = 0;
+  counters.ips7100.pm03					  = 0;
+  counters.ips7100.pm05					  = 0;
+  counters.ips7100.pm1					  = 0;
+	counters.ips7100.pm25				    = 0;
+  counters.ips7100.pm5					  = 0;
+	counters.ips7100.pm10				    = 0;
+  counters.ips7100.part0_1				= 0;
+  counters.ips7100.part0_3				= 0;
+  counters.ips7100.part0_5				= 0;
+	counters.ips7100.part1_0				= 0;
+	counters.ips7100.part2_5				= 0;
+	counters.ips7100.part5_0				= 0;
+	counters.ips7100.part10_0				= 0;
+	counters.ips7100.nrOfMeas				= 0;
 
 }
 
@@ -750,21 +750,21 @@ var processDataCycle	= function() {
   results.sps.tps							    = Math.round((counters.sps.tps/counters.sps.nrOfMeas)*100)/100;
 	results.sps.nrOfMeas						= counters.sps.nrOfMeas;
 
-  results.ips1700.pm01							    = Math.round((counters.ips1700.pm01/counters.ips1700.nrOfMeas)*100)/100;
-  results.ips1700.pm03							    = Math.round((counters.ips1700.pm03/counters.ips1700.nrOfMeas)*100)/100;
-  results.ips1700.pm05							    = Math.round((counters.ips1700.pm05/counters.ips1700.nrOfMeas)*100)/100;
-  results.ips1700.pm1							    = Math.round((counters.ips1700.pm1/counters.ips1700.nrOfMeas)*100)/100;
-	results.ips1700.pm25							  = Math.round((counters.ips1700.pm25/counters.ips1700.nrOfMeas)*100)/100;
-  results.ips1700.pm5							    = Math.round((counters.ips1700.pm5/counters.ips1700.nrOfMeas)*100)/100;
-	results.ips1700.pm10							  = Math.round((counters.ips1700.pm10/counters.ips1700.nrOfMeas)*100)/100;
-	results.ips1700.part0_1							= Math.round((counters.ips1700.part0_1/counters.ips1700.nrOfMeas)*100)/100;
-  results.ips1700.part0_3							= Math.round((counters.ips1700.part0_3/counters.ips1700.nrOfMeas)*100)/100;
-  results.ips1700.part0_5							= Math.round((counters.ips1700.part0_5/counters.ips1700.nrOfMeas)*100)/100;
-	results.ips1700.part1_0							= Math.round((counters.ips1700.part1_0/counters.ips1700.nrOfMeas)*100)/100;
-	results.ips1700.part2_5							= Math.round((counters.ips1700.part2_5/counters.ips1700.nrOfMeas)*100)/100;
-	results.ips1700.part5_0							= Math.round((counters.ips1700.part5_0/counters.ips1700.nrOfMeas)*100)/100;
-	results.ips1700.part10_0						= Math.round((counters.ips1700.part10_0/counters.ips1700.nrOfMeas)*100)/100;
-	results.ips1700.nrOfMeas						= counters.ips1700.nrOfMeas;
+  results.ips7100.pm01							    = Math.round((counters.ips7100.pm01/counters.ips7100.nrOfMeas)*100)/100;
+  results.ips7100.pm03							    = Math.round((counters.ips7100.pm03/counters.ips7100.nrOfMeas)*100)/100;
+  results.ips7100.pm05							    = Math.round((counters.ips7100.pm05/counters.ips7100.nrOfMeas)*100)/100;
+  results.ips7100.pm1							    = Math.round((counters.ips7100.pm1/counters.ips7100.nrOfMeas)*100)/100;
+	results.ips7100.pm25							  = Math.round((counters.ips7100.pm25/counters.ips7100.nrOfMeas)*100)/100;
+  results.ips7100.pm5							    = Math.round((counters.ips7100.pm5/counters.ips7100.nrOfMeas)*100)/100;
+	results.ips7100.pm10							  = Math.round((counters.ips7100.pm10/counters.ips7100.nrOfMeas)*100)/100;
+	results.ips7100.part0_1							= Math.round((counters.ips7100.part0_1/counters.ips7100.nrOfMeas)*100)/100;
+  results.ips7100.part0_3							= Math.round((counters.ips7100.part0_3/counters.ips7100.nrOfMeas)*100)/100;
+  results.ips7100.part0_5							= Math.round((counters.ips7100.part0_5/counters.ips7100.nrOfMeas)*100)/100;
+	results.ips7100.part1_0							= Math.round((counters.ips7100.part1_0/counters.ips7100.nrOfMeas)*100)/100;
+	results.ips7100.part2_5							= Math.round((counters.ips7100.part2_5/counters.ips7100.nrOfMeas)*100)/100;
+	results.ips7100.part5_0							= Math.round((counters.ips7100.part5_0/counters.ips7100.nrOfMeas)*100)/100;
+	results.ips7100.part10_0						= Math.round((counters.ips7100.part10_0/counters.ips7100.nrOfMeas)*100)/100;
+	results.ips7100.nrOfMeas						= counters.ips7100.nrOfMeas;
 
 	initCounters();
 	counters.busy = false;
@@ -940,40 +940,40 @@ var sendData = function() {
 			});
 		}
     if (results.ips7100.nrOfMeas > 0) {
-//			url = openiodUrl + '/ips1700'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
-//						'pm01:'+results.ips1700.pm01+',pm03:'+results.ips1700.pm03+',pm05:'+results.ips1700.pm05+', +
-//						'pm1:'+results.ips1700.pm1+',pm25:'+results.ips1700.pm25+',pm5:'+results.ips1700.pm5+',pm10:'+results.ips1700.pm10 +
-//						',raw0_1:'+results.ips1700.part0_1+',raw0_3:'+results.ips1700.part0_3 +
-//						',raw0_5:'+results.ips1700.part0_5+',raw1_0:'+results.ips1700.part1_0 +
-//						',raw2_5:'+results.ips1700.part2_5+',raw4_0:'+results.ips1700.part4_0+
-//            ',raw10_0:'+results.ips1700.part10_0 ;
+//			url = openiodUrl + '/ips7100'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
+//						'pm01:'+results.ips7100.pm01+',pm03:'+results.ips7100.pm03+',pm05:'+results.ips7100.pm05+', +
+//						'pm1:'+results.ips7100.pm1+',pm25:'+results.ips7100.pm25+',pm5:'+results.ips7100.pm5+',pm10:'+results.ips7100.pm10 +
+//						',raw0_1:'+results.ips7100.part0_1+',raw0_3:'+results.ips7100.part0_3 +
+//						',raw0_5:'+results.ips7100.part0_5+',raw1_0:'+results.ips7100.part1_0 +
+//						',raw2_5:'+results.ips7100.part2_5+',raw4_0:'+results.ips7100.part4_0+
+//            ',raw10_0:'+results.ips7100.part10_0 ;
 //			console.log(url);
 //			sendRequest(url);
       redisHmsetHashAsync(timeStamp.toISOString()+':ips7100'
         , 'foi', 'SCRP' + unit.id
         , 'pm01', results.ips7100.pm01
-        , 'pm03', results.ips1700.pm03
-        , 'pm05', results.ips1700.pm05
-        , 'pm1', results.ips1700.pm1
-        , 'pm25', results.ips1700.pm25
-        , 'pm5', results.ips1700.pm5
-        , 'pm10', results.ips1700.pm10
-        , 'raw0_1', results.ips1700.part0_1
-        , 'raw0_3', results.ips1700.part0_3
-        , 'raw0_5', results.ips1700.part0_5
-        , 'raw1_0', results.ips1700.part1_0
-        , 'raw2_5', results.ips1700.part2_5
-        , 'raw5_0', results.ips1700.part5_0
-        , 'raw10_0', results.ips1700.part10_0
+        , 'pm03', results.ips7100.pm03
+        , 'pm05', results.ips7100.pm05
+        , 'pm1', results.ips7100.pm1
+        , 'pm25', results.ips7100.pm25
+        , 'pm5', results.ips7100.pm5
+        , 'pm10', results.ips7100.pm10
+        , 'raw0_1', results.ips7100.part0_1
+        , 'raw0_3', results.ips7100.part0_3
+        , 'raw0_5', results.ips7100.part0_5
+        , 'raw1_0', results.ips7100.part1_0
+        , 'raw2_5', results.ips7100.part2_5
+        , 'raw5_0', results.ips7100.part5_0
+        , 'raw10_0', results.ips7100.part10_0
         ).then(function(res) {
           var _res = res;
           redisSaddAsync('new', timeStamp.toISOString()+':ips7100')
             .then(function(res2) {
               var _res2=res2;
-            //	redisSaddAsync('ips1700', timeStamp.toISOString()+':ips1700')
-              console.log('ips1700 ', timeStamp.toISOString()+':ips1700'+ _res2);
+            //	redisSaddAsync('ips7100', timeStamp.toISOString()+':ips7100')
+              console.log('ips7100 ', timeStamp.toISOString()+':ips7100'+ _res2);
             });
-          console.log(timeStamp.toString()+':ips1700'+_res);
+          console.log(timeStamp.toString()+':ips7100'+_res);
       });
     }
 
@@ -1278,63 +1278,63 @@ var processRaspiSpsRecord = function(result) {
 initSps30Device()
 
 
-const i2cIps1700 = new I2C();
-var Ips1700ProductType=''
-var Ips1700SerialNr =''
+const i2cIps7100 = new I2C();
+var Ips7100ProductType=''
+var Ips7100SerialNr =''
 
-var initIps1700Device = function() {
+var initIps7100Device = function() {
   raspi.init(() => {
     try {
       // read statusbyte
-      var status = i2cIps1700.readSync(addressI2cIps1700,Buffer.from([0x26]))
+      var status = i2cIps7100.readSync(addressI2cIps7100,Buffer.from([0x26]))
     }
     catch {
-      console.log('error initializing Ips1700, possibly not available')
-      indIps1700=false
+      console.log('error initializing Ips7100, possibly not available')
+      indIps7100=false
       return
     }
-    indIps1700=true
-    var str12=i2cIps1700.readSync(addressI2cIps1700,12)
-/*    Ips1700ProductType=''
+    indIps7100=true
+    var str12=i2cIps7100.readSync(addressI2cIps7100,12)
+/*    Ips7100ProductType=''
     if (Buffer.compare(str12,
       Buffer.from([0x30, 0x30, 0xf6, 0x30, 0x38, 0x4f, 0x30, 0x30, 0xf6, 0x30, 0x30, 0xf6])) ==0) {
-      Ips1700ProductType='00080000'
-      console.log('Ips1700 producttype found: '+ Ips1700ProductType)
-      indIps1700=true
+      Ips7100ProductType='00080000'
+      console.log('Ips7100 producttype found: '+ Ips7100ProductType)
+      indIps7100=true
     } else {
-      console.log('Ips1700 producttype not found')
-      indIps1700=false
+      console.log('Ips7100 producttype not found')
+      indIps7100=false
       return
     }
-    i2cIps1700.writeSync(addressI2cIps1700,Buffer.from([ 0xD0,0x33]))
-    var buf48=i2cIps1700.readSync(addressI2cIps1700,48)
-    Ips1700SerialNr=''
+    i2cIps7100.writeSync(addressI2cIps7100,Buffer.from([ 0xD0,0x33]))
+    var buf48=i2cIps7100.readSync(addressI2cIps7100,48)
+    Ips7100SerialNr=''
     for (var i=0;i<48;i=i+3) {
       if (buf48[i]==0) break
-      Ips1700SerialNr+=String.fromCharCode(buf48[i])
+      Ips7100SerialNr+=String.fromCharCode(buf48[i])
       if (buf48[i+1]==0) break
-      Ips1700SerialNr+=String.fromCharCode(buf48[i+1])
+      Ips7100SerialNr+=String.fromCharCode(buf48[i+1])
     }
-    console.log(`Ips1700 producttype: ${Ips1700ProductType}`)
-    console.log(`Ips1700 serialnr: ${Ips1700SerialNr}`)
+    console.log(`Ips7100 producttype: ${Ips7100ProductType}`)
+    console.log(`Ips7100 serialnr: ${Ips7100SerialNr}`)
 */
     // start measuring
-    i2cIps1700.writeSync(addressI2cIps1700,Buffer.from([ 0x20,0x03])) // 0x03=1x/sec
+    i2cIps7100.writeSync(addressI2cIps7100,Buffer.from([ 0x20,0x03])) // 0x03=1x/sec
   });
 }
-var readIps1700Device = function() {
-  if (indIps1700==true) {
+var readIps7100Device = function() {
+  if (indIps7100==true) {
     var result=[]
-    i2cIps1700.writeSync(addressI2cIps1700,Buffer.from([ 0x21]))
+    i2cIps7100.writeSync(addressI2cIps7100,Buffer.from([ 0x21]))
     // floats
-    var buf28=i2cIps1700.readSync(addressI2cIps1700,28)
+    var buf28=i2cIps7100.readSync(addressI2cIps7100,28)
     for (var i=0;i<28;i=i+6) {
 //      console.log(i)
-      if (buf28[i+2]!=calcCrcIps1700(buf28[i],buf28[i+1])) {
+      if (buf28[i+2]!=calcCrcIps7100(buf28[i],buf28[i+1])) {
         console.log('checksum error')
         break
       }
-      if (buf28[i+5]!=calcCrcIps1700(buf28[i+3],buf28[i+4])) {
+      if (buf28[i+5]!=calcCrcIps7100(buf28[i+3],buf28[i+4])) {
         console.log('checksum error')
         break
       }
@@ -1363,16 +1363,16 @@ var readIps1700Device = function() {
 //      }
       result.push(value)
     }
-    i2cIps1700.writeSync(addressI2cIps1700,Buffer.from([ 0x22]))
+    i2cIps7100.writeSync(addressI2cIps7100,Buffer.from([ 0x22]))
     // floats
-    var buf56=i2cIps1700.readSync(addressI2cIps1700,56)
+    var buf56=i2cIps7100.readSync(addressI2cIps7100,56)
     for (var i=0;i<56;i=i+6) {
 //      console.log(i)
-      if (buf56[i+2]!=calcCrcIps1700(buf56[i],buf56[i+1])) {
+      if (buf56[i+2]!=calcCrcIps7100(buf56[i],buf56[i+1])) {
         console.log('checksum error')
         break
       }
-      if (buf56[i+5]!=calcCrcIps1700(buf56[i+3],buf56[i+4])) {
+      if (buf56[i+5]!=calcCrcIps7100(buf56[i+3],buf56[i+4])) {
         console.log('checksum error')
         break
       }
@@ -1409,24 +1409,24 @@ var readIps1700Device = function() {
 
 var processRaspiSpsRecord = function(result) {
 	if (counters.busy==true) {
-		console.log('Counters busy, Ips1700 measurement ignored *******************************');
+		console.log('Counters busy, Ips7100 measurement ignored *******************************');
 		return;
 	}
-	counters.ips1700.nrOfMeas++;
-  counters.ips1700.pm01			  	+= result[0]
-  counters.ips1700.pm03			  	+= result[1]
-  counters.ips1700.pm05			  	+= result[2]
-	counters.ips1700.pm1			  	+= result[3]
-	counters.ips1700.pm25			    += result[4]
-  counters.ips1700.pm5			    += result[5]
-	counters.ips1700.pm10			    += result[6]
-	counters.ips1700.part0_1			+= result[7]
-  counters.ips1700.part0_3			+= result[8]
-  counters.ips1700.part0_5			+= result[9]
-	counters.ips1700.part1_0			+= result[10]
-	counters.ips1700.part2_5			+= result[11]
-	counters.ips1700.part5_0			+= result[12]
-	counters.ips1700.part10_0			+= result[13]
+	counters.ips7100.nrOfMeas++;
+  counters.ips7100.pm01			  	+= result[0]
+  counters.ips7100.pm03			  	+= result[1]
+  counters.ips7100.pm05			  	+= result[2]
+	counters.ips7100.pm1			  	+= result[3]
+	counters.ips7100.pm25			    += result[4]
+  counters.ips7100.pm5			    += result[5]
+	counters.ips7100.pm10			    += result[6]
+	counters.ips7100.part0_1			+= result[7]
+  counters.ips7100.part0_3			+= result[8]
+  counters.ips7100.part0_5			+= result[9]
+	counters.ips7100.part1_0			+= result[10]
+	counters.ips7100.part2_5			+= result[11]
+	counters.ips7100.part5_0			+= result[12]
+	counters.ips7100.part10_0			+= result[13]
 }
 
 

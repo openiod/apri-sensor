@@ -1,6 +1,42 @@
 #
 # start script onder sudo su -
 
+# prepare sdccard on Debian laptop:
+# Copy raspbian Butcher Lite img to sdcard with BalenaEtcher
+# sudo touch /media/awiel/boot/ssh
+# unmount sdcard from within debian Places
+# start Raspberry Pi with ethernet usb adapter
+# ssh to pi@ipaddress
+
+# make img (copy) of sdcard on Debian:
+#  df -h (partitions: /dev/sda1 /dev/sda2 ; device /dev/sda)
+# sudo umount /dev/sda1 /dev/sda2
+# sudo apt-get update && sudo apt-get install dcfldd
+# sudo dcfldd if=/dev/sda of=aprisensor_####.img
+# sudo sync
+# sudo chown awiel.awiel aprisensor_####.img
+# shrink img
+# sudo apt-get update && sudo apt-get install gparted
+# sudo fdisk -l aprisensor_####.img
+# startsector of partition2 = 532480
+# mount the second partition
+# sudo losetup /dev/loop0 aprisensor_####.img -o $((<STARTSECTOR>*512))
+# sudo apt-get update && sudo apt-get install gparted
+# sudo gparted /dev/loop0
+# see http://www.aoakley.com/articles/2015-10-09-resizing-sd-images.php
+#-----------------------------------------------
+
+# after first boot of Raspberry Pi:
+# sudo raspi-config --expand-rootfs
+# sudo shutdown -reboot
+# check ID: cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2
+# vi /etc/hosts:
+# laatste regel: 127.0.1.1		ID## ID##.local
+# sudo nmcli general hostname ID##.local
+# sudo rm /opt/SCAPE604/log/*.log
+# wijzig de Redis configuratie
+# sudo reboot
+
 # ID:
 cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2
 
@@ -140,5 +176,5 @@ systemctl enable SCAPE604-apri-sensor-raspi.service
 #systemctl enable SCAPE604-apri-sensor-tsi3007.service
 #systemctl start SCAPE604-apri-sensor-tsi3007.service
 
-# when installed via eth0 this file will block nmcli from connecting to wifi 
+# when installed via eth0 this file will block nmcli from connecting to wifi
 rm /etc/wpa_supplicant/wpa_supplicant.conf

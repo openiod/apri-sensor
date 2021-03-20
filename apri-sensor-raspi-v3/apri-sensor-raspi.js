@@ -1532,13 +1532,13 @@ socket.on('info', function(data) {
 
 var processRaspiSerialData7100=function(data){
   if (data=='\n') {
-    console.log('process ips7100 record '+ ips7100Record)
+    //console.log('process ips7100 record '+ ips7100Record)
     ips7100Record='ips7100,'
     return
   }
   ips7100Record +=String.fromCharCode(data)
-  console.log(data)
-  console.log(ips7100Record)
+  //console.log(data)
+  //console.log(ips7100Record)
 }
 
 var serialDevices=[
@@ -1600,13 +1600,13 @@ var initSerial=function(serialDeviceIndex){
         });
       }
       if (serialDevices[serialDeviceIndex].deviceType=='ips7100') {
-        console.log('serial device for ips7100 opened' + options)
+        console.log('serial device for ips7100 opened')
         console.dir(options)
         serialDevices[serialDeviceIndex].serial.on('data', (data) => {
-          console.log('serial on data')
-          console.log(data)
-          printHex(data,'T');
-          process.stdout.write(data);
+          //console.log('serial on data')
+          console.log(data.substr(0,50))
+          //printHex(data,'T');
+          //process.stdout.write(data);
           for (var i=0;i<data.length;i++) {
             processRaspiSerialData7100(data[i]);
           }

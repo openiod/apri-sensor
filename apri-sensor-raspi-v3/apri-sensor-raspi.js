@@ -1584,14 +1584,13 @@ var serialDevices=[
     ,validData:false
     ,deviceType:'ips7100'
   }
-  /*,
+  ,
   {device:'/dev/ttyS0'
     ,baudRate:9600
     ,initiated:false
     ,validData:false
     ,deviceType:'pmsa003'
-  }*/
-
+  }
 ]
 
 var scanSerialDevices=function() {

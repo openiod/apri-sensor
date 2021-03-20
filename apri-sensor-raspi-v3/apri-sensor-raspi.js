@@ -972,6 +972,7 @@ var sendData = function() {
         , 'raw2_5', results.ips7100.part2_5
         , 'raw5_0', results.ips7100.part5_0
         , 'raw10_0', results.ips7100.part10_0
+        , 'serialNr', ips7100SerialNr
         ).then(function(res) {
           var _res = res;
           redisSaddAsync('new', timeStamp.toISOString()+':ips7100')

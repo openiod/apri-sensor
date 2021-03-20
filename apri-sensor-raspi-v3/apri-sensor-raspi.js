@@ -1355,10 +1355,10 @@ var processRaspiIps7100Record = function(result) {
 	counters.ips7100.pm10			    += parseFloat(result[28])
   ips7100SerialNr = result[29]
   ips7100Hash = result[30]
-  console.log('========================')
-  console.dir(counters.ips7100)
-  console.log('........................')
-  console.dir(result)
+  //console.log('========================')
+  //console.dir(counters.ips7100)
+  //console.log('........................')
+  //console.dir(result)
 }
 
 

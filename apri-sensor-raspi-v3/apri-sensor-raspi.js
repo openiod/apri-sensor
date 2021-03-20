@@ -1532,7 +1532,9 @@ socket.on('info', function(data) {
 
 var processRaspiSerialData7100=function(data){
   if (data=='\n') {
-    //console.log('process ips7100 record '+ ips7100Record)
+    console.log('process ips7100 record '+ ips7100Record)
+    var items = ips7100Record.split(',')
+    console.dir(items)
     ips7100Record='ips7100,'
     return
   }
@@ -1604,8 +1606,6 @@ var initSerial=function(serialDeviceIndex){
         console.dir(options)
         serialDevices[serialDeviceIndex].serial.on('data', (data) => {
           //console.log('serial on data')
-          ips7100Record='DR:'+data
-          console.log(ips7100Record.substr(0,50))
           //printHex(data,'T');
           //process.stdout.write(data);
           for (var i=0;i<data.length;i++) {

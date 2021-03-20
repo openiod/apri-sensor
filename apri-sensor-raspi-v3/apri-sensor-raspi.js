@@ -1593,8 +1593,10 @@ var initSerial=function(serialDeviceIndex){
             processRaspiSerialData7100(data[i]);
           }
         });
-        console.log('write start measurement ips7100')
-        serialDevices[serialDeviceIndex].serial.write('$Won=200\r\n')
+        var command ='$Won=200\r\n'
+        console.log('write start measurement ips7100: '+command)
+
+        serialDevices[serialDeviceIndex].serial.write(command)
       }
       //serial.write('Hello from raspi-serial');
     });

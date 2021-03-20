@@ -757,21 +757,21 @@ var processDataCycle	= function() {
   results.sps.tps							    = Math.round((counters.sps.tps/counters.sps.nrOfMeas)*100)/100;
 	results.sps.nrOfMeas						= counters.sps.nrOfMeas;
 
-  results.ips7100.pm01							    = Math.round((counters.ips7100.pm01/counters.ips7100.nrOfMeas)*100)/100;
-  results.ips7100.pm03							    = Math.round((counters.ips7100.pm03/counters.ips7100.nrOfMeas)*100)/100;
-  results.ips7100.pm05							    = Math.round((counters.ips7100.pm05/counters.ips7100.nrOfMeas)*100)/100;
-  results.ips7100.pm1							    = Math.round((counters.ips7100.pm1/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.pm25							  = Math.round((counters.ips7100.pm25/counters.ips7100.nrOfMeas)*100)/100;
-  results.ips7100.pm5							    = Math.round((counters.ips7100.pm5/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.pm10							  = Math.round((counters.ips7100.pm10/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.part0_1							= Math.round((counters.ips7100.part0_1/counters.ips7100.nrOfMeas)*100)/100;
-  results.ips7100.part0_3							= Math.round((counters.ips7100.part0_3/counters.ips7100.nrOfMeas)*100)/100;
-  results.ips7100.part0_5							= Math.round((counters.ips7100.part0_5/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.part1_0							= Math.round((counters.ips7100.part1_0/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.part2_5							= Math.round((counters.ips7100.part2_5/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.part5_0							= Math.round((counters.ips7100.part5_0/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.part10_0						= Math.round((counters.ips7100.part10_0/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.nrOfMeas						= counters.ips7100.nrOfMeas;
+  results.ips7100.pm01						= Math.round((counters.ips7100.pm01/counters.ips7100.nrOfMeas)*100)/100;
+  results.ips7100.pm03						= Math.round((counters.ips7100.pm03/counters.ips7100.nrOfMeas)*100)/100;
+  results.ips7100.pm05						= Math.round((counters.ips7100.pm05/counters.ips7100.nrOfMeas)*100)/100;
+  results.ips7100.pm1							= Math.round((counters.ips7100.pm1/counters.ips7100.nrOfMeas)*100)/100;
+	results.ips7100.pm25						= Math.round((counters.ips7100.pm25/counters.ips7100.nrOfMeas)*100)/100;
+  results.ips7100.pm5							= Math.round((counters.ips7100.pm5/counters.ips7100.nrOfMeas)*100)/100;
+	results.ips7100.pm10						= Math.round((counters.ips7100.pm10/counters.ips7100.nrOfMeas)*100)/100;
+	results.ips7100.part0_1					= Math.round((counters.ips7100.part0_1/counters.ips7100.nrOfMeas)*100)/100;
+  results.ips7100.part0_3					= Math.round((counters.ips7100.part0_3/counters.ips7100.nrOfMeas)*100)/100;
+  results.ips7100.part0_5					= Math.round((counters.ips7100.part0_5/counters.ips7100.nrOfMeas)*100)/100;
+	results.ips7100.part1_0					= Math.round((counters.ips7100.part1_0/counters.ips7100.nrOfMeas)*100)/100;
+	results.ips7100.part2_5					= Math.round((counters.ips7100.part2_5/counters.ips7100.nrOfMeas)*100)/100;
+	results.ips7100.part5_0					= Math.round((counters.ips7100.part5_0/counters.ips7100.nrOfMeas)*100)/100;
+	results.ips7100.part10_0				= Math.round((counters.ips7100.part10_0/counters.ips7100.nrOfMeas)*100)/100;
+	results.ips7100.nrOfMeas				= counters.ips7100.nrOfMeas;
 
 	initCounters();
 	counters.busy = false;
@@ -972,6 +972,7 @@ var sendData = function() {
         , 'raw2_5', results.ips7100.part2_5
         , 'raw5_0', results.ips7100.part5_0
         , 'raw10_0', results.ips7100.part10_0
+        , 'ips7100SerialNr':ips7100SerialNr
         ).then(function(res) {
           var _res = res;
           redisSaddAsync('new', timeStamp.toISOString()+':ips7100')
@@ -983,8 +984,6 @@ var sendData = function() {
           console.log(timeStamp.toString()+':ips7100'+_res);
       });
     }
-
-
 
     if (results.bme280.nrOfMeas == 0 & results.bme680.nrOfMeas == 0) {
       console.log('Both bmw280/bme680 counters zero, looks like error, next time initdevices ')
@@ -1285,159 +1284,32 @@ var processRaspiSpsRecord = function(result) {
 initSps30Device()
 
 
-const i2cIps7100 = new I2C();
-var Ips7100ProductType=''
-var Ips7100SerialNr =''
+var ips7100SerialNr =''
+var ips7100Hash=''
 
-var initIps7100Device = function() {
-  raspi.init(() => {
-    try {
-      // read statusbyte
-      var status = i2cIps7100.readSync(addressI2cIps7100,Buffer.from([0x26]))
-    }
-    catch {
-      console.log('error initializing Ips7100, possibly not available')
-      indIps7100=false
-      return
-    }
-    indIps7100=true
-    var str12=i2cIps7100.readSync(addressI2cIps7100,12)
-/*    Ips7100ProductType=''
-    if (Buffer.compare(str12,
-      Buffer.from([0x30, 0x30, 0xf6, 0x30, 0x38, 0x4f, 0x30, 0x30, 0xf6, 0x30, 0x30, 0xf6])) ==0) {
-      Ips7100ProductType='00080000'
-      console.log('Ips7100 producttype found: '+ Ips7100ProductType)
-      indIps7100=true
-    } else {
-      console.log('Ips7100 producttype not found')
-      indIps7100=false
-      return
-    }
-    i2cIps7100.writeSync(addressI2cIps7100,Buffer.from([ 0xD0,0x33]))
-    var buf48=i2cIps7100.readSync(addressI2cIps7100,48)
-    Ips7100SerialNr=''
-    for (var i=0;i<48;i=i+3) {
-      if (buf48[i]==0) break
-      Ips7100SerialNr+=String.fromCharCode(buf48[i])
-      if (buf48[i+1]==0) break
-      Ips7100SerialNr+=String.fromCharCode(buf48[i+1])
-    }
-    console.log(`Ips7100 producttype: ${Ips7100ProductType}`)
-    console.log(`Ips7100 serialnr: ${Ips7100SerialNr}`)
-*/
-    // start measuring
-    i2cIps7100.writeSync(addressI2cIps7100,Buffer.from([ 0x20,0x03])) // 0x03=1x/sec
-  });
-}
-var readIps7100Device = function() {
-  if (indIps7100==true) {
-    var result=[]
-    i2cIps7100.writeSync(addressI2cIps7100,Buffer.from([ 0x21]))
-    // floats
-    var buf28=i2cIps7100.readSync(addressI2cIps7100,28)
-    for (var i=0;i<28;i=i+6) {
-//      console.log(i)
-      if (buf28[i+2]!=calcCrcIps7100(buf28[i],buf28[i+1])) {
-        console.log('checksum error')
-        break
-      }
-      if (buf28[i+5]!=calcCrcIps7100(buf28[i+3],buf28[i+4])) {
-        console.log('checksum error')
-        break
-      }
-      var data=[buf28[i],buf28[i+1],buf28[i+3],buf28[i+4]]
-//      console.dir(data)
-//      console.log(buf30[i])
-//      console.log(buf30[i+1])
-      // Create a buffer
-      var buf = new ArrayBuffer(4);
-      // Create a data view of it
-      //var view = new DataView(buf);
-      var view = new Float32Array(buf);
-      var view8 = new Uint8Array(buf);
-      var view16 = new Uint16Array(buf);
-
-//      function bytesToFloat(bytes) {
-      // JavaScript bitwise operators yield a 32 bits integer, not a float.
-      // Assume LSB (least significant byte first).
-      var bits = buf60[i]<<24 | buf60[i+1]<<16 | buf60[i+3]<<8 | buf60[i+4]
-//      var bits = bytes[3]<<24 | bytes[2]<<16 | bytes[1]<<8 | bytes[0];
-      var sign = (bits>>>31 === 0) ? 1.0 : -1.0;
-      var e = bits>>>23 & 0xff;
-      var m = (e === 0) ? (bits & 0x7fffff)<<1 : (bits & 0x7fffff) | 0x800000;
-      var value = sign * m * Math.pow(2, e - 150);
-//        return f;
-//      }
-      result.push(value)
-    }
-    i2cIps7100.writeSync(addressI2cIps7100,Buffer.from([ 0x22]))
-    // floats
-    var buf56=i2cIps7100.readSync(addressI2cIps7100,56)
-    for (var i=0;i<56;i=i+6) {
-//      console.log(i)
-      if (buf56[i+2]!=calcCrcIps7100(buf56[i],buf56[i+1])) {
-        console.log('checksum error')
-        break
-      }
-      if (buf56[i+5]!=calcCrcIps7100(buf56[i+3],buf56[i+4])) {
-        console.log('checksum error')
-        break
-      }
-      var data=[buf56[i],buf56[i+1],buf56[i+3],buf56[i+4]]
-//      console.dir(data)
-//      console.log(buf30[i])
-//      console.log(buf30[i+1])
-      // Create a buffer
-      var buf = new ArrayBuffer(4);
-      // Create a data view of it
-      //var view = new DataView(buf);
-      var view = new Float32Array(buf);
-      var view8 = new Uint8Array(buf);
-      var view16 = new Uint16Array(buf);
-
-//      function bytesToFloat(bytes) {
-      // JavaScript bitwise operators yield a 32 bits integer, not a float.
-      // Assume LSB (least significant byte first).
-      var bits = buf56[i]<<24 | buf56[i+1]<<16 | buf56[i+3]<<8 | buf56[i+4]
-//      var bits = bytes[3]<<24 | bytes[2]<<16 | bytes[1]<<8 | bytes[0];
-      var sign = (bits>>>31 === 0) ? 1.0 : -1.0;
-      var e = bits>>>23 & 0xff;
-      var m = (e === 0) ? (bits & 0x7fffff)<<1 : (bits & 0x7fffff) | 0x800000;
-      var value = sign * m * Math.pow(2, e - 150);
-//        return f;
-//      }
-      result.push(value)
-    }
-    if (result.length==10) {
-      processRaspiSpsRecord(result)
-    }
-  }
-}
-
-var processRaspiSpsRecord = function(result) {
+var processRaspiIps7100Record = function(result) {
 	if (counters.busy==true) {
 		console.log('Counters busy, Ips7100 measurement ignored *******************************');
 		return;
 	}
 	counters.ips7100.nrOfMeas++;
-  counters.ips7100.pm01			  	+= result[0]
-  counters.ips7100.pm03			  	+= result[1]
-  counters.ips7100.pm05			  	+= result[2]
-	counters.ips7100.pm1			  	+= result[3]
-	counters.ips7100.pm25			    += result[4]
-  counters.ips7100.pm5			    += result[5]
-	counters.ips7100.pm10			    += result[6]
-	counters.ips7100.part0_1			+= result[7]
-  counters.ips7100.part0_3			+= result[8]
-  counters.ips7100.part0_5			+= result[9]
-	counters.ips7100.part1_0			+= result[10]
-	counters.ips7100.part2_5			+= result[11]
+	counters.ips7100.part0_1			+= result[2]
+  counters.ips7100.part0_3			+= result[4]
+  counters.ips7100.part0_5			+= result[6]
+	counters.ips7100.part1_0			+= result[8]
+	counters.ips7100.part2_5			+= result[10]
 	counters.ips7100.part5_0			+= result[12]
-	counters.ips7100.part10_0			+= result[13]
+	counters.ips7100.part10_0			+= result[14]
+  counters.ips7100.pm01			  	+= result[16]
+  counters.ips7100.pm03			  	+= result[18]
+  counters.ips7100.pm05			  	+= result[20]
+	counters.ips7100.pm1			  	+= result[22]
+	counters.ips7100.pm25			    += result[24]
+  counters.ips7100.pm5			    += result[26]
+	counters.ips7100.pm10			    += result[28]
+  ips7100SerialNr=result[29]
+  ips7100Hash=result[30]
 }
-
-
-initIps7100Device()
 
 var initBmeDevice = function(){
   console.log('initBmeDevice')
@@ -1568,8 +1440,24 @@ var processRaspiSerialData7100=function(data){
   if (data==10) { // \n line feed
     console.log('process ips7100 record '+ ips7100Record)
     var items = ips7100Record.split(',')
-    if (items.length == 31 && items[1]=='PC0.1') { // valid ips-7100 record
+    if (items.length == 31
+      && items[1]=='PC0.1'
+      && items[3]=='PC0.3'
+      && items[5]=='PC0.5'
+      && items[7]=='PC1.0'
+      && items[9]=='PC2.5'
+      && items[11]=='PC5.0'
+      && items[13]=='PC10'
+      && items[15]=='PM0.1'
+      && items[17]=='PM0.3'
+      && items[19]=='PM0.5'
+      && items[21]=='PM1.0'
+      && items[23]=='PM2.5'
+      && items[25]=='PM5.0'
+      && items[27]=='PM10'
+      ) { // valid ips-7100 record
       //console.dir(items)
+      processRaspiIps7100Record(items)
     }
     ips7100Record='ips7100,'
     return
@@ -1596,7 +1484,7 @@ var serialDevices=[
 var scanSerialDevices=function() {
   var inUseDevices=[]
   for (var i=0;i<serialDevices.length;i++){
-    console.dir(serialDevices[i])
+    //console.dir(serialDevices[i])
     var serialDevice=serialDevices[i]
     // device in error state, reboot or restart process for retry
     if (serialDevice.error!=undefined) continue
@@ -1670,7 +1558,6 @@ if (ads1115Available==true) {
   //setTimeout(getAds1115Tgs5042, 1000);
 }
 let timerIdSps30 = setInterval(readSps30Device, 1000)
-//let timerIdips7100 = setInterval(readIps7100Device, 1000)
 
 
 let timerDataCycle = setInterval(processDataCycle, loopTimeCycle)

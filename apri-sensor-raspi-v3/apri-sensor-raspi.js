@@ -1606,6 +1606,7 @@ var initSerial=function(serialDeviceIndex){
           console.log('serial on data')
           console.log(data)
           printHex(data,'T');
+          process.stdout.write(data);
           for (var i=0;i<data.length;i++) {
             processRaspiSerialData7100(data[i]);
           }

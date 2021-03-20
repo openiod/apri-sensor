@@ -27,6 +27,7 @@
 #-----------------------------------------------
 
 # after first boot of Raspberry Pi:
+# /boot/config.txt --> dtoverlay=i2c-gpio,bus=3  (software i2c on gpio 23 sda 24 scl)
 # sudo raspi-config --expand-rootfs
 # sudo shutdown -reboot
 # check ID: cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2

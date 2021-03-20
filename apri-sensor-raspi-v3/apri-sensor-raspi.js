@@ -134,7 +134,7 @@ var indSps30=false
 var addressI2cSps30=0x69
 
 var indIps7100=false
-var addressI2cIps7100=0x93
+var addressI2cIps7100=0x4b //0x93
 
 //const port = new SerialPort('/dev/ttyAMA0')
 //var app = express();
@@ -1523,21 +1523,77 @@ socket.on('info', function(data) {
 	//socket.broadcast.emit('aireassignal', { data: data } );
 });
 
-raspi.init(() => {
-  serial = new Serial({portId:'/dev/ttyS0',baudRate:9600});
-  serial.open(() => {
-    //console.log('serial open')
-    serial.on('data', (data) => {
-      //console.log('serial on data')
-      //console.log(data)
-      //printHex(data,'T');
-			for (var i=0;i<data.length;i++) {
-				processRaspiSerialData(data[i]);
-			}
+var processRaspiSerialData7100=function(data){
+  console.log(data)
+}
+
+var serialDevices=[
+  {device:'/dev/ttyS0'
+    ,baudrate:9600
+    ,initiated:false
+    ,validData:false
+    ,deviceType:'pmsa003'
+  }
+  ,{device:'/dev/ttyS0'
+    ,baudrate:115200
+    ,initiated:false
+    ,validData:false
+    ,deviceType:'ips7100'
+  }
+]
+
+var scanSerialDevices=function() {
+  var inUseDevices=[]
+  for (var i=0;i<serialDevices.length;i++){
+    var serialDevice=serialDevices[i]
+    // device in error state, reboot or restart process for retry
+    if (serialDevice.error!=undefined) continue
+    // device in use
+    if (inUseDevices[serialDevice.device]!=undefined) continue
+    if (serialDevice.validData==true) {
+      inUseDevices[serialDevice.device]
+      continue
+    }
+    if (serialDevice.scanTime == undefined || new Date().getTime()-serialDevice.scanTime.getTime()>5000) {
+      initSerial(i)
+    }
+  }
+}
+
+var initSerial=function(serialDeviceIndex){
+  console.log('init serial '+serialDevices[serialDeviceIndex].device+' '+
+    serialDevices[serialDeviceIndex].deviceType)
+  raspi.init(() => {
+    serialDevices[serialDeviceIndex].serial = new Serial({portId:serialDevices[serialDeviceIndex].device,baudRate:serialDevices[serialDeviceIndex].baudRate});
+    serialDevices[serialDeviceIndex].serial.serialDeviceIndex=serialDeviceIndex
+    serialDevices[serialDeviceIndex].serial.open(() => {
+      //console.log('serial open')
+      if (serialDevices[serialDeviceIndex].deviceType=='pmsa003') {
+        console.log('serial device for pmsa003 opened')
+        serialDevices[serialDeviceIndex].serial.on('data', (data) => {
+          //console.log('serial on data')
+          //console.log(data)
+          //printHex(data,'T');
+          for (var i=0;i<data.length;i++) {
+            processRaspiSerialData(data[i]);
+          }
+        });
+      }
+      if (serialDevices[serialDeviceIndex].deviceType=='ips7100') {
+        console.log('serial device for pmsa003 opened')
+        serialDevices[serialDeviceIndex].serial.on('data', (data) => {
+          //console.log('serial on data')
+          //console.log(data)
+          //printHex(data,'T');
+//          for (var i=0;i<data.length;i++) {
+            processRaspiSerialData7100(data);
+//          }
+        });
+      }
+      //serial.write('Hello from raspi-serial');
     });
-    serial.write('Hello from raspi-serial');
   });
-});
+}
 
 let timerIdBme280 = setInterval(readSensorDataBme280, 2000)
 //setTimeout(readSensorDataBme280, 1000);
@@ -1550,8 +1606,11 @@ if (ads1115Available==true) {
   //setTimeout(getAds1115Tgs5042, 1000);
 }
 let timerIdSps30 = setInterval(readSps30Device, 1000)
-let timerIdips7100 = setInterval(readIps7100Device, 1000)
+//let timerIdips7100 = setInterval(readIps7100Device, 1000)
 
 
 let timerDataCycle = setInterval(processDataCycle, loopTimeCycle)
 //setTimeout(processDataCycle, loopTimeCycle);
+
+scanSerialDevices()
+setTimeout(scanSerialDevices, 20000);

@@ -946,6 +946,8 @@ var sendData = function() {
 		    	console.log(timeStamp.toString()+':sps30'+_res);
 			});
 		}
+    console.log('==========================================')
+    console.dir(results.ips7100)
     if (results.ips7100.nrOfMeas > 0) {
 //			url = openiodUrl + '/ips7100'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
 //						'pm01:'+results.ips7100.pm01+',pm03:'+results.ips7100.pm03+',pm05:'+results.ips7100.pm05+', +
@@ -1537,6 +1539,12 @@ var scanSerialDevices=function() {
     if (serialDevice.error!=undefined) continue
     // device in use
     if (inUseDevices[serialDevice.device]!=undefined) continue
+    if (serialDevice.deviceType=='ips7100'	&& counters.ips7100.nrOfMeas>0) {
+      serialDevice.validData=true
+    }
+    if (serialDevice.deviceType=='pmsa003' &&	counters.ips7100.nrOfMeas>0) {
+      serialDevice.validData=true
+    }
     if (serialDevice.validData==true) {
       inUseDevices[serialDevice.device]=true
       continue
@@ -1544,12 +1552,7 @@ var scanSerialDevices=function() {
     if (serialDevice.scanTime == undefined || new Date().getTime()-serialDevice.scanTime.getTime()>5000) {
       inUseDevices[serialDevice.device]=true
       initSerial(i)
-    }
-    if (serialDevice.deviceType=='ips7100'	&& counters.ips7100.nrOfMeas>0) {
-      serialDevice.validData=true
-    }
-    if (serialDevice.deviceType=='pmsa003' &&	counters.ips7100.nrOfMeas>0) {
-      serialDevice.validData=true
+      serialDevice.scanTime=new Date()
     }
   }
   console.dir(inUseDevices)

@@ -70,6 +70,7 @@ var getAds1115Tgs5042 = function() {
       console.log(' * CO ppm:', co, ' ',mgM3, ' mg/m3');
       if (counters.busy == false) {
         counters.tgs5042.nrOfMeas++;
+        counters.tgs5042.nrOfMeasTotal++;
         counters.tgs5042.co			+= mgM3;
       }
     }
@@ -245,16 +246,19 @@ var counters	= {
 		, part5_0			: 0
 		, part10_0		: 0
 		, nrOfMeas		: 0
+    , nrOfMeasTotal	: 0
 	},
 	ds18b20: {
 		temperature		: 0
 		, nrOfMeas		: 0
+    , nrOfMeasTotal	: 0
 	},
 	bme280: {
 		  temperature	: 0
 		, pressure		: 0
 		, rHum				: 0
 		, nrOfMeas		: 0
+    , nrOfMeasTotal	: 0
 	},
   bme680: {
 		  temperature	: 0
@@ -262,10 +266,12 @@ var counters	= {
 		, rHum				: 0
     , gasResistance	: 0
 		, nrOfMeas		: 0
+    , nrOfMeasTotal	: 0
 	},
 	tgs5042: {
 		co		: 0
 		, nrOfMeas		: 0
+    , nrOfMeasTotal	: 0
 	},
   sps: 	{
 			pm1			    : 0
@@ -279,6 +285,7 @@ var counters	= {
 		, part10_0		: 0
     , tps			    : 0
 		, nrOfMeas		: 0
+    , nrOfMeasTotal	: 0
 	},
   ips7100: 	{
       pm01			    : 0
@@ -296,6 +303,7 @@ var counters	= {
 		, part5_0			: 0
 		, part10_0		: 0
 		, nrOfMeas		: 0
+    , nrOfMeasTotal	: 0
 	}
 };
 var results			= {
@@ -448,6 +456,7 @@ var processRaspiSerialRecord = function() {
 		return;
 	}
 	counters.pms.nrOfMeas++;
+  counters.pms.nrOfMeasTotal++;
 	counters.pms.pm1CF1				+= (view8[4]<<8)	+ view8[5];
 	counters.pms.pm25CF1			+= (view8[6]<<8)	+ view8[7];
 	counters.pms.pm10CF1			+= (view8[8]<<8)	+ view8[9];
@@ -552,6 +561,7 @@ const readSensorDataBme280 = () => {
           console.log('BME280 pressure below 900. Less than 3.3V power? Measure skipped');
         } else {
           counters.bme280.nrOfMeas++;
+          counters.bme280.nrOfMeasTotal++;
   				counters.bme280.temperature				+= data.temperature_C;
   				counters.bme280.pressure					+= data.pressure_hPa;
   				counters.bme280.rHum							+= data.humidity;
@@ -590,6 +600,7 @@ const readSensorDataBme680 = async function(){
       console.log('BME680 pressure below 900. Less than 3.3V power? Measure skipped');
     } else {
       counters.bme680.nrOfMeas++;
+      counters.bme680.nrOfMeasTotal++;
       counters.bme680.temperature				+= data.temperature;
       counters.bme680.pressure					+= data.pressure;
       counters.bme680.rHum							+= data.humidity;
@@ -628,6 +639,7 @@ var initBme680	= function() {
               console.log('BME680 pressure below 900. Less than 3.3V power? Measure skipped');
             } else {
               counters.bme680.nrOfMeas++;
+              counters.bme680.nrOfMeasTotal++;
               counters.bme680.temperature				+= data.temperature;
               counters.bme680.pressure					+= data.pressure;
               counters.bme680.rHum							+= data.humidity;
@@ -673,6 +685,7 @@ var processDeviceData	= function(err,temperatureData) {
         console.log('Error, temerature value our of range: ' + temperature);
       } else {
         counters.ds18b20.nrOfMeas++;
+        counters.ds18b20.nrOfMeasTotal++;
   			counters.ds18b20.temperature			+= temperature;
         console.log(' ' + temperature + ' ' + counters.ds18b20.nrOfMeas);
       }
@@ -1272,6 +1285,7 @@ var processRaspiSpsRecord = function(result) {
 		return;
 	}
 	counters.sps.nrOfMeas++;
+  counters.sps.nrOfMeasTotal++;
 	counters.sps.pm1			  	+= result[0]
 	counters.sps.pm25			    += result[1]
   counters.sps.pm4			    += result[2]
@@ -1339,6 +1353,7 @@ var processRaspiIps7100Record = function(result) {
 		return;
 	}
 	counters.ips7100.nrOfMeas++;
+  counters.ips7100.nrOfMeasTotal++;
 	counters.ips7100.part0_1			+= parseFloat(result[2])
   counters.ips7100.part0_3			+= parseFloat(result[4])
   counters.ips7100.part0_5			+= parseFloat(result[6])
@@ -1491,7 +1506,7 @@ var processRaspiSerialData7100=function(data){
 */
   if (data==13) return // \r carriage return
   if (data==10) { // \n line feed
-    console.log('process ips7100 record '+ ips7100Record)
+//    console.log('process ips7100 record '+ ips7100Record)
     var items = ips7100Record.split(',')
     if (items.length == 31
       && items[1]=='PC0.1'
@@ -1537,29 +1552,35 @@ var serialDevices=[
 var scanSerialDevices=function() {
   var inUseDevices=[]
   for (var i=0;i<serialDevices.length;i++){
-    console.dir(serialDevices[i])
     var serialDevice=serialDevices[i]
     // device in error state, reboot or restart process for retry
     if (serialDevice.error!=undefined) continue
     // device in use
     if (inUseDevices[serialDevice.device]!=undefined) continue
-    if (serialDevice.deviceType=='ips7100'	&& counters.ips7100.nrOfMeas>0) {
+    if (serialDevice.deviceType=='ips7100'	&& counters.ips7100.nrOfMeasTotal>0) {
       serialDevice.validData=true
     }
-    if (serialDevice.deviceType=='pmsa003' &&	counters.ips7100.nrOfMeas>0) {
+    if (serialDevice.deviceType=='pmsa003' &&	counters.pmsa003.nrOfMeasTotal>0) {
       serialDevice.validData=true
     }
     if (serialDevice.validData==true) {
       inUseDevices[serialDevice.device]=true
       continue
     }
-    if (serialDevice.scanTime == undefined || new Date().getTime()-serialDevice.scanTime.getTime()>5000) {
-      inUseDevices[serialDevice.device]=true
-      initSerial(i)
+    if (serialDevice.scanTime == undefined ||
+        new Date().getTime()-serialDevice.scanTime.getTime()>5000) {
+      if (serialDevice.serial == undefined ) {
+        inUseDevices[serialDevice.device]=true
+        initSerial(i)
+      } else {
+        serialDevice.serial.close()
+        inUseDevices[serialDevice.device]=false
+      }
       serialDevice.scanTime=new Date()
     }
   }
   console.dir(inUseDevices)
+  console.dir(serialDevices[i])
 }
 
 var initSerial=function(serialDeviceIndex){

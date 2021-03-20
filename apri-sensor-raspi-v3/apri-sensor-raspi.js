@@ -435,11 +435,12 @@ var view16 					= new Uint16Array(byteArray);
 var pos 						= 0;
 var checksum 				= 0;
 //-------------- raspi-serial ips7100
-var ips7100Record = ''
+var byteArrayIps7100 			= new ArrayBuffer(200);
+var ips7100Record = 'ips7100,'
 //var byteArray 			= new ArrayBuffer(32);
-//var view8 					= new Uint8Array(byteArray);
+var view8Ips7100 			= new Uint8Array(byteArray);
 //var view16 					= new Uint16Array(byteArray);
-//var pos 						= 0;
+var posIps7100				= 0;
 
 var processRaspiSerialRecord = function() {
 	if (counters.busy==true) {
@@ -1532,7 +1533,7 @@ socket.on('info', function(data) {
 var processRaspiSerialData7100=function(data){
   if (data=='\n') {
     console.log('process ips7100 record '+ ips7100Record)
-    ips7100Record=''
+    ips7100Record='ips7100,'
     return
   }
   ips7100Record +=String.fromCharCode(data)
@@ -1546,13 +1547,14 @@ var serialDevices=[
     ,initiated:false
     ,validData:false
     ,deviceType:'ips7100'
-  },
+  }
+  /*,
   {device:'/dev/ttyS0'
     ,baudrate:9600
     ,initiated:false
     ,validData:false
     ,deviceType:'pmsa003'
-  }
+  }*/
 
 ]
 

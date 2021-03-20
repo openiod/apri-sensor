@@ -1611,10 +1611,10 @@ var scanSerialDevices=function() {
       inUseDevices[serialDevice.device]=true
       initSerial(i)
     }
-    if (deviceType=='ips7100'	&& counters.ips7100.nrOfMeas>0) {
+    if (serialDevice.deviceType=='ips7100'	&& counters.ips7100.nrOfMeas>0) {
       serialDevice.validData=true
     }
-    if (deviceType=='pmsa003' &&	counters.ips7100.nrOfMeas>0) {
+    if (serialDevice.deviceType=='pmsa003' &&	counters.ips7100.nrOfMeas>0) {
       serialDevice.validData=true
     }
   }

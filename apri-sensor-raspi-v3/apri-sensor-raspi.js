@@ -1557,6 +1557,7 @@ var scanSerialDevices=function() {
       continue
     }
     if (serialDevice.scanTime == undefined || new Date().getTime()-serialDevice.scanTime.getTime()>5000) {
+      inUseDevices[serialDevice.device]=true
       initSerial(i)
     }
   }

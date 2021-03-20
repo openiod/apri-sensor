@@ -959,8 +959,6 @@ var sendData = function() {
 		    	console.log(timeStamp.toString()+':sps30'+_res);
 			});
 		}
-    console.log('==========================================')
-    console.dir(results.ips7100)
     if (results.ips7100.nrOfMeas > 0) {
 //			url = openiodUrl + '/ips7100'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
 //						'pm01:'+results.ips7100.pm01+',pm03:'+results.ips7100.pm03+',pm05:'+results.ips7100.pm05+', +
@@ -999,8 +997,6 @@ var sendData = function() {
           console.log(timeStamp.toString()+':ips7100'+_res);
       });
     }
-
-
 
     if (results.bme280.nrOfMeas == 0 & results.bme680.nrOfMeas == 0) {
       console.log('Both bmw280/bme680 counters zero, looks like error, next time initdevices ')
@@ -1075,7 +1071,7 @@ var sendData = function() {
         for (var i=0; i<serialDevices.length;i++) {
           if (serialDevices[i].deviceType == 'pmsa003') {
             if (serialDevices[i].serial!=undefined){
-              serialDevices[i].serial.write(cmdView8);              
+              serialDevices[i].serial.write(cmdView8);
             }
           }
         }
@@ -1376,10 +1372,6 @@ var processRaspiIps7100Record = function(result) {
 	counters.ips7100.pm10			    += parseFloat(result[28])
   ips7100SerialNr = result[29]
   ips7100Hash = result[30]
-  //console.log('========================')
-  //console.dir(counters.ips7100)
-  //console.log('........................')
-  //console.dir(result)
 }
 
 

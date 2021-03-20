@@ -1591,9 +1591,9 @@ var initSerial=function(serialDeviceIndex){
       if (serialDevices[serialDeviceIndex].deviceType=='pmsa003') {
         console.log('serial device for pmsa003 opened')
         serialDevices[serialDeviceIndex].serial.on('data', (data) => {
-          //console.log('serial on data')
-          //console.log(data)
-          //printHex(data,'T');
+          console.log('serial on data')
+          console.log(data)
+          printHex(data,'T');
           for (var i=0;i<data.length;i++) {
             processRaspiSerialData(data[i]);
           }

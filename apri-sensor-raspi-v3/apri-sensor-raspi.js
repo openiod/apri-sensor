@@ -1531,15 +1531,18 @@ socket.on('info', function(data) {
 });
 
 var processRaspiSerialData7100=function(data){
-  if (data==10) { // \n
+  if (data==13) return // \r carriage return
+  if (data==10) { // \n line feed
     console.log('process ips7100 record '+ ips7100Record)
     var items = ips7100Record.split(',')
-    console.dir(items)
+    console.log(items.length)
+    if (items.length == 31 && items[1]=='PC0.1') { // valid ips-7100 record
+      console.dir(items)
+    }
     ips7100Record='ips7100,'
     return
   }
   ips7100Record +=String.fromCharCode(data)
-  console.log(ips7100Record)
 }
 
 var serialDevices=[

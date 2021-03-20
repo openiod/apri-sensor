@@ -1028,7 +1028,7 @@ var sendData = function() {
       //ds18b20InitCounter=0
     //}
 
-    if (results.pms.nrOfMeas == 0) {
+    if (results.pms.nrOfMeas == 0 && results.pms.nrOfMeasTotal > 0 ) {
 //    if (process.argv[2]=='test') {
       if (pmsa003InitCounter <1) {
         console.log('pmsa003 counters zero, looks like error, next time try active mode ')
@@ -1072,7 +1072,13 @@ var sendData = function() {
         console.log(cmdView8[6])
         console.log(cmdView8)
 */
-        serial.write(cmdView8);
+        for (var i=0; i<serialDevices.length;i++) {
+          if (serialDevices[i].deviceType == 'pmsa003') {
+            if (serialDevices[i].serial!=undefined){
+              serialDevices[i].serial.write(cmdView8);              
+            }
+          }
+        }
       }
     } else {
       pmsa003InitCounter=0
@@ -1580,7 +1586,7 @@ var scanSerialDevices=function() {
     }
   }
   console.dir(inUseDevices)
-  console.dir(serialDevices[i])
+  console.dir(serialDevices)
 }
 
 var initSerial=function(serialDeviceIndex){

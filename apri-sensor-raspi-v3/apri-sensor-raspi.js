@@ -1529,35 +1529,38 @@ var processRaspiSerialData7100=function(data){
 
 var serialDevices=[
   {device:'/dev/ttyS0'
+    ,baudrate:115200
+    ,initiated:false
+    ,validData:false
+    ,deviceType:'ips7100'
+  },
+  {device:'/dev/ttyS0'
     ,baudrate:9600
     ,initiated:false
     ,validData:false
     ,deviceType:'pmsa003'
   }
-  ,{device:'/dev/ttyS0'
-    ,baudrate:115200
-    ,initiated:false
-    ,validData:false
-    ,deviceType:'ips7100'
-  }
+
 ]
 
 var scanSerialDevices=function() {
   var inUseDevices=[]
   for (var i=0;i<serialDevices.length;i++){
+    console.dir(serialDevices[i])
     var serialDevice=serialDevices[i]
     // device in error state, reboot or restart process for retry
     if (serialDevice.error!=undefined) continue
     // device in use
     if (inUseDevices[serialDevice.device]!=undefined) continue
     if (serialDevice.validData==true) {
-      inUseDevices[serialDevice.device]
+      inUseDevices[serialDevice.device]=true
       continue
     }
     if (serialDevice.scanTime == undefined || new Date().getTime()-serialDevice.scanTime.getTime()>5000) {
       initSerial(i)
     }
   }
+  console.dir(inUseDevices)
 }
 
 var initSerial=function(serialDeviceIndex){

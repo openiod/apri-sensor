@@ -1531,13 +1531,45 @@ socket.on('info', function(data) {
 });
 
 var processRaspiSerialData7100=function(data){
+/*
+  [ 'ips7100',
+  'PC0.1',
+  '18590',
+  'PC0.3',
+  '10345',
+  'PC0.5',
+  '2641',
+  'PC1.0',
+  '246',
+  'PC2.5',
+  '65',
+  'PC5.0',
+  '1',
+  'PC10',
+  '0',
+  'PM0.1',
+  ' 0.01553309',
+  'PM0.3',
+  ' 0.24892623',
+  'PM0.5',
+  ' 0.52479007',
+  'PM1.0',
+  ' 0.73060520',
+  'PM2.5',
+  ' 1.01262989',
+  'PM5.0',
+  ' 1.09557569',
+  'PM10',
+  ' 1.09557569',
+  'IPS-S-21C000096V18',
+  'y3hmwH/uvwi6MDsVjL6EWg== ' ]
+*/
   if (data==13) return // \r carriage return
   if (data==10) { // \n line feed
     console.log('process ips7100 record '+ ips7100Record)
     var items = ips7100Record.split(',')
-    console.log(items.length)
     if (items.length == 31 && items[1]=='PC0.1') { // valid ips-7100 record
-      console.dir(items)
+      //console.dir(items)
     }
     ips7100Record='ips7100,'
     return
@@ -1578,6 +1610,12 @@ var scanSerialDevices=function() {
     if (serialDevice.scanTime == undefined || new Date().getTime()-serialDevice.scanTime.getTime()>5000) {
       inUseDevices[serialDevice.device]=true
       initSerial(i)
+    }
+    if (deviceType=='ips7100'	&& counters.ips7100.nrOfMeas>0) {
+      serialDevice.validData=true
+    }
+    if (deviceType=='pmsa003' &&	counters.ips7100.nrOfMeas>0) {
+      serialDevice.validData=true
     }
   }
   console.dir(inUseDevices)

@@ -1339,22 +1339,26 @@ var processRaspiIps7100Record = function(result) {
 		return;
 	}
 	counters.ips7100.nrOfMeas++;
-	counters.ips7100.part0_1			+= result[2]
-  counters.ips7100.part0_3			+= result[4]
-  counters.ips7100.part0_5			+= result[6]
-	counters.ips7100.part1_0			+= result[8]
-	counters.ips7100.part2_5			+= result[10]
-	counters.ips7100.part5_0			+= result[12]
-	counters.ips7100.part10_0			+= result[14]
-  counters.ips7100.pm01			  	+= result[16]
-  counters.ips7100.pm03			  	+= result[18]
-  counters.ips7100.pm05			  	+= result[20]
-	counters.ips7100.pm1			  	+= result[22]
-	counters.ips7100.pm25			    += result[24]
-  counters.ips7100.pm5			    += result[26]
-	counters.ips7100.pm10			    += result[28]
+	counters.ips7100.part0_1			+= parseFloat(result[2])
+  counters.ips7100.part0_3			+= parseFloat(result[4])
+  counters.ips7100.part0_5			+= parseFloat(result[6])
+	counters.ips7100.part1_0			+= parseFloat(result[8])
+	counters.ips7100.part2_5			+= parseFloat(result[10])
+	counters.ips7100.part5_0			+= parseFloat(result[12])
+	counters.ips7100.part10_0			+= parseFloat(result[14])
+  counters.ips7100.pm01			  	+= parseFloat(result[16])
+  counters.ips7100.pm03			  	+= parseFloat(result[18])
+  counters.ips7100.pm05			  	+= parseFloat(result[20])
+	counters.ips7100.pm1			  	+= parseFloat(result[22])
+	counters.ips7100.pm25			    += parseFloat(result[24])
+  counters.ips7100.pm5			    += parseFloat(result[26])
+	counters.ips7100.pm10			    += parseFloat(result[28])
   ips7100SerialNr = result[29]
   ips7100Hash = result[30]
+  console.log('========================')
+  console.dir(counters.ips7100)
+  console.log('........................')
+  console.dir(result)
 }
 
 

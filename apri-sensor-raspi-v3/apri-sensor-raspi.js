@@ -434,6 +434,12 @@ var view8 					= new Uint8Array(byteArray);
 var view16 					= new Uint16Array(byteArray);
 var pos 						= 0;
 var checksum 				= 0;
+//-------------- raspi-serial ips7100
+var ips7100Record = ''
+//var byteArray 			= new ArrayBuffer(32);
+//var view8 					= new Uint8Array(byteArray);
+//var view16 					= new Uint16Array(byteArray);
+//var pos 						= 0;
 
 var processRaspiSerialRecord = function() {
 	if (counters.busy==true) {
@@ -1524,7 +1530,14 @@ socket.on('info', function(data) {
 });
 
 var processRaspiSerialData7100=function(data){
+  if (data=='\n') {
+    console.log('process ips7100 record '+ ips7100Record)
+    ips7100Record=''
+    return
+  }
+  ips7100Record +=data
   console.log(data)
+  console.log(ips7100Record)
 }
 
 var serialDevices=[
@@ -1584,14 +1597,14 @@ var initSerial=function(serialDeviceIndex){
         });
       }
       if (serialDevices[serialDeviceIndex].deviceType=='ips7100') {
-        console.log('serial device for pmsa003 opened')
+        console.log('serial device for ips7100 opened')
         serialDevices[serialDeviceIndex].serial.on('data', (data) => {
           //console.log('serial on data')
           //console.log(data)
           //printHex(data,'T');
-//          for (var i=0;i<data.length;i++) {
-            processRaspiSerialData7100(data);
-//          }
+          for (var i=0;i<data.length;i++) {
+            processRaspiSerialData7100(data[i]);
+          }
         });
       }
       //serial.write('Hello from raspi-serial');

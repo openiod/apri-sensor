@@ -1531,7 +1531,7 @@ socket.on('info', function(data) {
 });
 
 var processRaspiSerialData7100=function(data){
-  if (data=='\n') {
+  if (data==10) { // \n
     console.log('process ips7100 record '+ ips7100Record)
     var items = ips7100Record.split(',')
     console.dir(items)
@@ -1539,7 +1539,6 @@ var processRaspiSerialData7100=function(data){
     return
   }
   ips7100Record +=String.fromCharCode(data)
-  console.log(data)
   console.log(ips7100Record)
 }
 

@@ -1581,7 +1581,8 @@ var initSerial=function(serialDeviceIndex){
   console.log('init serial '+serialDevices[serialDeviceIndex].device+' '+
     serialDevices[serialDeviceIndex].deviceType)
   raspi.init(() => {
-    serialDevices[serialDeviceIndex].serial = new Serial({portId:serialDevices[serialDeviceIndex].device,baudRate:serialDevices[serialDeviceIndex].baudRate});
+    var options={portId:serialDevices[serialDeviceIndex].device,baudRate:serialDevices[serialDeviceIndex].baudRate}
+    serialDevices[serialDeviceIndex].serial = new Serial(options);
     serialDevices[serialDeviceIndex].serial.serialDeviceIndex=serialDeviceIndex
     serialDevices[serialDeviceIndex].serial.open(() => {
       //console.log('serial open')
@@ -1597,7 +1598,7 @@ var initSerial=function(serialDeviceIndex){
         });
       }
       if (serialDevices[serialDeviceIndex].deviceType=='ips7100') {
-        console.log('serial device for ips7100 opened')
+        console.log('serial device for ips7100 opened' + options)
         serialDevices[serialDeviceIndex].serial.on('data', (data) => {
           //console.log('serial on data')
           //console.log(data)
@@ -1606,6 +1607,8 @@ var initSerial=function(serialDeviceIndex){
             processRaspiSerialData7100(data[i]);
           }
         });
+        console.log('write start measurement ips7100')
+        serialDevices[serialDeviceIndex].serial.write('$Won=200\r\n')
       }
       //serial.write('Hello from raspi-serial');
     });

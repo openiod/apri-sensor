@@ -1543,14 +1543,14 @@ var processRaspiSerialData7100=function(data){
 
 var serialDevices=[
   {device:'/dev/ttyS0'
-    ,baudrate:115200
+    ,baudRate:115200
     ,initiated:false
     ,validData:false
     ,deviceType:'ips7100'
   }
   /*,
   {device:'/dev/ttyS0'
-    ,baudrate:9600
+    ,baudRate:9600
     ,initiated:false
     ,validData:false
     ,deviceType:'pmsa003'

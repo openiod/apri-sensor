@@ -1604,7 +1604,8 @@ var initSerial=function(serialDeviceIndex){
         console.dir(options)
         serialDevices[serialDeviceIndex].serial.on('data', (data) => {
           //console.log('serial on data')
-          console.log(data.substr(0,50))
+          ips7100Record='DR:'+data
+          console.log(ips7100Record.substr(0,50))
           //printHex(data,'T');
           //process.stdout.write(data);
           for (var i=0;i<data.length;i++) {

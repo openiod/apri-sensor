@@ -1535,7 +1535,7 @@ var processRaspiSerialData7100=function(data){
     ips7100Record=''
     return
   }
-  ips7100Record +=data
+  ips7100Record +=String.fromCharCode(data)
   console.log(data)
   console.log(ips7100Record)
 }

@@ -2,7 +2,7 @@
 ** Module: apri-sensor-raspi
 **
 ** Main system module for handling sensor measurement data for:
-**  DS18B20, PMSA003/PMS7003, BME280, BME680, TGS5042, SPS30, IPS7100
+**  DS18B20, PMSA003/PMS7003, BME280, BME680, TGS5042, SPS30
 **
 */
 
@@ -70,7 +70,6 @@ var getAds1115Tgs5042 = function() {
       console.log(' * CO ppm:', co, ' ',mgM3, ' mg/m3');
       if (counters.busy == false) {
         counters.tgs5042.nrOfMeas++;
-        counters.tgs5042.nrOfMeasTotal++;
         counters.tgs5042.co			+= mgM3;
       }
     }
@@ -133,9 +132,6 @@ catch(err) {
 
 var indSps30=false
 var addressI2cSps30=0x69
-
-var indIps7100=false
-var addressI2cIps7100=0x4b //0x93
 
 //const port = new SerialPort('/dev/ttyAMA0')
 //var app = express();
@@ -246,19 +242,16 @@ var counters	= {
 		, part5_0			: 0
 		, part10_0		: 0
 		, nrOfMeas		: 0
-    , nrOfMeasTotal	: 0
 	},
 	ds18b20: {
 		temperature		: 0
 		, nrOfMeas		: 0
-    , nrOfMeasTotal	: 0
 	},
 	bme280: {
 		  temperature	: 0
 		, pressure		: 0
 		, rHum				: 0
 		, nrOfMeas		: 0
-    , nrOfMeasTotal	: 0
 	},
   bme680: {
 		  temperature	: 0
@@ -266,12 +259,10 @@ var counters	= {
 		, rHum				: 0
     , gasResistance	: 0
 		, nrOfMeas		: 0
-    , nrOfMeasTotal	: 0
 	},
 	tgs5042: {
 		co		: 0
 		, nrOfMeas		: 0
-    , nrOfMeasTotal	: 0
 	},
   sps: 	{
 			pm1			    : 0
@@ -285,25 +276,6 @@ var counters	= {
 		, part10_0		: 0
     , tps			    : 0
 		, nrOfMeas		: 0
-    , nrOfMeasTotal	: 0
-	},
-  ips7100: 	{
-      pm01			    : 0
-    , pm03			    : 0
-    , pm05			    : 0
-    , pm1			    : 0
-		, pm25			  : 0
-    , pm5			    : 0
-		, pm10			  : 0
-    , part0_1			: 0
-    , part0_3			: 0
-		, part0_5			: 0
-		, part1_0			: 0
-		, part2_5			: 0
-		, part5_0			: 0
-		, part10_0		: 0
-		, nrOfMeas		: 0
-    , nrOfMeasTotal	: 0
 	}
 };
 var results			= {
@@ -344,7 +316,7 @@ var results			= {
 		, nrOfMeas		: 0
 	},
   sps: 	{
-      pm1			    : 0
+			pm1			    : 0
 		, pm25			  : 0
     , pm4			    : 0
 		, pm10			  : 0
@@ -353,23 +325,7 @@ var results			= {
 		, part2_5			: 0
 		, part4_0			: 0
 		, part10_0		: 0
-		, nrOfMeas		: 0
-	},
-  ips7100: 	{
-			pm01		    : 0
-    , pm03		    : 0
-    , pm05		    : 0
-    , pm1			    : 0
-		, pm25			  : 0
-    , pm5			    : 0
-		, pm10			  : 0
-    , part0_1			: 0
-    , part0_3			: 0
-		, part0_5			: 0
-		, part1_0			: 0
-		, part2_5			: 0
-		, part5_0			: 0
-		, part10_0		: 0
+    , tps			    : 0
 		, nrOfMeas		: 0
 	}
 };
@@ -417,23 +373,6 @@ var initCounters	= function () {
 	counters.sps.part10_0				= 0;
   counters.sps.tps					  = 0;
 	counters.sps.nrOfMeas				= 0;
-
-  counters.ips7100.pm01					  = 0;
-  counters.ips7100.pm03					  = 0;
-  counters.ips7100.pm05					  = 0;
-  counters.ips7100.pm1					  = 0;
-	counters.ips7100.pm25				    = 0;
-  counters.ips7100.pm5					  = 0;
-	counters.ips7100.pm10				    = 0;
-  counters.ips7100.part0_1				= 0;
-  counters.ips7100.part0_3				= 0;
-  counters.ips7100.part0_5				= 0;
-	counters.ips7100.part1_0				= 0;
-	counters.ips7100.part2_5				= 0;
-	counters.ips7100.part5_0				= 0;
-	counters.ips7100.part10_0				= 0;
-	counters.ips7100.nrOfMeas				= 0;
-
 }
 
 //-------------- raspi-serial
@@ -442,13 +381,6 @@ var view8 					= new Uint8Array(byteArray);
 var view16 					= new Uint16Array(byteArray);
 var pos 						= 0;
 var checksum 				= 0;
-//-------------- raspi-serial ips7100
-var byteArrayIps7100 			= new ArrayBuffer(200);
-var ips7100Record = 'ips7100,'
-//var byteArray 			= new ArrayBuffer(32);
-var view8Ips7100 			= new Uint8Array(byteArray);
-//var view16 					= new Uint16Array(byteArray);
-var posIps7100				= 0;
 
 var processRaspiSerialRecord = function() {
 	if (counters.busy==true) {
@@ -456,7 +388,6 @@ var processRaspiSerialRecord = function() {
 		return;
 	}
 	counters.pms.nrOfMeas++;
-  counters.pms.nrOfMeasTotal++;
 	counters.pms.pm1CF1				+= (view8[4]<<8)	+ view8[5];
 	counters.pms.pm25CF1			+= (view8[6]<<8)	+ view8[7];
 	counters.pms.pm10CF1			+= (view8[8]<<8)	+ view8[9];
@@ -561,7 +492,6 @@ const readSensorDataBme280 = () => {
           console.log('BME280 pressure below 900. Less than 3.3V power? Measure skipped');
         } else {
           counters.bme280.nrOfMeas++;
-          counters.bme280.nrOfMeasTotal++;
   				counters.bme280.temperature				+= data.temperature_C;
   				counters.bme280.pressure					+= data.pressure_hPa;
   				counters.bme280.rHum							+= data.humidity;
@@ -600,7 +530,6 @@ const readSensorDataBme680 = async function(){
       console.log('BME680 pressure below 900. Less than 3.3V power? Measure skipped');
     } else {
       counters.bme680.nrOfMeas++;
-      counters.bme680.nrOfMeasTotal++;
       counters.bme680.temperature				+= data.temperature;
       counters.bme680.pressure					+= data.pressure;
       counters.bme680.rHum							+= data.humidity;
@@ -639,7 +568,6 @@ var initBme680	= function() {
               console.log('BME680 pressure below 900. Less than 3.3V power? Measure skipped');
             } else {
               counters.bme680.nrOfMeas++;
-              counters.bme680.nrOfMeasTotal++;
               counters.bme680.temperature				+= data.temperature;
               counters.bme680.pressure					+= data.pressure;
               counters.bme680.rHum							+= data.humidity;
@@ -685,7 +613,6 @@ var processDeviceData	= function(err,temperatureData) {
         console.log('Error, temerature value our of range: ' + temperature);
       } else {
         counters.ds18b20.nrOfMeas++;
-        counters.ds18b20.nrOfMeasTotal++;
   			counters.ds18b20.temperature			+= temperature;
         console.log(' ' + temperature + ' ' + counters.ds18b20.nrOfMeas);
       }
@@ -723,8 +650,7 @@ var processDataCycle	= function() {
     '; bme680: '+ counters.bme680.nrOfMeas  +
     '; ds18b20: '+ counters.ds18b20.nrOfMeas +
     '; tgs5042: '+ counters.tgs5042.nrOfMeas +
-    '; sps30: '+ counters.sps.nrOfMeas +
-    '; ips7100: '+ counters.ips7100.nrOfMeas
+    '; sps30: '+ counters.sps.nrOfMeas
   )
 
   results.pms.pm1CF1							= Math.round((counters.pms.pm1CF1/counters.pms.nrOfMeas)*100)/100;
@@ -769,22 +695,6 @@ var processDataCycle	= function() {
 	results.sps.part10_0						= Math.round((counters.sps.part10_0/counters.sps.nrOfMeas)*100)/100;
   results.sps.tps							    = Math.round((counters.sps.tps/counters.sps.nrOfMeas)*100)/100;
 	results.sps.nrOfMeas						= counters.sps.nrOfMeas;
-
-  results.ips7100.pm01							    = Math.round((counters.ips7100.pm01/counters.ips7100.nrOfMeas)*100)/100;
-  results.ips7100.pm03							    = Math.round((counters.ips7100.pm03/counters.ips7100.nrOfMeas)*100)/100;
-  results.ips7100.pm05							    = Math.round((counters.ips7100.pm05/counters.ips7100.nrOfMeas)*100)/100;
-  results.ips7100.pm1							    = Math.round((counters.ips7100.pm1/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.pm25							  = Math.round((counters.ips7100.pm25/counters.ips7100.nrOfMeas)*100)/100;
-  results.ips7100.pm5							    = Math.round((counters.ips7100.pm5/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.pm10							  = Math.round((counters.ips7100.pm10/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.part0_1							= Math.round((counters.ips7100.part0_1/counters.ips7100.nrOfMeas)*100)/100;
-  results.ips7100.part0_3							= Math.round((counters.ips7100.part0_3/counters.ips7100.nrOfMeas)*100)/100;
-  results.ips7100.part0_5							= Math.round((counters.ips7100.part0_5/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.part1_0							= Math.round((counters.ips7100.part1_0/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.part2_5							= Math.round((counters.ips7100.part2_5/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.part5_0							= Math.round((counters.ips7100.part5_0/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.part10_0						= Math.round((counters.ips7100.part10_0/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.nrOfMeas						= counters.ips7100.nrOfMeas;
 
 	initCounters();
 	counters.busy = false;
@@ -959,44 +869,7 @@ var sendData = function() {
 		    	console.log(timeStamp.toString()+':sps30'+_res);
 			});
 		}
-    if (results.ips7100.nrOfMeas > 0) {
-//			url = openiodUrl + '/ips7100'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
-//						'pm01:'+results.ips7100.pm01+',pm03:'+results.ips7100.pm03+',pm05:'+results.ips7100.pm05+', +
-//						'pm1:'+results.ips7100.pm1+',pm25:'+results.ips7100.pm25+',pm5:'+results.ips7100.pm5+',pm10:'+results.ips7100.pm10 +
-//						',raw0_1:'+results.ips7100.part0_1+',raw0_3:'+results.ips7100.part0_3 +
-//						',raw0_5:'+results.ips7100.part0_5+',raw1_0:'+results.ips7100.part1_0 +
-//						',raw2_5:'+results.ips7100.part2_5+',raw4_0:'+results.ips7100.part4_0+
-//            ',raw10_0:'+results.ips7100.part10_0 ;
-//			console.log(url);
-//			sendRequest(url);
-      redisHmsetHashAsync(timeStamp.toISOString()+':ips7100'
-        , 'foi', 'SCRP' + unit.id
-        , 'pm01', results.ips7100.pm01
-        , 'pm03', results.ips7100.pm03
-        , 'pm05', results.ips7100.pm05
-        , 'pm1', results.ips7100.pm1
-        , 'pm25', results.ips7100.pm25
-        , 'pm5', results.ips7100.pm5
-        , 'pm10', results.ips7100.pm10
-        , 'raw0_1', results.ips7100.part0_1
-        , 'raw0_3', results.ips7100.part0_3
-        , 'raw0_5', results.ips7100.part0_5
-        , 'raw1_0', results.ips7100.part1_0
-        , 'raw2_5', results.ips7100.part2_5
-        , 'raw5_0', results.ips7100.part5_0
-        , 'raw10_0', results.ips7100.part10_0
-        , 'serialNr', ips7100SerialNr
-        ).then(function(res) {
-          var _res = res;
-          redisSaddAsync('new', timeStamp.toISOString()+':ips7100')
-            .then(function(res2) {
-              var _res2=res2;
-            //	redisSaddAsync('ips7100', timeStamp.toISOString()+':ips7100')
-              console.log('ips7100 ', timeStamp.toISOString()+':ips7100'+ _res2);
-            });
-          console.log(timeStamp.toString()+':ips7100'+_res);
-      });
-    }
+
 
     if (results.bme280.nrOfMeas == 0 & results.bme680.nrOfMeas == 0) {
       console.log('Both bmw280/bme680 counters zero, looks like error, next time initdevices ')
@@ -1024,7 +897,7 @@ var sendData = function() {
       //ds18b20InitCounter=0
     //}
 
-    if (results.pms.nrOfMeas == 0 && results.pms.nrOfMeasTotal > 0 ) {
+    if (results.pms.nrOfMeas == 0) {
 //    if (process.argv[2]=='test') {
       if (pmsa003InitCounter <1) {
         console.log('pmsa003 counters zero, looks like error, next time try active mode ')
@@ -1068,13 +941,7 @@ var sendData = function() {
         console.log(cmdView8[6])
         console.log(cmdView8)
 */
-        for (var i=0; i<serialDevices.length;i++) {
-          if (serialDevices[i].deviceType == 'pmsa003') {
-            if (serialDevices[i].serial!=undefined){
-              serialDevices[i].serial.write(cmdView8);
-            }
-          }
-        }
+        serial.write(cmdView8);
       }
     } else {
       pmsa003InitCounter=0
@@ -1082,9 +949,6 @@ var sendData = function() {
 
     if (results.sps.nrOfMeas == 0) {
       // reset sps30 when connected ?
-    }
-    if (results.ips7100.nrOfMeas == 0) {
-      // reset ips7100 when connected ?
     }
 
 };
@@ -1287,7 +1151,6 @@ var processRaspiSpsRecord = function(result) {
 		return;
 	}
 	counters.sps.nrOfMeas++;
-  counters.sps.nrOfMeasTotal++;
 	counters.sps.pm1			  	+= result[0]
 	counters.sps.pm25			    += result[1]
   counters.sps.pm4			    += result[2]
@@ -1302,80 +1165,6 @@ var processRaspiSpsRecord = function(result) {
 
 
 initSps30Device()
-
-
-const i2cIps7100 = new I2C();
-var ips7100SerialNr =''
-var ips7100Hash=''
-
-var initIps7100Device = function() {
-  raspi.init(() => {
-    try {
-      // read statusbyte
-      var status = i2cIps7100.readSync(addressI2cIps7100,Buffer.from([0x26]))
-    }
-    catch {
-      console.log('error initializing Ips7100, possibly not available')
-      indIps7100=false
-      return
-    }
-    indIps7100=true
-    var str12=i2cIps7100.readSync(addressI2cIps7100,12)
-/*    Ips7100ProductType=''
-    if (Buffer.compare(str12,
-      Buffer.from([0x30, 0x30, 0xf6, 0x30, 0x38, 0x4f, 0x30, 0x30, 0xf6, 0x30, 0x30, 0xf6])) ==0) {
-      Ips7100ProductType='00080000'
-      console.log('Ips7100 producttype found: '+ Ips7100ProductType)
-      indIps7100=true
-    } else {
-      console.log('Ips7100 producttype not found')
-      indIps7100=false
-      return
-    }
-    i2cIps7100.writeSync(addressI2cIps7100,Buffer.from([ 0xD0,0x33]))
-    var buf48=i2cIps7100.readSync(addressI2cIps7100,48)
-    Ips7100SerialNr=''
-    for (var i=0;i<48;i=i+3) {
-      if (buf48[i]==0) break
-      Ips7100SerialNr+=String.fromCharCode(buf48[i])
-      if (buf48[i+1]==0) break
-      Ips7100SerialNr+=String.fromCharCode(buf48[i+1])
-    }
-    console.log(`Ips7100 producttype: ${Ips7100ProductType}`)
-    console.log(`Ips7100 serialnr: ${Ips7100SerialNr}`)
-*/
-    // start measuring
-    i2cIps7100.writeSync(addressI2cIps7100,Buffer.from([ 0x20,0x03])) // 0x03=1x/sec
-  });
-}
-
-var processRaspiIps7100Record = function(result) {
-	if (counters.busy==true) {
-		console.log('Counters busy, Ips7100 measurement ignored *******************************');
-		return;
-	}
-	counters.ips7100.nrOfMeas++;
-  counters.ips7100.nrOfMeasTotal++;
-	counters.ips7100.part0_1			+= parseFloat(result[2])
-  counters.ips7100.part0_3			+= parseFloat(result[4])
-  counters.ips7100.part0_5			+= parseFloat(result[6])
-	counters.ips7100.part1_0			+= parseFloat(result[8])
-	counters.ips7100.part2_5			+= parseFloat(result[10])
-	counters.ips7100.part5_0			+= parseFloat(result[12])
-	counters.ips7100.part10_0			+= parseFloat(result[14])
-  counters.ips7100.pm01			  	+= parseFloat(result[16])
-  counters.ips7100.pm03			  	+= parseFloat(result[18])
-  counters.ips7100.pm05			  	+= parseFloat(result[20])
-	counters.ips7100.pm1			  	+= parseFloat(result[22])
-	counters.ips7100.pm25			    += parseFloat(result[24])
-  counters.ips7100.pm5			    += parseFloat(result[26])
-	counters.ips7100.pm10			    += parseFloat(result[28])
-  ips7100SerialNr = result[29]
-  ips7100Hash = result[30]
-}
-
-
-initIps7100Device()
 
 var initBmeDevice = function(){
   console.log('initBmeDevice')
@@ -1468,158 +1257,21 @@ socket.on('info', function(data) {
 	//socket.broadcast.emit('aireassignal', { data: data } );
 });
 
-var processRaspiSerialData7100=function(data){
-/*
-  [ 'ips7100',
-  'PC0.1',
-  '18590',
-  'PC0.3',
-  '10345',
-  'PC0.5',
-  '2641',
-  'PC1.0',
-  '246',
-  'PC2.5',
-  '65',
-  'PC5.0',
-  '1',
-  'PC10',
-  '0',
-  'PM0.1',
-  ' 0.01553309',
-  'PM0.3',
-  ' 0.24892623',
-  'PM0.5',
-  ' 0.52479007',
-  'PM1.0',
-  ' 0.73060520',
-  'PM2.5',
-  ' 1.01262989',
-  'PM5.0',
-  ' 1.09557569',
-  'PM10',
-  ' 1.09557569',
-  'IPS-S-21C000096V18',
-  'y3hmwH/uvwi6MDsVjL6EWg== ' ]
-*/
-  if (data==13) return // \r carriage return
-  if (data==10) { // \n line feed
-//    console.log('process ips7100 record '+ ips7100Record)
-    var items = ips7100Record.split(',')
-    if (items.length == 31
-      && items[1]=='PC0.1'
-      && items[3]=='PC0.3'
-      && items[5]=='PC0.5'
-      && items[7]=='PC1.0'
-      && items[9]=='PC2.5'
-      && items[11]=='PC5.0'
-      && items[13]=='PC10'
-      && items[15]=='PM0.1'
-      && items[17]=='PM0.3'
-      && items[19]=='PM0.5'
-      && items[21]=='PM1.0'
-      && items[23]=='PM2.5'
-      && items[25]=='PM5.0'
-      && items[27]=='PM10'
-      ) { // valid ips-7100 record
-      //console.dir(items)
-      processRaspiIps7100Record(items)
-    }
-    ips7100Record='ips7100,'
-    return
-  }
-  ips7100Record +=String.fromCharCode(data)
-}
-
-var serialDevices=[
-  {device:'/dev/ttyS0'
-    ,baudRate:9600
-    ,initiated:false
-    ,validData:false
-    ,deviceType:'pmsa003'
-  },
-  {device:'/dev/ttyS0'
-    ,baudRate:115200
-    ,initiated:false
-    ,validData:false
-    ,deviceType:'ips7100'
-  }
-]
-
-var scanSerialDevices=function() {
-  var inUseDevices=[]
-  for (var i=0;i<serialDevices.length;i++){
-    var serialDevice=serialDevices[i]
-    // device in error state, reboot or restart process for retry
-    if (serialDevice.error!=undefined) continue
-    // device in use
-    if (inUseDevices[serialDevice.device]!=undefined) continue
-    if (serialDevice.deviceType=='ips7100'	&& counters.ips7100.nrOfMeasTotal>0) {
-      serialDevice.validData=true
-    }
-    if (serialDevice.deviceType=='pmsa003' &&	counters.pms.nrOfMeasTotal>0) {
-      serialDevice.validData=true
-    }
-    if (serialDevice.validData==true) {
-      inUseDevices[serialDevice.device]=true
-      continue
-    }
-    if (serialDevice.scanTime == undefined ||
-        new Date().getTime()-serialDevice.scanTime.getTime()>5000) {
-      if (serialDevice.serial == undefined ) {
-        inUseDevices[serialDevice.device]=true
-        initSerial(i)
-      } else {
-        serialDevice.serial.close()
-        inUseDevices[serialDevice.device]=false
-      }
-      serialDevice.scanTime=new Date()
-    }
-  }
-  console.dir(inUseDevices)
-  console.dir(serialDevices)
-}
-
-var initSerial=function(serialDeviceIndex){
-  console.log('init serial '+serialDevices[serialDeviceIndex].device+' '+
-    serialDevices[serialDeviceIndex].deviceType)
-  raspi.init(() => {
-    var options={portId:serialDevices[serialDeviceIndex].device,baudRate:serialDevices[serialDeviceIndex].baudRate}
-    serialDevices[serialDeviceIndex].serial = new Serial(options);
-    serialDevices[serialDeviceIndex].serial.serialDeviceIndex=serialDeviceIndex
-    serialDevices[serialDeviceIndex].serial.open(() => {
-      //console.log('serial open')
-      if (serialDevices[serialDeviceIndex].deviceType=='pmsa003') {
-        console.log('serial device for pmsa003 opened')
-        serialDevices[serialDeviceIndex].serial.on('data', (data) => {
-          //console.log('serial on data')
-          //console.log(data)
-          //printHex(data,'T');
-          for (var i=0;i<data.length;i++) {
-            processRaspiSerialData(data[i]);
-          }
-        });
-      }
-      if (serialDevices[serialDeviceIndex].deviceType=='ips7100') {
-        console.log('serial device for ips7100 opened')
-        console.dir(options)
-        serialDevices[serialDeviceIndex].serial.on('data', (data) => {
-          //console.log('serial on data')
-          //printHex(data,'T');
-          //process.stdout.write(data);
-          for (var i=0;i<data.length;i++) {
-            processRaspiSerialData7100(data[i]);
-          }
-        });
-        var command ='$Won=200\r\n'
-        console.log('write start measurement ips7100: '+command)
-
-        serialDevices[serialDeviceIndex].serial.write(command)
-      }
-      //serial.write('Hello from raspi-serial');
+raspi.init(() => {
+  serial = new Serial({portId:'/dev/ttyS0',baudRate:9600});
+  serial.open(() => {
+    //console.log('serial open')
+    serial.on('data', (data) => {
+      //console.log('serial on data')
+      //console.log(data)
+      //printHex(data,'T');
+			for (var i=0;i<data.length;i++) {
+				processRaspiSerialData(data[i]);
+			}
     });
+    serial.write('Hello from raspi-serial');
   });
-}
+});
 
 let timerIdBme280 = setInterval(readSensorDataBme280, 2000)
 //setTimeout(readSensorDataBme280, 1000);
@@ -1636,6 +1288,3 @@ let timerIdSps30 = setInterval(readSps30Device, 1000)
 
 let timerDataCycle = setInterval(processDataCycle, loopTimeCycle)
 //setTimeout(processDataCycle, loopTimeCycle);
-
-scanSerialDevices()
-setTimeout(scanSerialDevices, 20000);

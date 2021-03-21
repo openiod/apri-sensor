@@ -186,9 +186,6 @@ var getRedisData = function(redisArray, redisArrayIndex) {
 			case 'sps30':
         url = sps30Attributes(res)+'&dateObserved='+dateObserved;
         break;
-			case 'ips7100':
-        url = ips7100Attributes(res)+'&dateObserved='+dateObserved;
-        break;
       default:
         console.log('ERROR: redis entry unknown: '+ redisKey);
     };
@@ -229,13 +226,6 @@ var sps30Attributes = function(res) {
     ',raw0_5:'+res.raw0_5+',raw1_0:'+res.raw1_0 +
     ',raw2_5:'+res.raw2_5+',raw4_0:'+res.raw4_0+',raw10_0:'+res.raw10_0 +
 		',tps:'+res.tps
-}
-var ips7100Attributes = function(res) {
-  return openiodUrl + '/ips7100'+ '/v1/m?foi=' + res.foi + '&observation=' +
-    'pm01:'+res.pm01+',pm03:'+res.pm03+',pm05:'+res.pm05+',pm1:'+res.pm1+',pm25:'+res.pm25+',pm5:'+res.pm5+',pm10:'+res.pm10 +
-    ',raw0_1:'+res.raw0_1+',raw0_3:'+res.raw0_3+',raw0_5:'+res.raw0_5+',raw1_0:'+res.raw1_0 +
-    ',raw2_5:'+res.raw2_5+',raw5_0:'+res.raw5_0+',raw10_0:'+res.raw10_0 +
-		',serialNr:'+res.serialNr
 }
 
 // send data to service

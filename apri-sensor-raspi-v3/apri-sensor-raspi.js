@@ -1533,17 +1533,16 @@ var processRaspiSerialData7100=function(data){
 
 var serialDevices=[
   {device:'/dev/ttyS0'
-    ,baudRate:115200
-    ,initiated:false
-    ,validData:false
-    ,deviceType:'ips7100'
-  }
-  ,
-  {device:'/dev/ttyS0'
     ,baudRate:9600
     ,initiated:false
     ,validData:false
     ,deviceType:'pmsa003'
+  },
+  {device:'/dev/ttyS0'
+    ,baudRate:115200
+    ,initiated:false
+    ,validData:false
+    ,deviceType:'ips7100'
   }
 ]
 

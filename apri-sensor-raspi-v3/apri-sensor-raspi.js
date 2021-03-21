@@ -1558,7 +1558,7 @@ var scanSerialDevices=function() {
     if (serialDevice.deviceType=='ips7100'	&& counters.ips7100.nrOfMeasTotal>0) {
       serialDevice.validData=true
     }
-    if (serialDevice.deviceType=='pmsa003' &&	counters.pmsa003.nrOfMeasTotal>0) {
+    if (serialDevice.deviceType=='pmsa003' &&	counters.pms.nrOfMeasTotal>0) {
       serialDevice.validData=true
     }
     if (serialDevice.validData==true) {

@@ -1493,9 +1493,13 @@ var serialDevices=[
 ]
 
 var scanSerialDevices=function() {
+  console.log('Scan serial devices')
   var inUseDevices=[]
   for (var i=0;i<serialDevices.length;i++){
+    console.log('Device 1: ')
     var serialDevice=serialDevices[i]
+    console.dir(serialDevice)
+    console.dir(inUseDevices)
     // device in error state, reboot or restart process for retry
     if (serialDevice.error!=undefined) continue
     // device in use

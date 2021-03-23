@@ -1493,15 +1493,19 @@ var serialDevices=[
 ]
 
 var scanSerialDevices=function() {
-  console.log('Scan serial devices')
+//  console.log('Scan serial devices')
   var inUseDevices=[]
   for (var i=0;i<serialDevices.length;i++){
-    console.log('Device '+i)
+//    console.log('Device '+i)
     var serialDevice=serialDevices[i]
-    console.dir(serialDevice)
-    console.dir(inUseDevices)
+//    console.dir(serialDevice)
+//    console.dir(inUseDevices)
     // device in error state, reboot or restart process for retry
     if (serialDevice.error!=undefined) continue
+    if (serialDevice.validData==true) {
+      inUseDevices[serialDevice.device]=true
+      continue
+    }
     // device in use
     if (inUseDevices[serialDevice.device]!=undefined) continue
     if (serialDevice.deviceType=='ips7100'	&& counters.ips7100.nrOfMeasTotal>0) {
@@ -1526,10 +1530,10 @@ var scanSerialDevices=function() {
       }
       serialDevice.scanTime=new Date()
     }
-    console.log('next ===============')
+//    console.log('next ===============')
   }
-  console.dir(inUseDevices)
-  console.dir(serialDevices)
+//  console.dir(inUseDevices)
+//  console.dir(serialDevices)
 }
 
 var initSerial=function(serialDeviceIndex){

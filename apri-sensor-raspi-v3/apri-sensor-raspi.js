@@ -134,8 +134,8 @@ catch(err) {
 var indSps30=false
 var addressI2cSps30=0x69
 
-var indIps7100=false
-var addressI2cIps7100=0x4b //0x93
+var ips7100SerialNr =''
+var ips7100Hash=''
 
 //const port = new SerialPort('/dev/ttyAMA0')
 //var app = express();

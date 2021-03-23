@@ -1589,4 +1589,4 @@ let timerDataCycle = setInterval(processDataCycle, loopTimeCycle)
 //setTimeout(processDataCycle, loopTimeCycle);
 
 scanSerialDevices()
-setTimeout(scanSerialDevices, 20000);
+let timerSerialDevices = setInterval(scanSerialDevices, 10000)

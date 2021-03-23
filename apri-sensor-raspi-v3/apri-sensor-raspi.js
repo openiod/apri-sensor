@@ -1496,7 +1496,7 @@ var scanSerialDevices=function() {
   console.log('Scan serial devices')
   var inUseDevices=[]
   for (var i=0;i<serialDevices.length;i++){
-    console.log('Device 1: ')
+    console.log('Device '+i)
     var serialDevice=serialDevices[i]
     console.dir(serialDevice)
     console.dir(inUseDevices)
@@ -1525,6 +1525,7 @@ var scanSerialDevices=function() {
       }
       serialDevice.scanTime=new Date()
     }
+    console.log('next ===============')
   }
   console.dir(inUseDevices)
   console.dir(serialDevices)

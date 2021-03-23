@@ -443,12 +443,7 @@ var view16 					= new Uint16Array(byteArray);
 var pos 						= 0;
 var checksum 				= 0;
 //-------------- raspi-serial ips7100
-var byteArrayIps7100 			= new ArrayBuffer(200);
 var ips7100Record = 'ips7100,'
-//var byteArray 			= new ArrayBuffer(32);
-var view8Ips7100 			= new Uint8Array(byteArray);
-//var view16 					= new Uint16Array(byteArray);
-var posIps7100				= 0;
 
 var processRaspiSerialRecord = function() {
 	if (counters.busy==true) {
@@ -1303,52 +1298,6 @@ var processRaspiSpsRecord = function(result) {
 
 initSps30Device()
 
-
-const i2cIps7100 = new I2C();
-var ips7100SerialNr =''
-var ips7100Hash=''
-
-var initIps7100Device = function() {
-  raspi.init(() => {
-    try {
-      // read statusbyte
-      var status = i2cIps7100.readSync(addressI2cIps7100,Buffer.from([0x26]))
-    }
-    catch {
-      console.log('error initializing Ips7100, possibly not available')
-      indIps7100=false
-      return
-    }
-    indIps7100=true
-    var str12=i2cIps7100.readSync(addressI2cIps7100,12)
-/*    Ips7100ProductType=''
-    if (Buffer.compare(str12,
-      Buffer.from([0x30, 0x30, 0xf6, 0x30, 0x38, 0x4f, 0x30, 0x30, 0xf6, 0x30, 0x30, 0xf6])) ==0) {
-      Ips7100ProductType='00080000'
-      console.log('Ips7100 producttype found: '+ Ips7100ProductType)
-      indIps7100=true
-    } else {
-      console.log('Ips7100 producttype not found')
-      indIps7100=false
-      return
-    }
-    i2cIps7100.writeSync(addressI2cIps7100,Buffer.from([ 0xD0,0x33]))
-    var buf48=i2cIps7100.readSync(addressI2cIps7100,48)
-    Ips7100SerialNr=''
-    for (var i=0;i<48;i=i+3) {
-      if (buf48[i]==0) break
-      Ips7100SerialNr+=String.fromCharCode(buf48[i])
-      if (buf48[i+1]==0) break
-      Ips7100SerialNr+=String.fromCharCode(buf48[i+1])
-    }
-    console.log(`Ips7100 producttype: ${Ips7100ProductType}`)
-    console.log(`Ips7100 serialnr: ${Ips7100SerialNr}`)
-*/
-    // start measuring
-    i2cIps7100.writeSync(addressI2cIps7100,Buffer.from([ 0x20,0x03])) // 0x03=1x/sec
-  });
-}
-
 var processRaspiIps7100Record = function(result) {
 	if (counters.busy==true) {
 		console.log('Counters busy, Ips7100 measurement ignored *******************************');
@@ -1373,9 +1322,6 @@ var processRaspiIps7100Record = function(result) {
   ips7100SerialNr = result[29]
   ips7100Hash = result[30]
 }
-
-
-initIps7100Device()
 
 var initBmeDevice = function(){
   console.log('initBmeDevice')

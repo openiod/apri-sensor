@@ -1521,6 +1521,7 @@ var scanSerialDevices=function() {
         initSerial(i)
       } else {
         serialDevice.serial.close()
+        serialDevice.error=true
         inUseDevices[serialDevice.device]=false
       }
       serialDevice.scanTime=new Date()

@@ -1223,11 +1223,18 @@ var readSps30Device = function() {
       // JavaScript bitwise operators yield a 32 bits integer, not a float.
       // Assume LSB (least significant byte first).
       var bits = buf60[i]<<24 | buf60[i+1]<<16 | buf60[i+3]<<8 | buf60[i+4]
-//      var bits = bytes[3]<<24 | bytes[2]<<16 | bytes[1]<<8 | bytes[0];
       var sign = (bits>>>31 === 0) ? 1.0 : -1.0;
       var e = bits>>>23 & 0xff;
       var m = (e === 0) ? (bits & 0x7fffff)<<1 : (bits & 0x7fffff) | 0x800000;
       var value = sign * m * Math.pow(2, e - 150);
+
+      // the nodejs procedure to convert float (4 bytes) into double
+
+      const bufTest = Buffer.from([buf60[i], buf60[i+1], buf60[i+3], buf60[i+4]]);
+      console.log('test: '+i)
+      console.log(value);
+      console.log(bufTest.readFloatBE(0));
+      console.log(bufTest.readFloatLE(0));
 //        return f;
 //      }
 

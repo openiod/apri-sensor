@@ -1230,11 +1230,11 @@ var readSps30Device = function() {
 
       // the nodejs procedure to convert float (4 bytes) into double
 
-      const bufTest = Buffer.from([buf60[i], buf60[i+1], buf60[i+3], buf60[i+4]]);
-      console.log('test: '+i)
-      console.log(value);
-      console.log(bufTest.readFloatBE(0));
-      console.log(bufTest.readFloatLE(0));
+      // const bufTest = Buffer.from([buf60[i], buf60[i+1], buf60[i+3], buf60[i+4]]);
+      // console.log('test: '+i)
+      // console.log(value);
+      // dit geeft dezelfde resultaat als de bovenstaande float omrekening: console.log(bufTest.readFloatBE(0));
+      // deze geeft foutieve waarden: console.log(bufTest.readFloatLE(0));
 //        return f;
 //      }
 

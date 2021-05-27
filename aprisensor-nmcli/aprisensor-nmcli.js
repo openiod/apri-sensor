@@ -545,9 +545,10 @@ const postApConnect = async ( url, req, res) => {
     catch {
       console.log('**********************')
       console.log(body)
-      console.log(lzString.decompress(body))
+      //console.log(lzString.decompress(body))
       result={error:'decompress'}
     }
+    console.log(body)
     if (result.error=='decompress') {
       console.log('try uncompressed')
       try {

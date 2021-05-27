@@ -11,10 +11,13 @@ npm run dev
 ## tar cfvz aprisensor-netmanager.tar.gz ../aprisensor-netmanager/public
 
 mv /home/awiel/opt/apri-sensor/aprisensor-netmanager /home/awiel/opt/apri-sensor/aprisensor-netmanager-previousversion
+rm -rf /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime
 cp -R ../aprisensor-netmanager/public /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime
 cd /home/awiel/opt/apri-sensor/
 git status
 git push
+
+sudo systemctl restart SCAPE604-aprisensor-nmcli
 
 run 'sudo git pull' or default update on sensorkit in /opt/SCAPE604/apri-sensor
 # clear browser cache

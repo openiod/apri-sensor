@@ -570,7 +570,7 @@ const postApConnect = async ( url, req, res) => {
 			return
     }
 //		if (result.ssid==undefined) {
-		}
+//		}
     var ssid =result.ssid
     var passwd=result.passwd
     if (result.passwd.substr(0,3)=='SCP') {

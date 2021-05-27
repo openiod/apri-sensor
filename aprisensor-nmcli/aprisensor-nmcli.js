@@ -549,7 +549,7 @@ const postApConnect = async ( url, req, res) => {
       result={error:'decompress'}
     }
     console.log(body)
-    if (result.error=='decompress') {
+    if (result == null || result.error=='decompress') {
       console.log('try uncompressed')
       try {
         result = JSON.parse(body)
@@ -561,7 +561,7 @@ const postApConnect = async ( url, req, res) => {
         result={error:'json'}
       }
     }
-    if (result.error!=undefined) {
+    if (result == null || result.error!=undefined) {
       processStatus.connectionBusy.status=false
 			processStatus.connectionBusy.statusSince=new Date()
 			res.writeHead(400);

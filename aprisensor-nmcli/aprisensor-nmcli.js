@@ -546,14 +546,30 @@ const postApConnect = async ( url, req, res) => {
       console.log('**********************')
       console.log(body)
       console.log(lzString.decompress(body))
+      result={error:'decompress'}
     }
-		if (result.ssid==undefined) {
-			processStatus.connectionBusy.status=false
+    if (result.error=='decompress') {
+      console.log('try uncompressed')
+      try {
+        result = JSON.parse(body)
+        console.log(result)
+      }
+      catch {
+        console.log('**********************')
+        console.log(body)
+        result={error:'json'}
+      }
+    }
+    if (result.error!=undefined) {
+      processStatus.connectionBusy.status=false
 			processStatus.connectionBusy.statusSince=new Date()
 			res.writeHead(400);
-			res.write(`{error:400,message: 'invalid data'}`);
+      let msgBody={error:400,message: 'invalid data, ' + result.error }
+			res.write(JSON.stringify(msgBody));
 			res.end()
 			return
+    }
+//		if (result.ssid==undefined) {
 		}
     var ssid =result.ssid
     var passwd=result.passwd
@@ -562,12 +578,12 @@ const postApConnect = async ( url, req, res) => {
     }
     console.log('connection down')
     await execPromise("LC_ALL=C nmcli connection down '"+ssid+"'")
-    .then((result)=>{console.log('then')})
-    .catch((error)=>{console.log('catch')})
-    console.log('connection delete')
+    .then((result)=>{console.log('then connection down')})
+    .catch((error)=>{console.log('catch connection down')})
+    console.log('connection deactivated when active')
     await execPromise("LC_ALL=C nmcli connection delete '"+ssid+"'")
-    .then((result)=>{console.log('then')})
-    .catch((error)=>{console.log('catch')})
+    .then((result)=>{console.log('then connection delete')})
+    .catch((error)=>{console.log('catch connection delete')})
     console.log('connection create')
 /*
 nmcli connection add type wifi ifname wlp7s0 con-name ap-24 autoconnect no ssid ap-24 ipv4.method shared 802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk 'iam@Home' ipv6.method shared

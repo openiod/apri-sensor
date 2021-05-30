@@ -17,8 +17,8 @@ cd /home/awiel/opt/apri-sensor/
 git status
 git push
 
-sudo systemctl restart SCAPE604-aprisensor-nmcli
-
+# on sensorkit:
 run 'sudo git pull' or default update on sensorkit in /opt/SCAPE604/apri-sensor
+sudo systemctl restart SCAPE604-aprisensor-nmcli
 # clear browser cache
 # open webpage of sensorkit https://sensorId4p.local or ipaddress

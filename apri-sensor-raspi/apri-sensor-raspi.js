@@ -1194,7 +1194,13 @@ var initSps30Device = function() {
 var readSps30Device = function() {
   if (indSps30==true) {
     var result=[]
-    i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x03,0x00]))
+    try {
+      i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x03,0x00]))
+    }
+    catch {
+      console.log('ERROR readSps30Device writeSync ')
+      return
+    }
     // floats
     var buf60=i2cSps30.readSync(addressI2cSps30,60)
     for (var i=0;i<60;i=i+6) {

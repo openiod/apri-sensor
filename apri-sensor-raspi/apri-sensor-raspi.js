@@ -1153,15 +1153,16 @@ var calcCrcSps30=function(data1,data2) {
 
 var initSps30Device = function() {
   raspi.init(() => {
+    var str12
     try {
       i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0xD0,0x02]))
+      str12=i2cSps30.readSync(addressI2cSps30,12)
     }
     catch {
       console.log('error initializing SPS30, possibly not available')
       indSps30=false
       return
     }
-    var str12=i2cSps30.readSync(addressI2cSps30,12)
     sps30ProductType=''
     if (Buffer.compare(str12,
       Buffer.from([0x30, 0x30, 0xf6, 0x30, 0x38, 0x4f, 0x30, 0x30, 0xf6, 0x30, 0x30, 0xf6])) ==0) {
@@ -1173,8 +1174,16 @@ var initSps30Device = function() {
       indSps30=false
       return
     }
-    i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0xD0,0x33]))
-    var buf48=i2cSps30.readSync(addressI2cSps30,48)
+    var buf48
+    try {
+      i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0xD0,0x33]))
+      buf48=i2cSps30.readSync(addressI2cSps30,48)
+    }
+    catch {
+      console.log('error initializing SPS30, possibly not available')
+      indSps30=false
+      return
+    }
     sps30SerialNr=''
     for (var i=0;i<48;i=i+3) {
       if (buf48[i]==0) break
@@ -1185,24 +1194,32 @@ var initSps30Device = function() {
     console.log(`SPS30 producttype: ${sps30ProductType}`)
     console.log(`SPS30 serialnr: ${sps30SerialNr}`)
     // start measuring
+    try {
       // float
-    i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x00,0x10,0x03,0x00,calcCrcSps30(0x03,0x00)]))
-//      // integer
-//    i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x00,0x10,0x05,0x00,0xF6]))
+      i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x00,0x10,0x03,0x00,calcCrcSps30(0x03,0x00)]))
+      //      // integer
+      //    i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x00,0x10,0x05,0x00,0xF6]))
+    }
+    catch {
+      console.log('error initializing SPS30, possibly not available')
+      indSps30=false
+      return
+    }
   });
 }
 var readSps30Device = function() {
   if (indSps30==true) {
+    var buf60
     var result=[]
     try {
       i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x03,0x00]))
+      buf60=i2cSps30.readSync(addressI2cSps30,60)
     }
     catch {
       console.log('ERROR readSps30Device writeSync ')
       return
     }
     // floats
-    var buf60=i2cSps30.readSync(addressI2cSps30,60)
     for (var i=0;i<60;i=i+6) {
 //      console.log(i)
       if (buf60[i+2]!=calcCrcSps30(buf60[i],buf60[i+1])) {
@@ -1267,6 +1284,11 @@ var readSps30Device = function() {
 //      floatView[0] = Math.PI
 //      console.log(intView[0].toString(2)); //bits of the 32 bit float
 //      console.log(floatView[0])
+
+      // convert number of particles from cm3 into 0.1L (multiply by 100)
+      if (result.length>=4 && result.length<=8) {
+        value=value*100
+      }
       result.push(value)
     }
 /* integer
@@ -1301,10 +1323,10 @@ var processRaspiSpsRecord = function(result) {
   counters.sps.pm4			    += result[2]
 	counters.sps.pm10			    += result[3]
 	counters.sps.part0_5			+= result[4]
-	counters.sps.part1_0			+= result[5]
-	counters.sps.part2_5			+= result[6]
-	counters.sps.part4_0			+= result[7]
-	counters.sps.part10_0			+= result[8]
+	counters.sps.part1_0			+= result[5]-result[4]
+	counters.sps.part2_5			+= result[6]-result[5]
+	counters.sps.part4_0			+= result[7]-result[6]
+	counters.sps.part10_0			+= result[8]-result[7]
   counters.sps.tps			    += result[9]
 }
 

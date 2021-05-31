@@ -765,21 +765,24 @@ var processDataCycle	= function() {
   results.sps.tps							    = Math.round((counters.sps.tps/counters.sps.nrOfMeas)*100)/100;
 	results.sps.nrOfMeas						= counters.sps.nrOfMeas;
 
-  results.ips7100.pm01							    = Math.round((counters.ips7100.pm01/counters.ips7100.nrOfMeas)*100)/100;
-  results.ips7100.pm03							    = Math.round((counters.ips7100.pm03/counters.ips7100.nrOfMeas)*100)/100;
-  results.ips7100.pm05							    = Math.round((counters.ips7100.pm05/counters.ips7100.nrOfMeas)*100)/100;
-  results.ips7100.pm1							    = Math.round((counters.ips7100.pm1/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.pm25							  = Math.round((counters.ips7100.pm25/counters.ips7100.nrOfMeas)*100)/100;
-  results.ips7100.pm5							    = Math.round((counters.ips7100.pm5/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.pm10							  = Math.round((counters.ips7100.pm10/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.part0_1							= Math.round((counters.ips7100.part0_1/counters.ips7100.nrOfMeas)*100)/100;
-  results.ips7100.part0_3							= Math.round((counters.ips7100.part0_3/counters.ips7100.nrOfMeas)*100)/100;
-  results.ips7100.part0_5							= Math.round((counters.ips7100.part0_5/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.part1_0							= Math.round((counters.ips7100.part1_0/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.part2_5							= Math.round((counters.ips7100.part2_5/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.part5_0							= Math.round((counters.ips7100.part5_0/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.part10_0						= Math.round((counters.ips7100.part10_0/counters.ips7100.nrOfMeas)*100)/100;
-	results.ips7100.nrOfMeas						= counters.ips7100.nrOfMeas;
+  // skip first 20 measurements, initialization fase of the ips7100
+  if (counters.ips7100.nrOfMeasTotal>20) {
+    results.ips7100.pm01					= Math.round((counters.ips7100.pm01/counters.ips7100.nrOfMeas)*100)/100;
+    results.ips7100.pm03					= Math.round((counters.ips7100.pm03/counters.ips7100.nrOfMeas)*100)/100;
+    results.ips7100.pm05					= Math.round((counters.ips7100.pm05/counters.ips7100.nrOfMeas)*100)/100;
+    results.ips7100.pm1						= Math.round((counters.ips7100.pm1/counters.ips7100.nrOfMeas)*100)/100;
+  	results.ips7100.pm25					= Math.round((counters.ips7100.pm25/counters.ips7100.nrOfMeas)*100)/100;
+    results.ips7100.pm5						= Math.round((counters.ips7100.pm5/counters.ips7100.nrOfMeas)*100)/100;
+  	results.ips7100.pm10					= Math.round((counters.ips7100.pm10/counters.ips7100.nrOfMeas)*100)/100;
+  	results.ips7100.part0_1				= Math.round((counters.ips7100.part0_1/counters.ips7100.nrOfMeas)*100)/100;
+    results.ips7100.part0_3				= Math.round((counters.ips7100.part0_3/counters.ips7100.nrOfMeas)*100)/100;
+    results.ips7100.part0_5				= Math.round((counters.ips7100.part0_5/counters.ips7100.nrOfMeas)*100)/100;
+  	results.ips7100.part1_0				= Math.round((counters.ips7100.part1_0/counters.ips7100.nrOfMeas)*100)/100;
+  	results.ips7100.part2_5				= Math.round((counters.ips7100.part2_5/counters.ips7100.nrOfMeas)*100)/100;
+  	results.ips7100.part5_0				= Math.round((counters.ips7100.part5_0/counters.ips7100.nrOfMeas)*100)/100;
+  	results.ips7100.part10_0			= Math.round((counters.ips7100.part10_0/counters.ips7100.nrOfMeas)*100)/100;
+  	results.ips7100.nrOfMeas			= counters.ips7100.nrOfMeas;
+  }
 
 	initCounters();
 	counters.busy = false;

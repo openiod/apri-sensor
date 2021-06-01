@@ -1235,12 +1235,58 @@ const getActiveConnection = function() {
 
 const statusCheck = async function() {
 
+  // determine with result of ping to (default) gateway if connection is active
   execPromise("ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null")
   .then((result)=>{
     console.log('statusCheck then: '+result)
-    console.dir(result)
+    // console.dir(result) -> result.stderr result.stdout
+    processStatus.gateway.status='OK'
+    processStatus.gateway.statusSince=new Date()
+    return
   }).catch((error)=>{
     console.log('statusCheck catch: '+error)
+    unit.gateway=''
+		if (processStatus.gateway.status!='ERROR') {
+			processStatus.gateway.status='ERROR'
+			processStatus.gateway.statusSince=new Date()
+		}
+    // retrieve all wifi connections (no await)
+    execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')
+    .then((result)=>{
+      //console.log('status check get all connections then')
+      var stdoutArray	= result.stdout.split('\n');
+      unit.connections=[]
+      for (var i=0;i<stdoutArray.length-1;i++) {
+        var pos = stdoutArray[i].indexOf("wifi")
+        var tmp=stdoutArray[i].substr(0,pos-1).trim()
+        if (tmp!=unit.ssid) {
+          unit.connections.push(tmp)
+        }
+      }
+      getActiveConnection()
+    	.then((result)=>{
+    		var stdoutArray	= result.stdout.split(' ');
+    		var tmp=stdoutArray[stdoutArray.length-1]
+    		unit.connection=tmp.split('\n')[0]
+    		//console.log(unit.connection)
+        if (unit.connection==unit.ssid){
+          setGpioBlueLedOn()
+        } else {
+          setGpioBlueLedOff()
+        }
+    	})
+    	.catch((error)=>{
+    		//console.log("getActiveConnection error")
+    		unit.connection=''
+    	})
+
+      console.dir(processStatus)
+      console.dir(unit)
+    })
+    .catch((error)=>{
+      console.log('status check get all connections catch')
+      unit.connections=[]
+    })
   })
 //  ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null && echo ok || echo error
 
@@ -1337,7 +1383,7 @@ const statusCheck = async function() {
 //    }
 //  }
     if (unit.connection!=unit.ssid){
-      setGpioBlueLedOff()
+      //setGpioBlueLedOff()
       //console.log('Hotspot is not active)')
       if (processStatus.gateway.status != 'OK') {
         // console.log('No gateway so no standard connection')
@@ -1354,7 +1400,7 @@ const statusCheck = async function() {
 //  if (processStatus.hotspot.status=='OK') {
   // hotspot active?
   if (unit.connection==unit.ssid){
-    setGpioBlueLedOn()
+    //setGpioBlueLedOn()
     //if (processStatus.hotspot.status=='OK') {
      // after 120 sec. stop hotspot and try standard connection
     if (new Date().getTime() - processStatus.hotspot.statusSince.getTime() >300000){

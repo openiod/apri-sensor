@@ -980,8 +980,8 @@ actions.push(async function() {
 })
 
 actions.push(async function() {
+  statusCheck()
 	setInterval(statusCheck, 10000);
-	statusCheck()
 
 	nextAction()
 })
@@ -1234,6 +1234,15 @@ const getActiveConnection = function() {
 
 
 const statusCheck = async function() {
+
+  execPromise("ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null")
+  .then((result)=>{
+    console.log('statusCheck then: '+result)
+  }).catch((error)=>{
+    console.log('statusCheck catch: '+error)
+  })
+//  ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null && echo ok || echo error
+
 	if (skipStatusCheck==true) return
 	getIpAddress()
 	checkTimeSync()

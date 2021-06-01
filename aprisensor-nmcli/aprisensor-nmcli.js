@@ -1238,6 +1238,7 @@ const statusCheck = async function() {
   execPromise("ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null")
   .then((result)=>{
     console.log('statusCheck then: '+result)
+    console.dir(result)
   }).catch((error)=>{
     console.log('statusCheck catch: '+error)
   })

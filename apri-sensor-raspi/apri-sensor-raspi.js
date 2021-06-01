@@ -104,6 +104,7 @@ var sleepMode = 0
 var ds18b20InitTime = new Date()
 var gpio
 var gpioDs18b20, gpioBme
+//, gpioBlueLed
 //, gpioFan
 try {
   gpio = require('onoff').Gpio
@@ -112,6 +113,7 @@ catch (err) {
   console.log('GPIO module onoff not installed');
 }
 if (gpio != undefined) {
+  //gpioBlueLed = new gpio(19, 'out'); //use GPIO-19 pin .., and specify that it is output
   gpioDs18b20 = new gpio(25, 'out'); //use GPIO-25 pin 22, and specify that it is output
   //gpioFan = new gpio(26, 'out'); //use GPIO-26 pin 37, and specify that it is output
   gpioBme = new gpio(27, 'out'); //use GPIO-27 pin 13, and specify that it is output

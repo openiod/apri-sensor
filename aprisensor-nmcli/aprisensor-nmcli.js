@@ -63,6 +63,36 @@ let key
 //const algoritm="sha256"
 const algoritm="AES-GCM"
 
+var gpio
+var gpioBlueLed
+var gpioBlueLedStatus='off'
+//gpioDs18b20, gpioBme
+//, gpioFan
+try {
+  gpio = require('onoff').Gpio
+}
+catch (err) {
+  console.log('GPIO module onoff not installed');
+}
+if (gpio != undefined) {
+  gpioBlueLed = new gpio(19, 'out'); //use GPIO-19 pin .., and specify that it is output
+  //gpioDs18b20 = new gpio(25, 'out'); //use GPIO-25 pin 22, and specify that it is output
+  //gpioFan = new gpio(26, 'out'); //use GPIO-26 pin 37, and specify that it is output
+  //gpioBme = new gpio(27, 'out'); //use GPIO-27 pin 13, and specify that it is output
+}
+var setGpioBlueLedOn = function() {
+  console.log('set blue LED GPIO on')
+  gpioBlueLed.writeSync(1); //set pin state to 1 (power LED on)
+  gpioBlueLedStatus='on'
+}
+var setGpioBlueLedOff = function() {
+  console.log('set blue LED GPIO off')
+  gpioBlueLed.writeSync(0); //set pin state to 0 (power LED off)
+  gpioBlueLedStatus='off'
+}
+
+
+
 var unit = {'connectionStatus':{} }
 var unitCrypto={}
 
@@ -1297,6 +1327,7 @@ const statusCheck = async function() {
 //    }
 //  }
     if (unit.connection!=unit.ssid){
+      setGpioBlueLedOff()
       //console.log('Hotspot is not active)')
       if (processStatus.gateway.status != 'OK') {
         // console.log('No gateway so no standard connection')
@@ -1313,6 +1344,7 @@ const statusCheck = async function() {
 //  if (processStatus.hotspot.status=='OK') {
   // hotspot active?
   if (unit.connection==unit.ssid){
+    setGpioBlueLedOn()
     //if (processStatus.hotspot.status=='OK') {
      // after 120 sec. stop hotspot and try standard connection
     if (new Date().getTime() - processStatus.hotspot.statusSince.getTime() >300000){

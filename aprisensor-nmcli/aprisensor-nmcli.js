@@ -1294,7 +1294,7 @@ const statusCheck = async function() {
 	getIpAddress()
 	checkTimeSync()
 	//await getGateway()
-	await execPromise('ip route | grep "default via" ')
+	await execPromise("ping -q -w 1 -c 1 `ip r | grep default | head -1 | cut -d ' ' -f 3` > /dev/null")
 	.then( async (result)=>{
 		var stdoutArray	= result.stdout.split(' ');
 		unit.gateway=stdoutArray[2]

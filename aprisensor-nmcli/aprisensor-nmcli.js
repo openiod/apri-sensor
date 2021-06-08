@@ -298,6 +298,12 @@ var columnsToJsonArray = function(columns) {
 }
 
 const getGeneral = function(req,res,callback) {
+  // keep hotspot active as long web page connected. (activate other connectio through webpage)
+  if (unit.connection==unit.ssid){
+    // hotspot status will last as long as wifi-config-web page active (pulse)
+    processStatus.hotspot.statusSince = new Date()
+  }
+
 	execPromise("LC_ALL=C nmcli general")
 	.then((result)=>{
 		var resultJson = columnsToJsonArray(result.stdout)
@@ -683,6 +689,9 @@ const hotspotDelete = function() {
 }
 
 const tryCandidateConnection = async function(index) {
+  // give processing some time
+  processStatus.gateway.statusSince=new Date()
+  
 	if (processStatus.connectionBusy.status==false) {
 		processStatus.connectionBusy.status=true
 		processStatus.connectionBusy.statusSince=new Date()
@@ -1232,8 +1241,44 @@ const getActiveConnection = function() {
   return execPromise('LC_ALL=C nmcli d show '+unit.ifname+' |grep GENERAL.CONNECTION')
 }
 
+const initiateConnectionOrHotspot = function() {
+  if (unit.connection==''){
+    // give process some time
+    console.log('No connection, checkHotspotActivation')
+    processStatus.gateway.statusSince=new Date()
+    checkHotspotActivation()
+    return
+  }
+  if (unit.connection!=unit.ssid){
+    console.log('No gateway for ' + unit.connection)
+    if (new Date().getTime() - processStatus.gateway.statusSince.getTime() > 20000) {
+      console.log('No gateway for ' + unit.connection + ', activating hotspot')
+      checkHotspotActivation()
+    }
+    return
+  }
+
+  if (unit.connection==unit.ssid){
+    // hotspot status will last at least x time and will stay active as long wifi-config-web page active
+    if (new Date().getTime() - processStatus.hotspot.statusSince.getTime() >10000){
+      if (unit.connections.length > 0 ){
+        connectionsIndex=0
+        console.log('tryCandidateConnection starting with index 0')
+        tryCandidateConnection(connectionsIndex)
+      }
+    }
+  }
+
+}
 
 const statusCheck = async function() {
+
+  if (unit.connection==unit.ssid){
+    setGpioBlueLedOn()
+  } else {
+    setGpioBlueLedOff()
+  }
+
 
 if (unit.hostname =='9EB6.local') {
   // determine with result of ping to (default) gateway if connection is active
@@ -1251,6 +1296,10 @@ if (unit.hostname =='9EB6.local') {
 			processStatus.gateway.status='ERROR'
 			processStatus.gateway.statusSince=new Date()
 		}
+    // no furter action when recent statusSince, give proces of (re)connecting some time
+    if (new Date().getTime() - processStatus.gateway.statusSince.getTime() < 10000) {
+      return
+    }
     // retrieve all wifi connections (no await)
     execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')
     .then((result)=>{
@@ -1273,19 +1322,12 @@ if (unit.hostname =='9EB6.local') {
     		//console.log(unit.connection)
         console.dir(processStatus)
         console.dir(unit)
-        if (unit.connection==unit.ssid){
-          setGpioBlueLedOn()
-        } else {
-          setGpioBlueLedOff()
-          if (unit.connection=='') {
-            console.log('')
-            //createHotspotConnection()
-          }
-        }
+        initiateConnectionOrHotspot()
     	})
     	.catch((error)=>{
     		console.log("getActiveConnection catch")
     		unit.connection=''
+        initiateConnectionOrHotspot()
         // todo: initiate Hotspot  --> activate connection or create hostspot?
         console.dir(processStatus)
         console.dir(unit)
@@ -1294,11 +1336,15 @@ if (unit.hostname =='9EB6.local') {
     .catch((error)=>{
       console.log('status check get all connections catch')
       unit.connections=[]
+      unit.connection=''
+      initiateConnectionOrHotspot()
       // todo: initiate Hotspot --> create hotspot and activate
     })
   })
 }
-
+if (unit.hostname =='9EB6.local') {
+  return
+}
 //  ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null && echo ok || echo error
 
 	if (skipStatusCheck==true) return

@@ -691,7 +691,7 @@ const hotspotDelete = function() {
 const tryCandidateConnection = async function(index) {
   // give processing some time
   processStatus.gateway.statusSince=new Date()
-  
+
 	if (processStatus.connectionBusy.status==false) {
 		processStatus.connectionBusy.status=true
 		processStatus.connectionBusy.statusSince=new Date()
@@ -1278,6 +1278,9 @@ const statusCheck = async function() {
   } else {
     setGpioBlueLedOff()
   }
+
+  getIpAddress()
+	checkTimeSync()
 
 
 if (unit.hostname =='9EB6.local') {

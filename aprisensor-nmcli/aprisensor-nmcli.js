@@ -1279,11 +1279,12 @@ const statusCheck = async function() {
     setGpioBlueLedOff()
   }
 
-  getIpAddress()
-	checkTimeSync()
-
 
 if (unit.hostname =='9EB6.local') {
+
+  getIpAddress()
+	checkTimeSync()
+  console.dir(unit)
   // determine with result of ping to (default) gateway if connection is active
   execPromise("ping -q -w 1 -c 1 `ip r | grep default | head -1 | cut -d ' ' -f 3` > /dev/null")
   .then((result)=>{

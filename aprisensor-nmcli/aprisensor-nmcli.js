@@ -1235,6 +1235,7 @@ const getActiveConnection = function() {
 
 const statusCheck = async function() {
 
+if (unit.hostname =='9EB6.local') {
   // determine with result of ping to (default) gateway if connection is active
   execPromise("ping -q -w 1 -c 1 `ip r | grep default | head -1 | cut -d ' ' -f 3` > /dev/null")
   .then((result)=>{
@@ -1265,29 +1266,39 @@ const statusCheck = async function() {
       }
       getActiveConnection()
     	.then((result)=>{
+        console.log("getActiveConnection then")
     		var stdoutArray	= result.stdout.split(' ');
     		var tmp=stdoutArray[stdoutArray.length-1]
     		unit.connection=tmp.split('\n')[0]
     		//console.log(unit.connection)
+        console.dir(processStatus)
+        console.dir(unit)
         if (unit.connection==unit.ssid){
           setGpioBlueLedOn()
         } else {
           setGpioBlueLedOff()
+          if (unit.connection=='') {
+            console.log('')
+            //createHotspotConnection()
+          }
         }
     	})
     	.catch((error)=>{
-    		//console.log("getActiveConnection error")
+    		console.log("getActiveConnection catch")
     		unit.connection=''
-    	})
-
-      console.dir(processStatus)
-      console.dir(unit)
+        // todo: initiate Hotspot  --> activate connection or create hostspot?
+        console.dir(processStatus)
+        console.dir(unit)
+      })
     })
     .catch((error)=>{
       console.log('status check get all connections catch')
       unit.connections=[]
+      // todo: initiate Hotspot --> create hotspot and activate
     })
   })
+}
+
 //  ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null && echo ok || echo error
 
 	if (skipStatusCheck==true) return

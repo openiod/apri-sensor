@@ -332,7 +332,7 @@ const getConnectionShow = function(req,res,callback) {
 	});
 }
 const getDeviceHotspot = function(req,res,callback) {
-  unit.hotspotTill=new Date(New Date().getTime()+60000 )
+  unit.hotspotTill=new Date(new Date().getTime()+60000 )
   if (unit.connection==unit.ssid){
     //console.log('Hotspot connection is active')
     res.writeHead(400);

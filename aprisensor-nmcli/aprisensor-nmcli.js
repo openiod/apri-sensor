@@ -332,6 +332,7 @@ const getConnectionShow = function(req,res,callback) {
 	});
 }
 const getDeviceHotspot = function(req,res,callback) {
+  unit.hotspotTill=new Date(New Date().getTime()+60000 )
   if (unit.connection==unit.ssid){
     //console.log('Hotspot connection is active')
     res.writeHead(400);
@@ -1352,7 +1353,7 @@ const blinkLed = function(nr) {
   if (nr!=undefined) {
     nrTimesBlink=nr
   }
-  if (nrTimesBlink <= 0 || nrTimesBlink%2==0) {
+  if (nrTimesBlink <= 1 || nrTimesBlink%2==0) {
     setGpioBlueLedOff()
   } else {
     setGpioBlueLedOn()
@@ -1361,7 +1362,7 @@ const blinkLed = function(nr) {
   if (nrTimesBlink>0) {
     setTimeout(() => {
       blinkLed()
-    }, 330)
+    }, 200)
   }
 }
 
@@ -1373,16 +1374,24 @@ const statusCheck = async function() {
     setGpioBlueLedOff()
   }
 
-
 if (unit.hostname =='9EB6.local') {
 
   if (processStatus.connectionBusy.status==true) {
     // blink led
-    blinkLed(5)
+    blinkLed(40)
     console.log('waiting,processStatus.connectionBusy.status==true')
     return
   }
 
+  // let hotspot continue for some time
+  if (unit.ssid == unit.connection) {
+    if (unit.hotspotTill!=undefined ) {
+      if (new Date().getTime() < unit.hotspotTill.getTime()) {
+        console.log('Hotspot will stay for ' + unit.hotspotTill.getTime()-new Date().getTime() +' msec')
+        return
+      }
+    }
+  }
   // retrieve all wifi connections (no await)
   execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')
   .then((result)=>{

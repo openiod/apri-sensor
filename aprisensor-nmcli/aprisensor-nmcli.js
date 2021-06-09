@@ -1352,7 +1352,11 @@ const blinkLed = function(nr) {
   if (nr!=undefined) {
     nrTimesBlink=nr
   }
-  setGpioBlueLedOn()
+  if (nrTimesBlink <= 0 || nrTimesBlink%2==0) {
+    setGpioBlueLedOff()
+  } else {
+    setGpioBlueLedOn()
+  }
   nrTimesBlink=nrTimesBlink-1
   if (nrTimesBlink>0) {
     setTimeout(() => {

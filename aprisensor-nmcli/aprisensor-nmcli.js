@@ -1365,13 +1365,19 @@ const blinkLed = function(nr) {
   if (nr!=undefined) {
     nrTimesBlink=nr
   }
-  if (nrTimesBlink <= 1 || nrTimesBlink%2==0) {
+  if (nrTimesBlink <= 1) {
+    nrTimesBlink=0
+    setGpioBlueLedOff()
+    return
+  }
+
+  if (nrTimesBlink%2==0) {
     setGpioBlueLedOff()
   } else {
     setGpioBlueLedOn()
   }
-  nrTimesBlink=nrTimesBlink-1
   if (nrTimesBlink>0) {
+    nrTimesBlink=nrTimesBlink-1
     setTimeout(() => {
       blinkLed()
     }, 180)
@@ -1380,11 +1386,6 @@ const blinkLed = function(nr) {
 
 const statusCheck = async function() {
 
-  if (unit.connection==unit.ssid){
-    setGpioBlueLedOn()
-  } else {
-    setGpioBlueLedOff()
-  }
 
 if (unit.hostname =='9EB6.local') {
 
@@ -1394,15 +1395,21 @@ if (unit.hostname =='9EB6.local') {
     console.log('waiting,processStatus.connectionBusy.status==true')
     return
   } else {
-    // stop blink
-    blinkLed(0)
+    if (unit.connection==unit.ssid){
+      setGpioBlueLedOn()
+    } else {
+      //setGpioBlueLedOff()
+      // stop blink
+      blinkLed(0)
+    }
   }
 
   // let hotspot continue for some time
   if (unit.ssid == unit.connection) {
-    if (unit.hotspotTill!=undefined ) {
-      if (new Date().getTime() < unit.hotspotTill.getTime()) {
-        console.log('Hotspot will stay for ' + unit.hotspotTill.getTime()-new Date().getTime() +' msec')
+    if (unit.hotspotTill!=undefined && unit.hotspotTill!=NaN ) {
+      var tmpTime=(unit.hotspotTill.getTime()) - (new Date().getTime())
+      if (tmpTime>0) {
+        console.log('Hotspot will stay for ' + tmpTime +' msec')
         return
       }
     }

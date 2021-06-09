@@ -857,6 +857,8 @@ const createHotspotConnection=function(){
   })
   .catch((error)=>{
     setHotspotStatus('ERROR',400,error)
+    processStatus.connectionBusy.status=false
+    processStatus.connectionBusy.statusSince=new Date()
   })
 }
 
@@ -866,16 +868,18 @@ const setHotspotUp = function() {
   .then(async (result)=>{
     setHotspotStatus('OK',200)
     unit.connection=unit.ssid
-		await sleep(2000)
     processStatus.connectionBusy.status=false
     processStatus.connectionBusy.statusSince=new Date()
+    // give processing some time
+    processStatus.gateway.statusSince=new Date()
     getIpAddress()
   })
   .catch(async (error)=>{
     unit.connection=''
-		await sleep(2000)
     processStatus.connectionBusy.status=false
     processStatus.connectionBusy.statusSince=new Date()
+    // give processing some time
+    processStatus.gateway.statusSince=new Date()
     setHotspotStatus('ERROR',400,error)
   })
 }
@@ -1358,6 +1362,37 @@ if (unit.hostname =='9EB6.local') {
     console.log('waiting,processStatus.connectionBusy.status==true')
     return
   }
+
+  // retrieve all wifi connections (no await)
+  execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')
+  .then((result)=>{
+    //console.log('status check get all connections then')
+    var stdoutArray	= result.stdout.split('\n');
+    unit.connections=[]
+    for (var i=0;i<stdoutArray.length-1;i++) {
+      var pos = stdoutArray[i].indexOf("wifi")
+      var tmp=stdoutArray[i].substr(0,pos-1).trim()
+      if (tmp!=unit.ssid) {
+        unit.connections.push(tmp)
+      }
+    }
+    getActiveConnection()
+    .then((result)=>{
+      console.log("getActiveConnection then")
+      var stdoutArray	= result.stdout.split(' ');
+      var tmp=stdoutArray[stdoutArray.length-1]
+      unit.connection=tmp.split('\n')[0]
+    })
+    .catch((error)=>{
+      console.log("getActiveConnection catch")
+      unit.connection=''
+    })
+  })
+  .catch((error)=>{
+    console.log('status check get all connections catch')
+    unit.connections=[]
+    unit.connection=''
+  })
 
   getIpAddress()
 	checkTimeSync()

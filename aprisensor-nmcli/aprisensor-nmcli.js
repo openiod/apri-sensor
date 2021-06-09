@@ -1347,7 +1347,7 @@ const initiateConnectionOrHotspot = function() {
 
 }
 
-const nrTimesBlink=0
+var nrTimesBlink=0
 const blinkLed = function(nr) {
   if (nr!=undefined) {
     nrTimesBlink=nr

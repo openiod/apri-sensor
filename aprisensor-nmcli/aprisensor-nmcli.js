@@ -332,7 +332,12 @@ const getConnectionShow = function(req,res,callback) {
 	});
 }
 const getDeviceHotspot = function(req,res,callback) {
-  unit.hotspotTill=new Date(new Date().getTime()+60000 )
+
+  // extra time for hotspot status to allow user to connect to
+  // ApriSensor hotspot SSID
+  // When webapp wifi config page is connected, hotspot will maintain its status
+  // until webapp is disconnected or an wifi connection is activated
+  unit.hotspotTill=new Date(new Date().getTime()+120000 )
   if (unit.connection==unit.ssid){
     //console.log('Hotspot connection is active')
     res.writeHead(400);
@@ -826,6 +831,13 @@ const createHotspot = function() {
   processStatus.hotspot.status='INIT'
   processStatus.hotspot.statusSince=new Date()
   processStatus.hotspot.message=''
+
+  // extra time for hotspot status to allow user to connect to
+  // ApriSensor hotspot SSID
+  // When webapp wifi config page is connected, hotspot will maintain its status
+  // until webapp is disconnected or an wifi connection is activated
+  unit.hotspotTill=new Date(new Date().getTime()+120000 )
+
   execPromise("LC_ALL=C nmcli connection delete '"+unit.ssid+"'")
   .then((result)=>{
     createHotspotConnection()
@@ -866,7 +878,7 @@ const createHotspotConnection=function(){
 const setHotspotUp = function() {
   console.log('3. Activate hotspot connection')
   execPromise("LC_ALL=C nmcli connection up '"+unit.ssid+"'")
-  .then(async (result)=>{
+  .then( (result)=>{
     setHotspotStatus('OK',200)
     unit.connection=unit.ssid
     processStatus.connectionBusy.status=false
@@ -875,7 +887,7 @@ const setHotspotUp = function() {
     processStatus.gateway.statusSince=new Date()
     getIpAddress()
   })
-  .catch(async (error)=>{
+  .catch( (error)=>{
     unit.connection=''
     processStatus.connectionBusy.status=false
     processStatus.connectionBusy.statusSince=new Date()
@@ -1362,7 +1374,7 @@ const blinkLed = function(nr) {
   if (nrTimesBlink>0) {
     setTimeout(() => {
       blinkLed()
-    }, 200)
+    }, 180)
   }
 }
 
@@ -1378,9 +1390,12 @@ if (unit.hostname =='9EB6.local') {
 
   if (processStatus.connectionBusy.status==true) {
     // blink led
-    blinkLed(40)
+    blinkLed(200)
     console.log('waiting,processStatus.connectionBusy.status==true')
     return
+  } else {
+    // stop blink
+    blinkLed(0)
   }
 
   // let hotspot continue for some time

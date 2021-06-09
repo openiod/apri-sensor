@@ -747,6 +747,76 @@ const tryCandidateConnection = async function(index) {
   })
 }
 
+const tryCandidateConnection2 =function(index) {
+
+	if (processStatus.connectionBusy.status==false) {
+		processStatus.connectionBusy.status=true
+		processStatus.connectionBusy.statusSince=new Date()
+	}
+  // no (more) connections to try
+  if (index>unit.connections.length-1) {
+    processStatus.connectionBusy.status=false
+    processStatus.connectionBusy.statusSince=new Date()
+    return
+  }
+	// ignore hotspot connection
+	if (unit.connections[index]==unit.ssid) {
+		tryCandidateConnection2(index+1)
+		return
+	}
+
+  // give processing some time
+  processStatus.gateway.statusSince=new Date()
+
+  var tmpConnection = unit.connections[index]
+  if (unit.connectionStatus[tmpConnection]==undefined) {
+    unit.connectionStatus[tmpConnection]={status:null}
+  }
+  /*
+  // ignore connection already tried less then 5 minutes ago
+	if (unit.connectionStatus[tmpConnection].status=='ERROR') {
+    if (new Date() - unit.connectionStatus[tmpConnection].statusLatest< 300000) {
+      tryCandidateConnection2(index+1)
+		  return
+    }
+	}
+  */
+
+  console.log(`tryCandidateConnection ${index} ${unit.connections[index]}`)
+  execPromise("LC_ALL=C nmcli connection up '"+unit.connections[index]+"'")
+  .then((result)=>{
+    if (unit.connectionStatus[tmpConnection].status!='OK') {
+      unit.connectionStatus[tmpConnection]={status:'OK',statusSince:new Date(),message:''}
+    }
+    console.log(`tryCandidateConnection then ${index} ${unit.connections[index]}`)
+    processStatus.connectionBusy.status=false
+    processStatus.connectionBusy.statusSince=new Date()
+    // give processing some time
+    processStatus.gateway.statusSince=new Date()
+    if (processStatus.connection.status!='OK') {
+      processStatus.connection.status='OK'
+      processStatus.connection.statusSince=new Date()
+      processStatus.connection.code=200
+      processStatus.connection.message=''
+    }
+  })
+  .catch((error)=>{
+    console.log(`tryCandidateConnection catch ${index} ${unit.connections[index]}`)
+    console.error(`exec error: ${error}`);
+    if (unit.connectionStatus[tmpConnection].status!='ERROR') {
+      unit.connectionStatus[tmpConnection]={status:'ERROR',statusSince:new Date()}
+    }
+    unit.connectionStatus[tmpConnection].message=error
+    if (processStatus.connection.status!='ERROR') {
+      processStatus.connection.status='ERROR'
+      processStatus.connection.statusSince=new Date()
+    }
+    processStatus.connection.code=400
+    processStatus.connection.message=error
+    tryCandidateConnection2(index+1)
+  })
+}
+
 const createHotspot = function() {
   console.log(`Create hotspot for ssid ${unit.ssid}`)
   console.log('1. Delete existing hotspot connection')
@@ -1243,8 +1313,8 @@ const getActiveConnection = function() {
 
 const initiateConnectionOrHotspot = function() {
   if (unit.connection==''){
-    // give process some time
     console.log('No connection, checkHotspotActivation')
+    // give process some time
     processStatus.gateway.statusSince=new Date()
     checkHotspotActivation()
     return
@@ -1253,6 +1323,8 @@ const initiateConnectionOrHotspot = function() {
     console.log('No gateway for ' + unit.connection)
     if (new Date().getTime() - processStatus.gateway.statusSince.getTime() > 20000) {
       console.log('No gateway for ' + unit.connection + ', activating hotspot')
+      // give process some time
+      processStatus.gateway.statusSince=new Date()
       checkHotspotActivation()
     }
     return
@@ -1264,7 +1336,7 @@ const initiateConnectionOrHotspot = function() {
       if (unit.connections.length > 0 ){
         connectionsIndex=0
         console.log('tryCandidateConnection starting with index 0')
-        tryCandidateConnection(connectionsIndex)
+        tryCandidateConnection2(connectionsIndex)
       }
     }
   }
@@ -1281,6 +1353,11 @@ const statusCheck = async function() {
 
 
 if (unit.hostname =='9EB6.local') {
+
+  if (processStatus.connectionBusy.status==true) {
+    console.log('waiting,processStatus.connectionBusy.status==true')
+    return
+  }
 
   getIpAddress()
 	checkTimeSync()

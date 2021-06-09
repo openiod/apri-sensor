@@ -1347,6 +1347,20 @@ const initiateConnectionOrHotspot = function() {
 
 }
 
+const nrTimesBlink=0
+const blinkLed = function(nr) {
+  if (nr!=undefined) {
+    nrTimesBlink=nr
+  }
+  setGpioBlueLedOn()
+  nrTimesBlink=nrTimesBlink-1
+  if (nrTimesBlink>0) {
+    setTimeout(() => {
+      blinkLed()
+    }, 330)
+  }
+}
+
 const statusCheck = async function() {
 
   if (unit.connection==unit.ssid){
@@ -1359,6 +1373,8 @@ const statusCheck = async function() {
 if (unit.hostname =='9EB6.local') {
 
   if (processStatus.connectionBusy.status==true) {
+    // blink led
+    blinkLed(5)
     console.log('waiting,processStatus.connectionBusy.status==true')
     return
   }

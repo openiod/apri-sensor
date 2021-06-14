@@ -10,12 +10,24 @@ npm run dev
 ## npm run build
 ## tar cfvz aprisensor-netmanager.tar.gz ../aprisensor-netmanager/public
 
-mv /home/awiel/opt/apri-sensor/aprisensor-netmanager /home/awiel/opt/apri-sensor/aprisensor-netmanager-previousversion
+mv /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion2
+rm -rf /home/awiel/opt/apri-sensor/aprisensor-netmanager-previousversion
+cp -r /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion
 rm -rf /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime
-cp -R ../aprisensor-netmanager/public /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime
+cp -r /data/Alfresco/opt/aprisensor-netmanager/public /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime
 cd /home/awiel/opt/apri-sensor/
 git status
 git push
+
+# on/for proxy2 server:
+scp aprisensor-netmanager.tar.gz proxy2:.
+ssh proxy2
+cd /var/www/netmanager.aprisensor.nl
+sudo mv aprisensor-netmanager aprisensor-netmanager-YYYYDDMM
+sudo tar zxvf ~/aprisensor-netmanager.tar.gz
+ls -l *er/public/build
+??sudo service nginx restart
+
 
 # on sensorkit:
 run 'sudo git pull' or default update on sensorkit in /opt/SCAPE604/apri-sensor

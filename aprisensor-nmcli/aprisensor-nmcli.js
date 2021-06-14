@@ -81,12 +81,12 @@ if (gpio != undefined) {
   //gpioBme = new gpio(27, 'out'); //use GPIO-27 pin 13, and specify that it is output
 }
 var setGpioBlueLedOn = function() {
-  console.log('set blue LED GPIO on')
+  //console.log('set blue LED GPIO on')
   gpioBlueLed.writeSync(1); //set pin state to 1 (power LED on)
   gpioBlueLedStatus='on'
 }
 var setGpioBlueLedOff = function() {
-  console.log('set blue LED GPIO off')
+  //console.log('set blue LED GPIO off')
   gpioBlueLed.writeSync(0); //set pin state to 0 (power LED off)
   gpioBlueLedStatus='off'
 }
@@ -1380,7 +1380,7 @@ const blinkLed = function(nr) {
     nrTimesBlink=nrTimesBlink-1
     setTimeout(() => {
       blinkLed()
-    }, 180)
+    }, 150)
   }
 }
 

@@ -18,6 +18,11 @@ mv SCAPE604-apri-sensor-raspi-old1.log SCAPE604-apri-sensor-raspi-old2.log
 mv SCAPE604-apri-sensor-raspi.log SCAPE604-apri-sensor-raspi-old1.log
 systemctl restart SCAPE604-apri-sensor-raspi
 
+mv SCAPE604-aprisensor-nmcli-old1.log SCAPE604-aprisensor-nmcli-old2.log
+mv SCAPE604-aprisensor-nmcli.log SCAPE604-aprisensor-nmcli-old1.log
+systemctl restart SCAPE604-aprisensor-nmcli
+
+
 # do not restart agent because loop will occur
 #sudo systemctl restart SCAPE604-apri-agent.service
 #sudo systemctl stop SCAPE604-apri-sensor-dylos.service

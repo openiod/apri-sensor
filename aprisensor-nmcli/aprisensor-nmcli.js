@@ -1386,8 +1386,9 @@ const blinkLed = function(nr) {
 
 const statusCheck = async function() {
 
-
-if (unit.hostname =='9EB6.local') {
+//############################
+//if (unit.hostname =='9EB6.local') {
+//############################
 
   if (processStatus.connectionBusy.status==true) {
     // blink led
@@ -1508,10 +1509,13 @@ if (unit.hostname =='9EB6.local') {
       // todo: initiate Hotspot --> create hotspot and activate
     })
   })
-}
-if (unit.hostname =='9EB6.local') {
+//############################
+//}
+//if (unit.hostname =='9EB6.local') {
   return
-}
+//}
+//############################
+
 //  ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null && echo ok || echo error
 
 	if (skipStatusCheck==true) return

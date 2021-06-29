@@ -767,8 +767,8 @@ var processDataCycle	= function() {
   results.sps.tps							    = Math.round((counters.sps.tps/counters.sps.nrOfMeas)*100)/100;
 	results.sps.nrOfMeas						= counters.sps.nrOfMeas;
 
-  // skip first 20 measurements, initialization fase of the ips7100
-  if (counters.ips7100.nrOfMeasTotal>20) {
+  // skip first 30 measurements, initialization fase of the ips7100
+  if (counters.ips7100.nrOfMeasTotal>30) {
     results.ips7100.pm01					= Math.round((counters.ips7100.pm01/counters.ips7100.nrOfMeas)*100)/100;
     results.ips7100.pm03					= Math.round((counters.ips7100.pm03/counters.ips7100.nrOfMeas)*100)/100;
     results.ips7100.pm05					= Math.round((counters.ips7100.pm05/counters.ips7100.nrOfMeas)*100)/100;

@@ -32,5 +32,9 @@ ls -l *er/public/build
 # on sensorkit:
 run 'sudo git pull' or default update on sensorkit in /opt/SCAPE604/apri-sensor
 sudo systemctl restart SCAPE604-aprisensor-nmcli
+# when upgrade stable version:
+# sudo rm -rf /opt/SCAPE604/aprisensor-netmanager-runtime-stable
+# sudo cp -r /opt/SCAPE604/apri-sensor/aprisensor-netmanager-runtime /opt/SCAPE604/aprisensor-netmanager-runtime-stable 
+
 # clear browser cache
 # open webpage of sensorkit https://sensorId4p.local or ipaddress

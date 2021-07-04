@@ -1,4 +1,4 @@
-SpecSpecSpec/*
+/*
 ** Module: apri-sensor-spec
 **
 ** Main system module for handling sensor measurement data via serial port
@@ -146,7 +146,7 @@ var resetRaspiSerialArray = function() {
 var processRaspiSerialData = function (data) {
   console.log('Data: '+data)
   return
-  
+
   var byte = data;
   if (pos==9) {
 //		console.log('Raspi-serial processing.');
@@ -218,33 +218,7 @@ var processRaspiSerialRecord = function() {
 	counters.spec.part				+= part;
 	console.log(counters.spec.nrOfMeas+' '+counters.spec.part+' '+counters.spec.part/counters.spec.nrOfMeas)
 }
-/*
-var mainProcess = function() {
-	console.log('Found usb comname: ' + serialPortPath );
 
-	var serialport = new SerialPort(serialPortPath, {parser: SerialPort.parsers.readline('\n')} );
-	serialport.on('open', function(){
-		console.log('Serial Port connected');
-		serialport.on('data', function(data){
-			var _data = data.substr(0,data.length-1);
-			var _dataArray	= data.split(',');
-			if (_dataArray.length == 3 && isNumeric(_dataArray[1]) && _data[_data.length-1] =='\r' ) {
-				console.log('measurement: ' + data);
-				processSpecSerialRecord(_dataArray);
-			} else {
-				console.log('log: ' + data);
-			}
-		});
-	});
-	serialport.on('error', function(err) {
-		console.log('Error: ', err.message);
-	});
-};
-
-function isNumeric(n) {
-  return !isNaN(parseFloat(n)) && isFinite(n);
-}
-*/
 var processDataCycle	= function() {
 	setTimeout(processDataCycle, loopTimeCycle);
 	counters.busy = true;
@@ -340,8 +314,19 @@ var printHex = function(buffer, tekst) {
   console.log('log: ' + tekst +'  lengte:'+buffer.length+ " "+ str); // + data);
 }
 
-raspi.init(() => {
-  var serial = new Serial({portId:serialPortPath, baudRate:9600});
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+var initSpec = async function() {
+  serial.write('e')
+  await sleep(2)
+  serial.write('e')
+
+}
+
+raspi.init(async () => {
+  serial = new Serial({portId:serialPortPath, baudRate:9600});
   serial.open(() => {
     serial.on('data', (data) => {
       printHex(data,'T');
@@ -349,7 +334,8 @@ raspi.init(() => {
 				processRaspiSerialData(data[i]);
 			}
     });
-		setInterval(askSerialData,1000,serial)
+    initSpec()
+		//setInterval(askSerialData,1000,serial)
 		console.log('ask serial data init')
   });
 });

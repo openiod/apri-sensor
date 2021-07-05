@@ -170,6 +170,22 @@ var processRaspiSerialRecord = function(rec) {
 	}
 
   console.log(rec)
+  var eepromRecArray = []
+  if (rec.substr(0,2)=='SN') {
+    console.log('this is a measurement')
+    eepromRecArray = rec.split(',')
+    if (eepromRecArray.length >= 4) {
+      console.log('this is a measurement: ' + eepromRecArray[0]+'/'+eepromRecArray[1]+'/'+eepromRecArray[2]+'/'+eepromRecArray[3])
+    }
+    return
+  }
+  eepromRecArray = rec.split('=')
+  if (eepromRecArray.length > 1) {
+    console.log('this is an eeprom value: '+eepromRecArray[0]+':'+eepromRecArray[1])
+    return
+  }
+  console.log('record not recognized as eeprom value or measurement')
+
   return
 
 	counters.spec.nrOfMeas++;

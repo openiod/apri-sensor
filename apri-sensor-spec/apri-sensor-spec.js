@@ -81,7 +81,7 @@ var usbPorts			= [];
 
 var sensorKey			= '';
 var serialPortPath;
-serialPortPath		= "/dev/ttyUSB1"; // default port
+serialPortPath		= "/dev/ttyUSB0"; // default port
 var deviceParam			= process.argv[2];
 console.log('Param for serial device is ' + deviceParam);
 if (deviceParam != undefined) {
@@ -136,15 +136,6 @@ var byteArray 			= new ArrayBuffer(500);
 var view8 					= new Uint8Array(byteArray);
 var view16 					= new Uint16Array(byteArray);
 var serialString = ''
-var
-  binaryString = '',
-  bytes = new Uint8Array(arrayBuffer),
-  length = bytes.length;
-for (var i = 0; i < length; i++) {
-  binaryString += String.fromCharCode(bytes[i]);
-}
-
-
 var pos 						= 0;
 var part = 0
 

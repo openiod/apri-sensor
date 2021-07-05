@@ -318,32 +318,25 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-var initSpec = async function() {
-  serial.write('e')
-  await sleep(2)
-  serial.write('e')
-
-}
-
 raspi.init(async () => {
   serial = new Serial({portId:serialPortPath, baudRate:9600});
   serial.open(() => {
     serial.on('data', (data) => {
       printHex(data,'T');
-			for (var i=0;i<data.length;i++) {
-				processRaspiSerialData(data[i]);
-			}
+			//for (var i=0;i<data.length;i++) {
+			//	processRaspiSerialData(data[i]);
+			//}
     });
-    initSpec()
+    // read info from sensor (eeprom)
+    serial.write('ee') // first e is trigger, second e call for eeprom info
+    sleep(5000)
+    // start continues measuring
+    serial.write('cc')
+
 		//setInterval(askSerialData,1000,serial)
-		console.log('ask serial data init')
+		//console.log('ask serial data init')
   });
 });
-
-var askSerialData = function(serial){
-	console.log('ask serial data')
-	serial.write('RD\r\n')
-}
 
 
 setTimeout(processDataCycle, loopTimeCycle);

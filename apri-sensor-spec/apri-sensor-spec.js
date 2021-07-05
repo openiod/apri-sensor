@@ -132,9 +132,19 @@ var initCounters	= function () {
 	counters.spec.nrOfMeas				= 0;
 }
 //-------------- raspi-serial
-var byteArray 			= new ArrayBuffer(10);
+var byteArray 			= new ArrayBuffer(500);
 var view8 					= new Uint8Array(byteArray);
 var view16 					= new Uint16Array(byteArray);
+var serialString = ''
+var
+  binaryString = '',
+  bytes = new Uint8Array(arrayBuffer),
+  length = bytes.length;
+for (var i = 0; i < length; i++) {
+  binaryString += String.fromCharCode(bytes[i]);
+}
+
+
 var pos 						= 0;
 var part = 0
 
@@ -144,76 +154,33 @@ var resetRaspiSerialArray = function() {
 }
 
 var processRaspiSerialData = function (data) {
-  console.log('Data: '+data)
-  return
 
-  var byte = data;
-  if (pos==9) {
-//		console.log('Raspi-serial processing.');
-		if (byte == 0x0A) {
-			processRaspiSerialRecord();
-		}
-    resetRaspiSerialArray();
+  if (data == 0x0D) {
+    return
   }
-  if (pos==8) {
-    if (byte == 0x0D) {
-      view8[pos] = byte;
-      pos++;
-    } else {
-			resetRaspiSerialArray();
-    }
+  if (data == 0x0A) {
+    processRaspiSerialRecord(serialString);
+    serialString = ''
+    return
   }
-	if (pos==7) {
-    view8[pos] = byte;
-		//console.log('dit moet 6 zijn: ' + byte.toString(16))
-    part = part + (byte - 0x30)
-    pos++;
+  for (var i=0;i<data.length;i++) {
+    serialString += String.fromCharCode(data[i]);
   }
-	if (pos==6) {
-    view8[pos] = byte;
-		//console.log('dit moet 5 zijn: ' + byte.toString(16))
-    part = part + (byte - 0x30) * 10
-    pos++;
-  }
-	if (pos==5) {
-    view8[pos] = byte;
-		//console.log('dit moet 4 zijn: ' + byte.toString(16))
-    part = part + (byte - 0x30) * 100
-    pos++;
-  }
-	if (pos==4) {
-    view8[pos] = byte;
-    part = part + (byte - 0x30) * 1000
-    pos++;
-  }
-	if (pos==3) {
-    view8[pos] = byte;
-    part = part + (byte - 0x30) * 10000
-    pos++;
-  }
-  if (pos==2) {
-    view8[pos] = byte;
-    part = (byte - 0x30) * 100000;
-    pos++;
-  }
-  if (pos==1) {
-    if (byte == 0x44) {
-      view8[pos] = byte;
-      pos++;
-    } else resetRaspiSerialArray();
-  }
-  if (pos==0 & byte == 0x52) {
-    view8[pos] = byte;
-    part = 0;
-    pos = 1;
-  }
+
+  console.log('Data: '+data)
+  console.log(serialString)
+  return
 }
 //  end-of raspi-serial variables and functions
-var processRaspiSerialRecord = function() {
+var processRaspiSerialRecord = function(rec) {
 	if (counters.busy==true) {
 		console.log('Counters busy, measurement ignored *******************************');
 		return;
 	}
+
+  console.log(rec)
+  return
+
 	counters.spec.nrOfMeas++;
 	counters.spec.part				+= part;
 	console.log(counters.spec.nrOfMeas+' '+counters.spec.part+' '+counters.spec.part/counters.spec.nrOfMeas)
@@ -229,6 +196,8 @@ var processDataCycle	= function() {
 
 	initCounters();
 	counters.busy = false;
+
+  return
 
   sendData();
 }
@@ -319,6 +288,7 @@ function sleep(ms) {
 }
 
 raspi.init(() => {
+  console.log('serialPortPath: '+serialPortPath)
   serial = new Serial({portId:serialPortPath, baudRate:9600});
   serial.open(() => {
     serial.on('data', (data) => {

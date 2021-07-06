@@ -154,9 +154,10 @@ var processRaspiSerialData = function (data) {
     serialString = ''
     return
   }
-  for (var i=0;i<data.length;i++) {
-    serialString += String.fromCharCode(data[i]);
-  }
+  //for (var i=0;i<data.length;i++) {
+    // serialString += String.fromCharCode(data[i]);
+    serialString += String.fromCharCode.apply(null, new Uint8Array(data));
+  //}
 
   console.log('Data: '+data)
   console.log(serialString)
@@ -170,13 +171,10 @@ var processRaspiSerialRecord = function(rec) {
 	}
 
   console.log(rec)
-  var eepromRecArray = []
-  if (rec.substr(0,2)=='SN') {
+  var eepromRecArray = rec.split(',')
+  if (eepromRecArray.length >= 4) {
     console.log('this is a measurement')
-    eepromRecArray = rec.split(',')
-    if (eepromRecArray.length >= 4) {
-      console.log('this is a measurement: ' + eepromRecArray[0]+'/'+eepromRecArray[1]+'/'+eepromRecArray[2]+'/'+eepromRecArray[3])
-    }
+    console.log('this is a measurement: ' + parseFloat(eepromRecArray[0])+'/'+parseFloat(eepromRecArray[1])+'/'+parseFloat(eepromRecArray[2])+'/'+parseFloat(eepromRecArray[3]))
     return
   }
   eepromRecArray = rec.split('=')
@@ -304,11 +302,14 @@ raspi.init(() => {
 			processRaspiSerialData(data[i]);
 			//}
     });
+    serial.write('c')
+    //sleep(5)
+    serial.write('c')
     // read info from sensor (eeprom)
-    serial.write('ee') // first e is trigger, second e call for eeprom info
-    sleep(5000)
+    serial.write('e') // first e is trigger, second e call for eeprom info
+    //sleep(5)
+    serial.write('e') // first e is trigger, second e call for eeprom info
     // start continues measuring
-    serial.write('cc')
 
 		//setInterval(askSerialData,1000,serial)
 		//console.log('ask serial data init')

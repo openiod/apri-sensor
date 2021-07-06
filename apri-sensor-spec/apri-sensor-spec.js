@@ -301,7 +301,7 @@ raspi.init(() => {
     serial.on('data', (data) => {
       printHex(data,'T');
 			//for (var i=0;i<data.length;i++) {
-			//	processRaspiSerialData(data[i]);
+			processRaspiSerialData(data[i]);
 			//}
     });
     // read info from sensor (eeprom)

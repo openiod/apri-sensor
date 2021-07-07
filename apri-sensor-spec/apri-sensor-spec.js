@@ -311,10 +311,20 @@ var writeEepromR = function() {
 var writeEepromE = function() {
   console.log('serial.write e to sensor (writeEepromE)')
   serial.write('e\r\n')
-  setTimeout(writeEepromC,1000)
+  setTimeout(writeEepromE2,1000)
+}
+var writeEepromE2 = function() {
+  console.log('serial.write e to sensor (writeEepromE2)')
+  serial.write('e\r\n')
+  setTimeout(writeEepromC,3000)
 }
 var writeEepromC = function() {
   console.log('serial.write c to sensor (writeEepromC)')
+  serial.write('c\r\n')
+  setTimeout(writeEepromC2,1000)
+}
+var writeEepromC2 = function() {
+  console.log('serial.write c to sensor (writeEepromC2)')
   serial.write('c\r\n')
 }
 raspi.init(() => {

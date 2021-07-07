@@ -180,12 +180,11 @@ var processRaspiSerialRecord = function(rec) {
   console.log(rec)
   if (rec.substr(0,6)=='Enter ') { // Enter output interval(
     console.log('Het meetinterval van de sensor wordt nu op 10 seconden gezet')
-    serial.write('10\n')
+    serial.write('10\r\n')
     return
   }
   var eepromRecArray = rec.split(',')
   if (eepromRecArray.length >= 4) {
-    console.log('this is a measurement')
     console.log('this is a measurement: ' + parseFloat(eepromRecArray[0])+'/'+parseFloat(eepromRecArray[1])+'/'+parseFloat(eepromRecArray[2])+'/'+parseFloat(eepromRecArray[3]))
     return
   }
@@ -314,9 +313,9 @@ raspi.init(() => {
 			processRaspiSerialData(data);
 			//}
     });
-    serial.write('c')
+    //serial.write('c')
     //sleep(5)
-    serial.write('c')
+    //serial.write('c')
     // read info from sensor (eeprom)
     serial.write('e') // first e is trigger, second e call for eeprom info
     //sleep(5)

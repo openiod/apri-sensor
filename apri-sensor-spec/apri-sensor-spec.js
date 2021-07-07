@@ -316,7 +316,7 @@ var writeEepromR2 = function() {
 var writeEepromE = function() {
   console.log('serial.write e to sensor (writeEepromE)')
   serial.write('e')
-  setTimeout(writeEepromE2,5)
+  setTimeout(writeEepromE2,3)
 }
 var writeEepromE2 = function() {
   console.log('serial.write e to sensor (writeEepromE2)')

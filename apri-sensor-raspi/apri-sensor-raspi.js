@@ -1200,7 +1200,7 @@ var initSps30Device = function() {
     console.log(`SPS30 serialnr: ${sps30SerialNr}`)
     // start measuring
     try {
-      // float
+      // set sensor to produce floating point values
       i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x00,0x10,0x03,0x00,calcCrcSps30(0x03,0x00)]))
       //      // integer
       //    i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x00,0x10,0x05,0x00,0xF6]))

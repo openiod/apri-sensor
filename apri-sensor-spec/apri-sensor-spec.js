@@ -177,7 +177,6 @@ var processRaspiSerialRecord = function(rec) {
 		return;
 	}
 
-  console.log(rec)
   if (rec.substr(0,6)=='Enter ') { // Enter output interval(
     console.log('Het meetinterval van de sensor wordt nu op 10 seconden gezet')
     serial.write('10\r\n')
@@ -193,6 +192,7 @@ var processRaspiSerialRecord = function(rec) {
     console.log('sensor config: '+eepromRecArray[0]+':'+eepromRecArray[1])
     return
   }
+  console.log(rec)
   console.log('record not recognized as eeprom value or measurement')
 
   return

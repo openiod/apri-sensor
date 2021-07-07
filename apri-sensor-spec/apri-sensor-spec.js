@@ -321,7 +321,7 @@ var writeEepromE = function() {
 var writeEepromE2 = function() {
   console.log('serial.write e to sensor (writeEepromE2)')
   serial.write('e')
-  setTimeout(writeEepromC,3000)
+  //setTimeout(writeEepromC,3000)
 }
 var writeEepromC = function() {
   console.log('serial.write c to sensor (writeEepromC)')
@@ -347,9 +347,9 @@ raspi.init(() => {
     //serial.write('c')
     // read info from sensor (eeprom)
     //console.log('serial.write e to sensor (first trigger)')
-    serial.write('e') // first e is trigger, second e call for eeprom info
+    //serial.write('e') // first e is trigger, second e call for eeprom info
     //sleep(5)
-    setTimeout(writeEepromR,2000)
+    setTimeout(writeEepromE,2000)
     //serial.write('e') // first e is trigger, second e call for eeprom info
     // start continues measuring
 

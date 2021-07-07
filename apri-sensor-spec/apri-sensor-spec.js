@@ -156,8 +156,11 @@ var processRaspiSerialData = function (data) {
   }
   //for (var i=0;i<data.length;i++) {
     // serialString += String.fromCharCode(data[i]);
-    serialString += String.fromCharCode.apply(null, new Uint8Array(data));
+//    serialString += String.fromCharCode.apply(null, new Uint8Array(data));
   //}
+  for (var i=0;i<data.length;i++) {
+	  serialString = serialString+ data[i].toString();
+  }
 
   console.log('Data: '+data)
   console.log(serialString)
@@ -299,7 +302,7 @@ raspi.init(() => {
     serial.on('data', (data) => {
       printHex(data,'T');
 			//for (var i=0;i<data.length;i++) {
-			processRaspiSerialData(data[i]);
+			processRaspiSerialData(data);
 			//}
     });
     serial.write('c')

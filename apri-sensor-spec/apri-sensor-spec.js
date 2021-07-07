@@ -324,7 +324,7 @@ raspi.init(() => {
     console.log('serial.write e to sensor (first trigger)')
     serial.write('e') // first e is trigger, second e call for eeprom info
     //sleep(5)
-    setTimeout(writeEeprom(),2000)
+    setTimeout(writeEeprom,2000)
     serial.write('e') // first e is trigger, second e call for eeprom info
     // start continues measuring
 

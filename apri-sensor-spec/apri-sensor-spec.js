@@ -159,7 +159,7 @@ var processRaspiSerialData = function (data) {
 //    serialString += String.fromCharCode.apply(null, new Uint8Array(data));
   //}
   for (var i=0;i<data.length;i++) {
-	  serialString = serialString+ data[i].toString();
+	  serialString = serialString+ data[i].toString('utf8');
   }
 
   console.log('Data: '+data)

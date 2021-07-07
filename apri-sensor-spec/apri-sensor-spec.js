@@ -158,14 +158,15 @@ var processRaspiSerialData = function (data) {
     // serialString += String.fromCharCode(data[i]);
 //    serialString += String.fromCharCode.apply(null, new Uint8Array(data));
   //}
-  var tmp= new Uint8Array(data)
-  serialString = serialString+ tmp.toString('utf8');
+//  var tmp= new Uint8Array(data)
+//  serialString = serialString+ tmp.toString('utf8');
+  serialString = serialString+ data;
 
 //  for (var i=0;i<data.length;i++) {
 //	  serialString = serialString+ data[i].toString('utf8');
 //  }
 
-  console.log('Data: '+data)
+//  console.log('Data: '+data)
   console.log(serialString)
   return
 }

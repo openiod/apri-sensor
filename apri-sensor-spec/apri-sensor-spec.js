@@ -305,27 +305,32 @@ function sleep(ms) {
 
 var writeEepromR = function() {
   console.log('serial.write r to sensor =reset (writeEepromR)')
-  serial.write('r\r\n')
+  serial.write('r')
+  setTimeout(writeEepromR2,1000)
+}
+var writeEepromR2 = function() {
+  console.log('serial.write r to sensor =reset (writeEepromR2)')
+  serial.write('r')
   setTimeout(writeEepromE,1000)
 }
 var writeEepromE = function() {
   console.log('serial.write e to sensor (writeEepromE)')
-  serial.write('e\r\n')
+  serial.write('e')
   setTimeout(writeEepromE2,1000)
 }
 var writeEepromE2 = function() {
   console.log('serial.write e to sensor (writeEepromE2)')
-  serial.write('e\r\n')
+  serial.write('e')
   setTimeout(writeEepromC,3000)
 }
 var writeEepromC = function() {
   console.log('serial.write c to sensor (writeEepromC)')
-  serial.write('c\r\n')
+  serial.write('c')
   setTimeout(writeEepromC2,1000)
 }
 var writeEepromC2 = function() {
   console.log('serial.write c to sensor (writeEepromC2)')
-  serial.write('c\r\n')
+  serial.write('c')
 }
 raspi.init(() => {
   console.log('serialPortPath: '+serialPortPath)

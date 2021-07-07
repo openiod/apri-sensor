@@ -190,7 +190,7 @@ var processRaspiSerialRecord = function(rec) {
   }
   eepromRecArray = rec.split('=')
   if (eepromRecArray.length > 1) {
-    console.log('this is an eeprom value: '+eepromRecArray[0]+':'+eepromRecArray[1])
+    console.log('sensor config: '+eepromRecArray[0]+':'+eepromRecArray[1])
     return
   }
   console.log('record not recognized as eeprom value or measurement')

@@ -305,17 +305,17 @@ function sleep(ms) {
 
 var writeEepromR = function() {
   console.log('serial.write r to sensor =reset (writeEepromR)')
-  serial.write('r')
+  serial.write('r\r\n')
   setTimeout(writeEepromE,1000)
 }
 var writeEepromE = function() {
   console.log('serial.write e to sensor (writeEepromE)')
-  serial.write('e')
+  serial.write('e\r\n')
   setTimeout(writeEepromC,1000)
 }
 var writeEepromC = function() {
   console.log('serial.write c to sensor (writeEepromC)')
-  serial.write('c')
+  serial.write('c\r\n')
 }
 raspi.init(() => {
   console.log('serialPortPath: '+serialPortPath)

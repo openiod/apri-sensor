@@ -304,13 +304,13 @@ function sleep(ms) {
 }
 
 var writeEepromF = function() {
-  console.log('serial.write f to sensor =factory reset (writeEepromF)')
-  serial.write('f')
+  console.log('serial.write d to sensor =factory reset (writeEepromF)')
+  serial.write('d')
   setTimeout(writeEepromF2,3)
 }
 var writeEepromF2 = function() {
-  console.log('serial.write f to sensor =factory reset (writeEepromF2)')
-  serial.write('f')
+  console.log('serial.write d to sensor =factory reset (writeEepromF2)')
+  serial.write('d')
   setTimeout(writeEepromR,1000)
 }
 var writeEepromR = function() {

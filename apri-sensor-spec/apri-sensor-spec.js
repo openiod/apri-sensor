@@ -303,13 +303,19 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+var writeEepromR = function() {
+  console.log('serial.write r to sensor =reset (writeEepromR)')
+  serial.write('r')
+  setTimeout(writeEepromE,1000)
+}
 var writeEepromE = function() {
   console.log('serial.write e to sensor (writeEepromE)')
   serial.write('e')
+  setTimeout(writeEepromC,1000)
 }
 var writeEepromC = function() {
   console.log('serial.write c to sensor (writeEepromC)')
-  serial.write('e')
+  serial.write('c')
 }
 raspi.init(() => {
   console.log('serialPortPath: '+serialPortPath)
@@ -328,7 +334,7 @@ raspi.init(() => {
     //console.log('serial.write e to sensor (first trigger)')
     serial.write('e') // first e is trigger, second e call for eeprom info
     //sleep(5)
-    setTimeout(writeEepromC,2000)
+    setTimeout(writeEepromR,2000)
     //serial.write('e') // first e is trigger, second e call for eeprom info
     // start continues measuring
 

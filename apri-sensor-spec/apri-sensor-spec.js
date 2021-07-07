@@ -167,7 +167,7 @@ var processRaspiSerialData = function (data) {
 //  }
 
 //  console.log('Data: '+data)
-  console.log(serialString)
+//  console.log(serialString)
   return
 }
 //  end-of raspi-serial variables and functions
@@ -178,6 +178,11 @@ var processRaspiSerialRecord = function(rec) {
 	}
 
   console.log(rec)
+  if (rec.substr(0,6)=='Enter ') { // Enter output interval(
+    console.log('Het meetinterval van de sensor wordt nu op 10 seconden gezet')
+    serial.write('10\n')
+    return
+  }
   var eepromRecArray = rec.split(',')
   if (eepromRecArray.length >= 4) {
     console.log('this is a measurement')
@@ -304,7 +309,7 @@ raspi.init(() => {
   serial = new Serial({portId:serialPortPath, baudRate:9600});
   serial.open(() => {
     serial.on('data', (data) => {
-      printHex(data,'T');
+      //printHex(data,'T');
 			//for (var i=0;i<data.length;i++) {
 			processRaspiSerialData(data);
 			//}

@@ -146,10 +146,10 @@ var resetRaspiSerialArray = function() {
 
 var processRaspiSerialData = function (data) {
 
-  if (data == 0x0D) {
+  if (data[0] == 0x0D) {
     return
   }
-  if (data == 0x0A) {
+  if (data[0] == 0x0A) {
     processRaspiSerialRecord(serialString);
     serialString = ''
     return

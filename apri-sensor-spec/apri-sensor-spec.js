@@ -303,8 +303,12 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-var writeEeprom = function() {
-  console.log('serial.write e to sensor (writeEeprom)')
+var writeEepromE = function() {
+  console.log('serial.write e to sensor (writeEepromE)')
+  serial.write('e')
+}
+var writeEepromC = function() {
+  console.log('serial.write c to sensor (writeEepromC)')
   serial.write('e')
 }
 raspi.init(() => {
@@ -321,11 +325,11 @@ raspi.init(() => {
     //sleep(5)
     //serial.write('c')
     // read info from sensor (eeprom)
-    console.log('serial.write e to sensor (first trigger)')
+    //console.log('serial.write e to sensor (first trigger)')
     serial.write('e') // first e is trigger, second e call for eeprom info
     //sleep(5)
-    setTimeout(writeEeprom,2000)
-    serial.write('e') // first e is trigger, second e call for eeprom info
+    setTimeout(writeEepromC,2000)
+    //serial.write('e') // first e is trigger, second e call for eeprom info
     // start continues measuring
 
 		//setInterval(askSerialData,1000,serial)

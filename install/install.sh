@@ -15,14 +15,38 @@
 # sudo dcfldd if=/dev/sda of=aprisensor_####.img
 # sudo sync
 # sudo chown awiel.awiel aprisensor_####.img
-# shrink img
-# sudo apt-get update && sudo apt-get install gparted
+# shrink img:
+# # eenmalig: sudo apt-get update && sudo apt-get install gparted
 # sudo fdisk -l aprisensor_####.img
 # startsector of partition2 = 532480
 # mount the second partition
-# sudo losetup /dev/loop0 aprisensor_####.img -o $((<STARTSECTOR>*512))
-# sudo apt-get update && sudo apt-get install gparted
+# #sudo losetup /dev/loop0 aprisensor_####.img -o $((<STARTSECTOR>*512))
+# sudo losetup /dev/loop0 aprisensor_####.img -o $((532480*512))
+# start gparted, select partion en menu: Partition/Resize-Move
 # sudo gparted /dev/loop0
+# change minimum size to 2430 (minimum size + +-20MB)
+# click 'resize'-button
+# Menu: Edit / Apply All
+#  Noteer the new size! see log details resize2fs -p ... (2488320K)
+# close gparted
+# reset loop device to total img:
+# sudo losetup -d /dev/loop0
+# sudo losetup /dev/loop0 imagename.img
+# sudo fdisk /dev/loop0
+# p<enter> for partiion info
+# d<enter>2<enter> delete partition 2
+# create new partion 2 with partion start address
+# do not forget the '+'
+# n<enter>p<enter>2<enter>532480<enter>+2488320K<enter>
+# w<enter>  write partion tabel
+# remove signature? N(o)
+# show loop device and delete it:
+# sudo fdisk -l /dev/loop0
+# sudo losetup -d /dev/loop0
+# truncate file to endsector of 2e partition:
+# truncate -s $(((END+1)*512)) imagename.img
+# truncate -s $(((4976640+1)*512)) imagename.img
+#
 # see http://www.aoakley.com/articles/2015-10-09-resizing-sd-images.php
 #-----------------------------------------------
 
@@ -31,13 +55,17 @@
 # sudo raspi-config --expand-rootfs
 # sudo reboot
 # check ID: cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2
-# vi /etc/hosts:
-# eerste regel: 127.0.0.1       localhost
-# laatste regel: 127.0.1.1		ID## ID##.local
-# sudo nmcli general hostname ID##.local
+#### niet meer:  vi /etc/hosts:
+#### eerste regel: 127.0.0.1       localhost
+#### laatste regel: 127.0.1.1		ID## ID##.local
+#### dit gaat automatisch bij starten: sudo nmcli general hostname ID##.local
 # sudo rm /opt/SCAPE604/log/*.log
-# wijzig de Redis configuratie
+#### hoeft niet meer: wijzig de Redis configuratie
 # sudo reboot
+# update na connect met internet de apri-sensor software
+# cd /opt/SCAPE604/apri-sensor
+# sudo git status
+# sudo git pull
 
 # ID:
 cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2

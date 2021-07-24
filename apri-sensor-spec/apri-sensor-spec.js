@@ -321,7 +321,8 @@ var writeEepromR = function() {
 var writeEepromR2 = function() {
   console.log('serial.write r to sensor =reset (writeEepromR2)')
   serial.write('r')
-  setTimeout(writeEepromE,1000)
+  // after 1.5 seconds after reset, the sensor enters the low-power mode
+  setTimeout(writeEepromE,2000)
 }
 var writeEepromE = function() {
   console.log('serial.write e to sensor (writeEepromE)')

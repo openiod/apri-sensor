@@ -950,6 +950,7 @@ actions.push(function() {
 //    console.log('getCpuInfo A')
 		if (error) {
 			console.error(`exec error: ${error}`);
+      unit.ssid='NOTAPRISENSOR'
 		} else {
       var serial = stdout.substr(0,stdout.length-1)
   		if (serial =='') {
@@ -964,6 +965,18 @@ actions.push(function() {
     nextAction()
 	}
 )})
+actions.push(function() {
+//  console.log('getHostname 1')
+	exec("nmcli general hostname "+unit.ssid+".local", (error, stdout, stderr) => {
+//    console.log('getHostname')
+		if (error) {
+			console.error(`exec error: ${error}`);
+		} else {
+      console.log("nmcli general hostname "+unit.ssid+".local")
+    }
+    nextAction()
+	})
+})
 actions.push(function() {
 //  console.log('getCpuInfo B1')
 	exec("cat /proc/cpuinfo | grep Hardware | cut -d ' ' -f 2", (error, stdout, stderr) => {
@@ -1077,7 +1090,7 @@ actions.push(async function() {
 
 actions.push(async function() {
   statusCheck()
-	setInterval(statusCheck, 10000);
+	setInterval(statusCheck, 7000);
 
 	nextAction()
 })
@@ -1512,7 +1525,10 @@ const statusCheck = async function() {
 //############################
 //}
 //if (unit.hostname =='9EB6.local') {
-  return
+//  return
+
+}
+/*
 //}
 //############################
 
@@ -1645,6 +1661,7 @@ const statusCheck = async function() {
     }
   }
 }
+*/
 const updateCrypto = function(){
 	unitCrypto.key = 	key
 
@@ -1654,6 +1671,7 @@ const updateCrypto = function(){
 	unitCrypto.cipher = crypto.createCipheriv(algoritm, Buffer.from(key), unitCrypto.iv)
 	unitCrypto.decipher = crypto.createDecipheriv(algoritm, Buffer.from(key), unitCrypto.iv)
 */
+
 }
 const encrypt=function(data){
 	var encrypted = unitCrypto.cipher.update(data,'utf8','hex')

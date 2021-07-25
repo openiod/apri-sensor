@@ -52,16 +52,16 @@
 
 # after first boot of Raspberry Pi:
 # /boot/config.txt --> dtoverlay=i2c-gpio,bus=3  (software i2c on gpio 23 sda 24 scl)
+# sudo rm /opt/SCAPE604/log/*.log
 # sudo raspi-config --expand-rootfs
 # sudo reboot
 # check ID: cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2
-# vi /etc/hosts:
-# eerste regel: 127.0.0.1       localhost #### ####.local
+#### dit niet meer nodig, gaat automatisch:
+#### vi /etc/hosts:
+#### eerste regel: 127.0.0.1       localhost #### ####.local
 #### dit niet: laatste regel: 127.0.1.1		ID## ID##.local
 #### dit gaat automatisch bij starten: sudo nmcli general hostname ID##.local
-# sudo rm /opt/SCAPE604/log/*.log
 #### hoeft niet meer: wijzig de Redis configuratie
-# sudo reboot
 # update na connect met internet de apri-sensor software
 # cd /opt/SCAPE604/apri-sensor
 # sudo git status

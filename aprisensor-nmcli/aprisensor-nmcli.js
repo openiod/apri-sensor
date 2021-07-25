@@ -1421,7 +1421,17 @@ const statusCheck = async function() {
 //############################
 
   // test if nginx process is running, if not start service
-  execPromise('LC_ALL=C if [ ! -e /var/run/nginx.pid ] ; then systemctl start nginx ; fi')
+  fs.readFile("/var/run/nginx.pid", 'utf8', function (err, data) {
+    if (err) {
+      console.log('nginx not running, starting nginx')
+      execPromise('LC_ALL=C systemctl start nginx')
+      .then((result)=>{
+      })
+      .catch((error)=>{
+      })
+    }
+  });
+
 
   if (processStatus.connectionBusy.status==true) {
     // blink led

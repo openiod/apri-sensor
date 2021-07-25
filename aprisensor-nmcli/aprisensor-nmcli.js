@@ -917,6 +917,7 @@ var startActionReboot = function() {
 }
 
 const actions = []
+
 actions.push(function() {
 //  console.log('getHostname 1')
 	exec("hostname", (error, stdout, stderr) => {
@@ -965,6 +966,22 @@ actions.push(function() {
     nextAction()
 	}
 )})
+actions.push(function() {
+  // reset /etc/hosts filw
+  var hostsFileStandard = "127.0.0.1 localhost "+unit.ssid+" "+unit.ssid+".local\n" +
+    "::1		localhost ip6-localhost ip6-loopback\n" +
+    "ff02::1		ip6-allnodes\n" +
+    "ff02::2		ip6-allrouters\n" +
+    "127.0.1.1 raspberry\n"
+  fs.readFile("/etc/hosts", 'utf8', function (err, data) {
+    if (err || data != hostsFileStandard) {
+      console.log('/etc/hosts file rewritten')
+      console.log(hostsFileStandard)
+      writeFile('/etc/hosts', hostsFileStandard, 'utf8', callback);
+    }
+  });
+  nextAction()
+})
 actions.push(function() {
 //  console.log('getHostname 1')
 	exec("nmcli general hostname "+unit.ssid+".local", (error, stdout, stderr) => {
@@ -1402,6 +1419,9 @@ const statusCheck = async function() {
 //############################
 //if (unit.hostname =='9EB6.local') {
 //############################
+
+  // test if nginx process is running, if not start service
+  execPromise('LC_ALL=C if [ ! -e /var/run/nginx.pid ]; then sudo systemctl start nginx ; fi')
 
   if (processStatus.connectionBusy.status==true) {
     // blink led

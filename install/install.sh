@@ -11,7 +11,7 @@
 # make img (copy) of sdcard on Debian:
 #  df -h (partitions: /dev/sda1 /dev/sda2 ; device /dev/sda)
 # sudo umount /dev/sda1 /dev/sda2
-# sudo apt-get update && sudo apt-get install dcfldd
+# #eenmalig:sudo apt-get update && sudo apt-get install dcfldd
 # sudo dcfldd if=/dev/sda of=aprisensor_####.img
 # sudo sync
 # sudo chown awiel.awiel aprisensor_####.img
@@ -22,12 +22,12 @@
 # mount the second partition
 # #sudo losetup /dev/loop0 aprisensor_####.img -o $((<STARTSECTOR>*512))
 # sudo losetup /dev/loop0 aprisensor_####.img -o $((532480*512))
-# start gparted, select partion en menu: Partition/Resize-Move
 # sudo gparted /dev/loop0
-# change minimum size to 2430 (minimum size + +-20MB)
+# # select partion en menu: Partition / Resize/Move
+# # change minimum size to 2430 (minimum size + +-20MB)
 # click 'resize'-button
-# Menu: Edit / Apply All
-#  Noteer the new size! see log details resize2fs -p ... (2488320K)
+# Menu: Edit / Apply All Operations
+#  Noteer the new size! see log details shrink file system / resize2fs -p ... (2488320K)
 # close gparted
 # reset loop device to total img:
 # sudo losetup -d /dev/loop0
@@ -55,9 +55,9 @@
 # sudo raspi-config --expand-rootfs
 # sudo reboot
 # check ID: cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2
-#### niet meer:  vi /etc/hosts:
-#### eerste regel: 127.0.0.1       localhost
-#### laatste regel: 127.0.1.1		ID## ID##.local
+# vi /etc/hosts:
+# eerste regel: 127.0.0.1       localhost #### ####.local
+#### dit niet: laatste regel: 127.0.1.1		ID## ID##.local
 #### dit gaat automatisch bij starten: sudo nmcli general hostname ID##.local
 # sudo rm /opt/SCAPE604/log/*.log
 #### hoeft niet meer: wijzig de Redis configuratie

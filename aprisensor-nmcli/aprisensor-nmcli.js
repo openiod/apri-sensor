@@ -977,7 +977,7 @@ actions.push(function() {
     if (err || data != hostsFileStandard) {
       console.log('/etc/hosts file rewritten')
       console.log(hostsFileStandard)
-      fs.writeFile('/etc/hosts', hostsFileStandard, 'utf8');
+      fs.writeFile('/etc/hosts', hostsFileStandard, 'utf8',(err) => {});
     }
   });
   nextAction()

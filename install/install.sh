@@ -8,7 +8,7 @@
 # start Raspberry Pi with ethernet usb adapter
 # ssh to pi@ipaddress
 
-# make img (copy) of sdcard on Debian:
+# make truncated img (copy) of sdcard on Debian:
 #  df -h (partitions: /dev/sda1 /dev/sda2 ; device /dev/sda)
 # sudo umount /dev/sda1 /dev/sda2
 # #eenmalig:sudo apt-get update && sudo apt-get install dcfldd
@@ -64,7 +64,7 @@
 #### dit gaat automatisch bij starten: sudo nmcli general hostname ID##.local
 #### hoeft niet meer: wijzig de Redis configuratie
 # update na connect met internet de apri-sensor software
-# cd /opt/SCAPE604/apri-sensor
+# cd /opt/SCAPE604/git/apri-sensor
 # sudo git status
 # sudo git pull
 
@@ -91,8 +91,8 @@ apt -y install network-manager
 
 #avahi, redis, nginx
 apt -y install avahi-utils
+#see install/avahi/avahi-deamon.conf
 apt -y install redis-server
-apt -y install nginx
 
 #todo
 ## Edit the Redis configuration file to setup caching.
@@ -107,6 +107,7 @@ apt -y install nginx
 #!! # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
 
 apt install git -y
+apt -y install nginx
 
 #reinstall node/npm:
 #sudo apt remove nodered -y
@@ -123,8 +124,8 @@ apt install git -y
 # for Raspberry Pi Zero W:
 mkdir /opt/nodejs
 cd /opt/nodejs
-wget https://nodejs.org/dist/v10.16.2/node-v10.16.2-linux-armv6l.tar.gz
-tar -C /usr/local --strip-components 1 -xzf node-v10.16.2-linux-armv6l.tar.gz
+wget https://nodejs.org/dist/v10.24.1/node-v10.24.1-linux-armv6l.tar.gz
+tar -C /usr/local --strip-components 1 -xzf node-v10.24.1-linux-armv6l.tar.gz
 
 # niet echt noodzakelijk
 # npm install -g npm
@@ -141,9 +142,12 @@ usermod -a -G dialout pi
 
 mkdir -p /opt/SCAPE604/log
 mkdir /opt/SCAPE604/config/
-cd /opt/SCAPE604
+mkdir /opt/SCAPE604/git/
+mkdir /opt/SCAPE604/apri-sensor/
+cd /opt/SCAPE604/git
 git clone https://github.com/openiod/apri-sensor.git
-cd /opt/SCAPE604/apri-sensor
+/opt/SCAPE604/apri-sensor/install/git2as.sh
+cd /opt/SCAPE604/apri-sensor/
 #bij upgrade kan deze rm nog wel eens een blockade voorkomen
 #rm package-lock.json
 #git pull

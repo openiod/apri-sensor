@@ -153,23 +153,23 @@ cd /opt/SCAPE604/apri-sensor/
 #git pull
 cp apri-config/apri-system-example.json /opt/SCAPE604/config/apri-system.json
 #onderstaande onder root uitvoeren (sudo is niet voldoende)
-#sudo su -
+sudo su -
 cd /opt/SCAPE604/apri-sensor
 npm install
+exit  # exit root
+cp /opt/SCAPE604/git/apri-sensor/install/avahi/avahi-daemon.conf /etc/avahi/avahi-daemon.conf
 
-cp /opt/SCAPE604/apri-sensor/install/avahi/avahi-daemon.conf /etc/avahi/avahi-daemon.conf
 
-#cd /opt/SCAPE604/apri-sensor/install
-
+# eenmalig, als runtime stable is
 rm -r /opt/SCAPE604/aprisensor-netmanager-runtime-stable
 cp -r /opt/SCAPE604/apri-sensor/aprisensor-netmanager-runtime /opt/SCAPE604/aprisensor-netmanager-runtime-stable
-cp /opt/SCAPE604/apri-sensor/install/aprisensor-netmanager/aprisensor-netmanager-nginx-site-default.conf /etc/nginx/sites-available/default
+cp /opt/SCAPE604/git/apri-sensor/install/aprisensor-netmanager/aprisensor-netmanager-nginx-site-default.conf /etc/nginx/sites-available/default
 #ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 #sudo vi /etc/nginx/sites-available/default
 #sudo nginx -t
 
 rm -r /opt/SCAPE604/aprisensor-nmcli-stable
-cp -r /opt/SCAPE604/apri-sensor/aprisensor-nmcli /opt/SCAPE604/aprisensor-nmcli-stable
+cp -r /opt/SCAPE604/git/apri-sensor/aprisensor-nmcli /opt/SCAPE604/aprisensor-nmcli-stable
 cd /opt/SCAPE604/aprisensor-nmcli-stable
 npm install http-terminator
 
@@ -182,10 +182,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # cleanup redis archive
 */15 * * * * /opt/SCAPE604/apri-sensor/apri-sensor-redis/apri-sensor-redis.sh
-# wifi check
-# no more since aprisensor-nmcli
-# */5 * * * * /opt/SCAPE604/apri-sensor/wifi_check.sh
-#<--
+<--
 
 cp /opt/SCAPE604/apri-sensor/apri-config/SCAPE604-apri-agent.service.org /etc/systemd/system/SCAPE604-apri-agent.service
 systemctl enable SCAPE604-apri-agent.service
@@ -213,3 +210,4 @@ systemctl enable SCAPE604-apri-sensor-raspi.service
 
 # when installed via eth0 this file will block nmcli from connecting to wifi
 rm /etc/wpa_supplicant/wpa_supplicant.conf
+cp /opt/SCAPE604/git/apri-sensor/install/interfaces.org /etc/network/interfaces

@@ -2,7 +2,7 @@
 
 #cd `dirname $0`
 
-if [[ -d /opt/SCAPE604/git ]]
+if [[ -d /opt/SCAPE604/git/apri-sensor ]]
 then
     mkdir -p /opt/SCAPE604/git
     cd /opt/SCAPE604/git

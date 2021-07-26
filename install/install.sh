@@ -27,7 +27,8 @@
 # # change minimum size to 2430 (minimum size + +-20MB)
 # click 'resize'-button
 # Menu: Edit / Apply All Operations
-#  Noteer the new size! see log details shrink file system / resize2fs -p ... (2488320K)
+#  Noteer the new size!
+#   see log details shrink file system / resize2fs -p ... (2488320K)
 # close gparted
 # reset loop device to total img:
 # sudo losetup -d /dev/loop0
@@ -38,8 +39,8 @@
 # create new partion 2 with partion start address
 # do not forget the '+'
 # n<enter>p<enter>2<enter>532480<enter>+2488320K<enter>
-# w<enter>  write partion tabel
 # remove signature? N(o)
+#? w<enter>  write partion tabel
 # show loop device and delete it:
 # sudo fdisk -l /dev/loop0
 # sudo losetup -d /dev/loop0

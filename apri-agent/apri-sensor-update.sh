@@ -1,13 +1,22 @@
 #!/bin/sh
 
-cd `dirname $0`
-cd ..
+#cd `dirname $0`
 
-echo Start of update proces >> ../log/apri-agent-update.log
-date >> ../log/apri-agent-update.log
+if [[ -d /opt/SCAPE604/git ]]
+then
+    mkdir -p /opt/SCAPE604/git
+    cd /opt/SCAPE604/git
+    git clone https://github.com/openiod/apri-sensor.git
+    echo "git clone"
+fi
+cd /opt/SCAPE604/git
+
+
+echo Start of update proces >> /opt/SCAPE604/log/apri-agent-update.log
+date >> /opt/SCAPE604/log/apri-agent-update.log
 # get software updates from github
-git checkout package-lock.json
-git pull >> ../log/apri-agent-update.log
+# git checkout package-lock.json
+git pull >> /opt/SCAPE604/log/apri-agent-update.log 2>>/opt/SCAPE604/log/apri-agent-update2.log
 
 cd /opt/SCAPE604/log
 mv SCAPE604-apri-sensor-connector-old1.log SCAPE604-apri-sensor-connector-old2.log
@@ -27,6 +36,6 @@ systemctl restart SCAPE604-aprisensor-nmcli
 #sudo systemctl restart SCAPE604-apri-agent.service
 #sudo systemctl stop SCAPE604-apri-sensor-dylos.service
 #sudo systemctl start SCAPE604-apri-sensor-dylos.service
-echo End of update proces >> ../log/apri-agent-update.log
+echo End of update proces >> /opt/SCAPE604/log/apri-agent-update.log
 
 exit 0

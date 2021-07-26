@@ -2,12 +2,12 @@
 
 #cd `dirname $0`
 
-if [[ -d /opt/SCAPE604/git/apri-sensor ]]
+if [ ! -d /opt/SCAPE604/git/apri-sensor ]
 then
     mkdir -p /opt/SCAPE604/git
     cd /opt/SCAPE604/git
     git clone https://github.com/openiod/apri-sensor.git
-    echo "git clone"
+    echo "git clone ended"
 fi
 cd /opt/SCAPE604/git
 

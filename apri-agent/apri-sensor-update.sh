@@ -9,11 +9,11 @@ then
     git clone https://github.com/openiod/apri-sensor.git
     echo "git clone ended"
 fi
-cd /opt/SCAPE604/git
-
+cd /opt/SCAPE604/git/apri-sensor
 
 echo Start of update proces >> /opt/SCAPE604/log/apri-agent-update.log
 date >> /opt/SCAPE604/log/apri-agent-update.log
+
 # get software updates from github
 # git checkout package-lock.json
 git pull >> /opt/SCAPE604/log/apri-agent-update.log 2>>/opt/SCAPE604/log/apri-agent-update2.log

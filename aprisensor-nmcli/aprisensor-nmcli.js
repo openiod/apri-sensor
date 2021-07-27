@@ -219,6 +219,14 @@ const requestListener = function (req, res) {
           postApConnect(url,req,res)
           break
         }
+        if (req.url == '/nmcli/api/v1/reboot') {
+          postReboot(url,req,res)
+          break
+        }
+        if (req.url == '/nmcli/api/v1/shutdown') {
+          postShutDown(url,req,res)
+          break
+        }
 				res.writeHead(400);
 				res.write(`{error:400,message: 'Invalid API-call: ${methodType} ${url}'}`);
 				res.end();
@@ -681,6 +689,17 @@ nmcli connection add type wifi ifname wlp7s0 con-name ap-24 autoconnect no ssid 
     });
 		*/
   })
+}
+
+// reboot Raspberry Pi
+const postReboot = async ( url, req, res) => {
+  console.log(`Reboot`)
+  return exec("LC_ALL=C reboot ")
+}
+// shutdown Raspberry Pi
+const postShutDown = async ( url, req, res) => {
+  console.log(`Shutdown`)
+  return exec("LC_ALL=C shutdown -h now ")
 }
 
 const hotspotDown = function() {

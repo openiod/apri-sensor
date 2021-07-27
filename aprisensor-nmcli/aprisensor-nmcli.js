@@ -227,6 +227,10 @@ const requestListener = function (req, res) {
           postShutDown(url,req,res)
           break
         }
+        if (req.url == '/nmcli/api/v1/upgrade') {
+          postUpGrade(url,req,res)
+          break
+        }
 				res.writeHead(400);
 				res.write(`{error:400,message: 'Invalid API-call: ${methodType} ${url}'}`);
 				res.end();
@@ -700,6 +704,11 @@ const postReboot = async ( url, req, res) => {
 const postShutDown = async ( url, req, res) => {
   console.log(`Shutdown`)
   return exec("LC_ALL=C shutdown -h now ")
+}
+// shutdown Raspberry Pi
+const postUpGrade = async ( url, req, res) => {
+  console.log(`Upgrade`)
+  return exec("LC_ALL=C /opt/SCAPE604/git/apri-sensor/install/git2as.sh ")
 }
 
 const hotspotDown = function() {

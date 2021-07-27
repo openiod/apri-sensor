@@ -14,7 +14,7 @@ mv /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion /ho
 rm -rf /home/awiel/opt/apri-sensor/aprisensor-netmanager-previousversion
 cp -r /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion
 rm -rf /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime
-cp -r /data/Alfresco/opt/aprisensor-netmanager/public /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime
+cp -r /data/Alfresco/opt/aprisensor-netmanager/public/* /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime
 cd /home/awiel/opt/apri-sensor/
 git status
 git push
@@ -34,7 +34,7 @@ run 'sudo git pull' or default update on sensorkit in /opt/SCAPE604/apri-sensor
 sudo systemctl restart SCAPE604-aprisensor-nmcli
 # when upgrade stable version:
 # sudo rm -rf /opt/SCAPE604/aprisensor-netmanager-runtime-stable
-# sudo cp -r /opt/SCAPE604/apri-sensor/aprisensor-netmanager-runtime /opt/SCAPE604/aprisensor-netmanager-runtime-stable 
+# sudo cp -r /opt/SCAPE604/apri-sensor/aprisensor-netmanager-runtime /opt/SCAPE604/aprisensor-netmanager-runtime-stable
 
 # clear browser cache
 # open webpage of sensorkit https://sensorId4p.local or ipaddress

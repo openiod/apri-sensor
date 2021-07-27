@@ -945,7 +945,17 @@ var startActionReboot = function() {
 }
 
 const actions = []
-
+actions.push(function() {
+  // restart avahi-daemon for correct ####.local
+	exec("systemctl restart avahi-daemon ", (error, stdout, stderr) => {
+		if (error) {
+			console.error(`exec error: ${error}`);
+		} else {
+  		console.log('avahi-daemon restart') 
+    }
+    nextAction()
+	})
+})
 actions.push(function() {
 //  console.log('getHostname 1')
 	exec("hostname", (error, stdout, stderr) => {

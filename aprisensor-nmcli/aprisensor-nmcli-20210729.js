@@ -552,14 +552,14 @@ const postDeviceConnect = ( url, req, res) => {
   req.on('data', chunk => {
     body += chunk.toString(); // convert Buffer to string
   });
-  req.on('end', async () => {
+  req.on('end', () => {
 		var result = JSON.parse(body)
 		var id =result.NAME
 		//if (result.key=='device') id=result.DEVICE
 		//if (result.key=='name') id=result.NAME
 		//if (result.key=='type') id=result.TYPE
 //    exec("LC_ALL=C nmcli device wifi connect '"+id+ "' password '"+result.password+"'", (error, stdout, stderr) => {
-	  await execPromise("LC_ALL=C nmcli connection up '"+id+"'")
+	  execPromise("LC_ALL=C nmcli connection up '"+id+"'")
     .then((result)=> {
       console.log(`postDeviceConnect then ${id} `)
       if (unit.connectionStatus[id].status!='OK') {
@@ -732,7 +732,7 @@ const hotspotDelete = function() {
   return execPromise("LC_ALL=C nmcli connection delete '"+unit.ssid+"'")
 }
 
-const tryCandidateConnection = async function(index) {
+const tryCandidateConnection = function(index) {
   // give processing some time
   processStatus.gateway.statusSince=new Date()
 
@@ -763,7 +763,7 @@ const tryCandidateConnection = async function(index) {
 	}
   if (unit.connectionStatus[tmpConnection] ==undefined) unit.connectionStatus[tmpConnection]={}
   console.log(`tryCandidateConnection ${index} ${unit.connections[index]}`)
-  await execPromise("LC_ALL=C nmcli connection up '"+unit.connections[index]+"'")
+  execPromise("LC_ALL=C nmcli connection up '"+unit.connections[index]+"'")
   .then((result)=>{
     console.log(`tryCandidateConnection then ${index} ${unit.connections[index]}`)
     if (unit.connectionStatus[tmpConnection].status!='OK') {
@@ -844,7 +844,7 @@ const tryCandidateConnection2 =function(index) {
       unit.connectionStatus[tmpConnection]={status:'ERROR',statusSince:new Date()}
     }
     console.log('add error array to connectionStatus ' +tmpConnection)
-    unit.connectionStatus[tmpConnection].message=error.split('\n')
+    unit.connectionStatus[tmpConnection].message=(''+error).split('\n')
     if (processStatus.connection.status!='ERROR') {
       processStatus.connection.status='ERROR'
       processStatus.connection.statusSince=new Date()

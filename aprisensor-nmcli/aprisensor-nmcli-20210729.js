@@ -548,7 +548,7 @@ const postDeviceConnect = ( url, req, res) => {
   console.log(url)
   if (processStatus.connectionBusy.status == false) {
   	res.writeHead(400);
-		res.write(JSON.stringify({error:400,message: 'sensorkit is bezig, even wachten en dan opnieuw proberen'});
+		res.write(JSON.stringify({error:400,message: 'sensorkit is bezig, even wachten en dan opnieuw proberen'}));
 		res.end();
     return
   }

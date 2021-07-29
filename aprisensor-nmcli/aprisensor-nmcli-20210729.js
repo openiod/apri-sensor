@@ -789,7 +789,7 @@ const tryCandidateConnection2 =function(index) {
 	}
   // no (more) connections to try
   if (index>unit.connections.length-1) {
-    
+
     processStatus.connectionBusy.status=false
     processStatus.connectionBusy.statusSince=new Date()
     return
@@ -1471,21 +1471,18 @@ const statusCheck = async function() {
     }
   });
 
-
   if (processStatus.connectionBusy.status==true) {
     // blink led
     blinkLed(46)
     console.log('waiting,processStatus.connectionBusy.status==true')
     return
+  }
+  if (unit.connection==unit.ssid){
+    blinkLed(0)
+    setGpioBlueLedOn()
   } else {
-    if (unit.connection==unit.ssid){
-      blinkLed(0)
-      setGpioBlueLedOn()
-    } else {
-      //setGpioBlueLedOff()
-      // stop blink
-      blinkLed(0)
-    }
+    // blink twice showing process is active
+    blinkLed(4)
   }
 
   // let hotspot continue for some time
@@ -1498,6 +1495,7 @@ const statusCheck = async function() {
       }
     }
   }
+/*
   // retrieve all wifi connections (no await)
   execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')
   .then((result)=>{
@@ -1528,14 +1526,16 @@ const statusCheck = async function() {
     unit.connections=[]
     unit.connection=''
   })
+*/
 
   getIpAddress()
-	checkTimeSync()
+	if (processStatus.timeSync.status!='OK') checkTimeSync()  // only untill first OK
+
   console.dir(unit)
   // determine with result of ping to (default) gateway if connection is active
   execPromise("ping -q -w 1 -c 1 `ip r | grep default | head -1 | cut -d ' ' -f 3` > /dev/null")
   .then((result)=>{
-    console.log('statusCheck then: '+result)
+    console.log('statusCheck then: '+result.stdout)
     // console.dir(result) -> result.stderr result.stdout
     processStatus.gateway.status='OK'
     processStatus.gateway.statusSince=new Date()

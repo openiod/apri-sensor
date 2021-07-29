@@ -561,12 +561,10 @@ const postDeviceConnect = ( url, req, res) => {
 //    exec("LC_ALL=C nmcli device wifi connect '"+id+ "' password '"+result.password+"'", (error, stdout, stderr) => {
 	  await execPromise("LC_ALL=C nmcli connection up '"+id+"'")
     .then((result)=> {
-      if (processStatus.connection.status!='OK') {
-        processStatus.connection.status='OK'
-        processStatus.connection.statusSince=new Date()
+      console.log(`postDeviceConnect then ${id} `)
+      if (unit.connectionStatus[id].status!='OK') {
+        unit.connectionStatus[id]={status:'OK',statusSince:new Date()}
       }
-      processStatus.connection.code=200
-      processStatus.connection.message=''
 			processStatus.connectionBusy.status=false
       processStatus.connectionBusy.statusSince=new Date()
   		res.writeHead(200);
@@ -575,12 +573,10 @@ const postDeviceConnect = ( url, req, res) => {
     })
     .catch((error)=>{
       console.error(`exec error: ${error}`);
-      if (processStatus.connection.status!='ERROR') {
-        processStatus.connection.status='ERROR'
-        processStatus.connection.statusSince=new Date()
+      if (unit.connectionStatus[id].status!='ERROR') {
+        unit.connectionStatus[id]={status:'ERROR',statusSince:new Date()}
       }
-      processStatus.connection.code=400
-      processStatus.connection.message=error
+      unit.connectionStatus[id].message=error.split('\n')
 			processStatus.connectionBusy.status=false
       processStatus.connectionBusy.statusSince=new Date()
 			res.writeHead(400);
@@ -765,14 +761,12 @@ const tryCandidateConnection = async function(index) {
   console.log(`tryCandidateConnection ${index} ${unit.connections[index]}`)
   await execPromise("LC_ALL=C nmcli connection up '"+unit.connections[index]+"'")
   .then((result)=>{
+    console.log(`tryCandidateConnection then ${index} ${unit.connections[index]}`)
     if (unit.connectionStatus[tmpConnection].status!='OK') {
       unit.connectionStatus[tmpConnection]={status:'OK',statusSince:new Date()}
     }
-    console.log(`tryCandidateConnection then ${index} ${unit.connections[index]}`)
     processStatus.connectionBusy.status=false
     processStatus.connectionBusy.statusSince=new Date()
-		processStatus.gateway.statusSince=new Date()
-		processStatus.gateway.status='OK' // give some time to settle connection (gateway setting etc.)
   })
   .catch((error)=>{
     console.log(`tryCandidateConnection catch ${index} ${unit.connections[index]}`)
@@ -780,13 +774,7 @@ const tryCandidateConnection = async function(index) {
     if (unit.connectionStatus[tmpConnection].status!='ERROR') {
       unit.connectionStatus[tmpConnection]={status:'ERROR',statusSince:new Date()}
     }
-    unit.connectionStatus[tmpConnection]={status:'ERROR',statusLatest:new Date()}
-    if (processStatus.connection.status!='ERROR') {
-      processStatus.connection.status='ERROR'
-      processStatus.connection.statusSince=new Date()
-    }
-    processStatus.connection.code=400
-    processStatus.connection.message=error
+    unit.connectionStatus[tmpConnection].message=error.split('\n')
     tryCandidateConnection(index+1)
   })
 }

@@ -1501,7 +1501,7 @@ const statusCheck = async function() {
     }
     getActiveConnection()
     .then((result)=>{
-      console.log("getActiveConnection then")
+      //console.log("getActiveConnection then")
       var stdoutArray	= result.stdout.split(' ');
       var tmp=stdoutArray[stdoutArray.length-1]
       unit.connection=tmp.split('\n')[0]
@@ -1539,7 +1539,8 @@ const statusCheck = async function() {
       processStatus.gateway.status='OK'
       processStatus.gateway.statusSince=new Date()
     }
-    console.log('status gateway OK since '+ processStatus.gateway.statusSince.toISOString())
+    console.log('status gateway OK since '+ processStatus.gateway.statusSince.toISOString()+
+      ' SSID:'+unit.ssid+' con:'+unit.connection+' cons:'+JSON.stringify(unit.connections))
     return
   }).catch((error)=>{
     console.log('statusCheck catch: '+error)

@@ -341,7 +341,13 @@ const getConnectionShow = function(req,res,callback) {
 		}
 		var resultJson = columnsToJsonArray(stdout)
     console.log(resultJson)
-    console.log(unit.connectionStatus[tmpConnection])
+    for (var i=0;i<resultjson.length;i++) {
+      var tmpCon = resultJson[i].name
+      if (unit.connectionStatus[tmpCon]!=undefined) {
+        resultJson[i].status = unit.connectionStatus[tmpCon]
+      }
+    }
+    console.dir(resultJson)
 
 		return callback(resultJson, req,res)
 	});

@@ -572,6 +572,7 @@ const postDeviceConnect = ( url, req, res) => {
   	  res.end(`Device connected`);
     })
     .catch((error)=>{
+      console.log('id: '+id)
       console.error(`exec error: ${error}`);
       if (unit.connectionStatus[id].status!='ERROR') {
         unit.connectionStatus[id]={status:'ERROR',statusSince:new Date()}

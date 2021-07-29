@@ -1535,6 +1535,7 @@ const statusCheck = async function() {
   // determine with result of ping to (default) gateway if connection is active
   execPromise("ping -q -w 1 -c 1 `ip r | grep default | head -1 | cut -d ' ' -f 3` > /dev/null")
   .then((result)=>{
+    console.dir(result)
     console.log('statusCheck then: '+result.stdout)
     // console.dir(result) -> result.stderr result.stdout
     processStatus.gateway.status='OK'

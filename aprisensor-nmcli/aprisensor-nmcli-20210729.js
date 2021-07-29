@@ -93,7 +93,7 @@ var setGpioBlueLedOff = function() {
 
 
 
-var unit = {'connectionStatus':{} }
+var unit = {'connectionStatus':{},connection:'',connections:[] }
 var unitCrypto={}
 
 var connectionsIndex=0
@@ -1398,6 +1398,8 @@ const getActiveConnection = function() {
 }
 
 const initiateConnectionOrHotspot = function() {
+  console.log('SSID:'+unit.ssid+' con:'+unit.connection+' cons:'+JSON.stringify(unit.connections))
+
   if (unit.connection==''){
     console.log('No connection, checkHotspotActivation')
     // give process some time
@@ -1455,10 +1457,6 @@ const blinkLed = function(nr) {
 
 const statusCheck = async function() {
 
-//############################
-//if (unit.hostname =='9EB6.local') {
-//############################
-
   if (processStatus.connectionBusy.status==true) {
     // blink led
     blinkLed(46)
@@ -1483,7 +1481,7 @@ const statusCheck = async function() {
       }
     }
   }
-
+/*
   // retrieve all wifi connections (no await)
   execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')
   .then((result)=>{
@@ -1514,7 +1512,7 @@ const statusCheck = async function() {
     unit.connections=[]
     unit.connection=''
   })
-
+*/
   // test if nginx process is running, if not start service
   fs.readFile("/var/run/nginx.pid", 'utf8', function (err, data) {
     if (err) {
@@ -1530,14 +1528,14 @@ const statusCheck = async function() {
   getIpAddress()
 	if (processStatus.timeSync.status!='OK') checkTimeSync()  // only untill first OK
 
-  console.log('SSID:'+unit.ssid+' con:'+unit.connection+' cons:'+JSON.stringify(unit.connections))
   // determine with result of ping to (default) gateway if connection is active
   execPromise("ping -q -w 1 -c 1 `ip r | grep default | head -1 | cut -d ' ' -f 3` > /dev/null")
   .then((result)=>{
-    console.log('statusCheck then')
-    // console.dir(result) -> result.stderr result.stdout
-    processStatus.gateway.status='OK'
-    processStatus.gateway.statusSince=new Date()
+    if (processStatus.gateway.status!='OK') {
+      processStatus.gateway.status='OK'
+      processStatus.gateway.statusSince=new Date()
+    }
+    console.log('status gateway OK since '+ processStatus.gateway.statusSince)
     return
   }).catch((error)=>{
     console.log('statusCheck catch: '+error)
@@ -1570,8 +1568,8 @@ const statusCheck = async function() {
     		var tmp=stdoutArray[stdoutArray.length-1]
     		unit.connection=tmp.split('\n')[0]
     		//console.log(unit.connection)
-        console.dir(processStatus)
-        console.dir(unit)
+//        console.dir(processStatus)
+//        console.dir(unit)
         initiateConnectionOrHotspot()
     	})
     	.catch((error)=>{
@@ -1579,8 +1577,8 @@ const statusCheck = async function() {
     		unit.connection=''
         initiateConnectionOrHotspot()
         // todo: initiate Hotspot  --> activate connection or create hostspot?
-        console.dir(processStatus)
-        console.dir(unit)
+//        console.dir(processStatus)
+//        console.dir(unit)
       })
     })
     .catch((error)=>{

@@ -337,9 +337,12 @@ const getConnectionShow = function(req,res,callback) {
 	exec("LC_ALL=C nmcli connection show ", (error, stdout, stderr) => {
 		if (error) {
 			// console.error(`exec error: ${error}`);
-			return callback(resultJson, req,res);
+			return callback(error, req,res);
 		}
 		var resultJson = columnsToJsonArray(stdout)
+    console.log(resultJson)
+    console.log(unit.connectionStatus[tmpConnection])
+
 		return callback(resultJson, req,res)
 	});
 }

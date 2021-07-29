@@ -574,6 +574,9 @@ const postDeviceConnect = ( url, req, res) => {
     .catch((error)=>{
       console.log('id: '+id)
       console.error(`exec error: ${error}`);
+      if (unit.connectionStatus[id]==undefined) {
+        unit.connectionStatus[id]={status:'ERROR',statusSince:new Date()}
+      }
       if (unit.connectionStatus[id].status!='ERROR') {
         unit.connectionStatus[id]={status:'ERROR',statusSince:new Date()}
       }

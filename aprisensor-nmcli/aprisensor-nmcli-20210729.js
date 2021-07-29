@@ -580,7 +580,7 @@ const postDeviceConnect = ( url, req, res) => {
       if (unit.connectionStatus[id].status!='ERROR') {
         unit.connectionStatus[id]={status:'ERROR',statusSince:new Date()}
       }
-      unit.connectionStatus[id].message=error.split('\n')
+      unit.connectionStatus[id].message=(''+error).split('\n')
 			processStatus.connectionBusy.status=false
       processStatus.connectionBusy.statusSince=new Date()
 			res.writeHead(400);

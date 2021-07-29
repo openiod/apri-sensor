@@ -1538,7 +1538,7 @@ const statusCheck = async function() {
       processStatus.gateway.status='OK'
       processStatus.gateway.statusSince=new Date()
     }
-    console.log('status gateway OK since '+ processStatus.gateway.statusSince.toISOString)
+    console.log('status gateway OK since '+ processStatus.gateway.statusSince.toISOString())
     return
   }).catch((error)=>{
     console.log('statusCheck catch: '+error)

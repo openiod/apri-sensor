@@ -562,6 +562,9 @@ const postDeviceConnect = ( url, req, res) => {
   req.on('end', () => {
 		var result = JSON.parse(body)
 		var id =result.NAME
+    if (unit.connectionStatus[id]==undefined) {
+      unit.connectionStatus[id]={status:'INIT',statusSince:new Date()}
+    }
 		//if (result.key=='device') id=result.DEVICE
 		//if (result.key=='name') id=result.NAME
 		//if (result.key=='type') id=result.TYPE

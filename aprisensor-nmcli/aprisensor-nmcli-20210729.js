@@ -1471,8 +1471,8 @@ const statusCheck = async function() {
     blinkLed(0)
     setGpioBlueLedOn()
   } else {
-    // blink twice showing process is active
-    blinkLed(5)
+    // blink once showing process is active
+    blinkLed(2)
   }
 
   // let hotspot continue for some time
@@ -1539,6 +1539,8 @@ const statusCheck = async function() {
       processStatus.gateway.status='OK'
       processStatus.gateway.statusSince=new Date()
     }
+    // blink twice showing process is active and gateway OK
+    blinkLed(4)
     console.log('status gateway OK since '+ processStatus.gateway.statusSince.toISOString()+
       ' SSID:'+unit.ssid+' con:'+unit.connection+' cons:'+JSON.stringify(unit.connections))
     return

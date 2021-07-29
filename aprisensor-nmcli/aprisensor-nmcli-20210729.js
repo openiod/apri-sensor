@@ -913,15 +913,15 @@ const setHotspotUp = function() {
     processStatus.connectionBusy.status=false
     processStatus.connectionBusy.statusSince=new Date()
     // give processing some time
-    processStatus.gateway.statusSince=new Date()
-    getIpAddress()
+//    processStatus.gateway.statusSince=new Date()
+//    getIpAddress()
   })
   .catch( (error)=>{
     unit.connection=''
     processStatus.connectionBusy.status=false
     processStatus.connectionBusy.statusSince=new Date()
     // give processing some time
-    processStatus.gateway.statusSince=new Date()
+//    processStatus.gateway.statusSince=new Date()
     setHotspotStatus('ERROR',400,error)
   })
 }
@@ -1153,7 +1153,7 @@ actions.push(async function() {
 
 
 function getIpAddress() {
-	console.log('getIpAddress')
+	//console.log('getIpAddress')
   execPromise('hostname --all-ip-address')
 	.then((result)=> {
 	  var stdoutArray	= result.stdout.split('\n');
@@ -1305,17 +1305,17 @@ var createService	= function(sensor, sensorKey) {
 const checkHotspotActivation= async function() {
   // hotspot only for ApriSensor (SCRP*)
 //  if (unit.serial.substr(0,4) == 'SCRP') {
-    await getGateway()
-    if (processStatus.gateway.status != 'OK') {
-      if (processStatus.timeSync.status!='ERROR') {
-        processStatus.timeSync.status='ERROR'
-        processStatus.timeSync.statusSince=new Date()
-      }
+//    await getGateway()
+//    if (processStatus.gateway.status != 'OK') {
+//      if (processStatus.timeSync.status!='ERROR') {
+//        processStatus.timeSync.status='ERROR'
+//        processStatus.timeSync.statusSince=new Date()
+//      }
       console.log(`ApriSensor unit, starting hotspot for ${unit.serial} with ssid ${unit.ssid}`)
       createHotspot()
-    } else {
-      console.log(`gateway: ${unit.gateway}`)
-    }
+//    } else {
+//      console.log(`gateway: ${unit.gateway}`)
+//    }
 
 //  } else {
 //    console.log(`Not an ApriSensor unit, no automatic start as hotspot for ${unit.serial}`)
@@ -1403,18 +1403,21 @@ const initiateConnectionOrHotspot = function() {
   if (unit.connection==''){
     console.log('No connection, checkHotspotActivation')
     // give process some time
-    processStatus.gateway.statusSince=new Date()
-    checkHotspotActivation()
+//    processStatus.gateway.statusSince=new Date()
+//    checkHotspotActivation()
+    createHotspot()
+
     return
   }
   if (unit.connection!=unit.ssid){
-    console.log('No gateway for ' + unit.connection)
-    if (new Date().getTime() - processStatus.gateway.statusSince.getTime() > 20000) {
+//    console.log('No gateway for ' + unit.connection)
+//    if (new Date().getTime() - processStatus.gateway.statusSince.getTime() > 20000) {
       console.log('No gateway for ' + unit.connection + ', activating hotspot')
       // give process some time
-      processStatus.gateway.statusSince=new Date()
-      checkHotspotActivation()
-    }
+//      processStatus.gateway.statusSince=new Date()
+//      checkHotspotActivation()
+      createHotspot()
+//    }
     return
   }
 
@@ -1535,7 +1538,7 @@ const statusCheck = async function() {
       processStatus.gateway.status='OK'
       processStatus.gateway.statusSince=new Date()
     }
-    console.log('status gateway OK since '+ processStatus.gateway.statusSince)
+    console.log('status gateway OK since '+ processStatus.gateway.statusSince.toISOString)
     return
   }).catch((error)=>{
     console.log('statusCheck catch: '+error)

@@ -1540,7 +1540,7 @@ const statusCheck = async function() {
       processStatus.gateway.statusSince=new Date()
     }
     // blink twice showing process is active and gateway OK
-    blinkLed(4)
+    blinkLed(5)
     console.log('status gateway OK since '+ processStatus.gateway.statusSince.toISOString()+
       ' SSID:'+unit.ssid+' con:'+unit.connection+' cons:'+JSON.stringify(unit.connections))
     return

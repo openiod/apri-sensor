@@ -1459,18 +1459,6 @@ const statusCheck = async function() {
 //if (unit.hostname =='9EB6.local') {
 //############################
 
-  // test if nginx process is running, if not start service
-  fs.readFile("/var/run/nginx.pid", 'utf8', function (err, data) {
-    if (err) {
-      console.log('nginx not running, starting nginx')
-      execPromise('LC_ALL=C systemctl start nginx')
-      .then((result)=>{
-      })
-      .catch((error)=>{
-      })
-    }
-  });
-
   if (processStatus.connectionBusy.status==true) {
     // blink led
     blinkLed(46)
@@ -1495,7 +1483,7 @@ const statusCheck = async function() {
       }
     }
   }
-/*
+
   // retrieve all wifi connections (no await)
   execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')
   .then((result)=>{
@@ -1526,7 +1514,18 @@ const statusCheck = async function() {
     unit.connections=[]
     unit.connection=''
   })
-*/
+
+  // test if nginx process is running, if not start service
+  fs.readFile("/var/run/nginx.pid", 'utf8', function (err, data) {
+    if (err) {
+      console.log('nginx not running, starting nginx')
+      execPromise('LC_ALL=C systemctl start nginx')
+      .then((result)=>{
+      })
+      .catch((error)=>{
+      })
+    }
+  });
 
   getIpAddress()
 	if (processStatus.timeSync.status!='OK') checkTimeSync()  // only untill first OK

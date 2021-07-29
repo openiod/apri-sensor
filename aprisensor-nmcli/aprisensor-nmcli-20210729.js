@@ -546,6 +546,12 @@ const postPublicKey = ( url, req, res) => {
 
 const postDeviceConnect = ( url, req, res) => {
   console.log(url)
+  if (processStatus.connectionBusy.status == false) {
+  	res.writeHead(400);
+		res.write({error:400,message: 'sensorkit is bezig, even wachten en dan opnieuw proberen'});
+		res.end();
+    return
+  }
 	processStatus.connectionBusy.status=true
   processStatus.connectionBusy.statusSince=new Date()
   let body = '';

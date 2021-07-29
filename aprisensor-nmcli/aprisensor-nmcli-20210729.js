@@ -851,7 +851,8 @@ const tryCandidateConnection2 =function(index) {
     if (unit.connectionStatus[tmpConnection].status!='ERROR') {
       unit.connectionStatus[tmpConnection]={status:'ERROR',statusSince:new Date()}
     }
-    unit.connectionStatus[tmpConnection].message=error
+    console.log('add error array to connectionStatus ' +tmpConnection)
+    unit.connectionStatus[tmpConnection].message=error.split('\n')
     if (processStatus.connection.status!='ERROR') {
       processStatus.connection.status='ERROR'
       processStatus.connection.statusSince=new Date()
@@ -1473,7 +1474,7 @@ const statusCheck = async function() {
 
   if (processStatus.connectionBusy.status==true) {
     // blink led
-    blinkLed(46)
+    blinkLed(48)
     console.log('waiting,processStatus.connectionBusy.status==true')
     return
   }

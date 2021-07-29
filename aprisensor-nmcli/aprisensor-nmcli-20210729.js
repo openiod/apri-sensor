@@ -800,8 +800,8 @@ const tryCandidateConnection2 =function(index) {
 		return
 	}
 
-  // give processing some time
-  processStatus.gateway.statusSince=new Date()
+  //// give processing some time
+  //processStatus.gateway.statusSince=new Date()
 
   var tmpConnection = unit.connections[index]
   if (unit.connectionStatus[tmpConnection]==undefined) {
@@ -1322,6 +1322,7 @@ const checkHotspotActivation= async function() {
 //  }
 }
 
+/*
 // when online no automatic activation of the hotspot necessary
 const getGateway = async function() {
   await execPromise('ip route | grep "default via" ')
@@ -1343,7 +1344,7 @@ const getGateway = async function() {
     }
   })
 }
-
+*/
 const checkTimeSync = async function() {
   // get file attributes for last time synchronization date & time
   fs.stat("/var/lib/systemd/timesync/clock", async (err, stat) => {
@@ -1484,7 +1485,7 @@ const statusCheck = async function() {
       }
     }
   }
-/*
+
   // retrieve all wifi connections (no await)
   execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')
   .then((result)=>{
@@ -1515,7 +1516,7 @@ const statusCheck = async function() {
     unit.connections=[]
     unit.connection=''
   })
-*/
+
   // test if nginx process is running, if not start service
   fs.readFile("/var/run/nginx.pid", 'utf8', function (err, data) {
     if (err) {

@@ -1482,7 +1482,7 @@ const statusCheck = async function() {
     setGpioBlueLedOn()
   } else {
     // blink twice showing process is active
-    blinkLed(4)
+    blinkLed(5)
   }
 
   // let hotspot continue for some time
@@ -1531,12 +1531,11 @@ const statusCheck = async function() {
   getIpAddress()
 	if (processStatus.timeSync.status!='OK') checkTimeSync()  // only untill first OK
 
-  console.dir(unit)
+  console.log('SSID:'+unit.ssid+' con:'+unit.connection+' cons:'+JSON.stringify(unit.connections))
   // determine with result of ping to (default) gateway if connection is active
   execPromise("ping -q -w 1 -c 1 `ip r | grep default | head -1 | cut -d ' ' -f 3` > /dev/null")
   .then((result)=>{
-    console.dir(result)
-    console.log('statusCheck then: '+result.stdout)
+    console.log('statusCheck then')
     // console.dir(result) -> result.stderr result.stdout
     processStatus.gateway.status='OK'
     processStatus.gateway.statusSince=new Date()

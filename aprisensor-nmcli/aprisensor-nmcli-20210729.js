@@ -346,6 +346,7 @@ const getConnectionShow = function(req,res,callback) {
       if (unit.connectionStatus[tmpCon]!=undefined) {
         resultJson[i].status = unit.connectionStatus[tmpCon]
       }
+      console.dir(unit.connectionStatus[tmpCon])
     }
     console.dir(resultJson)
 

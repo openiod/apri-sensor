@@ -1458,12 +1458,6 @@ const initiateConnectionOrHotspot = function() {
     // hotspot status will last at least x time and will stay active as long wifi-config-web page active
 
 
-    if (unit.connection==unit.ssid &&
-      new Date().getTime() - processStatus.hotspot.statusSince.getTime() <30000) {
-      console.log('hotspot active wait minimal 30 seconds')
-      return
-    }
-
     if (unit.connections.length > 0 ){
       connectionsIndex=0
       console.log('tryCandidateConnection starting with index 0')
@@ -1595,11 +1589,15 @@ const statusCheck = async function() {
 //      return
 //    }
     console.log('Hotspot status: '+processStatus.hotspot.status)
-    console.log('Hotspot time: '+new Date().getTime - processStatus.hotspot.statusSince.getTime())
-    if (processStatus.hotspot.status!='OK' ||
-        new Date().getTime - processStatus.hotspot.statusSince.getTime()>120000 ) {
-      initiateConnectionOrHotspot()
+    console.log('Hotspot time: '+new Date().getTime() - processStatus.hotspot.statusSince.getTime())
+    if (unit.connection==unit.ssid &&
+      new Date().getTime() - processStatus.hotspot.statusSince.getTime() <30000) {
+      console.log('hotspot active wait minimal 30 seconds')
+      return
     }
+
+    initiateConnectionOrHotspot()    
+
 
     /*
     // retrieve all wifi connections (no await)

@@ -604,7 +604,7 @@ const postDeviceConnect = ( url, req, res) => {
         console.dir(unit.connectionStatus[id])
         unit.connectionStatus[id].message.push(msg)
       }
-      console.dir(unit.connectionStatus[tmpConnection])
+      console.dir(unit.connectionStatus[id])
 
 			processStatus.connectionBusy.status=false
       processStatus.connectionBusy.statusSince=new Date()

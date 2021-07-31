@@ -575,7 +575,7 @@ const postDeviceConnect = ( url, req, res) => {
       if (unit.connectionStatus[id].status!='OK') {
         unit.connectionStatus[id]={status:'OK',statusSince:new Date()}
       }
-      if (unit.connection==unit.ssid) {
+      if (id==unit.ssid) {
         processStatus.hotspot.status='OK'
         processStatus.hotspot.statusSince=new Date()
       }
@@ -1456,16 +1456,21 @@ const initiateConnectionOrHotspot = function() {
 */
 //  if (unit.connection==unit.ssid){
     // hotspot status will last at least x time and will stay active as long wifi-config-web page active
-    if (new Date().getTime() - processStatus.hotspot.statusSince.getTime() >30000){
-      if (unit.connections.length > 0 ){
-        connectionsIndex=0
-        console.log('tryCandidateConnection starting with index 0')
-        tryCandidateConnection2(connectionsIndex)
-      }
-    } else {
-      console.log('hotspot active for < 30 seconds')
+
+
+    if (unit.connection==unit.ssid &&
+      new Date().getTime() - processStatus.hotspot.statusSince.getTime() <30000) {
+      console.log('hotspot active wait minimal 30 seconds')
+      return
     }
-//  }
+
+    if (unit.connections.length > 0 ){
+      connectionsIndex=0
+      console.log('tryCandidateConnection starting with index 0')
+      tryCandidateConnection2(connectionsIndex)
+    } else {
+      createHotspot()
+    }
 
 }
 

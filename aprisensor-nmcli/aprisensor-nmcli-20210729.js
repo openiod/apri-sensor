@@ -277,7 +277,7 @@ initHttpServer()
 // **********************************************************************************
 
 var columnsToJsonArray = function(columns) {
-	var records = columns.split('\n')
+	var records = (''+columns).split('\n')
 	var resultJson=[]
   var keyArray=[]
 	// split record 1 at space(s) (column labels)

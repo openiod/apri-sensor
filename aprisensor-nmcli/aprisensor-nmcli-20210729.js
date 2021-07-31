@@ -572,6 +572,7 @@ const postDeviceConnect = ( url, req, res) => {
 	  execPromise("LC_ALL=C nmcli connection up '"+id+"'")
     .then((result)=> {
       console.log(`postDeviceConnect then ${id} `)
+      unit.connection=id
       if (unit.connectionStatus[id].status!='OK') {
         unit.connectionStatus[id]={status:'OK',statusSince:new Date()}
       }
@@ -588,6 +589,7 @@ const postDeviceConnect = ( url, req, res) => {
     .catch((error)=>{
       console.log('id: '+id)
       console.error(`exec error: ${error}`);
+      unit.connection=''
       if (unit.connectionStatus[id]==undefined) {
         unit.connectionStatus[id]={status:'ERROR',statusSince:new Date()}
       }

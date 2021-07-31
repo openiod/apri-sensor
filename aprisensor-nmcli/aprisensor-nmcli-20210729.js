@@ -1499,10 +1499,23 @@ const statusCheck = async function() {
     }
   }
 
+  // test if nginx process is running, if not start service
+  fs.readFile("/var/run/nginx.pid", 'utf8', function (err, data) {
+    if (err) {
+      console.log('nginx not running, starting nginx')
+      execPromise('LC_ALL=C systemctl start nginx')
+      .then((result)=>{
+      })
+      .catch((error)=>{
+      })
+    }
+  });
 
-/*
-  // retrieve all wifi connections (no await)
-  execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')
+  getIpAddress()
+	if (processStatus.timeSync.status!='OK') checkTimeSync()  // only untill first OK
+
+  // retrieve all wifi connections
+  await execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')
   .then((result)=>{
     //console.log('status check get all connections then')
     var stdoutArray	= result.stdout.split('\n');
@@ -1531,34 +1544,7 @@ const statusCheck = async function() {
     unit.connections=[]
     unit.connection=''
   })
-  */
 
-  // test if nginx process is running, if not start service
-  fs.readFile("/var/run/nginx.pid", 'utf8', function (err, data) {
-    if (err) {
-      console.log('nginx not running, starting nginx')
-      execPromise('LC_ALL=C systemctl start nginx')
-      .then((result)=>{
-      })
-      .catch((error)=>{
-      })
-    }
-  });
-
-  getIpAddress()
-	if (processStatus.timeSync.status!='OK') checkTimeSync()  // only untill first OK
-
-  await getActiveConnection()
-  .then((result)=>{
-    //console.log("getActiveConnection then")
-    var stdoutArray	= result.stdout.split(' ');
-    var tmp=stdoutArray[stdoutArray.length-1]
-    unit.connection=tmp.split('\n')[0]
-  })
-  .catch((error)=>{
-    console.log("getActiveConnection catch")
-    unit.connection=''
-  })
   // determine with result of ping to (default) gateway if connection is active
   execPromise("ping -q -w 1 -c 1 `ip r | grep default | head -1 | cut -d ' ' -f 3` > /dev/null")
   .then((result)=>{
@@ -1579,9 +1565,12 @@ const statusCheck = async function() {
 			processStatus.gateway.statusSince=new Date()
 		}
     // no furter action when recent statusSince, give proces of (re)connecting some time
-    if (new Date().getTime() - processStatus.gateway.statusSince.getTime() < 10000) {
-      return
-    }
+//    if (new Date().getTime() - processStatus.gateway.statusSince.getTime() < 10000) {
+//      return
+//    }
+
+    initiateConnectionOrHotspot()
+    /*
     // retrieve all wifi connections (no await)
     execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')
     .then((result)=>{
@@ -1595,8 +1584,6 @@ const statusCheck = async function() {
           unit.connections.push(tmp)
         }
       }
-      initiateConnectionOrHotspot()
-      /*
       getActiveConnection()
     	.then((result)=>{
         console.log("getActiveConnection then")
@@ -1616,7 +1603,6 @@ const statusCheck = async function() {
 //        console.dir(processStatus)
 //        console.dir(unit)
       })
-      */
     })
     .catch((error)=>{
       console.log('status check get all connections catch')
@@ -1625,6 +1611,7 @@ const statusCheck = async function() {
       initiateConnectionOrHotspot()
       // todo: initiate Hotspot --> create hotspot and activate
     })
+    */
   })
 //############################
 //}

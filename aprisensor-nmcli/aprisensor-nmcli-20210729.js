@@ -1476,7 +1476,7 @@ const statusCheck = async function() {
 
   if (processStatus.connectionBusy.status==true) {
     // blink led
-    blinkLed(48)
+    blinkLed(49)
     console.log('waiting,processStatus.connectionBusy.status==true')
     return
   }

@@ -597,6 +597,15 @@ const postDeviceConnect = ( url, req, res) => {
         unit.connectionStatus[id]={status:'ERROR',statusSince:new Date()}
       }
       unit.connectionStatus[id].message=(''+error).split('\n')
+      const regex = /password/
+      if (unit.connectionStatus[id].message[1].match(regex) !=null) {
+        var msg='Wachtwoord niet juist, connectie opnieuw aanmaken.'
+        console.log('add readable text to the message: '+msg)
+        console.dir(unit.connectionStatus[id])
+        unit.connectionStatus[id].message.push(msg)
+      }
+      console.dir(unit.connectionStatus[tmpConnection])
+
 			processStatus.connectionBusy.status=false
       processStatus.connectionBusy.statusSince=new Date()
 			res.writeHead(400);

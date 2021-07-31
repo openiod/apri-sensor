@@ -617,11 +617,6 @@ const postApConnect = async ( url, req, res) => {
       body += chunk.toString(); // convert Buffer to string
   });
   req.on('end', async () => {
-    createHotspot()
-    res.writeHead(200);
-    res.write({msg:'hotspot creation activated'});
-    res.end(`The accesspoint is connected to the device`);
-/*
     var result ={}
     try {
       result = JSON.parse(lzString.decompress(body))
@@ -699,7 +694,7 @@ const postApConnect = async ( url, req, res) => {
       res.write(`{error:400,message: '${error}'}`);
       res.end();
 		})
-*/
+
 /*
     console.log('connection up')
     await execPromise("LC_ALL=C nmcli connection up '"+ssid+ "'")

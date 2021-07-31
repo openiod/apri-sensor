@@ -801,9 +801,19 @@ const tryCandidateConnection2 =function(index) {
 	}
   // no (more) connections to try
   if (index>unit.connections.length-1) {
-
-    processStatus.connectionBusy.status=false
-    processStatus.connectionBusy.statusSince=new Date()
+    console.log('0. Activate hotspot connection')
+    execPromise("LC_ALL=C nmcli connection up '"+unit.ssid+"'")
+    .then( (result)=>{
+      setHotspotStatus('OK',200)
+      unit.connection=unit.ssid
+      processStatus.connectionBusy.status=false
+      processStatus.connectionBusy.statusSince=new Date()
+    })
+    .catch( (error)=>{
+      createHotspot()
+    })
+    //processStatus.connectionBusy.status=false
+    //processStatus.connectionBusy.statusSince=new Date()
     return
   }
 	// ignore hotspot connection
@@ -854,7 +864,11 @@ const tryCandidateConnection2 =function(index) {
       unit.connectionStatus[tmpConnection]={status:'ERROR',statusSince:new Date()}
     }
     console.log('add error array to connectionStatus ' +tmpConnection)
+    console.log('0: ' + (''+error).split('\n')[0])
+    console.log('1: ' + (''+error).split('\n')[1])
+    console.log('2: ' + (''+error).split('\n')[2])
     unit.connectionStatus[tmpConnection].message=(''+error).split('\n')
+
     if (processStatus.connection.status!='ERROR') {
       processStatus.connection.status='ERROR'
       processStatus.connection.statusSince=new Date()
@@ -1423,6 +1437,7 @@ const initiateConnectionOrHotspot = function() {
 
     return
   }
+/*
   if (unit.connection!=unit.ssid){
 //    console.log('No gateway for ' + unit.connection)
 //    if (new Date().getTime() - processStatus.gateway.statusSince.getTime() > 20000) {
@@ -1434,17 +1449,19 @@ const initiateConnectionOrHotspot = function() {
 //    }
     return
   }
-
-  if (unit.connection==unit.ssid){
+*/
+//  if (unit.connection==unit.ssid){
     // hotspot status will last at least x time and will stay active as long wifi-config-web page active
-    if (new Date().getTime() - processStatus.hotspot.statusSince.getTime() >10000){
+    if (new Date().getTime() - processStatus.hotspot.statusSince.getTime() >30000){
       if (unit.connections.length > 0 ){
         connectionsIndex=0
         console.log('tryCandidateConnection starting with index 0')
         tryCandidateConnection2(connectionsIndex)
       }
+    } else {
+      console.log('hotspot active for < 30 seconds')
     }
-  }
+//  }
 
 }
 

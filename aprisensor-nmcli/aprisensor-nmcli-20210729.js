@@ -873,6 +873,11 @@ const tryCandidateConnection2 =function(index) {
     console.log('1: ' + (''+error).split('\n')[1])
     console.log('2: ' + (''+error).split('\n')[2])
     unit.connectionStatus[tmpConnection].message=(''+error).split('\n')
+    const regex = /password/
+    if (unit.connectionStatus[tmpConnection].message[1].match(regex) !=null) {
+      unit.connectionStatus[tmpConnection].message.push('Wachtwoord niet juist, connectie opnieuw aanmaken.')
+    }
+    console.dir(unit.connectionStatus[tmpConnection])
 
     if (processStatus.connection.status!='ERROR') {
       processStatus.connection.status='ERROR'

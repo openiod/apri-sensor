@@ -875,7 +875,8 @@ const tryCandidateConnection2 =function(index) {
     unit.connectionStatus[tmpConnection].message=(''+error).split('\n')
     const regex = /password/
     if (unit.connectionStatus[tmpConnection].message[1].match(regex) !=null) {
-      unit.connectionStatus[tmpConnection].message.push({'Wachtwoord niet juist, connectie opnieuw aanmaken.'})
+      var msg='Wachtwoord niet juist, connectie opnieuw aanmaken.'
+      unit.connectionStatus[tmpConnection].message.push(msg)
     }
     console.dir(unit.connectionStatus[tmpConnection])
 

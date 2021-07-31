@@ -1499,6 +1499,19 @@ const statusCheck = async function() {
     }
   }
 
+  getActiveConnection()
+  .then((result)=>{
+    //console.log("getActiveConnection then")
+    var stdoutArray	= result.stdout.split(' ');
+    var tmp=stdoutArray[stdoutArray.length-1]
+    unit.connection=tmp.split('\n')[0]
+  })
+  .catch((error)=>{
+    console.log("getActiveConnection catch")
+    unit.connection=''
+  })
+
+/*
   // retrieve all wifi connections (no await)
   execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')
   .then((result)=>{
@@ -1529,6 +1542,7 @@ const statusCheck = async function() {
     unit.connections=[]
     unit.connection=''
   })
+  */
 
   // test if nginx process is running, if not start service
   fs.readFile("/var/run/nginx.pid", 'utf8', function (err, data) {
@@ -1581,6 +1595,8 @@ const statusCheck = async function() {
           unit.connections.push(tmp)
         }
       }
+      initiateConnectionOrHotspot()
+      /*
       getActiveConnection()
     	.then((result)=>{
         console.log("getActiveConnection then")
@@ -1600,6 +1616,7 @@ const statusCheck = async function() {
 //        console.dir(processStatus)
 //        console.dir(unit)
       })
+      */
     })
     .catch((error)=>{
       console.log('status check get all connections catch')

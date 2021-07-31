@@ -617,6 +617,11 @@ const postApConnect = async ( url, req, res) => {
       body += chunk.toString(); // convert Buffer to string
   });
   req.on('end', async () => {
+    createHotspot()
+    res.writeHead(200);
+    res.write({msg:'hotspot creation activated'});
+    res.end(`The accesspoint is connected to the device`);
+/*
     var result ={}
     try {
       result = JSON.parse(lzString.decompress(body))
@@ -666,9 +671,6 @@ const postApConnect = async ( url, req, res) => {
     .then((result)=>{console.log('then connection delete')})
     .catch((error)=>{console.log('catch connection delete')})
     console.log('connection create')
-/*
-nmcli connection add type wifi ifname wlp7s0 con-name ap-24 autoconnect no ssid ap-24 ipv4.method shared 802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk 'iam@Home' ipv6.method shared
-*/
 //    var createCommand= "LC_ALL=C nmcli connection  type wifi ifname '"+unit.ifname+"' con-name '"+ssid+"' autoconnect yes  \
 //ipv4.method shared 802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk '"+passwd+"' \
 //      802-1x.eap pwd 802-1x.password '"+passwd+"' \
@@ -690,12 +692,14 @@ nmcli connection add type wifi ifname wlp7s0 con-name ap-24 autoconnect no ssid 
 		})
     .catch((error)=>{
 			console.log(error)
+      unit.connection=''
 			processStatus.connectionBusy.status=false
       processStatus.connectionBusy.statusSince=new Date()
 			res.writeHead(400);
       res.write(`{error:400,message: '${error}'}`);
       res.end();
 		})
+*/
 /*
     console.log('connection up')
     await execPromise("LC_ALL=C nmcli connection up '"+ssid+ "'")

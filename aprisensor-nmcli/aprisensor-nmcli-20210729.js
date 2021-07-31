@@ -921,7 +921,7 @@ const createHotspotConnection=function(){
 
   execPromise(hotspotCommand)
   .then((result)=>{
-    setHotspotStatus('OK',200)
+    //setHotspotStatus('OK',200)
     setHotspotUp()
   })
   .catch((error)=>{
@@ -1585,8 +1585,13 @@ const statusCheck = async function() {
 //    if (new Date().getTime() - processStatus.gateway.statusSince.getTime() < 10000) {
 //      return
 //    }
+    console.log('Hotspot status: '+processStatus.hotspot.status)
+    console.log('Hotspot time: '+new Date().getTime - processStatus.hotspot.statusSince.getTime())
+    if (processStatus.hotspot.status!='OK' ||
+        new Date().getTime - processStatus.hotspot.statusSince.getTime()>120000 ) {
+      initiateConnectionOrHotspot()
+    }
 
-    initiateConnectionOrHotspot()
     /*
     // retrieve all wifi connections (no await)
     execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')

@@ -575,6 +575,10 @@ const postDeviceConnect = ( url, req, res) => {
       if (unit.connectionStatus[id].status!='OK') {
         unit.connectionStatus[id]={status:'OK',statusSince:new Date()}
       }
+      if (unit.connection==unit.ssid) {
+        processStatus.hotspot.status='OK'
+        processStatus.hotspot.statusSince=new Date()
+      }
 			processStatus.connectionBusy.status=false
       processStatus.connectionBusy.statusSince=new Date()
   		res.writeHead(200);

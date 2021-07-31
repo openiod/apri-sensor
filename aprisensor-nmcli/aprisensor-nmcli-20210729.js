@@ -1499,17 +1499,6 @@ const statusCheck = async function() {
     }
   }
 
-  getActiveConnection()
-  .then((result)=>{
-    //console.log("getActiveConnection then")
-    var stdoutArray	= result.stdout.split(' ');
-    var tmp=stdoutArray[stdoutArray.length-1]
-    unit.connection=tmp.split('\n')[0]
-  })
-  .catch((error)=>{
-    console.log("getActiveConnection catch")
-    unit.connection=''
-  })
 
 /*
   // retrieve all wifi connections (no await)
@@ -1559,6 +1548,17 @@ const statusCheck = async function() {
   getIpAddress()
 	if (processStatus.timeSync.status!='OK') checkTimeSync()  // only untill first OK
 
+  await getActiveConnection()
+  .then((result)=>{
+    //console.log("getActiveConnection then")
+    var stdoutArray	= result.stdout.split(' ');
+    var tmp=stdoutArray[stdoutArray.length-1]
+    unit.connection=tmp.split('\n')[0]
+  })
+  .catch((error)=>{
+    console.log("getActiveConnection catch")
+    unit.connection=''
+  })
   // determine with result of ping to (default) gateway if connection is active
   execPromise("ping -q -w 1 -c 1 `ip r | grep default | head -1 | cut -d ' ' -f 3` > /dev/null")
   .then((result)=>{

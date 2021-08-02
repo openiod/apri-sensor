@@ -422,6 +422,7 @@ const getDeviceWifiListCache = function(req,res) {
 const getDeviceWifiList = async function(req,res) {
 //  console.log(`getDeviceWifiList`)
   var restartHotspot=false
+
   if (unit.ssid==unit.connection) { //hotspot active
 //    console.log("deactivate hotspot")
     processStatus.connectionBusy.status=true
@@ -433,6 +434,8 @@ const getDeviceWifiList = async function(req,res) {
 		}	catch(e){}
 //		await sleep(1000);
 		//await hotspotDown()
+
+    // all http connections must be terminated to allow disable hotspot
 		await httpTerminator.terminate()
 		.then((result) =>{
 			console.log('http server terminated')
@@ -453,6 +456,7 @@ const getDeviceWifiList = async function(req,res) {
 			await sleep(6000);
     })
   }
+
 //	await sleep(3000);
 	console.log('retrieveWifiList()')
   retrieveWifiList()
@@ -473,7 +477,9 @@ const getDeviceWifiList = async function(req,res) {
       createHotspotConnection()
 			console.log('http server restart')
 			//server.listen(apiPort);
+
 			initHttpServer()
+
 			return
     }
 		// when restarting as hotspot the connection is broken,
@@ -485,6 +491,7 @@ const getDeviceWifiList = async function(req,res) {
   .catch((error)=>{
 		console.log(`getDeviceWifiList catch`)
 		console.log(error)
+
 		if (restartHotspot==true) {
       console.log(`getDeviceWifiList reactivate hotspot`)
       createHotspotConnection()

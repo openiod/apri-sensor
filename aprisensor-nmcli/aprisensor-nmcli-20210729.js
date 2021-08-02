@@ -340,15 +340,15 @@ const getConnectionShow = function(req,res,callback) {
 			return callback(error, req,res);
 		}
 		var resultJson = columnsToJsonArray(stdout)
-    console.log(resultJson)
+//    console.log(resultJson)
     for (var i=0;i<resultJson.length;i++) {
       var tmpCon = resultJson[i].NAME
       if (unit.connectionStatus[tmpCon]!=undefined) {
         resultJson[i].status = unit.connectionStatus[tmpCon]
       }
-      console.dir(unit.connectionStatus[tmpCon])
+//      console.dir(unit.connectionStatus[tmpCon])
     }
-    console.dir(resultJson)
+//    console.dir(resultJson)
 
 		return callback(resultJson, req,res)
 	});
@@ -600,11 +600,11 @@ const postDeviceConnect = ( url, req, res) => {
       const regex = /password/
       if (unit.connectionStatus[id].message[1].match(regex) !=null) {
         var msg='Wachtwoord niet juist, connectie opnieuw aanmaken.'
-        console.log('add readable text to the message: '+msg)
-        console.dir(unit.connectionStatus[id])
+        //console.log('add readable text to the message: '+msg)
+        //console.dir(unit.connectionStatus[id])
         unit.connectionStatus[id].message.push(msg)
       }
-      console.dir(unit.connectionStatus[id])
+      //console.dir(unit.connectionStatus[id])
 
 			processStatus.connectionBusy.status=false
       processStatus.connectionBusy.statusSince=new Date()
@@ -877,19 +877,12 @@ const tryCandidateConnection2 =function(index) {
     if (unit.connectionStatus[tmpConnection].status!='ERROR') {
       unit.connectionStatus[tmpConnection]={status:'ERROR',statusSince:new Date()}
     }
-    console.log('add error array to connectionStatus ' +tmpConnection)
-    console.log('0: ' + (''+error).split('\n')[0])
-    console.log('1: ' + (''+error).split('\n')[1])
-    console.log('2: ' + (''+error).split('\n')[2])
     unit.connectionStatus[tmpConnection].message=(''+error).split('\n')
     const regex = /password/
     if (unit.connectionStatus[tmpConnection].message[1].match(regex) !=null) {
       var msg='Wachtwoord niet juist, connectie opnieuw aanmaken.'
-      console.log('add readable text to the message: '+msg)
-      console.dir(unit.connectionStatus[tmpConnection])
       unit.connectionStatus[tmpConnection].message.push(msg)
     }
-    console.dir(unit.connectionStatus[tmpConnection])
 
     if (processStatus.connection.status!='ERROR') {
       processStatus.connection.status='ERROR'
@@ -1526,17 +1519,6 @@ const statusCheck = async function() {
     blinkLed(2)
   }
 
-  // let hotspot continue for some time
-  if (unit.ssid == unit.connection) {
-    if (unit.hotspotTill!=undefined && unit.hotspotTill!=NaN ) {
-      var tmpTime=(unit.hotspotTill.getTime()) - (new Date().getTime())
-      if (tmpTime>0) {
-        console.log('Hotspot will stay for ' + tmpTime +' msec')
-        return
-      }
-    }
-  }
-
   // test if nginx process is running, if not start service
   fs.readFile("/var/run/nginx.pid", 'utf8', function (err, data) {
     if (err) {
@@ -1582,6 +1564,28 @@ const statusCheck = async function() {
     unit.connections=[]
     unit.connection=''
   })
+
+  if (unit.connection==unit.ssid &&
+    unit.connections.length==0) {
+    console.log('hotspot active and no wifi configurations configured yet')
+    return
+  }
+  if (unit.connection=='' &&
+    unit.connections.length==0) {
+    console.log('no active connection and no wifi configurations configured yet, create hotspot')
+    createHotspot()
+    return
+  }
+  // let hotspot continue for some time
+  if (unit.ssid == unit.connection) {
+    if (unit.hotspotTill!=undefined && unit.hotspotTill!=NaN ) {
+      var tmpTime=(unit.hotspotTill.getTime()) - (new Date().getTime())
+      if (tmpTime>0) {
+        console.log('Hotspot will stay for ' + tmpTime +' msec')
+        return
+      }
+    }
+  }
 
   // determine with result of ping to (default) gateway if connection is active
   execPromise("ping -q -w 1 -c 1 `ip r | grep default | head -1 | cut -d ' ' -f 3` > /dev/null")

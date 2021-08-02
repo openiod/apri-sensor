@@ -1562,7 +1562,7 @@ const nginxCheck = function() {
   execPromise('LC_ALL=C systemctl is-active nginx ')
   .then((result)=>{
     //console.log('nginx check then ')
-    //console.log(result)
+    console.log(result)
     let tmpResult=(''+result).split('\n')
     console.dir(tmpResult)
     if (tmpResult[0]!='active') {

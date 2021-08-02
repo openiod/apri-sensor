@@ -1619,6 +1619,7 @@ const statusCheck = async function() {
 	if (processStatus.timeSync.status!='OK') checkTimeSync()  // only untill first OK
 
   avahiCheck()
+  nginxCheck()
 
   // retrieve all wifi connections
   await execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')

@@ -1465,7 +1465,7 @@ const getActiveConnection = function() {
 
 const initiateConnectionOrHotspot = function() {
   console.log('SSID:'+unit.ssid+' con:'+unit.connection+' cons:'+JSON.stringify(unit.connections))
-
+/*
   if (unit.connection==''){
     console.log('No connection, checkHotspotActivation')
     // give process some time
@@ -1475,6 +1475,7 @@ const initiateConnectionOrHotspot = function() {
 
     return
   }
+  */
 /*
   if (unit.connection!=unit.ssid){
 //    console.log('No gateway for ' + unit.connection)

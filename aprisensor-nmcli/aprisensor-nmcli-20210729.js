@@ -1691,6 +1691,7 @@ const statusCheck = async function() {
 			processStatus.gateway.status='ERROR'
 			processStatus.gateway.statusSince=new Date()
 		}
+
     // no furter action when recent statusSince, give proces of (re)connecting some time
 //    if (new Date().getTime() - processStatus.gateway.statusSince.getTime() < 10000) {
 //      return
@@ -1703,6 +1704,13 @@ const statusCheck = async function() {
       tmpWaitTime < 30000) {
       console.log('hotspot active wait minimal 30 seconds')
       return
+    }
+    if (unit.connection!=unit.ssid && unit.connection !='') {
+      tmpWaitTime = new Date().getTime() - processStatus.gateway.statusSince.getTime()
+      if (tmpWaitTime < 10000) {
+        console.log('gateway problem less then 10 seconds ago, wait for next round')
+        return
+      }
     }
 
     initiateConnectionOrHotspot()

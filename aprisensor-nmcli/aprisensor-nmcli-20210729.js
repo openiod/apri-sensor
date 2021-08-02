@@ -1516,8 +1516,8 @@ const avahiCheck = function() {
   // test avahi and restart when needed
   execPromise('LC_ALL=C avahi-browse -at | grep IPv4 | grep ' + unit.ssid + ' | head -1 ')
   .then((result)=>{
-    console.log('avahi check then')
-    console.log(result)
+//    console.log('avahi check then')
+//    console.log(result)
     let regex = new RegExp(unit.ssid)
 //    console.log(''+result.stdout.match(regex))
 //    console.log(result.stdout.match(regex))

@@ -988,6 +988,7 @@ var startActionReboot = function() {
 }
 
 const actions = []
+/*
 actions.push(function() {
   // restart avahi-daemon for correct ####.local
 	exec("systemctl stop avahi-daemon ; systemctl start avahi-daemon ", (error, stdout, stderr) => {
@@ -999,6 +1000,7 @@ actions.push(function() {
     nextAction()
 	})
 })
+*/
 actions.push(function() {
 //  console.log('getHostname 1')
 	exec("hostname", (error, stdout, stderr) => {
@@ -1503,6 +1505,29 @@ const blinkLed = function(nr) {
   }
 }
 
+const avahiCheck = function() {
+  // test avahi and restart when needed
+  execPromise('LC_ALL=C avahi-browse -at | grep ' + unit.ssid + ' | head -1 ')
+  .then((result)=>{
+    console.log('avahi check then')
+    console.log(result)
+  })
+  .catch((error)=>{
+    console.log('avahi check catch, restart avahi daemon')
+    avahiRestart()
+  })
+}
+
+const avahiRestart = function() {
+  execPromise("systemctl stop avahi-daemon ; systemctl start avahi-daemon ")
+  .then((result))=>{
+    console.log('restart avahi then')
+  }
+  .catch((error)=>{
+    console.log('restart avahi catch')
+  }
+}
+
 const statusCheck = async function() {
 
   if (processStatus.connectionBusy.status==true) {
@@ -1533,6 +1558,8 @@ const statusCheck = async function() {
 
   getIpAddress()
 	if (processStatus.timeSync.status!='OK') checkTimeSync()  // only untill first OK
+
+  avahiCheck()
 
   // retrieve all wifi connections
   await execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')

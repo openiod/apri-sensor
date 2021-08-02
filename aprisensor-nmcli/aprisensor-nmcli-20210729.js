@@ -878,6 +878,7 @@ const tryCandidateConnection2 =function(index) {
   */
 
   console.log(`tryCandidateConnection ${index} ${unit.connections[index]}`)
+  console.log(unit.connectionStatus[tmpConnection])
   execPromise("LC_ALL=C nmcli connection up '"+unit.connections[index]+"'")
   .then((result)=>{
     if (unit.connectionStatus[tmpConnection].status!='OK') {

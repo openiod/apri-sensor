@@ -292,6 +292,9 @@ var columnsToJsonArray = function(columns) {
     keyArray.push(key)
     var keyPrev=key.index+key.name.length
   }
+
+  if (keyArray.length==0) return resultJson
+
 //	console.dir(keyArray)
   for (var i=0;i<keyArray.length-1;i++){
     keyArray[i].colWidth=keyArray[i+1].index-keyArray[i].index
@@ -339,6 +342,10 @@ const getConnectionShow = function(req,res,callback) {
 			// console.error(`exec error: ${error}`);
 			return callback(error, req,res);
 		}
+    if (stdout=='') {
+      console.log('No connections available, hotspot will be created')
+      createHotspot()
+    }
 		var resultJson = columnsToJsonArray(stdout)
 //    console.log(resultJson)
     for (var i=0;i<resultJson.length;i++) {
@@ -636,24 +643,24 @@ const postApConnect = async ( url, req, res) => {
     var result ={}
     try {
       result = JSON.parse(lzString.decompress(body))
-      console.log(result)
+      //console.log(result)
     }
     catch {
-      console.log('**********************')
-      console.log(body)
+      console.log('** catch decompress ********************')
+      //console.log(body)
       //console.log(lzString.decompress(body))
       result={error:'decompress'}
     }
-    console.log(body)
+    //console.log(body)
     if (result == null || result.error=='decompress') {
       console.log('try uncompressed')
       try {
         result = JSON.parse(body)
-        console.log(result)
+        //console.log(result)
       }
       catch {
-        console.log('**********************')
-        console.log(body)
+        console.log('** catch uncompressed ********************')
+        //console.log(body)
         result={error:'json'}
       }
     }
@@ -690,10 +697,10 @@ const postApConnect = async ( url, req, res) => {
       ssid '"+ssid+"' \
       802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk '"+passwd+"' \
       wifi-sec.key-mgmt wpa-psk wifi-sec.psk '"+passwd+"' "
-    console.log(createCommand)
+    //console.log(createCommand)
     execPromise(createCommand)
     .then((result)=>{
-			console.log('then')
+			console.log('nmcli connection add then')
 //			console.log(result)
 			processStatus.connectionBusy.status=false
       processStatus.connectionBusy.statusSince=new Date()
@@ -820,6 +827,8 @@ const tryCandidateConnection2 =function(index) {
 		processStatus.connectionBusy.status=true
 		processStatus.connectionBusy.statusSince=new Date()
 	}
+
+
   // no (more) connections to try
   if (index>unit.connections.length-1) {
     console.log('0. Activate hotspot connection')
@@ -837,19 +846,27 @@ const tryCandidateConnection2 =function(index) {
     //processStatus.connectionBusy.statusSince=new Date()
     return
   }
+
 	// ignore hotspot connection
 	if (unit.connections[index]==unit.ssid) {
 		tryCandidateConnection2(index+1)
 		return
 	}
 
-  //// give processing some time
-  //processStatus.gateway.statusSince=new Date()
-
   var tmpConnection = unit.connections[index]
   if (unit.connectionStatus[tmpConnection]==undefined) {
     unit.connectionStatus[tmpConnection]={status:null}
   }
+
+  if (unit.connectionStatus[tmpConnection].passwordError == true &&
+    new Date() - unit.connectionStatus[tmpConnection].statusSince< 120000) {
+    console.log('Wait time for connection '+tmpConnection+' less than 120 seconds (password error) ')
+    tryCandidateConnection2(index+1)
+		return
+  }
+  //// give processing some time
+  //processStatus.gateway.statusSince=new Date()
+
   /*
   // ignore connection already tried less then 5 minutes ago
 	if (unit.connectionStatus[tmpConnection].status=='ERROR') {
@@ -888,15 +905,9 @@ const tryCandidateConnection2 =function(index) {
     const regex = /password/
     if (unit.connectionStatus[tmpConnection].message[1].match(regex) !=null) {
       var msg='Wachtwoord niet juist, connectie opnieuw aanmaken.'
-      unit.connectionStatus[tmpConnection].message.push(msg)
+      unit.connectionStatus[tmpConnection].passwordError = true
     }
 
-    if (processStatus.connection.status!='ERROR') {
-      processStatus.connection.status='ERROR'
-      processStatus.connection.statusSince=new Date()
-    }
-    processStatus.connection.code=400
-    processStatus.connection.message=error
     tryCandidateConnection2(index+1)
   })
 }

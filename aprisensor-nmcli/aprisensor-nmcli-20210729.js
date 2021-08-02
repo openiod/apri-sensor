@@ -1564,6 +1564,7 @@ const nginxCheck = function() {
     //console.log('nginx check then ')
     //console.log(result)
     let tmpResult=(''+result).split('\n')
+    console.dir(tmpResult)
     if (tmpResult[0]!='active') {
       execPromise('LC_ALL=C systemctl restart nginx ')
       .then((result)=>{

@@ -1528,6 +1528,34 @@ const avahiRestart = function() {
   }
 }
 
+const nginxCheck = function() {
+  // test nginx and restart when needed
+  execPromise('LC_ALL=C systemctl is-active nginx ')
+  .then((result)=>{
+    console.log('nginx check then ')
+    console.log(result)
+    if (result!='active') {
+      execPromise('LC_ALL=C systemctl restart nginx ')
+      .then((result)=>{
+        console.log('nginx restart then ')
+      })
+      .catch((error)=>{
+        console.log('nginx restart catch ')
+      })
+    }
+  })
+  .catch((error)=>{
+    console.log('nginx check catch, restart nginx')
+    execPromise('LC_ALL=C systemctl restart nginx ')
+    .then((result)=>{
+      console.log('nginx restart then ')
+    })
+    .catch((error)=>{
+      console.log('nginx restart catch ')
+    })
+  })
+}
+
 const statusCheck = async function() {
 
   if (processStatus.connectionBusy.status==true) {
@@ -1544,6 +1572,7 @@ const statusCheck = async function() {
     blinkLed(2)
   }
 
+/*
   // test if nginx process is running, if not start service
   fs.readFile("/var/run/nginx.pid", 'utf8', function (err, data) {
     if (err) {
@@ -1555,6 +1584,7 @@ const statusCheck = async function() {
       })
     }
   });
+*/
 
   getIpAddress()
 	if (processStatus.timeSync.status!='OK') checkTimeSync()  // only untill first OK

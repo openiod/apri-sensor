@@ -1519,9 +1519,9 @@ const avahiCheck = function() {
     console.log('avahi check then')
     console.log(result)
     let regex = new RegExp(unit.ssid)
-    console.log(''+result.stdout.match(regex))
-    console.log(result.stdout.match(regex))
-    if (''+result.stdout.match(regex) ==null) {
+//    console.log(''+result.stdout.match(regex))
+//    console.log(result.stdout.match(regex))
+    if (''+result.stdout.match(regex) !=unit.ssid) {
       console.log('SSID '+unit.ssid+' not found with avahi-browse, restart avahi-daemon')
       avahiRestart()
     }

@@ -431,7 +431,7 @@ const getDeviceWifiList = async function(req,res) {
   var restartHotspot=false
 
   if (unit.ssid==unit.connection) { //hotspot active
-//    console.log("deactivate hotspot")
+    console.log("deactivate hotspot")
     processStatus.connectionBusy.status=true
     processStatus.connectionBusy.statusSince=new Date()
 		try {
@@ -464,7 +464,7 @@ const getDeviceWifiList = async function(req,res) {
     })
   }
 
-//	await sleep(3000);
+	await sleep(3000)
 	console.log('retrieveWifiList()')
   retrieveWifiList()
   .then((result) => {

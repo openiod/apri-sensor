@@ -1514,10 +1514,15 @@ const blinkLed = function(nr) {
 
 const avahiCheck = function() {
   // test avahi and restart when needed
-  execPromise('LC_ALL=C avahi-browse -at | grep ' + unit.ssid + ' | head -1 ')
+  execPromise('LC_ALL=C avahi-browse -at | grep IPv4 | grep ' + unit.ssid + ' | head -1 ')
   .then((result)=>{
     console.log('avahi check then')
     console.log(result)
+    const regex = new RegExp(unit.ssid)
+    if (''+result.match(regex) ==null) {
+      console.log('SSID '+unit.ssid+' not found with avahi-browse, restart avahi-daemon')
+      avahiRestart()
+    }
   })
   .catch((error)=>{
     console.log('avahi check catch, restart avahi daemon')

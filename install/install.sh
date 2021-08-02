@@ -8,6 +8,12 @@
 # start Raspberry Pi with ethernet usb adapter
 # ssh to pi@ipaddress
 
+### ===== upgrade to V2-20210726 or later
+# mkdir -p /opt/SCAPE604/git
+# cd /opt/SCAPE604/git ; git clone https://github.com/openiod/apri-sensor.git
+# sudo /opt/SCAPE604/git/apri-sensor/install/git2as.sh
+### ===== end upgrade proc
+
 # make truncated img (copy) of sdcard on Debian:
 #  df -h (partitions: /dev/sda1 /dev/sda2 ; device /dev/sda)
 # sudo umount /dev/sda1 /dev/sda2

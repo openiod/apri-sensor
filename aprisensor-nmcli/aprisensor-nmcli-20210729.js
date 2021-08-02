@@ -836,6 +836,7 @@ const tryCandidateConnection2 =function(index) {
     .then( (result)=>{
       setHotspotStatus('OK',200)
       unit.connection=unit.ssid
+      processStatus.hotspot.statusSince=new Date()
       processStatus.connectionBusy.status=false
       processStatus.connectionBusy.statusSince=new Date()
     })

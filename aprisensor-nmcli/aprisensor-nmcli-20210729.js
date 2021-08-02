@@ -1527,7 +1527,7 @@ const avahiCheck = function() {
 
 const avahiRestart = function() {
   execPromise("systemctl stop avahi-daemon ; systemctl start avahi-daemon ")
-  .then((result))=>{
+  .then((result)=>{
     console.log('restart avahi then')
   }
   .catch((error)=>{

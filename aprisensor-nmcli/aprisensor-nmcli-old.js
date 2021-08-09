@@ -93,7 +93,7 @@ var setGpioBlueLedOff = function() {
 
 
 
-var unit = {'connectionStatus':{},connection:'',connections:[] }
+var unit = {'connectionStatus':{} }
 var unitCrypto={}
 
 var connectionsIndex=0
@@ -277,7 +277,7 @@ initHttpServer()
 // **********************************************************************************
 
 var columnsToJsonArray = function(columns) {
-	var records = (''+columns).split('\n')
+	var records = columns.split('\n')
 	var resultJson=[]
   var keyArray=[]
 	// split record 1 at space(s) (column labels)
@@ -292,9 +292,6 @@ var columnsToJsonArray = function(columns) {
     keyArray.push(key)
     var keyPrev=key.index+key.name.length
   }
-
-  if (keyArray.length==0) return resultJson
-
 //	console.dir(keyArray)
   for (var i=0;i<keyArray.length-1;i++){
     keyArray[i].colWidth=keyArray[i+1].index-keyArray[i].index
@@ -340,23 +337,9 @@ const getConnectionShow = function(req,res,callback) {
 	exec("LC_ALL=C nmcli connection show ", (error, stdout, stderr) => {
 		if (error) {
 			// console.error(`exec error: ${error}`);
-			return callback(error, req,res);
+			return callback(resultJson, req,res);
 		}
-    if (stdout=='') {
-      console.log('No connections available, hotspot will be created')
-      createHotspot()
-    }
 		var resultJson = columnsToJsonArray(stdout)
-//    console.log(resultJson)
-    for (var i=0;i<resultJson.length;i++) {
-      var tmpCon = resultJson[i].NAME
-      if (unit.connectionStatus[tmpCon]!=undefined) {
-        resultJson[i].status = unit.connectionStatus[tmpCon]
-      }
-//      console.dir(unit.connectionStatus[tmpCon])
-    }
-//    console.dir(resultJson)
-
 		return callback(resultJson, req,res)
 	});
 }
@@ -429,9 +412,8 @@ const getDeviceWifiListCache = function(req,res) {
 const getDeviceWifiList = async function(req,res) {
 //  console.log(`getDeviceWifiList`)
   var restartHotspot=false
-
   if (unit.ssid==unit.connection) { //hotspot active
-    console.log("deactivate hotspot")
+//    console.log("deactivate hotspot")
     processStatus.connectionBusy.status=true
     processStatus.connectionBusy.statusSince=new Date()
 		try {
@@ -441,8 +423,6 @@ const getDeviceWifiList = async function(req,res) {
 		}	catch(e){}
 //		await sleep(1000);
 		//await hotspotDown()
-
-    // all http connections must be terminated to allow disable hotspot
 		await httpTerminator.terminate()
 		.then((result) =>{
 			console.log('http server terminated')
@@ -463,8 +443,7 @@ const getDeviceWifiList = async function(req,res) {
 			await sleep(6000);
     })
   }
-
-	await sleep(3000)
+//	await sleep(3000);
 	console.log('retrieveWifiList()')
   retrieveWifiList()
   .then((result) => {
@@ -484,9 +463,7 @@ const getDeviceWifiList = async function(req,res) {
       createHotspotConnection()
 			console.log('http server restart')
 			//server.listen(apiPort);
-
 			initHttpServer()
-
 			return
     }
 		// when restarting as hotspot the connection is broken,
@@ -498,7 +475,6 @@ const getDeviceWifiList = async function(req,res) {
   .catch((error)=>{
 		console.log(`getDeviceWifiList catch`)
 		console.log(error)
-
 		if (restartHotspot==true) {
       console.log(`getDeviceWifiList reactivate hotspot`)
       createHotspotConnection()
@@ -560,40 +536,27 @@ const postPublicKey = ( url, req, res) => {
 
 const postDeviceConnect = ( url, req, res) => {
   console.log(url)
-  if (processStatus.connectionBusy.status == true) {
-    console.log('resource busy, retry later')
-  	res.writeHead(400);
-		res.write(JSON.stringify({error:400,message: 'sensorkit is bezig, even wachten en dan opnieuw proberen'}));
-		res.end();
-    return
-  }
 	processStatus.connectionBusy.status=true
   processStatus.connectionBusy.statusSince=new Date()
   let body = '';
   req.on('data', chunk => {
     body += chunk.toString(); // convert Buffer to string
   });
-  req.on('end', () => {
+  req.on('end', async () => {
 		var result = JSON.parse(body)
 		var id =result.NAME
-    if (unit.connectionStatus[id]==undefined) {
-      unit.connectionStatus[id]={status:'INIT',statusSince:new Date()}
-    }
 		//if (result.key=='device') id=result.DEVICE
 		//if (result.key=='name') id=result.NAME
 		//if (result.key=='type') id=result.TYPE
 //    exec("LC_ALL=C nmcli device wifi connect '"+id+ "' password '"+result.password+"'", (error, stdout, stderr) => {
-	  execPromise("LC_ALL=C nmcli connection up '"+id+"'")
+	  await execPromise("LC_ALL=C nmcli connection up '"+id+"'")
     .then((result)=> {
-      console.log(`postDeviceConnect then ${id} `)
-      unit.connection=id
-      if (unit.connectionStatus[id].status!='OK') {
-        unit.connectionStatus[id]={status:'OK',statusSince:new Date()}
+      if (processStatus.connection.status!='OK') {
+        processStatus.connection.status='OK'
+        processStatus.connection.statusSince=new Date()
       }
-      if (id==unit.ssid) {
-        processStatus.hotspot.status='OK'
-        processStatus.hotspot.statusSince=new Date()
-      }
+      processStatus.connection.code=200
+      processStatus.connection.message=''
 			processStatus.connectionBusy.status=false
       processStatus.connectionBusy.statusSince=new Date()
   		res.writeHead(200);
@@ -601,25 +564,13 @@ const postDeviceConnect = ( url, req, res) => {
   	  res.end(`Device connected`);
     })
     .catch((error)=>{
-      console.log('id: '+id)
       console.error(`exec error: ${error}`);
-      unit.connection=''
-      if (unit.connectionStatus[id]==undefined) {
-        unit.connectionStatus[id]={status:'ERROR',statusSince:new Date()}
+      if (processStatus.connection.status!='ERROR') {
+        processStatus.connection.status='ERROR'
+        processStatus.connection.statusSince=new Date()
       }
-      if (unit.connectionStatus[id].status!='ERROR') {
-        unit.connectionStatus[id]={status:'ERROR',statusSince:new Date()}
-      }
-      unit.connectionStatus[id].message=(''+error).split('\n')
-      const regex = /password/
-      if (unit.connectionStatus[id].message[1].match(regex) !=null) {
-        var msg='Wachtwoord niet juist, connectie opnieuw aanmaken.'
-        //console.log('add readable text to the message: '+msg)
-        //console.dir(unit.connectionStatus[id])
-        unit.connectionStatus[id].message.push(msg)
-      }
-      //console.dir(unit.connectionStatus[id])
-
+      processStatus.connection.code=400
+      processStatus.connection.message=error
 			processStatus.connectionBusy.status=false
       processStatus.connectionBusy.statusSince=new Date()
 			res.writeHead(400);
@@ -643,24 +594,24 @@ const postApConnect = async ( url, req, res) => {
     var result ={}
     try {
       result = JSON.parse(lzString.decompress(body))
-      //console.log(result)
+      console.log(result)
     }
     catch {
-      console.log('** catch decompress ********************')
-      //console.log(body)
+      console.log('**********************')
+      console.log(body)
       //console.log(lzString.decompress(body))
       result={error:'decompress'}
     }
-    //console.log(body)
+    console.log(body)
     if (result == null || result.error=='decompress') {
       console.log('try uncompressed')
       try {
         result = JSON.parse(body)
-        //console.log(result)
+        console.log(result)
       }
       catch {
-        console.log('** catch uncompressed ********************')
-        //console.log(body)
+        console.log('**********************')
+        console.log(body)
         result={error:'json'}
       }
     }
@@ -689,6 +640,9 @@ const postApConnect = async ( url, req, res) => {
     .then((result)=>{console.log('then connection delete')})
     .catch((error)=>{console.log('catch connection delete')})
     console.log('connection create')
+/*
+nmcli connection add type wifi ifname wlp7s0 con-name ap-24 autoconnect no ssid ap-24 ipv4.method shared 802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk 'iam@Home' ipv6.method shared
+*/
 //    var createCommand= "LC_ALL=C nmcli connection  type wifi ifname '"+unit.ifname+"' con-name '"+ssid+"' autoconnect yes  \
 //ipv4.method shared 802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk '"+passwd+"' \
 //      802-1x.eap pwd 802-1x.password '"+passwd+"' \
@@ -697,10 +651,10 @@ const postApConnect = async ( url, req, res) => {
       ssid '"+ssid+"' \
       802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk '"+passwd+"' \
       wifi-sec.key-mgmt wpa-psk wifi-sec.psk '"+passwd+"' "
-    //console.log(createCommand)
+    console.log(createCommand)
     execPromise(createCommand)
     .then((result)=>{
-			console.log('nmcli connection add then')
+			console.log('then')
 //			console.log(result)
 			processStatus.connectionBusy.status=false
       processStatus.connectionBusy.statusSince=new Date()
@@ -710,14 +664,12 @@ const postApConnect = async ( url, req, res) => {
 		})
     .catch((error)=>{
 			console.log(error)
-      unit.connection=''
 			processStatus.connectionBusy.status=false
       processStatus.connectionBusy.statusSince=new Date()
 			res.writeHead(400);
       res.write(`{error:400,message: '${error}'}`);
       res.end();
 		})
-
 /*
     console.log('connection up')
     await execPromise("LC_ALL=C nmcli connection up '"+ssid+ "'")
@@ -770,7 +722,7 @@ const hotspotDelete = function() {
   return execPromise("LC_ALL=C nmcli connection delete '"+unit.ssid+"'")
 }
 
-const tryCandidateConnection = function(index) {
+const tryCandidateConnection = async function(index) {
   // give processing some time
   processStatus.gateway.statusSince=new Date()
 
@@ -801,14 +753,16 @@ const tryCandidateConnection = function(index) {
 	}
   if (unit.connectionStatus[tmpConnection] ==undefined) unit.connectionStatus[tmpConnection]={}
   console.log(`tryCandidateConnection ${index} ${unit.connections[index]}`)
-  execPromise("LC_ALL=C nmcli connection up '"+unit.connections[index]+"'")
+  await execPromise("LC_ALL=C nmcli connection up '"+unit.connections[index]+"'")
   .then((result)=>{
-    console.log(`tryCandidateConnection then ${index} ${unit.connections[index]}`)
     if (unit.connectionStatus[tmpConnection].status!='OK') {
       unit.connectionStatus[tmpConnection]={status:'OK',statusSince:new Date()}
     }
+    console.log(`tryCandidateConnection then ${index} ${unit.connections[index]}`)
     processStatus.connectionBusy.status=false
     processStatus.connectionBusy.statusSince=new Date()
+		processStatus.gateway.statusSince=new Date()
+		processStatus.gateway.status='OK' // give some time to settle connection (gateway setting etc.)
   })
   .catch((error)=>{
     console.log(`tryCandidateConnection catch ${index} ${unit.connections[index]}`)
@@ -816,7 +770,13 @@ const tryCandidateConnection = function(index) {
     if (unit.connectionStatus[tmpConnection].status!='ERROR') {
       unit.connectionStatus[tmpConnection]={status:'ERROR',statusSince:new Date()}
     }
-    unit.connectionStatus[tmpConnection].message=error.split('\n')
+    unit.connectionStatus[tmpConnection]={status:'ERROR',statusLatest:new Date()}
+    if (processStatus.connection.status!='ERROR') {
+      processStatus.connection.status='ERROR'
+      processStatus.connection.statusSince=new Date()
+    }
+    processStatus.connection.code=400
+    processStatus.connection.message=error
     tryCandidateConnection(index+1)
   })
 }
@@ -827,47 +787,25 @@ const tryCandidateConnection2 =function(index) {
 		processStatus.connectionBusy.status=true
 		processStatus.connectionBusy.statusSince=new Date()
 	}
-
-
   // no (more) connections to try
   if (index>unit.connections.length-1) {
-    console.log('0. Activate hotspot connection')
-    execPromise("LC_ALL=C nmcli connection up '"+unit.ssid+"'")
-    .then( (result)=>{
-      setHotspotStatus('OK',200)
-      unit.connection=unit.ssid
-      processStatus.hotspot.statusSince=new Date()
-      processStatus.connectionBusy.status=false
-      processStatus.connectionBusy.statusSince=new Date()
-    })
-    .catch( (error)=>{
-      createHotspot()
-    })
-    //processStatus.connectionBusy.status=false
-    //processStatus.connectionBusy.statusSince=new Date()
+    processStatus.connectionBusy.status=false
+    processStatus.connectionBusy.statusSince=new Date()
     return
   }
-
 	// ignore hotspot connection
 	if (unit.connections[index]==unit.ssid) {
 		tryCandidateConnection2(index+1)
 		return
 	}
 
+  // give processing some time
+  processStatus.gateway.statusSince=new Date()
+
   var tmpConnection = unit.connections[index]
   if (unit.connectionStatus[tmpConnection]==undefined) {
     unit.connectionStatus[tmpConnection]={status:null}
   }
-
-  if (unit.connectionStatus[tmpConnection].passwordError == true &&
-    new Date() - unit.connectionStatus[tmpConnection].statusSince< 120000) {
-    console.log('Wait time for connection '+tmpConnection+' less than 120 seconds (password error) ')
-    tryCandidateConnection2(index+1)
-		return
-  }
-  //// give processing some time
-  //processStatus.gateway.statusSince=new Date()
-
   /*
   // ignore connection already tried less then 5 minutes ago
 	if (unit.connectionStatus[tmpConnection].status=='ERROR') {
@@ -879,7 +817,6 @@ const tryCandidateConnection2 =function(index) {
   */
 
   console.log(`tryCandidateConnection ${index} ${unit.connections[index]}`)
-  console.log(unit.connectionStatus[tmpConnection])
   execPromise("LC_ALL=C nmcli connection up '"+unit.connections[index]+"'")
   .then((result)=>{
     if (unit.connectionStatus[tmpConnection].status!='OK') {
@@ -903,14 +840,13 @@ const tryCandidateConnection2 =function(index) {
     if (unit.connectionStatus[tmpConnection].status!='ERROR') {
       unit.connectionStatus[tmpConnection]={status:'ERROR',statusSince:new Date()}
     }
-    unit.connectionStatus[tmpConnection].message=(''+error).split('\n')
-    const regex = /password/
-    if (unit.connectionStatus[tmpConnection].message[1].match(regex) !=null) {
-      var msg='Wachtwoord niet juist, connectie opnieuw aanmaken a.u.b.'
-      unit.connectionStatus[tmpConnection].message.push(msg)
-      unit.connectionStatus[tmpConnection].passwordError = true
+    unit.connectionStatus[tmpConnection].message=error
+    if (processStatus.connection.status!='ERROR') {
+      processStatus.connection.status='ERROR'
+      processStatus.connection.statusSince=new Date()
     }
-
+    processStatus.connection.code=400
+    processStatus.connection.message=error
     tryCandidateConnection2(index+1)
   })
 }
@@ -957,7 +893,7 @@ const createHotspotConnection=function(){
 
   execPromise(hotspotCommand)
   .then((result)=>{
-    //setHotspotStatus('OK',200)
+    setHotspotStatus('OK',200)
     setHotspotUp()
   })
   .catch((error)=>{
@@ -976,15 +912,15 @@ const setHotspotUp = function() {
     processStatus.connectionBusy.status=false
     processStatus.connectionBusy.statusSince=new Date()
     // give processing some time
-//    processStatus.gateway.statusSince=new Date()
-//    getIpAddress()
+    processStatus.gateway.statusSince=new Date()
+    getIpAddress()
   })
   .catch( (error)=>{
     unit.connection=''
     processStatus.connectionBusy.status=false
     processStatus.connectionBusy.statusSince=new Date()
     // give processing some time
-//    processStatus.gateway.statusSince=new Date()
+    processStatus.gateway.statusSince=new Date()
     setHotspotStatus('ERROR',400,error)
   })
 }
@@ -1009,7 +945,6 @@ var startActionReboot = function() {
 }
 
 const actions = []
-/*
 actions.push(function() {
   // restart avahi-daemon for correct ####.local
 	exec("systemctl stop avahi-daemon ; systemctl start avahi-daemon ", (error, stdout, stderr) => {
@@ -1021,7 +956,6 @@ actions.push(function() {
     nextAction()
 	})
 })
-*/
 actions.push(function() {
 //  console.log('getHostname 1')
 	exec("hostname", (error, stdout, stderr) => {
@@ -1218,7 +1152,7 @@ actions.push(async function() {
 
 
 function getIpAddress() {
-	//console.log('getIpAddress')
+	console.log('getIpAddress')
   execPromise('hostname --all-ip-address')
 	.then((result)=> {
 	  var stdoutArray	= result.stdout.split('\n');
@@ -1370,24 +1304,23 @@ var createService	= function(sensor, sensorKey) {
 const checkHotspotActivation= async function() {
   // hotspot only for ApriSensor (SCRP*)
 //  if (unit.serial.substr(0,4) == 'SCRP') {
-//    await getGateway()
-//    if (processStatus.gateway.status != 'OK') {
-//      if (processStatus.timeSync.status!='ERROR') {
-//        processStatus.timeSync.status='ERROR'
-//        processStatus.timeSync.statusSince=new Date()
-//      }
+    await getGateway()
+    if (processStatus.gateway.status != 'OK') {
+      if (processStatus.timeSync.status!='ERROR') {
+        processStatus.timeSync.status='ERROR'
+        processStatus.timeSync.statusSince=new Date()
+      }
       console.log(`ApriSensor unit, starting hotspot for ${unit.serial} with ssid ${unit.ssid}`)
       createHotspot()
-//    } else {
-//      console.log(`gateway: ${unit.gateway}`)
-//    }
+    } else {
+      console.log(`gateway: ${unit.gateway}`)
+    }
 
 //  } else {
 //    console.log(`Not an ApriSensor unit, no automatic start as hotspot for ${unit.serial}`)
 //  }
 }
 
-/*
 // when online no automatic activation of the hotspot necessary
 const getGateway = async function() {
   await execPromise('ip route | grep "default via" ')
@@ -1409,7 +1342,7 @@ const getGateway = async function() {
     }
   })
 }
-*/
+
 const checkTimeSync = async function() {
   // get file attributes for last time synchronization date & time
   fs.stat("/var/lib/systemd/timesync/clock", async (err, stat) => {
@@ -1464,42 +1397,34 @@ const getActiveConnection = function() {
 }
 
 const initiateConnectionOrHotspot = function() {
-  console.log('SSID:'+unit.ssid+' con:'+unit.connection+' cons:'+JSON.stringify(unit.connections))
-/*
   if (unit.connection==''){
     console.log('No connection, checkHotspotActivation')
     // give process some time
-//    processStatus.gateway.statusSince=new Date()
-//    checkHotspotActivation()
-    createHotspot()
-
+    processStatus.gateway.statusSince=new Date()
+    checkHotspotActivation()
     return
   }
-  */
-/*
   if (unit.connection!=unit.ssid){
-//    console.log('No gateway for ' + unit.connection)
-//    if (new Date().getTime() - processStatus.gateway.statusSince.getTime() > 20000) {
+    console.log('No gateway for ' + unit.connection)
+    if (new Date().getTime() - processStatus.gateway.statusSince.getTime() > 20000) {
       console.log('No gateway for ' + unit.connection + ', activating hotspot')
       // give process some time
-//      processStatus.gateway.statusSince=new Date()
-//      checkHotspotActivation()
-      createHotspot()
-//    }
+      processStatus.gateway.statusSince=new Date()
+      checkHotspotActivation()
+    }
     return
   }
-*/
-//  if (unit.connection==unit.ssid){
+
+  if (unit.connection==unit.ssid){
     // hotspot status will last at least x time and will stay active as long wifi-config-web page active
-
-
-    if (unit.connections.length > 0 ){
-      connectionsIndex=0
-      console.log('tryCandidateConnection starting with index 0')
-      tryCandidateConnection2(connectionsIndex)
-    } else {
-      createHotspot()
+    if (new Date().getTime() - processStatus.hotspot.statusSince.getTime() >10000){
+      if (unit.connections.length > 0 ){
+        connectionsIndex=0
+        console.log('tryCandidateConnection starting with index 0')
+        tryCandidateConnection2(connectionsIndex)
+      }
     }
+  }
 
 }
 
@@ -1527,81 +1452,12 @@ const blinkLed = function(nr) {
   }
 }
 
-const avahiCheck = function() {
-  // test avahi and restart when needed
-  execPromise('LC_ALL=C avahi-browse -at | grep IPv4 | grep ' + unit.ssid + ' | head -1 ')
-  .then((result)=>{
-//    console.log('avahi check then')
-//    console.log(result)
-    let regex = new RegExp(unit.ssid)
-//    console.log(''+result.stdout.match(regex))
-//    console.log(result.stdout.match(regex))
-    if (''+result.stdout.match(regex) !=unit.ssid) {
-      console.log('SSID '+unit.ssid+' not found with avahi-browse, restart avahi-daemon')
-      avahiRestart()
-    }
-  })
-  .catch((error)=>{
-    console.log('avahi check catch, restart avahi daemon')
-    avahiRestart()
-  })
-}
-
-const avahiRestart = function() {
-  execPromise("systemctl stop avahi-daemon ; systemctl start avahi-daemon ")
-  .then((result)=>{
-    console.log('restart avahi then')
-  })
-  .catch((error)=>{
-    console.log('restart avahi catch')
-  })
-}
-
-const nginxCheck = function() {
-  // test nginx and restart when needed
-  execPromise('LC_ALL=C systemctl is-active nginx ')
-  .then((result)=>{
-    //console.log('nginx check then ')
-    let tmpResult=(''+result.stdout).split('\n')
-    if (tmpResult[0]!='active') {
-      execPromise('LC_ALL=C systemctl restart nginx ')
-      .then((result)=>{
-        console.log('nginx restart then ')
-      })
-      .catch((error)=>{
-        console.log('nginx restart catch ')
-      })
-    }
-  })
-  .catch((error)=>{
-    console.log('nginx check catch, restart nginx')
-    execPromise('LC_ALL=C systemctl restart nginx ')
-    .then((result)=>{
-      console.log('nginx restart then ')
-    })
-    .catch((error)=>{
-      console.log('nginx restart catch ')
-    })
-  })
-}
-
 const statusCheck = async function() {
 
-  if (processStatus.connectionBusy.status==true) {
-    // blink led
-    blinkLed(47)
-    console.log('waiting,processStatus.connectionBusy.status==true')
-    return
-  }
-  if (unit.connection==unit.ssid){
-    blinkLed(0)
-    setGpioBlueLedOn()
-  } else {
-    // blink once showing process is active
-    blinkLed(2)
-  }
+//############################
+//if (unit.hostname =='9EB6.local') {
+//############################
 
-/*
   // test if nginx process is running, if not start service
   fs.readFile("/var/run/nginx.pid", 'utf8', function (err, data) {
     if (err) {
@@ -1613,16 +1469,35 @@ const statusCheck = async function() {
       })
     }
   });
-*/
 
-  getIpAddress()
-	if (processStatus.timeSync.status!='OK') checkTimeSync()  // only untill first OK
 
-  avahiCheck()
-  nginxCheck()
+  if (processStatus.connectionBusy.status==true) {
+    // blink led
+    blinkLed(200)
+    console.log('waiting,processStatus.connectionBusy.status==true')
+    return
+  } else {
+    if (unit.connection==unit.ssid){
+      setGpioBlueLedOn()
+    } else {
+      //setGpioBlueLedOff()
+      // stop blink
+      blinkLed(0)
+    }
+  }
 
-  // retrieve all wifi connections
-  await execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')
+  // let hotspot continue for some time
+  if (unit.ssid == unit.connection) {
+    if (unit.hotspotTill!=undefined && unit.hotspotTill!=NaN ) {
+      var tmpTime=(unit.hotspotTill.getTime()) - (new Date().getTime())
+      if (tmpTime>0) {
+        console.log('Hotspot will stay for ' + tmpTime +' msec')
+        return
+      }
+    }
+  }
+  // retrieve all wifi connections (no await)
+  execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')
   .then((result)=>{
     //console.log('status check get all connections then')
     var stdoutArray	= result.stdout.split('\n');
@@ -1636,7 +1511,7 @@ const statusCheck = async function() {
     }
     getActiveConnection()
     .then((result)=>{
-      //console.log("getActiveConnection then")
+      console.log("getActiveConnection then")
       var stdoutArray	= result.stdout.split(' ');
       var tmp=stdoutArray[stdoutArray.length-1]
       unit.connection=tmp.split('\n')[0]
@@ -1652,39 +1527,16 @@ const statusCheck = async function() {
     unit.connection=''
   })
 
-  if (unit.connection==unit.ssid &&
-    unit.connections.length==0) {
-    console.log('hotspot active and no wifi configurations configured yet')
-    return
-  }
-  if (unit.connection=='' &&
-    unit.connections.length==0) {
-    console.log('no active connection and no wifi configurations configured yet, create hotspot')
-    createHotspot()
-    return
-  }
-  // let hotspot continue for some time
-  if (unit.ssid == unit.connection) {
-    if (unit.hotspotTill!=undefined && unit.hotspotTill!=NaN ) {
-      var tmpTime=(unit.hotspotTill.getTime()) - (new Date().getTime())
-      if (tmpTime>0) {
-        console.log('Hotspot will stay for ' + tmpTime +' msec')
-        return
-      }
-    }
-  }
-
+  getIpAddress()
+	checkTimeSync()
+  console.dir(unit)
   // determine with result of ping to (default) gateway if connection is active
   execPromise("ping -q -w 1 -c 1 `ip r | grep default | head -1 | cut -d ' ' -f 3` > /dev/null")
   .then((result)=>{
-    if (processStatus.gateway.status!='OK') {
-      processStatus.gateway.status='OK'
-      processStatus.gateway.statusSince=new Date()
-    }
-    // blink twice showing process is active and gateway OK
-    blinkLed(5)
-    console.log('status gateway OK since '+ processStatus.gateway.statusSince.toISOString()+
-      ' SSID:'+unit.ssid+' con:'+unit.connection+' cons:'+JSON.stringify(unit.connections))
+    console.log('statusCheck then: '+result)
+    // console.dir(result) -> result.stderr result.stdout
+    processStatus.gateway.status='OK'
+    processStatus.gateway.statusSince=new Date()
     return
   }).catch((error)=>{
     console.log('statusCheck catch: '+error)
@@ -1693,32 +1545,10 @@ const statusCheck = async function() {
 			processStatus.gateway.status='ERROR'
 			processStatus.gateway.statusSince=new Date()
 		}
-
     // no furter action when recent statusSince, give proces of (re)connecting some time
-//    if (new Date().getTime() - processStatus.gateway.statusSince.getTime() < 10000) {
-//      return
-//    }
-    console.log('Hotspot status: '+processStatus.hotspot.status)
-    var tmpWaitTime = new Date().getTime() - processStatus.hotspot.statusSince.getTime()
-    console.log('Hotspot time: '+ tmpWaitTime)
-    console.log(unit.connection +' '+unit.ssid)
-    if (unit.connection==unit.ssid &&
-      tmpWaitTime < 30000) {
-      console.log('hotspot active wait minimal 30 seconds')
+    if (new Date().getTime() - processStatus.gateway.statusSince.getTime() < 10000) {
       return
     }
-    if (unit.connection!=unit.ssid && unit.connection !='') {
-      tmpWaitTime = new Date().getTime() - processStatus.gateway.statusSince.getTime()
-      if (tmpWaitTime < 10000) {
-        console.log('gateway problem less then 10 seconds ago, wait for next round')
-        return
-      }
-    }
-
-    initiateConnectionOrHotspot()
-
-
-    /*
     // retrieve all wifi connections (no await)
     execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')
     .then((result)=>{
@@ -1739,8 +1569,8 @@ const statusCheck = async function() {
     		var tmp=stdoutArray[stdoutArray.length-1]
     		unit.connection=tmp.split('\n')[0]
     		//console.log(unit.connection)
-//        console.dir(processStatus)
-//        console.dir(unit)
+        console.dir(processStatus)
+        console.dir(unit)
         initiateConnectionOrHotspot()
     	})
     	.catch((error)=>{
@@ -1748,8 +1578,8 @@ const statusCheck = async function() {
     		unit.connection=''
         initiateConnectionOrHotspot()
         // todo: initiate Hotspot  --> activate connection or create hostspot?
-//        console.dir(processStatus)
-//        console.dir(unit)
+        console.dir(processStatus)
+        console.dir(unit)
       })
     })
     .catch((error)=>{
@@ -1759,7 +1589,6 @@ const statusCheck = async function() {
       initiateConnectionOrHotspot()
       // todo: initiate Hotspot --> create hotspot and activate
     })
-    */
   })
 //############################
 //}

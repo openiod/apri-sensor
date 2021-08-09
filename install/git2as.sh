@@ -7,12 +7,16 @@ cp /opt/SCAPE604/git/apri-sensor/apri-agent/apri-sensor-update.sh /opt/SCAPE604/
 # apri-config only once
 # cp -r /opt/SCAPE604/git/apri-sensor/apri-config /opt/SCAPE604/apri-sensor/.
 
-cp -r /opt/SCAPE604/git/apri-sensor/package.json /opt/SCAPE604/apri-sensor/.
-cp -r /opt/SCAPE604/git/apri-sensor/apri-sensor-connector /opt/SCAPE604/apri-sensor/.
-cp -r /opt/SCAPE604/git/apri-sensor/apri-sensor-raspi /opt/SCAPE604/apri-sensor/.
-cp -r /opt/SCAPE604/git/apri-sensor/apri-sensor-redis /opt/SCAPE604/apri-sensor/.
-cp -r /opt/SCAPE604/git/apri-sensor/aprisensor-netmanager-runtime /opt/SCAPE604/apri-sensor/.
-cp -r /opt/SCAPE604/git/apri-sensor/aprisensor-nmcli /opt/SCAPE604/apri-sensor/.
-cp -r /opt/SCAPE604/git/apri-sensor/images /opt/SCAPE604/apri-sensor/.
+if [ ! -d /opt/SCAPE604/git/apri-sensor ]
+then
+  cp -r /opt/SCAPE604/git/apri-sensor/package.json /opt/SCAPE604/apri-sensor/.
+  cp -r /opt/SCAPE604/git/apri-sensor/apri-sensor-connector /opt/SCAPE604/apri-sensor/.
+  cp -r /opt/SCAPE604/git/apri-sensor/apri-sensor-raspi /opt/SCAPE604/apri-sensor/.
+  cp -r /opt/SCAPE604/git/apri-sensor/apri-sensor-redis /opt/SCAPE604/apri-sensor/.
+  cp -r /opt/SCAPE604/git/apri-sensor/aprisensor-netmanager-runtime /opt/SCAPE604/apri-sensor/.
+  cp -r /opt/SCAPE604/git/apri-sensor/aprisensor-nmcli /opt/SCAPE604/apri-sensor/.
+  cp -r /opt/SCAPE604/git/apri-sensor/images /opt/SCAPE604/apri-sensor/.
 
-sudo systemctl restart SCAPE604-aprisensor-nmcli
+  sudo systemctl restart SCAPE604-aprisensor-nmcli
+  echo "git2as files copied"
+fi

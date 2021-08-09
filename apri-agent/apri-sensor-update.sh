@@ -6,8 +6,9 @@ if [ ! -d /opt/SCAPE604/git/apri-sensor ]
 then
     mkdir -p /opt/SCAPE604/git
     cd /opt/SCAPE604/git
-    git clone https://github.com/openiod/apri-sensor.git
-    echo "git clone ended"
+    # git clone https://github.com/openiod/apri-sensor.git
+    npx degit openiod/apri-sensor apri-sensor
+    echo "degit ended"
 fi
 cd /opt/SCAPE604/git/apri-sensor
 
@@ -16,7 +17,7 @@ date >> /opt/SCAPE604/log/apri-agent-update.log
 
 # get software updates from github
 # git checkout package-lock.json
-git pull >> /opt/SCAPE604/log/apri-agent-update.log 2>>/opt/SCAPE604/log/apri-agent-update2.log
+# git pull >> /opt/SCAPE604/log/apri-agent-update.log 2>>/opt/SCAPE604/log/apri-agent-update2.log
 
 cd /opt/SCAPE604/log
 mv SCAPE604-apri-sensor-connector-old1.log SCAPE604-apri-sensor-connector-old2.log

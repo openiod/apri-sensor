@@ -146,12 +146,15 @@ systemctl disable hciuart
 systemctl status hciuart
 usermod -a -G dialout pi
 
+npm install -g degit
+
 mkdir -p /opt/SCAPE604/log
 mkdir /opt/SCAPE604/config/
 mkdir /opt/SCAPE604/git/
 mkdir /opt/SCAPE604/apri-sensor/
 cd /opt/SCAPE604/git
-git clone https://github.com/openiod/apri-sensor.git
+npx degit openiod/apri-sensor apri-sensor
+# git clone https://github.com/openiod/apri-sensor.git
 /opt/SCAPE604/apri-sensor/install/git2as.sh
 cd /opt/SCAPE604/apri-sensor/
 #bij upgrade kan deze rm nog wel eens een blockade voorkomen

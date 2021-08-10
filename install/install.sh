@@ -10,15 +10,16 @@
 
 ### ===== upgrade to V2-20210726 or later
 # mkdir -p /opt/SCAPE604/git
-# cd /opt/SCAPE604/git ; git clone https://github.com/openiod/apri-sensor.git
+# rm -r /opt/SCAPE604/git/apri-sensor  # remove old version if exists
+# cd /opt/SCAPE604/git ; npx degit openiod/apri-sensor
 # sudo /opt/SCAPE604/git/apri-sensor/install/git2as.sh
 ### ===== end upgrade proc
 
 # make truncated img (copy) of sdcard on Debian:
-#  df -h (partitions: /dev/sda1 /dev/sda2 ; device /dev/sda)
+# df -h  # (partitions: /dev/sda1 /dev/sda2 ; device /dev/sda)
 # sudo umount /dev/sda1 /dev/sda2
 # #eenmalig:sudo apt-get update && sudo apt-get install dcfldd
-# sudo dcfldd if=/dev/sda of=aprisensor_####.img
+# sudo dcfldd if=/dev/sda of=aprisensor_v2-0-1.img
 # sudo sync
 # sudo chown awiel.awiel aprisensor_####.img
 # shrink img:

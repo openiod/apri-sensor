@@ -516,7 +516,7 @@ const getDeviceWifiList = async function(req,res) {
 }
 const retrieveWifiList=function(){
 	console.log(`retrieveWifiList`)
-	return execPromise("LC_ALL=C nmcli device wifi list")
+	return execPromise("LC_ALL=C systemctl restart network-manager ; nmcli device wifi list")
 }
 
 const deleteMethodHandler = ( url, req, res) => {

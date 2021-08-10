@@ -433,11 +433,14 @@ const getDeviceWifiList = async function(req,res) {
     console.log("deactivate hotspot")
     processStatus.connectionBusy.status=true
     processStatus.connectionBusy.statusSince=new Date()
+/*
 		try {
 			res.writeHead(210, { 'Content-Type': 'application/json' });
 	  	res.write(JSON.stringify(localWifiList));
 	  	res.end();
 		}	catch(e){}
+*/
+
 //		await sleep(1000);
 		//await hotspotDown()
 
@@ -454,70 +457,74 @@ const getDeviceWifiList = async function(req,res) {
     .then( async (result)=>{
       console.log(`hotspot delete then`)
       restartHotspot=true
-			await sleep(6000);
+			await sleep(2000);
     })
     .catch(async (error)=>{
 			console.log(`hotspot delete catch`)
       restartHotspot=true
-			await sleep(6000);
+			await sleep(2000);
     })
+    await restartNetworkManager()
+    .then( async (result)=>{
+      console.log(`restart network-manager then`)
+			await sleep(2000);
+    })
+    .catch(async (error)=>{
+      console.log(`restart network-manager catch`)
+			await sleep(2000);
+    })
+    await sleep(1000);
   }
 
-	await sleep(3000)
-  restartNetworkManager()
+	await sleep(2000)
+  console.log('retrieveWifiList()')
+  retrieveWifiList()
   .then((result) => {
-    console.log('retrieveWifiList()')
-    retrieveWifiList()
-    .then((result) => {
-      console.log(`retrieveWifiList then`)
-  //    console.log(result.stdout)
-      var tmpList=columnsToJsonArray(result.stdout)
-      if (tmpList.length!=0) {
-        console.log('============================')
-        localWifiList=tmpList
-        console.log(localWifiList)
-      } else {
-        console.log('----------------------------')
-        console.log(result.stdout)
-      }
-      if (restartHotspot==true) {
-  //      console.log(`getDeviceWifiList reactivate hotspot`)
-        createHotspotConnection()
-        console.log('http server restart')
-        //server.listen(apiPort);
+    console.log(`retrieveWifiList then`)
+//    console.log(result.stdout)
+    var tmpList=columnsToJsonArray(result.stdout)
+    if (tmpList.length!=0) {
+      console.log('============================')
+      localWifiList=tmpList
+      console.log(localWifiList)
+    } else {
+      console.log('----------------------------')
+      console.log(result.stdout)
+    }
+    if (restartHotspot==true) {
+//      console.log(`getDeviceWifiList reactivate hotspot`)
+      createHotspotConnection()
+      console.log('http server restart')
+      //server.listen(apiPort);
 
-        initHttpServer()
+      initHttpServer()
 
-        return
-      }
-      // when restarting as hotspot the connection is broken,
-      // writes to res have do not succeed.
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.write(JSON.stringify(localWifiList));
-      res.end();
-    })
-    .catch((error)=>{
-      console.log(`getDeviceWifiList catch`)
-      console.log(error)
-
-      if (restartHotspot==true) {
-        console.log(`getDeviceWifiList reactivate hotspot`)
-        createHotspotConnection()
-        console.log('http server restart')
-        //server.listen(apiPort);
-        initHttpServer()
-        return
-      }
-      // when restarting as hotspot the connection is broken,
-      // writes to res have do not succeed.
-      // return latest known wifi list
-      res.writeHead(201, { 'Content-Type': 'application/json' });
-      res.write(JSON.stringify(localWifiList));
-      res.end();
-    })
+      return
+    }
+    // when restarting as hotspot the connection is broken,
+    // writes to res have do not succeed.
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.write(JSON.stringify(localWifiList));
+    res.end();
   })
   .catch((error)=>{
-    console.log(`Error restart network-manager`)
+    console.log(`getDeviceWifiList catch`)
+    console.log(error)
+
+    if (restartHotspot==true) {
+      console.log(`getDeviceWifiList reactivate hotspot`)
+      createHotspotConnection()
+      console.log('http server restart')
+      //server.listen(apiPort);
+      initHttpServer()
+      return
+    }
+    // when restarting as hotspot the connection is broken,
+    // writes to res have do not succeed.
+    // return latest known wifi list
+    res.writeHead(201, { 'Content-Type': 'application/json' });
+    res.write(JSON.stringify(localWifiList));
+    res.end();
   })
 }
 const restartNetworkManager = function(){

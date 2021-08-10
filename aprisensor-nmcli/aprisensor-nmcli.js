@@ -96,7 +96,6 @@ var setGpioBlueLedOff = function() {
 var unit = {'connectionStatus':{},connection:'',connections:[] }
 var unitCrypto={}
 
-var connectionsIndex=0
 var localWifiList=[]
 
 var processStatus = []
@@ -434,11 +433,14 @@ const getDeviceWifiList = async function(req,res) {
     console.log("deactivate hotspot")
     processStatus.connectionBusy.status=true
     processStatus.connectionBusy.statusSince=new Date()
+/*
 		try {
 			res.writeHead(210, { 'Content-Type': 'application/json' });
 	  	res.write(JSON.stringify(localWifiList));
 	  	res.end();
 		}	catch(e){}
+*/
+
 //		await sleep(1000);
 		//await hotspotDown()
 
@@ -455,67 +457,81 @@ const getDeviceWifiList = async function(req,res) {
     .then( async (result)=>{
       console.log(`hotspot delete then`)
       restartHotspot=true
-			await sleep(6000);
+			await sleep(2000);
     })
     .catch(async (error)=>{
 			console.log(`hotspot delete catch`)
       restartHotspot=true
-			await sleep(6000);
+			await sleep(2000);
     })
+    await restartNetworkManager()
+    .then( async (result)=>{
+      console.log(`restart network-manager then`)
+			await sleep(2000);
+    })
+    .catch(async (error)=>{
+      console.log(`restart network-manager catch`)
+			await sleep(2000);
+    })
+    await sleep(1000);
   }
 
-	await sleep(3000)
-	console.log('retrieveWifiList()')
+	await sleep(2000)
+  console.log('retrieveWifiList()')
   retrieveWifiList()
   .then((result) => {
     console.log(`retrieveWifiList then`)
 //    console.log(result.stdout)
-		var tmpList=columnsToJsonArray(result.stdout)
-		if (tmpList.length!=0) {
-			console.log('============================')
-			localWifiList=tmpList
-			console.log(localWifiList)
-		} else {
-			console.log('----------------------------')
-			console.log(result.stdout)
-		}
+    var tmpList=columnsToJsonArray(result.stdout)
+    if (tmpList.length!=0) {
+      console.log('============================')
+      localWifiList=tmpList
+      console.log(localWifiList)
+    } else {
+      console.log('----------------------------')
+      console.log(result.stdout)
+    }
     if (restartHotspot==true) {
 //      console.log(`getDeviceWifiList reactivate hotspot`)
       createHotspotConnection()
-			console.log('http server restart')
-			//server.listen(apiPort);
+      console.log('http server restart')
+      //server.listen(apiPort);
 
-			initHttpServer()
+      initHttpServer()
 
-			return
+      return
     }
-		// when restarting as hotspot the connection is broken,
-		// writes to res have do not succeed.
+    // when restarting as hotspot the connection is broken,
+    // writes to res have do not succeed.
     res.writeHead(200, { 'Content-Type': 'application/json' });
-  	res.write(JSON.stringify(localWifiList));
-  	res.end();
+    res.write(JSON.stringify(localWifiList));
+    res.end();
   })
   .catch((error)=>{
-		console.log(`getDeviceWifiList catch`)
-		console.log(error)
+    console.log(`getDeviceWifiList catch`)
+    console.log(error)
 
-		if (restartHotspot==true) {
+    if (restartHotspot==true) {
       console.log(`getDeviceWifiList reactivate hotspot`)
       createHotspotConnection()
-			console.log('http server restart')
-			//server.listen(apiPort);
-			initHttpServer()
-			return
+      console.log('http server restart')
+      //server.listen(apiPort);
+      initHttpServer()
+      return
     }
-		// when restarting as hotspot the connection is broken,
-		// writes to res have do not succeed.
-		// return latest known wifi list
+    // when restarting as hotspot the connection is broken,
+    // writes to res have do not succeed.
+    // return latest known wifi list
     res.writeHead(201, { 'Content-Type': 'application/json' });
-  	res.write(JSON.stringify(localWifiList));
-  	res.end();
+    res.write(JSON.stringify(localWifiList));
+    res.end();
   })
 }
-const retrieveWifiList=function(){
+const restartNetworkManager = function(){
+	console.log(`restart network-manager`)
+	return execPromise("LC_ALL=C systemctl restart network-manager")
+}
+const retrieveWifiList = function(){
 	console.log(`retrieveWifiList`)
 	return execPromise("LC_ALL=C nmcli device wifi list")
 }
@@ -770,6 +786,7 @@ const hotspotDelete = function() {
   return execPromise("LC_ALL=C nmcli connection delete '"+unit.ssid+"'")
 }
 
+/*
 const tryCandidateConnection = function(index) {
   // give processing some time
   processStatus.gateway.statusSince=new Date()
@@ -778,7 +795,7 @@ const tryCandidateConnection = function(index) {
 		processStatus.connectionBusy.status=true
 		processStatus.connectionBusy.statusSince=new Date()
 	}
-  if (index>unit.connections.length-1) {
+  if (index > unit.connections.length-1) {
     processStatus.connectionBusy.status=false
     processStatus.connectionBusy.statusSince=new Date()
     return
@@ -820,17 +837,13 @@ const tryCandidateConnection = function(index) {
     tryCandidateConnection(index+1)
   })
 }
+*/
 
-const tryCandidateConnection2 =function(index) {
-
-	if (processStatus.connectionBusy.status==false) {
-		processStatus.connectionBusy.status=true
-		processStatus.connectionBusy.statusSince=new Date()
-	}
-
+const tryCandidateConnection2 =function(conIndex) {
+  let _conIndex = conIndex
 
   // no (more) connections to try
-  if (index>unit.connections.length-1) {
+  if (_conIndex > unit.connections.length-1) {
     console.log('0. Activate hotspot connection')
     execPromise("LC_ALL=C nmcli connection up '"+unit.ssid+"'")
     .then( (result)=>{
@@ -843,18 +856,16 @@ const tryCandidateConnection2 =function(index) {
     .catch( (error)=>{
       createHotspot()
     })
-    //processStatus.connectionBusy.status=false
-    //processStatus.connectionBusy.statusSince=new Date()
     return
   }
 
 	// ignore hotspot connection
-	if (unit.connections[index]==unit.ssid) {
-		tryCandidateConnection2(index+1)
+	if (unit.connections[_conIndex]==unit.ssid) {
+		tryCandidateConnection2(_conIndex + 1)
 		return
 	}
 
-  var tmpConnection = unit.connections[index]
+  var tmpConnection = unit.connections[_conIndex]
   if (unit.connectionStatus[tmpConnection]==undefined) {
     unit.connectionStatus[tmpConnection]={status:null}
   }
@@ -862,7 +873,7 @@ const tryCandidateConnection2 =function(index) {
   if (unit.connectionStatus[tmpConnection].passwordError == true &&
     new Date() - unit.connectionStatus[tmpConnection].statusSince< 120000) {
     console.log('Wait time for connection '+tmpConnection+' less than 120 seconds (password error) ')
-    tryCandidateConnection2(index+1)
+    tryCandidateConnection2(_conIndex+1)
 		return
   }
   //// give processing some time
@@ -878,14 +889,14 @@ const tryCandidateConnection2 =function(index) {
 	}
   */
 
-  console.log(`tryCandidateConnection ${index} ${unit.connections[index]}`)
+  console.log(`tryCandidateConnection2 ${_conIndex} ${unit.connections[_conIndex]}`)
   console.log(unit.connectionStatus[tmpConnection])
-  execPromise("LC_ALL=C nmcli connection up '"+unit.connections[index]+"'")
+  execPromise("LC_ALL=C nmcli connection up '"+unit.connections[_conIndex]+"'")
   .then((result)=>{
     if (unit.connectionStatus[tmpConnection].status!='OK') {
       unit.connectionStatus[tmpConnection]={status:'OK',statusSince:new Date(),message:''}
     }
-    console.log(`tryCandidateConnection then ${index} ${unit.connections[index]}`)
+    console.log(`tryCandidateConnection2 then ${_conIndex} ${unit.connections[_conIndex]}`)
     processStatus.connectionBusy.status=false
     processStatus.connectionBusy.statusSince=new Date()
     // give processing some time
@@ -898,7 +909,7 @@ const tryCandidateConnection2 =function(index) {
     }
   })
   .catch((error)=>{
-    console.log(`tryCandidateConnection catch ${index} ${unit.connections[index]}`)
+    console.log(`tryCandidateConnection2 catch ${_conIndex} ${unit.connections[_conIndex]}`)
     console.error(`exec error: ${error}`);
     if (unit.connectionStatus[tmpConnection].status!='ERROR') {
       unit.connectionStatus[tmpConnection]={status:'ERROR',statusSince:new Date()}
@@ -911,15 +922,17 @@ const tryCandidateConnection2 =function(index) {
       unit.connectionStatus[tmpConnection].passwordError = true
     }
 
-    tryCandidateConnection2(index+1)
+    tryCandidateConnection2(_conIndex+1)
   })
 }
 
 const createHotspot = function() {
   console.log(`Create hotspot for ssid ${unit.ssid}`)
   console.log('1. Delete existing hotspot connection')
-  processStatus.connectionBusy.status=true
-  processStatus.connectionBusy.statusSince=new Date()
+  if (processStatus.connectionBusy.status==false){
+    processStatus.connectionBusy.status=true
+    processStatus.connectionBusy.statusSince=new Date()
+  }
   processStatus.hotspot.status='INIT'
   processStatus.hotspot.statusSince=new Date()
   processStatus.hotspot.message=''
@@ -1465,6 +1478,8 @@ const getActiveConnection = function() {
 
 const initiateConnectionOrHotspot = function() {
   console.log('SSID:'+unit.ssid+' con:'+unit.connection+' cons:'+JSON.stringify(unit.connections))
+
+
 /*
   if (unit.connection==''){
     console.log('No connection, checkHotspotActivation')
@@ -1493,13 +1508,13 @@ const initiateConnectionOrHotspot = function() {
     // hotspot status will last at least x time and will stay active as long wifi-config-web page active
 
 
-    if (unit.connections.length > 0 ){
-      connectionsIndex=0
+//    if (unit.connections.length > 0 ){
       console.log('tryCandidateConnection starting with index 0')
-      tryCandidateConnection2(connectionsIndex)
-    } else {
-      createHotspot()
+    if (processStatus.connectionBusy.status==false) {
+        processStatus.connectionBusy.status=true
+        processStatus.connectionBusy.statusSince=new Date()
     }
+    tryCandidateConnection2(0)
 
 }
 
@@ -1587,7 +1602,11 @@ const nginxCheck = function() {
 
 const statusCheck = async function() {
 
-  if (processStatus.connectionBusy.status==true) {
+  if (processStatus.connectionBusy.status==true ||
+      (processStatus.connectionBusy.status==false &&
+        new Date().getTime() - processStatus.connectionBusy.statusSince.getTime() < 5000
+      )
+  ) {
     // blink led
     blinkLed(47)
     console.log('waiting,processStatus.connectionBusy.status==true')

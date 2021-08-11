@@ -1721,8 +1721,8 @@ const statusCheck = async function() {
     console.log('Hotspot time: '+ tmpWaitTime)
     console.log(unit.connection +' '+unit.ssid)
     if (unit.connection==unit.ssid &&
-      tmpWaitTime < 30000) {
-      console.log('hotspot active wait minimal 30 seconds')
+      tmpWaitTime < 50000) {
+      console.log('hotspot active wait minimal 50 seconds')
       return
     }
     if (unit.connection!=unit.ssid && unit.connection !='') {

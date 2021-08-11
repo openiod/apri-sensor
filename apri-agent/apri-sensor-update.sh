@@ -4,14 +4,17 @@
 
 if [ ! -d /opt/SCAPE604/git/apri-sensor ]
 then
-  # first clean up degit cache
-  rm -r /root/.degit/github/openiod/apri-sensor
   # make directory and get latest git repository
   mkdir -p /opt/SCAPE604/git
   cd /opt/SCAPE604/git
+  # git clone --depth 1 instead of degit
+  git clone --depth 1 https://github.com/openiod/apri-sensor.git
   # git clone https://github.com/openiod/apri-sensor.git
-  npx degit openiod/apri-sensor apri-sensor
-  echo "degit ended"
+  # first clean up degit cache
+  # rm -r /root/.degit/github/openiod/apri-sensor
+  # npx degit openiod/apri-sensor apri-sensor
+  # echo "degit ended"
+  # echo "git clone ended"
 fi
 cd /opt/SCAPE604/git/apri-sensor
 

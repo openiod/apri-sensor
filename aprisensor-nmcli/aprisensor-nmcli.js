@@ -433,13 +433,12 @@ const getDeviceWifiList = async function(req,res) {
     console.log("deactivate hotspot")
     processStatus.connectionBusy.status=true
     processStatus.connectionBusy.statusSince=new Date()
-/*
-		try {
+
+		try { // response to client. Client has to wait for result and then refresh list
 			res.writeHead(210, { 'Content-Type': 'application/json' });
 	  	res.write(JSON.stringify(localWifiList));
 	  	res.end();
 		}	catch(e){}
-*/
 
 //		await sleep(1000);
 		//await hotspotDown()

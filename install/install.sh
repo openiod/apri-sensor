@@ -15,6 +15,13 @@
 # sudo /opt/SCAPE604/git/apri-sensor/install/git2as.sh
 ### ===== end upgrade proc
 
+#### ===== e2fsck
+# df -h  # show devices
+# umount /dev/sda1 /dev/sda2
+# e2fsck /dev/sda2
+# e2fsck -c /dev/sda2
+#### ======
+
 # make truncated img (copy) of sdcard on Debian:
 # df -h  # (partitions: /dev/sda1 /dev/sda2 ; device /dev/sda)
 # sudo umount /dev/sda1 /dev/sda2

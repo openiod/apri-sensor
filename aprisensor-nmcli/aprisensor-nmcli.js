@@ -875,6 +875,7 @@ const tryCandidateConnection2 =function(conIndex) {
   console.log(unit.connectionStatus[tmpConnection])
   execPromise("LC_ALL=C nmcli connection up '"+unit.connections[_conIndex]+"'")
   .then((result)=>{
+    unit.connection=unit.connections[_conIndex]
     if (unit.connectionStatus[tmpConnection].status!='OK') {
       unit.connectionStatus[tmpConnection]={status:'OK',statusSince:new Date(),message:''}
     }

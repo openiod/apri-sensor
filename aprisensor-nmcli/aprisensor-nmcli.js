@@ -1004,7 +1004,9 @@ var startActionReboot = function() {
 
 const actions = []
 actions.push(function() {
-  fs.readFile("package,json", 'utf8', function (err, data) {
+  var packageFileName = __dirname+"/package.json"
+  console.log(packageFileName)
+  fs.readFile(packageFileName, 'utf8', function (err, data) {
     if (err) {
       console.log('package file not found')
     } else {

@@ -34,6 +34,7 @@ const ACCEPT_ENCODING_1 = 'application/json';
 const ACCEPT_ENCODING_2 = '*/*';
 
 const defaultPassword = 'scapeler'
+var packageFile={}
 
 var menuUrl;
 var localServer = {};
@@ -43,31 +44,12 @@ console.log('port: ' + apiPort)
 var hotspotPassword='scapeler'
 var skipStatusCheck = false
 
-
-/*
-const httpsOptions = {
-  key: fs.readFileSync('../../config/tls/aprisensor-key.pem'),
-  cert: fs.readFileSync('../../config/tls/aprisensor-cert.pem'),
-  rejectUnauthorized: true,
-};
-*/
-
 let key
-
-//let cipher = null
-//let decipher = null
-//let iv=null
-//let key=null
-//let resizedIV = new Buffer.allocUnsafe(16)
-//const algoritm="aes-256-cbc"
-//const algoritm="sha256"
 const algoritm="AES-GCM"
 
 var gpio
 var gpioBlueLed
 var gpioBlueLedStatus='off'
-//gpioDs18b20, gpioBme
-//, gpioFan
 try {
   gpio = require('onoff').Gpio
 }
@@ -90,8 +72,6 @@ var setGpioBlueLedOff = function() {
   gpioBlueLed.writeSync(0); //set pin state to 0 (power LED off)
   gpioBlueLedStatus='off'
 }
-
-
 
 var unit = {'connectionStatus':{},connection:'',connections:[] }
 var unitCrypto={}
@@ -321,9 +301,12 @@ const getGeneral = function(req,res,callback) {
 	execPromise("LC_ALL=C nmcli general")
 	.then((result)=>{
 		var resultJson = columnsToJsonArray(result.stdout)
-		resultJson[0].iv=unitCrypto.iv
-		resultJson[0].ivDate=unitCrypto.ivDate
-	 	return returnResultJson(resultJson[0], req,res);
+//		resultJson[0].iv=unitCrypto.iv
+//		resultJson[0].ivDate=unitCrypto.ivDate
+    var resultData = resultJson[0]
+    resultData.info={}
+    resultData.info.version=packageFile.version
+	 	return returnResultJson(resultData, req,res);
 	})
 	.catch((error)=>{
 		return returnError(error, req,res);
@@ -1016,11 +999,26 @@ var startActionReboot = function() {
 			console.error(`exec error: ${error}`);
 			return;
 		}
-//		unit.id = stdout.substr(0,stdout.length-1);
 	});
 }
 
 const actions = []
+actions.push(function() {
+  fs.readFile("../package,json", 'utf8', function (err, data) {
+    if (err) {
+      console.log('package file not found')
+    } else {
+      try{
+        packageFile = JSON.parse(data)
+      }
+      catch{
+        console.log('package file json parse error')
+        console.log(packageFile)
+      }
+    }
+  })
+  nextAction()
+})
 /*
 actions.push(function() {
   // restart avahi-daemon for correct ####.local

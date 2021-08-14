@@ -356,7 +356,7 @@ const getDeviceHotspot = function(req,res,callback) {
     res.end();
     return
   }
-  if (new Date().getTime() - processStatus.hotspot.statusSince.getTime() < 10000) {
+  if (new Date().getTime() - processStatus.hotspot.statusSince.getTime() < 15000) {
     console.log('A gateway problem maybe a problem, timesync or just mobile use')
     res.writeHead(400);
     res.write(`{status:400,message: 'Creation of hotspot maybe still busy, check or try again later'}`);
@@ -1004,7 +1004,7 @@ var startActionReboot = function() {
 
 const actions = []
 actions.push(function() {
-  var packageFileName = __dirname+"/package.json"
+  var packageFileName = __dirname+"/../package.json"
   console.log(packageFileName)
   fs.readFile(packageFileName, 'utf8', function (err, data) {
     if (err) {
@@ -1727,8 +1727,8 @@ const statusCheck = async function() {
     }
     if (unit.connection!=unit.ssid && unit.connection !='') {
       tmpWaitTime = new Date().getTime() - processStatus.gateway.statusSince.getTime()
-      if (tmpWaitTime < 10000) {
-        console.log('gateway problem less then 10 seconds ago, wait for next round')
+      if (tmpWaitTime < 15000) {
+        console.log('gateway problem less then 15 seconds ago, wait for next round')
         return
       }
     }

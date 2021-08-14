@@ -26,7 +26,8 @@
 # df -h  # (partitions: /dev/sda1 /dev/sda2 ; device /dev/sda)
 # sudo umount /dev/sda1 /dev/sda2
 # #eenmalig:sudo apt-get update && sudo apt-get install dcfldd
-# sudo dcfldd if=/dev/sda of=aprisensor_v2-0-1.img
+# controleer filesystem: e2fsck /dev/sda2
+# sudo dcfldd if=/dev/sda of=aprisensor_v2-0-2.img ; sudo sync
 # sudo sync
 # sudo chown awiel.awiel aprisensor_####.img
 # shrink img:

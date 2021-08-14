@@ -10,10 +10,10 @@ npm run dev
 ## npm run build
 ## tar cfvz aprisensor-netmanager.tar.gz ../aprisensor-netmanager/public
 
+rm -r /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion2
 mv /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion2
-rm -rf /home/awiel/opt/apri-sensor/aprisensor-netmanager-previousversion
-cp -r /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion
-rm -rf /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime/*
+mv /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion
+mkdir /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime
 cp -r /data/Alfresco/opt/aprisensor-netmanager/public/* /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime
 cd /home/awiel/opt/apri-sensor/
 git status

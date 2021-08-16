@@ -1513,8 +1513,8 @@ const initiateConnectionOrHotspot = function() {
     if (processStatus.connectionBusy.status==false) {
         processStatus.connectionBusy.status=true
         processStatus.connectionBusy.statusSince=new Date()
+        tryCandidateConnection2(0)
     }
-    tryCandidateConnection2(0)
 
 }
 

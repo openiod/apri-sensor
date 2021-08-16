@@ -841,6 +841,8 @@ const tryCandidateConnection2 =function(conIndex) {
       processStatus.hotspot.statusSince=new Date()
       processStatus.connectionBusy.status=false
       processStatus.connectionBusy.statusSince=new Date()
+      processStatus.gateway.status='INIT'
+      processStatus.gateway.statusSince=new Date()
     })
     .catch( (error)=>{
       createHotspot()
@@ -888,7 +890,9 @@ const tryCandidateConnection2 =function(conIndex) {
     }
     console.log(`tryCandidateConnection2 then ${_conIndex} ${unit.connections[_conIndex]}`)
     // give processing some time
+    processStatus.gateway.status='INIT'
     processStatus.gateway.statusSince=new Date()
+
     if (processStatus.connection.status!='OK') {
       processStatus.connection.status='OK'
       processStatus.connection.statusSince=new Date()
@@ -978,8 +982,8 @@ const setHotspotUp = function() {
     unit.connection=unit.ssid
     processStatus.connectionBusy.status=false
     processStatus.connectionBusy.statusSince=new Date()
-    // give processing some time
-//    processStatus.gateway.statusSince=new Date()
+    processStatus.gateway.status='INIT'
+    processStatus.gateway.statusSince=new Date()
 //    getIpAddress()
   })
   .catch( (error)=>{
@@ -1612,7 +1616,7 @@ const statusCheck = async function() {
 
   if (processStatus.connectionBusy.status==true ||
       (processStatus.connectionBusy.status==false &&
-        new Date().getTime() - processStatus.connectionBusy.statusSince.getTime() < 5000
+        new Date().getTime() - processStatus.connectionBusy.statusSince.getTime() < 10000
       )
   ) {
     // blink led
@@ -1627,6 +1631,7 @@ const statusCheck = async function() {
     // blink once showing process is active
     blinkLed(2)
   }
+
 
 /*
   // test if nginx process is running, if not start service
@@ -1701,6 +1706,12 @@ const statusCheck = async function() {
     }
   }
 
+
+  if (processStatus.gateway.status=='INIT' &&
+        new Date().getTime() - processStatus.gateway.statusSince.getTime() < 10000) {
+    console.log('Connection just initiated, wait 10 secs before first gateway check (' + tmpTime +' msec)')
+    return
+  }
   // determine with result of ping to (default) gateway if connection is active
   execPromise("ping -q -w 1 -c 1 `ip r | grep default | head -1 | cut -d ' ' -f 3` > /dev/null")
   .then((result)=>{

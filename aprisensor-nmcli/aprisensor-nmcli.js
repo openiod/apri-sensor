@@ -887,8 +887,6 @@ const tryCandidateConnection2 =function(conIndex) {
       unit.connectionStatus[tmpConnection]={status:'OK',statusSince:new Date(),message:''}
     }
     console.log(`tryCandidateConnection2 then ${_conIndex} ${unit.connections[_conIndex]}`)
-    processStatus.connectionBusy.status=false
-    processStatus.connectionBusy.statusSince=new Date()
     // give processing some time
     processStatus.gateway.statusSince=new Date()
     if (processStatus.connection.status!='OK') {
@@ -897,6 +895,8 @@ const tryCandidateConnection2 =function(conIndex) {
       processStatus.connection.code=200
       processStatus.connection.message=''
     }
+    processStatus.connectionBusy.status=false
+    processStatus.connectionBusy.statusSince=new Date()
   })
   .catch((error)=>{
     console.log(`tryCandidateConnection2 catch ${_conIndex} ${unit.connections[_conIndex]}`)
@@ -1526,6 +1526,7 @@ const initiateConnectionOrHotspot = function() {
 }
 
 var nrTimesBlink=0
+
 const blinkLed = function(nr) {
   if (nr!=undefined) {
     nrTimesBlink=nr

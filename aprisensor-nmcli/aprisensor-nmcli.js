@@ -629,6 +629,13 @@ const postDeviceConnect = ( url, req, res) => {
 
 // connect to accesspoint
 const postApConnect = async ( url, req, res) => {
+  if (processStatus.connectionBusy.status==true) {
+    res.writeHead(400);
+    let msgBody={error:400,message: 'sensorkit is bezig, probeer later nog eens' + result.error }
+    res.write(JSON.stringify(msgBody));
+    res.end()
+    return
+  }
   console.log(url)
   processStatus.connectionBusy.status=true
   processStatus.connectionBusy.statusSince=new Date()
@@ -639,6 +646,7 @@ const postApConnect = async ( url, req, res) => {
   });
   req.on('end', async () => {
     var result ={}
+/*
     try {
       result = JSON.parse(lzString.decompress(body))
       //console.log(result)
@@ -650,18 +658,17 @@ const postApConnect = async ( url, req, res) => {
       result={error:'decompress'}
     }
     //console.log(body)
-    if (result == null || result.error=='decompress') {
-      console.log('try uncompressed')
+*/
+//    if (result == null || result.error=='decompress') {
+//      console.log('try uncompressed')
       try {
         result = JSON.parse(body)
-        //console.log(result)
       }
       catch {
         console.log('** catch uncompressed ********************')
-        //console.log(body)
         result={error:'json'}
       }
-    }
+//    }
     if (result == null || result.error!=undefined) {
       processStatus.connectionBusy.status=false
 			processStatus.connectionBusy.statusSince=new Date()

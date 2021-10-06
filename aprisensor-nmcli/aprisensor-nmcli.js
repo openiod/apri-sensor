@@ -1713,7 +1713,8 @@ const statusCheck = async function() {
     return
   }
   // determine with result of ping to (default) gateway if connection is active
-  execPromise("ping -q -w 1 -c 1 `ip r | grep default | head -1 | cut -d ' ' -f 3` > /dev/null")
+//  execPromise("ping -q -w 1 -c 1 `ip r | grep default | head -1 | cut -d ' ' -f 3` > /dev/null")
+  execPromise("ping -q -w 1 -c 1 8.8.8.8 > /dev/null")
   .then((result)=>{
     if (processStatus.gateway.status!='OK') {
       processStatus.gateway.status='OK'

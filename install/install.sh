@@ -18,50 +18,53 @@
 #### ===== e2fsck
 # df -h  # show devices
 # umount /dev/sda1 /dev/sda2
-# e2fsck /dev/sda2
-# e2fsck -c /dev/sda2
+# sudo e2fsck /dev/sda2
+# sudo e2fsck -c /dev/sda2
 #### ======
 
 # make truncated img (copy) of sdcard on Debian:
 # df -h  # (partitions: /dev/sda1 /dev/sda2 ; device /dev/sda)
 # sudo umount /dev/sda1 /dev/sda2
 # #eenmalig:sudo apt-get update && sudo apt-get install dcfldd
-# controleer filesystem: e2fsck /dev/sda2
-# sudo dcfldd if=/dev/sda of=aprisensor_v2-0-2.img ; sudo sync
+# controleer filesystem: sudo e2fsck /dev/sda2
+# sudo dcfldd if=/dev/sda of=aprisensor_v2-0-3.img ; sudo sync
 # sudo sync
-# sudo chown awiel.awiel aprisensor_####.img
+# sudo chown awiel.awiel aprisensor_v2-0-3.img
 # shrink img:
 # # eenmalig: sudo apt-get update && sudo apt-get install gparted
-# sudo fdisk -l aprisensor_####.img
+# sudo fdisk -l aprisensor_v2-0-3.img
 # startsector of partition2 = 532480
 # mount the second partition
 # #sudo losetup /dev/loop0 aprisensor_####.img -o $((<STARTSECTOR>*512))
-# sudo losetup /dev/loop0 aprisensor_####.img -o $((532480*512))
+# sudo losetup /dev/loop0 aprisensor_v2-0-3.img -o $((532480*512))
 # sudo gparted /dev/loop0
 # # select partion en menu: Partition / Resize/Move
-# # change minimum size to 2430 (minimum size + +-20MB)
+# # change minimum size to 2430 (minimum size + +-20MB) #of 3500 voor standaard voldoende ruimte!!
 # click 'resize'-button
 # Menu: Edit / Apply All Operations
 #  Noteer the new size!
-#   see log details shrink file system / resize2fs -p ... (2488320K)
-# close gparted
+#   see log details shrink file system / resize2fs -p ... (2488320K of 3584000K)
+# close and quit gparted
 # reset loop device to total img:
 # sudo losetup -d /dev/loop0
-# sudo losetup /dev/loop0 imagename.img
+# sudo losetup /dev/loop0 aprisensor_v2-0-3.img
 # sudo fdisk /dev/loop0
-# p<enter> for partiion info
+# p<enter> for partion info
 # d<enter>2<enter> delete partition 2
 # create new partion 2 with partion start address
 # do not forget the '+'
-# n<enter>p<enter>2<enter>532480<enter>+2488320K<enter>
+# ##n<enter>p<enter>2<enter>532480<enter>+2488320K<enter>
+# n<enter>p<enter>2<enter>532480<enter>+3584000K<enter>
 # remove signature? N(o)
 #? w<enter>  write partion tabel
 # show loop device and delete it:
 # sudo fdisk -l /dev/loop0
 # sudo losetup -d /dev/loop0
-# truncate file to endsector of 2e partition:
-# truncate -s $(((END+1)*512)) imagename.img
-# truncate -s $(((4976640+1)*512)) imagename.img
+# truncate file to ENDsector of 2e partition:
+# truncate -s $(((END+1)*512)) aprisensor_v2-0-x.img
+# ###truncate -s $(((4976640+1)*512)) aprisensor_v2-0-2.img
+# truncate -s $(((7700479+1)*512)) aprisensor_v2-0-3.img
+
 #
 # see http://www.aoakley.com/articles/2015-10-09-resizing-sd-images.php
 #-----------------------------------------------
@@ -83,6 +86,9 @@
 # sudo git status
 # sudo git pull
 
+# sudo raspi-config
+# advanced split-memory 0-> GPU
+
 # ID:
 cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2
 
@@ -94,6 +100,13 @@ apt -y install network-manager
 #systemctl start NetworkManager.service
 #systemctl enable NetworkManager.service
 
+# log2ram https://github.com/azlux/log2ram
+echo "deb http://packages.azlux.fr/debian/ buster main" | sudo tee /etc/apt/sources.list.d/azlux.list
+wget -qO - https://azlux.fr/repo.gpg.key | sudo apt-key add -
+sudo apt update
+sudo apt install log2ram
+# wijzig /etc/log2ram.conf
+# PATH='/var/log;/opt/SCAPE604/log'
 
 #vi /etc/hosts:
 # laatste regel: 127.0.1.1		ID## ID##.local

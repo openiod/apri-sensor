@@ -1714,7 +1714,24 @@ const statusCheck = async function() {
   }
   // determine with result of ping to (default) gateway if connection is active
 //  execPromise("ping -q -w 1 -c 1 `ip r | grep default | head -1 | cut -d ' ' -f 3` > /dev/null")
-  execPromise("ping -q -w 1 -c 1 8.8.8.8 > /dev/null")
+
+  execPromise("LC_ALL=C nmcli networking connectivity check)
+  .then((result)=>{
+    console.log('nmcli networking connectivity check then '+ result)
+/*    if (processStatus.gateway.status!='OK') {
+      processStatus.gateway.status='OK'
+      processStatus.gateway.statusSince=new Date()
+    }
+    // blink twice showing process is active and gateway OK
+    blinkLed(5)
+    console.log('status gateway OK since '+ processStatus.gateway.statusSince.toISOString()+
+      ' SSID:'+unit.ssid+' con:'+unit.connection+' cons:'+JSON.stringify(unit.connections))
+    return
+*/
+  }).catch((error)=>{
+    console.log('nmcli networking connectivity check catch '+ error)
+  }
+  execPromise("LC_ALL=C ping -q -w 1 -c 1 8.8.8.8 > /dev/null")
   .then((result)=>{
     if (processStatus.gateway.status!='OK') {
       processStatus.gateway.status='OK'

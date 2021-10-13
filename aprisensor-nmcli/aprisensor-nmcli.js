@@ -1715,32 +1715,66 @@ const statusCheck = async function() {
   // determine with result of ping to (default) gateway if connection is active
 //  execPromise("ping -q -w 1 -c 1 `ip r | grep default | head -1 | cut -d ' ' -f 3` > /dev/null")
 
-  execPromise("LC_ALL=C nmcli networking connectivity check")
+/*
+  await execPromise("LC_ALL=C nmcli networking connectivity check")
   .then((result)=>{
     console.log('nmcli networking connectivity check then '+ result)
-/*    if (processStatus.gateway.status!='OK') {
-      processStatus.gateway.status='OK'
-      processStatus.gateway.statusSince=new Date()
-    }
-    // blink twice showing process is active and gateway OK
-    blinkLed(5)
-    console.log('status gateway OK since '+ processStatus.gateway.statusSince.toISOString()+
-      ' SSID:'+unit.ssid+' con:'+unit.connection+' cons:'+JSON.stringify(unit.connections))
-    return
-*/
   }).catch((error)=>{
     console.log('nmcli networking connectivity check catch '+ error)
   })
-  execPromise("LC_ALL=C ping -q -w 1 -c 1 8.8.8.8 > /dev/null")
+*/
+//  execPromise("LC_ALL=C ping -q -w 1 -c 1 8.8.8.8 > /dev/null")
+  await execPromise("LC_ALL=C nmcli networking connectivity check")
   .then((result)=>{
-    if (processStatus.gateway.status!='OK') {
-      processStatus.gateway.status='OK'
-      processStatus.gateway.statusSince=new Date()
+    if (result.stdout=='full\n') {
+      process.stdout.write(".");
+      // process.stdout.write("Downloading " + data.length + " bytes\r");
+      if (processStatus.gateway.status!='OK') {
+        processStatus.gateway.status='OK'
+        processStatus.gateway.statusSince=new Date()
+      }
+      // blink twice showing process is active and gateway OK
+      blinkLed(5)
+//      console.log('status gateway OK since '+ processStatus.gateway.statusSince.toISOString()+
+//        ' SSID:'+unit.ssid+' con:'+unit.connection+' cons:'+JSON.stringify(unit.connections))
+      return
     }
-    // blink twice showing process is active and gateway OK
-    blinkLed(5)
-    console.log('status gateway OK since '+ processStatus.gateway.statusSince.toISOString()+
-      ' SSID:'+unit.ssid+' con:'+unit.connection+' cons:'+JSON.stringify(unit.connections))
+    if (result.stdout=='limited\n') {
+      process.stdout.write("x");
+      if (processStatus.gateway.status!='OK') {
+        processStatus.gateway.status='OK'
+        processStatus.gateway.statusSince=new Date()
+      }
+      // blink twice showing process is active and gateway OK
+      blinkLed(5)
+      return
+    }
+
+    process.stdout.write("\n"+result.stdout+': ');
+    unit.gateway=''
+		if (processStatus.gateway.status!='ERROR') {
+			processStatus.gateway.status='ERROR'
+			processStatus.gateway.statusSince=new Date()
+		}
+
+    console.log('Hotspot status: '+processStatus.hotspot.status)
+    var tmpWaitTime = new Date().getTime() - processStatus.hotspot.statusSince.getTime()
+    console.log('Hotspot time: '+ tmpWaitTime)
+    console.log(unit.connection +' '+unit.ssid)
+    if (unit.connection==unit.ssid &&
+      tmpWaitTime < 50000) {
+      console.log('hotspot active wait minimal 50 seconds')
+      return
+    }
+    if (unit.connection!=unit.ssid && unit.connection !='') {
+      tmpWaitTime = new Date().getTime() - processStatus.gateway.statusSince.getTime()
+      if (tmpWaitTime < 15000) {
+        console.log('gateway problem less then 15 seconds ago, wait for next round')
+        return
+      }
+    }
+
+    initiateConnectionOrHotspot()
     return
   }).catch((error)=>{
     console.log('statusCheck catch: '+error)
@@ -1750,10 +1784,6 @@ const statusCheck = async function() {
 			processStatus.gateway.statusSince=new Date()
 		}
 
-    // no furter action when recent statusSince, give proces of (re)connecting some time
-//    if (new Date().getTime() - processStatus.gateway.statusSince.getTime() < 10000) {
-//      return
-//    }
     console.log('Hotspot status: '+processStatus.hotspot.status)
     var tmpWaitTime = new Date().getTime() - processStatus.hotspot.statusSince.getTime()
     console.log('Hotspot time: '+ tmpWaitTime)
@@ -1773,55 +1803,7 @@ const statusCheck = async function() {
 
     initiateConnectionOrHotspot()
 
-
-    /*
-    // retrieve all wifi connections (no await)
-    execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')
-    .then((result)=>{
-      //console.log('status check get all connections then')
-      var stdoutArray	= result.stdout.split('\n');
-      unit.connections=[]
-      for (var i=0;i<stdoutArray.length-1;i++) {
-        var pos = stdoutArray[i].indexOf("wifi")
-        var tmp=stdoutArray[i].substr(0,pos-1).trim()
-        if (tmp!=unit.ssid) {
-          unit.connections.push(tmp)
-        }
-      }
-      getActiveConnection()
-    	.then((result)=>{
-        console.log("getActiveConnection then")
-    		var stdoutArray	= result.stdout.split(' ');
-    		var tmp=stdoutArray[stdoutArray.length-1]
-    		unit.connection=tmp.split('\n')[0]
-    		//console.log(unit.connection)
-//        console.dir(processStatus)
-//        console.dir(unit)
-        initiateConnectionOrHotspot()
-    	})
-    	.catch((error)=>{
-    		console.log("getActiveConnection catch")
-    		unit.connection=''
-        initiateConnectionOrHotspot()
-        // todo: initiate Hotspot  --> activate connection or create hostspot?
-//        console.dir(processStatus)
-//        console.dir(unit)
-      })
-    })
-    .catch((error)=>{
-      console.log('status check get all connections catch')
-      unit.connections=[]
-      unit.connection=''
-      initiateConnectionOrHotspot()
-      // todo: initiate Hotspot --> create hotspot and activate
-    })
-    */
   })
-//############################
-//}
-//if (unit.hostname =='9EB6.local') {
-//  return
-
 }
 /*
 //}

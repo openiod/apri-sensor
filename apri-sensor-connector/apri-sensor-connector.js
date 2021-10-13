@@ -252,7 +252,7 @@ var sendData = function(redisArray, redisArrayIndex, redisKey,url) {
 	console.log(url);
   axios.get(url,{
 		headers: headers
-		,timeout: 2000
+		,timeout: 4000
 	})
   .then(response => {
 		//log('Response recieved');
@@ -326,7 +326,8 @@ var sendData = function(redisArray, redisArrayIndex, redisKey,url) {
 				 logDir(error.response.status);
 				 //logDir(error.response.headers);
 		 } else if (error.request) {
-			 log('error.request');
+			 var _err=''+error
+       log('error.request '+ _err.substr(0,33)); // time exceeded?
 				 // The request was made but no response was received
 				 // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
 				 // http.ClientRequest in node.js

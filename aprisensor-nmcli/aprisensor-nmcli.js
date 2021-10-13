@@ -699,7 +699,7 @@ const postApConnect = async ( url, req, res) => {
 //      802-1x.eap pwd 802-1x.password '"+passwd+"' \
 //ipv4.method shared ipv6.method shared \
     var createCommand= "LC_ALL=C nmcli connection add type wifi ifname '"+unit.ifname+"' con-name '"+ssid+"' autoconnect yes  \
-      ssid '"+ssid+"' \
+      ssid '"+ssid+"' 802-11-wireless.powersave 2 \
       802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk '"+passwd+"' \
       wifi-sec.key-mgmt wpa-psk wifi-sec.psk '"+passwd+"' "
     //console.log(createCommand)

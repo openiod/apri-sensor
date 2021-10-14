@@ -1723,8 +1723,8 @@ const statusCheck = async function() {
     console.log('nmcli networking connectivity check catch '+ error)
   })
 */
-//  execPromise("LC_ALL=C ping -q -w 1 -c 1 8.8.8.8 > /dev/null")
-  await execPromise("LC_ALL=C nmcli networking connectivity check")
+  await execPromise("LC_ALL=C ping -q -w 1 -c 1 8.8.8.8 > /dev/null")
+//  await execPromise("LC_ALL=C nmcli networking connectivity check")
   .then((result)=>{
     if (unit.connectionCount==undefined ) {
       unit.connectionCount=0
@@ -1738,6 +1738,17 @@ const statusCheck = async function() {
       unit.connectionPrev=unit.connection
       unit.connectionCount=0
     }
+    process.stdout.write(".");
+    // process.stdout.write("Downloading " + data.length + " bytes\r");
+    if (processStatus.gateway.status!='OK') {
+      processStatus.gateway.status='OK'
+      processStatus.gateway.statusSince=new Date()
+    }
+    // blink twice showing process is active and gateway OK
+    blinkLed(5)
+//      console.log('status gateway OK since '+ processStatus.gateway.statusSince.toISOString()+
+//        ' SSID:'+unit.ssid+' con:'+unit.connection+' cons:'+JSON.stringify(unit.connections))
+    return
 
     if (result.stdout=='full\n') {
       process.stdout.write("F");

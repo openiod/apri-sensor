@@ -1726,8 +1726,21 @@ const statusCheck = async function() {
 //  execPromise("LC_ALL=C ping -q -w 1 -c 1 8.8.8.8 > /dev/null")
   await execPromise("LC_ALL=C nmcli networking connectivity check")
   .then((result)=>{
+    if (unit.connectionCount==undefined ) {
+      unit.connectionCount=0
+      unit.connectionPrev=''
+    }
+    unit.connectionCount++
+    if(unit.connection!=unit.connectionPrev || unit.connectionCount>200) {
+      process.stdout.write("\nSSID:"+unit.ssid+"\n")
+      console.log(unit.connections)
+      process.stdout.write(unit.connectionPrev+'->'+unit.connection);
+      unit.connectionPrev=unit.connection
+      unit.connectionCount=0
+    }
+
     if (result.stdout=='full\n') {
-      process.stdout.write(".");
+      process.stdout.write("F");
       // process.stdout.write("Downloading " + data.length + " bytes\r");
       if (processStatus.gateway.status!='OK') {
         processStatus.gateway.status='OK'
@@ -1740,7 +1753,7 @@ const statusCheck = async function() {
       return
     }
     if (result.stdout=='limited\n') {
-      process.stdout.write("x");
+      process.stdout.write("L");
       if (processStatus.gateway.status!='OK') {
         processStatus.gateway.status='OK'
         processStatus.gateway.statusSince=new Date()

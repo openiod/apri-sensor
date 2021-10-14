@@ -953,7 +953,7 @@ const createHotspotConnection=function(){
 //    hotspotPassword+"' ipv6.method shared"
   var hotspotCommand= "LC_ALL=C nmcli connection add type wifi ifname '"+
     unit.ifname+"' con-name '"+unit.ssid+"' autoconnect yes wifi.mode ap ssid '"+
-    unit.ssid+"' ipv4.method shared" +
+    unit.ssid+"' ipv4.method shared 802-11-wireless.powersave 2 " +
     " 802-11-wireless.mode ap 802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk '"+
     hotspotPassword+"'"
 

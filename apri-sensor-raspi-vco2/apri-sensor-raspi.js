@@ -1411,6 +1411,7 @@ var initScd30Device = function() {
       indScd30=false
       return
     }
+/*
     scd30SerialNr=''
     for (var i=0;i<48;i=i+3) {
       if (buf48[i]==0) break
@@ -1420,19 +1421,19 @@ var initScd30Device = function() {
     }
     console.log(`SCD30 producttype: ${scd30ProductType}`)
     console.log(`SCD30 serialnr: ${scd30SerialNr}`)
-
-    var str12
-    0xC2 0xD1 0x00
+*/
+//    var str12
     try {
       // Start continuous measurement without ambient pressure compensation
       i2cScd30.writeSync(addressI2cScd30,Buffer.from([ 0xC2,0x00,0x10,0x00,0x00,0x81]))
       //str12=i2cScd30.readSync(addressI2cScd30,12)
     }
     catch {
-      console.log('error initializing SCD30, possibly not available')
+      console.log('error start continues measurement SCD30, possibly not available')
       indScd30=false
       return
     }
+/*
     //sps30ProductType=''
     if (Buffer.compare(str12,
       Buffer.from([0x30, 0x30, 0xf6, 0x30, 0x38, 0x4f, 0x30, 0x30, 0xf6, 0x30, 0x30, 0xf6])) ==0) {
@@ -1456,6 +1457,7 @@ var initScd30Device = function() {
       indScd30=false
       return
     }
+    */
   });
 }
 var readScd30Device = function() {

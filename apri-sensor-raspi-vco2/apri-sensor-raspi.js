@@ -1391,8 +1391,65 @@ initSps30Device()
 
 // =================================
 const i2cScd30 = new I2C();
+var scd30ProductType=''
+var scd30SerialNr =''
+
 
 var initScd30Device = function() {
+  raspi.init(() => {
+    var str12
+    try {
+      i2cScd30.writeSync(addressI2cScd30,Buffer.from([ 0xD0,0x02]))
+      str12=i2cScd30.readSync(addressI2cScd30,12)
+    }
+    catch {
+      console.log('error initializing SCD30, possibly not available')
+      indScd30=false
+      return
+    }
+    //sps30ProductType=''
+    if (Buffer.compare(str12,
+      Buffer.from([0x30, 0x30, 0xf6, 0x30, 0x38, 0x4f, 0x30, 0x30, 0xf6, 0x30, 0x30, 0xf6])) ==0) {
+      scd30ProductType='00080000'
+      console.log('SCD30 producttype found: '+ scd30ProductType)
+      indScd30=true
+    } else {
+      console.log('SCD30 producttype not found')
+      indScd30=false
+      return
+    }
+    var buf48
+    try {
+      i2cScd30.writeSync(addressI2cScd30,Buffer.from([ 0xD0,0x33]))
+      buf48=i2cScd30.readSync(addressI2cScd30,48)
+    }
+    catch {
+      console.log('error initializing SCD30, possibly not available')
+      indScd30=false
+      return
+    }
+    scd30SerialNr=''
+    for (var i=0;i<48;i=i+3) {
+      if (buf48[i]==0) break
+      scd30SerialNr+=String.fromCharCode(buf48[i])
+      if (buf48[i+1]==0) break
+      scd30SerialNr+=String.fromCharCode(buf48[i+1])
+    }
+    console.log(`SCD30 producttype: ${scd30ProductType}`)
+    console.log(`SCD30 serialnr: ${scd30SerialNr}`)
+    // start measuring
+    try {
+      // set sensor to produce floating point values
+      i2cScd30.writeSync(addressI2cScd30,Buffer.from([ 0x00,0x10,0x03,0x00,calcCrcSps30(0x03,0x00)]))
+      //      // integer
+      //    i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x00,0x10,0x05,0x00,0xF6]))
+    }
+    catch {
+      console.log('error initializing SCD30, possibly not available')
+      indScd30=false
+      return
+    }
+  });
 }
 var readScd30Device = function() {
 }

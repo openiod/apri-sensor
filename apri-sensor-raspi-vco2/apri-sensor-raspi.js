@@ -1398,13 +1398,14 @@ var scd30SerialNr =''
 var initScd30Device = function() {
   raspi.init(() => {
 
-    var buf32
+    var buf4
     try {
       // read firmware version
       i2cScd30.writeSync(addressI2cScd30,Buffer.from([ 0xC2, 0xD1, 0x00]))
       // firmware: 0xC3 0x03 0x42 0xF3
-      buf32=i2cScd30.readSync(addressI2cScd30,32)
-      console.log(buf32)
+      buf4=i2cScd30.readSync(addressI2cScd30,4)
+      console.log(buf4)
+      console.dir(buf4)
     }
     catch {
       console.log('error reading SCD30 firmware version, possibly not available')

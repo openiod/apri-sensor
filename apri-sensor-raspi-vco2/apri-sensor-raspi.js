@@ -1397,10 +1397,36 @@ var scd30SerialNr =''
 
 var initScd30Device = function() {
   raspi.init(() => {
-    var str12
+
+    var buf32
     try {
-      i2cScd30.writeSync(addressI2cScd30,Buffer.from([ 0xD0,0x02]))
-      str12=i2cScd30.readSync(addressI2cScd30,12)
+      // read firmware version
+      i2cScd30.writeSync(addressI2cScd30,Buffer.from([ 0xC2, 0xD1, 0x00]))
+      // firmware: 0xC3 0x03 0x42 0xF3
+      buf32=i2cScd30.readSync(addressI2cScd30,32)
+      console.log(buf32)
+    }
+    catch {
+      console.log('error reading SCD30 firmware version, possibly not available')
+      indScd30=false
+      return
+    }
+    scd30SerialNr=''
+    for (var i=0;i<48;i=i+3) {
+      if (buf48[i]==0) break
+      scd30SerialNr+=String.fromCharCode(buf48[i])
+      if (buf48[i+1]==0) break
+      scd30SerialNr+=String.fromCharCode(buf48[i+1])
+    }
+    console.log(`SCD30 producttype: ${scd30ProductType}`)
+    console.log(`SCD30 serialnr: ${scd30SerialNr}`)
+
+    var str12
+    0xC2 0xD1 0x00
+    try {
+      // Start continuous measurement without ambient pressure compensation
+      i2cScd30.writeSync(addressI2cScd30,Buffer.from([ 0xC2,0x00,0x10,0x00,0x00,0x81]))
+      //str12=i2cScd30.readSync(addressI2cScd30,12)
     }
     catch {
       console.log('error initializing SCD30, possibly not available')
@@ -1418,25 +1444,6 @@ var initScd30Device = function() {
       indScd30=false
       return
     }
-    var buf48
-    try {
-      i2cScd30.writeSync(addressI2cScd30,Buffer.from([ 0xD0,0x33]))
-      buf48=i2cScd30.readSync(addressI2cScd30,48)
-    }
-    catch {
-      console.log('error initializing SCD30, possibly not available')
-      indScd30=false
-      return
-    }
-    scd30SerialNr=''
-    for (var i=0;i<48;i=i+3) {
-      if (buf48[i]==0) break
-      scd30SerialNr+=String.fromCharCode(buf48[i])
-      if (buf48[i+1]==0) break
-      scd30SerialNr+=String.fromCharCode(buf48[i+1])
-    }
-    console.log(`SCD30 producttype: ${scd30ProductType}`)
-    console.log(`SCD30 serialnr: ${scd30SerialNr}`)
     // start measuring
     try {
       // set sensor to produce floating point values

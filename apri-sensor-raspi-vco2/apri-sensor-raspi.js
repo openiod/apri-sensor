@@ -309,6 +309,13 @@ var counters	= {
 		, part10_0		: 0
 		, nrOfMeas		: 0
     , nrOfMeasTotal	: 0
+	},
+  scd30: {
+		  temperature	: 0
+		, rHum				: 0
+    , co2		: 0
+		, nrOfMeas		: 0
+    , nrOfMeasTotal	: 0
 	}
 };
 var results			= {
@@ -376,6 +383,12 @@ var results			= {
 		, part5_0			: 0
 		, part10_0		: 0
 		, nrOfMeas		: 0
+	},
+  scd30: {
+		  temperature	: 0
+		, rHum				: 0
+    , co2		: 0
+		, nrOfMeas		: 0
 	}
 };
 
@@ -439,6 +452,10 @@ var initCounters	= function () {
 	counters.ips7100.part10_0				= 0;
 	counters.ips7100.nrOfMeas				= 0;
 
+  counters.scd30.temperature	= 0;
+	counters.scd30.rHum				= 0;
+  counters.scd30.co2		= 0;
+	counters.scd30.nrOfMeas		= 0;
 }
 
 //-------------- raspi-serial

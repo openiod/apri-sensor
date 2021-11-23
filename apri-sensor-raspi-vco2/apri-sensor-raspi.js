@@ -4,6 +4,25 @@
 ** Main system module for handling sensor measurement data for:
 **  DS18B20, PMSA003/PMS7003, BME280, BME680, TGS5042, SPS30, IPS7100, SCD30
 **
+*** SCD30 only with I2C clock stretching wich is only available in software i2c on Raspberry pi
+*** in /boot/config.txt for /dev/i2c-3
+***  dtoverlay=i2c-gpio,bus=3
+*** SDA will be on GPIO23 and SCL will be on GPIO24 which are pins 16 and 18 on the GPIO header respectively.
+
+sudo vi node_modules/raspi-i2c/dist/index.js
+if (device === undefined) {
+    console.log('Raspi-i2c address:')
+    console.log(address)
+    if(address==0x61) { // software i2c for clock stretching for SCD30 Sensirion
+      console.log('Raspi-i2c device: 3')
+      device = i2c_bus_1.openSync(3);
+    } else {
+      device = i2c_bus_1.openSync(raspi_board_1.getBoardRevision() === raspi_board_1.VERSION_1_MODEL_B_REV_1 ? 0 : 1);
+    }
+    this._devices[address] = device;
+}
+
+
 */
 
 "use strict"; // This is for your code to comply with the ECMAScript 5 standard.
@@ -42,6 +61,7 @@ var io	 										= require('socket.io-client');
 const exec 									= require('child_process').exec;
 const execFile							= require('child_process').execFile;
 const BME280 								= require('./BME280.js');
+const ModbusRTU             = require("modbus-serial");
 
 var ADS1x15
 var ads1115Available = false
@@ -1390,79 +1410,53 @@ initSps30Device()
 
 
 // =================================
-const i2cScd30 = new I2C();
-var scd30ProductType=''
-var scd30SerialNr =''
 
+const spleep=function(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 var initScd30Device = function() {
-  raspi.init(() => {
+  scd30Client.setID(0x61)
+  scd30Client.setTimeout(200)
+}
 
-    var buf4
-    try {
-      // read firmware version
-      i2cScd30.writeSync(addressI2cScd30,Buffer.from([ 0xC2, 0xD1, 0x00]))
-      // firmware: 0xC3 0x03 0x42 0xF3
-      buf4=i2cScd30.readSync(addressI2cScd30,4)
-      console.log(buf4)
-      console.dir(buf4)
+const readScd30Device = function() {
+  scd30Client.readHoldingRegisters(0x27, 1)
+  .then(async function(data) {
+    if (data.data[0]==1) {
+      //console.log('data available, read measurement')
+      await sleep(3)
+      readScd30Measurement()
     }
-    catch {
-      console.log('error reading SCD30 firmware version, possibly not available')
-      indScd30=false
-      return
-    }
-/*
-    scd30SerialNr=''
-    for (var i=0;i<48;i=i+3) {
-      if (buf48[i]==0) break
-      scd30SerialNr+=String.fromCharCode(buf48[i])
-      if (buf48[i+1]==0) break
-      scd30SerialNr+=String.fromCharCode(buf48[i+1])
-    }
-    console.log(`SCD30 producttype: ${scd30ProductType}`)
-    console.log(`SCD30 serialnr: ${scd30SerialNr}`)
-*/
-//    var str12
-    try {
-      // Start continuous measurement without ambient pressure compensation
-      i2cScd30.writeSync(addressI2cScd30,Buffer.from([ 0xC2,0x00,0x10,0x00,0x00,0x81]))
-      //str12=i2cScd30.readSync(addressI2cScd30,12)
-    }
-    catch {
-      console.log('error start continues measurement SCD30, possibly not available')
-      indScd30=false
-      return
-    }
-/*
-    //sps30ProductType=''
-    if (Buffer.compare(str12,
-      Buffer.from([0x30, 0x30, 0xf6, 0x30, 0x38, 0x4f, 0x30, 0x30, 0xf6, 0x30, 0x30, 0xf6])) ==0) {
-      scd30ProductType='00080000'
-      console.log('SCD30 producttype found: '+ scd30ProductType)
-      indScd30=true
-    } else {
-      console.log('SCD30 producttype not found')
-      indScd30=false
-      return
-    }
-    // start measuring
-    try {
-      // set sensor to produce floating point values
-      i2cScd30.writeSync(addressI2cScd30,Buffer.from([ 0x00,0x10,0x03,0x00,calcCrcSps30(0x03,0x00)]))
-      //      // integer
-      //    i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x00,0x10,0x05,0x00,0xF6]))
-    }
-    catch {
-      console.log('error initializing SCD30, possibly not available')
-      indScd30=false
-      return
-    }
-    */
-  });
+  })
+  .catch(function(err) {
+    console.log('xx error xxxx')
+    console.log(err)
+  })
 }
-var readScd30Device = function() {
+
+const readScd30Measurement= function() {
+  // console.log('read measurement')
+  // read the 6 registers starting at address 0x28
+  // on device number 0x61
+  scd30Client.readHoldingRegisters(0x28, 6)
+  .then(function(data) {
+    processRaspiScd30Record({
+      'co2':
+
+    })
+    var result = {}
+    result.co2         = data.buffer.readFloatBE(0))
+    result.temperature = data.buffer.readFloatBE(4))
+    result.rHum        = data.buffer.readFloatBE(8))
+    processRaspiScd30Record(result)
+  })
+  .catch(function(err) {
+    console.log('xx error xxxx')
+    console.log(err)
+  })
 }
+
 var processRaspiScd30Record = function(result) {
 	if (counters.busy==true) {
 		console.log('Counters busy, Scd30 measurement ignored *******************************');
@@ -1470,16 +1464,17 @@ var processRaspiScd30Record = function(result) {
 	}
 	counters.scd30.nrOfMeas++;
   counters.scd30.nrOfMeasTotal++;
-	counters.scd30.temperature			  	+= result[0]
-  counters.scd30.rHum			    += result[1]
-	counters.scd30.co2			    += result[2]
+  counters.scd30.co2			    += result.co2
+	counters.scd30.temperature	+= result.temperature
+  counters.scd30.rHum			    += result.rHum
 }
 
+// SCD30 open modbus connection to serial port
+var scd30Client = new ModbusRTU()
+scd30Client.connectRTUBuffered("/dev/ttyS0", { baudRate: 19200 }, initScd30Device;
 
-initScd30Device()
 
-
-
+// ips7100
 var processRaspiIps7100Record = function(result) {
 	if (counters.busy==true) {
 		console.log('Counters busy, Ips7100 measurement ignored *******************************');
@@ -1769,8 +1764,8 @@ if (ads1115Available==true) {
   let timerIdAds1115Tgs5042 = setInterval(getAds1115Tgs5042, 2000)
   //setTimeout(getAds1115Tgs5042, 1000);
 }
-let timerIdSps30 = setInterval(readSps30Device, 1000)
-let timerIdScd30 = setInterval(readScd30Device, 1000)
+let timerIdSps30 = setInterval(readSps30Device, 1000)  // particulate matter
+let timerIdScd30 = setInterval(readScd30Device, 1000)  // CO2,temperature,rHum
 
 
 let timerDataCycle = setInterval(processDataCycle, loopTimeCycle)

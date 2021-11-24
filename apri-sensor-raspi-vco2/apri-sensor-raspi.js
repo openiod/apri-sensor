@@ -63,6 +63,25 @@ const execFile							= require('child_process').execFile;
 const BME280 								= require('./BME280.js');
 const ModbusRTU             = require("modbus-serial");
 
+const aprisensorType = ''
+var aprisensorTypeConfig={}
+try {
+  aprisensorType= require('../config/aprisensor-type.cfg')
+}
+catch (err) {
+  aprisensorType=''
+  console.log('aprisensor-type.cfg not found');
+}
+if (aprisensorType!='') {
+  try {
+    aprisensorTypeConfig=fs.readFileSync('/../apri-config/aprisensor-types/'+aprisensorType+'.json')
+  }
+  catch (err) {
+    aprisensorTypeConfig={}
+    console.log('aprisensor-type '+aprisensorType+'.json' +' not found');
+  }
+}
+
 var ADS1x15
 var ads1115Available = false
 try {
@@ -1234,7 +1253,7 @@ var initSps30Device = function() {
       str12=i2cSps30.readSync(addressI2cSps30,12)
     }
     catch {
-      console.log('error initializing SPS30, possibly not available')
+      console.log('error initializing SPS30, maybe not available')
       indSps30=false
       return
     }
@@ -1255,7 +1274,7 @@ var initSps30Device = function() {
       buf48=i2cSps30.readSync(addressI2cSps30,48)
     }
     catch {
-      console.log('error initializing SPS30, possibly not available')
+      console.log('error initializing SPS30, maybe not available')
       indSps30=false
       return
     }
@@ -1276,7 +1295,7 @@ var initSps30Device = function() {
       //    i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x00,0x10,0x05,0x00,0xF6]))
     }
     catch {
-      console.log('error initializing SPS30, possibly not available')
+      console.log('error initializing SPS30, maybe not available')
       indSps30=false
       return
     }
@@ -1411,7 +1430,7 @@ initSps30Device()
 
 // =================================
 
-const spleep=function(ms) {
+const sleep=function(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -1421,6 +1440,14 @@ var initScd30Device = function() {
 }
 
 const readScd30Device = function() {
+  if (scd30Client.isOpen)  {
+    console.log('open')
+    //mbsState = MBS_STATE_NEXT;
+  } else {
+    console.log('not open')
+    return
+  }
+
   scd30Client.readHoldingRegisters(0x27, 1)
   .then(async function(data) {
     if (data.data[0]==1) {
@@ -1441,14 +1468,10 @@ const readScd30Measurement= function() {
   // on device number 0x61
   scd30Client.readHoldingRegisters(0x28, 6)
   .then(function(data) {
-    processRaspiScd30Record({
-      'co2':
-
-    })
     var result = {}
-    result.co2         = data.buffer.readFloatBE(0))
-    result.temperature = data.buffer.readFloatBE(4))
-    result.rHum        = data.buffer.readFloatBE(8))
+    result.co2         = data.buffer.readFloatBE(0)
+    result.temperature = data.buffer.readFloatBE(4)
+    result.rHum        = data.buffer.readFloatBE(8)
     processRaspiScd30Record(result)
   })
   .catch(function(err) {
@@ -1471,7 +1494,7 @@ var processRaspiScd30Record = function(result) {
 
 // SCD30 open modbus connection to serial port
 var scd30Client = new ModbusRTU()
-scd30Client.connectRTUBuffered("/dev/ttyS0", { baudRate: 19200 }, initScd30Device;
+scd30Client.connectRTUBuffered("/dev/ttyS0", { baudRate: 19200 }, initScd30Device)
 
 
 // ips7100

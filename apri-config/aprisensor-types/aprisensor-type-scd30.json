@@ -1,0 +1,12 @@
+{
+  "devices":
+  [
+    {"name": "SCD30"
+      ,"id":"scd30"
+      ,"device":"/dev/ttyS0"
+      ,"protocol":"modbus"
+      ,"baudRate":19200
+      ,"deviceType":"scd30"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{ 
+  "devices":
+  [
+    {"name": "PMSA003"
+      ,"id":"pmsa003"
+      ,"device":"/dev/ttyS0"
+      ,"baudRate":9600
+      ,"installed":"N"
+      ,"protocol":"serial"
+      ,"deviceType":"pmsa003"
+    },
+    {"name": "BME280"
+      ,"id":"bme280"
+      ,"device":"0x??"
+      ,"installed":"N"
+      ,"protocol":"I2C"
+      ,"deviceType":"bme280"
+    },
+    {"name": "BME680"
+      ,"id":"bme680"
+      ,"device":"0x??"
+      ,"installed":"N"
+      ,"protocol":"I2C"
+      ,"deviceType":"bme680"
+    },
+    {"name": "DS18B20"
+      ,"id":"ds18b20"
+      ,"device":"0x??"
+      ,"installed":"N"
+      ,"protocol":"onewire"
+      ,"deviceType":"ds18b20"
+    },
+    {"name": "SPS30"
+      ,"id":"sps30"
+      ,"device":"0x??"
+      ,"installed":"N"
+      ,"protocol":"I2C"
+      ,"deviceType":"sps30"
+    },
+    {"name": "TGS5042"
+      ,"id":"tgs5042"
+      ,"device":"0x??"
+      ,"installed":"N"
+      ,"protocol":"ads1x15"
+      ,"deviceType":"tgs5042"
+    },
+    {"name": "IPS7100"
+      ,"id":"ips7100"
+      ,"device":"/dev/ttyS0"
+      ,"baudRate":115200
+      ,"installed":"N"
+      ,"protocol":"serial"
+      ,"deviceType":"ips7100"
+    },
+    {"name": "SCD30"
+      ,"id":"scd30"
+      ,"device":"/dev/ttyS0"
+      ,"installed":"Y"
+      ,"protocol":"modbus"
+      ,"baudRate":19200
+      ,"deviceType":"scd30"
+    }
+  ]
+}

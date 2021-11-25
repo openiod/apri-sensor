@@ -64,7 +64,7 @@ try {
   const ModbusRTU             = require("modbus-serial");
 }
 catch (err) {
-  console.log('modbus-serial module (log) not found');
+  console.log('modbus-serial module (scd30) not found');
 }
 try {
   const winston = require('winston')
@@ -616,7 +616,7 @@ var processRaspiSerialData = function (data) {
 //----------------- raspi-i2c
 // The BME280 constructor options are optional.
 //
-if (aprisensorDevices=={}) {
+if (isEmpty(aprisensorDevices)) {
   const options = {
     i2cBusNo   : 1, // defaults to 1
     i2cAddress : 0x76  // BME280.BME280_DEFAULT_I2C_ADDRESS() // defaults to 0x77
@@ -1224,7 +1224,7 @@ var setGpioFanOff = function() {
 setGpioFanOff() // fan always on but first set gpio to off
 */
 
-if (aprisensorDevices=={}) {
+if (isEmpty(aprisensorDevices)) {
   const i2cSps30 = new I2C();
   var sps30ProductType=''
   var sps30SerialNr =''
@@ -1430,7 +1430,7 @@ var processRaspiSpsRecord = function(result) {
   counters.sps.tps			    += result[9]
 }
 
-if (aprisensorDevices=={}) {
+if (isEmpty(aprisensorDevices)) {
   initSps30Device()
 }
 
@@ -1438,6 +1438,9 @@ if (aprisensorDevices=={}) {
 
 const sleepFunction=function(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+function isEmpty(obj) {
+    return Object.keys(obj).length === 0;
 }
 
 var initScd30Device = function() {
@@ -1597,7 +1600,7 @@ var check_w1_device = function() {
   }
 }
 
-if (aprisensorDevices=={}) {
+if (isEmpty(aprisensorDevices)) {
   reset_w1_device()  // check w1 device for DS18B20
   resetBmeDevice()  // check bme280 or bme680
 }
@@ -1784,7 +1787,7 @@ var initSerial=function(serialDeviceIndex){
   });
 }
 
-if (aprisensorDevices=={}) {
+if (isEmpty(aprisensorDevices)) {
   let timerIdBme280 = setInterval(readSensorDataBme280, 2000)
   //setTimeout(readSensorDataBme280, 1000);
   let timerIdBme680 = setInterval(readSensorDataBme680, 2000)
@@ -1808,7 +1811,7 @@ if (aprisensorDevices.scd30!=undefined) {
 let timerDataCycle = setInterval(processDataCycle, loopTimeCycle)
 //setTimeout(processDataCycle, loopTimeCycle);
 
-if (aprisensorDevices=={}) {
+if (isEmpty(aprisensorDevices)) {
   scanSerialDevices()
   let timerSerialDevices = setInterval(scanSerialDevices, 10000)
 }

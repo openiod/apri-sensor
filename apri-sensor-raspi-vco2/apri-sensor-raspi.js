@@ -60,7 +60,12 @@ var io	 										= require('socket.io-client');
 const exec 									= require('child_process').exec;
 const execFile							= require('child_process').execFile;
 const BME280 								= require('./BME280.js');
-const ModbusRTU             = require("modbus-serial");
+try {
+  const ModbusRTU             = require("modbus-serial");
+}
+catch (err) {
+  console.log('modbus-serial module (log) not found');
+}
 try {
   const winston = require('winston')
 }

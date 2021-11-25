@@ -63,10 +63,11 @@ const execFile							= require('child_process').execFile;
 const BME280 								= require('./BME280.js');
 const ModbusRTU             = require("modbus-serial");
 
-const aprisensorType = ''
+var aprisensorType = ''
 var aprisensorTypeConfig={}
+var aprisensorDevices={}
 try {
-  aprisensorType= require('../config/aprisensor-type.cfg')
+  aprisensorType= fs.readFileSync('../config/aprisensor-type.cfg',{encoding:'utf8'}).split('\n')[0]
 }
 catch (err) {
   aprisensorType=''
@@ -74,7 +75,11 @@ catch (err) {
 }
 if (aprisensorType!='') {
   try {
-    aprisensorTypeConfig=fs.readFileSync('/../apri-config/aprisensor-types/'+aprisensorType+'.json')
+    aprisensorTypeConfig=JSON.parse(fs.readFileSync('apri-config/aprisensor-types/'+aprisensorType+'.json',{encoding:'utf8'}))
+    for (var i=0;i<aprisensorTypeConfig.devices.length;i++) {
+      var _dev=aprisensorTypeConfig.devices[i]
+      aprisensorDevices[_dev.deviceType]=_dev
+    }
   }
   catch (err) {
     aprisensorTypeConfig={}
@@ -82,17 +87,21 @@ if (aprisensorType!='') {
   }
 }
 
-var ADS1x15
-var ads1115Available = false
-try {
-  ADS1x15 = require('raspi-kit-ads1x15');
-  ads1115Available = true
-}
-catch (err) {
-  console.log('ADS1115 module not installed');
-}
+if (aprisensorDevices.tgs5042!=undefined) {
+  var ADS1x15
+  var ads1115Available = false
+  if (aprisensorDevices.tgs5042!=undefined) {
+    try {
+      ADS1x15 = require('raspi-kit-ads1x15');
+      ads1115Available = true
+    }
+    catch (err) {
+      console.log('ADS1115 module not installed');
+    }
+  }
 
-var adc
+  var adc
+}
 
 var getAds1115Tgs5042 = function() {
 //  setTimeout(getAds1115Tgs5042, 1000);
@@ -115,26 +124,27 @@ var getAds1115Tgs5042 = function() {
     }
   });
 }
-if (ads1115Available==true) {
-  // Init Raspi
-  raspi.init(() => {
-    // Init Raspi-I2c
-    const i2c = new I2C();
-    // Init the ADC
-    adc = new ADS1x15({
-      i2c,                                    // i2c interface
-      //chip: ADS1x15.chips.IC_ADS1015,         // chip model
-      chip: ADS1x15.chips.IC_ADS1115,         // chip model
-      address: ADS1x15.address.ADDRESS_0x48,  // i2c address on the bus
+if (aprisensorDevices.tgs5042!=undefined) {
+  if (ads1115Available==true) {
+    // Init Raspi
+    raspi.init(() => {
+      // Init Raspi-I2c
+      const i2c = new I2C();
+      // Init the ADC
+      adc = new ADS1x15({
+        i2c,                                    // i2c interface
+        //chip: ADS1x15.chips.IC_ADS1015,         // chip model
+        chip: ADS1x15.chips.IC_ADS1115,         // chip model
+        address: ADS1x15.address.ADDRESS_0x48,  // i2c address on the bus
 
-      // Defaults for future readings
+        // Defaults for future readings
 //        pga: ADS1x15.pga.PGA_4_096V,            // power-gain-amplifier range
-      pga: ADS1x15.pga.PGA_2_048V,            // power-gain-amplifier range
-      sps: ADS1x15.spsADS1015.SPS_250         // data rate (samples per second)
+        pga: ADS1x15.pga.PGA_2_048V,            // power-gain-amplifier range
+        sps: ADS1x15.spsADS1015.SPS_250         // data rate (samples per second)
+      });
     });
-  });
+  }
 }
-
 var pmsa003InitCounter = 0
 var serial
 var sleepMode = 0
@@ -595,11 +605,13 @@ var processRaspiSerialData = function (data) {
 //----------------- raspi-i2c
 // The BME280 constructor options are optional.
 //
-const options = {
-  i2cBusNo   : 1, // defaults to 1
-  i2cAddress : 0x76  // BME280.BME280_DEFAULT_I2C_ADDRESS() // defaults to 0x77
-};
-const bme280 = new BME280(options);
+if (aprisensorDevices=={}) {
+  const options = {
+    i2cBusNo   : 1, // defaults to 1
+    i2cAddress : 0x76  // BME280.BME280_DEFAULT_I2C_ADDRESS() // defaults to 0x77
+  };
+  const bme280 = new BME280(options);
+}
 // Read BME280 sensor data, repeat
 //
 const readSensorDataBme280 = () => {
@@ -1220,9 +1232,11 @@ var setGpioFanOff = function() {
 setGpioFanOff() // fan always on but first set gpio to off
 */
 
-const i2cSps30 = new I2C();
-var sps30ProductType=''
-var sps30SerialNr =''
+if (aprisensorDevices=={}) {
+  const i2cSps30 = new I2C();
+  var sps30ProductType=''
+  var sps30SerialNr =''
+}
 
 var calcCrcSps30=function(data1,data2) {
    var crc = 0xFF
@@ -1424,9 +1438,9 @@ var processRaspiSpsRecord = function(result) {
   counters.sps.tps			    += result[9]
 }
 
-
-initSps30Device()
-
+if (aprisensorDevices=={}) {
+  initSps30Device()
+}
 
 // =================================
 
@@ -1492,10 +1506,11 @@ var processRaspiScd30Record = function(result) {
   counters.scd30.rHum			    += result.rHum
 }
 
-// SCD30 open modbus connection to serial port
-var scd30Client = new ModbusRTU()
-scd30Client.connectRTUBuffered("/dev/ttyS0", { baudRate: 19200 }, initScd30Device)
-
+if (aprisensorDevices.scd30!=undefined) {
+  // SCD30 open modbus connection to serial port
+  var scd30Client = new ModbusRTU()
+  scd30Client.connectRTUBuffered("/dev/ttyS0", { baudRate: 19200 }, initScd30Device)
+}
 
 // ips7100
 var processRaspiIps7100Record = function(result) {
@@ -1591,9 +1606,10 @@ var check_w1_device = function() {
   }
 }
 
-reset_w1_device()  // check w1 device for DS18B20
-resetBmeDevice()  // check bme280 or bme680
-
+if (aprisensorDevices=={}) {
+  reset_w1_device()  // check w1 device for DS18B20
+  resetBmeDevice()  // check bme280 or bme680
+}
 
 
 var socket = io(socketUrl, {path:socketPath});
@@ -1777,22 +1793,31 @@ var initSerial=function(serialDeviceIndex){
   });
 }
 
-let timerIdBme280 = setInterval(readSensorDataBme280, 2000)
-//setTimeout(readSensorDataBme280, 1000);
-let timerIdBme680 = setInterval(readSensorDataBme680, 2000)
-//setTimeout(readSensorDataBme680, 1000);
-let timerIdDs18B20 = setInterval(readSensorDataDs18b20, 2000)
-// start processing TGS5042 CO sensor if available
-if (ads1115Available==true) {
-  let timerIdAds1115Tgs5042 = setInterval(getAds1115Tgs5042, 2000)
-  //setTimeout(getAds1115Tgs5042, 1000);
+if (aprisensorDevices=={}) {
+  let timerIdBme280 = setInterval(readSensorDataBme280, 2000)
+  //setTimeout(readSensorDataBme280, 1000);
+  let timerIdBme680 = setInterval(readSensorDataBme680, 2000)
+  //setTimeout(readSensorDataBme680, 1000);
+  let timerIdDs18B20 = setInterval(readSensorDataDs18b20, 2000)
+  let timerIdSps30 = setInterval(readSps30Device, 1000)  // particulate matter
 }
-let timerIdSps30 = setInterval(readSps30Device, 1000)  // particulate matter
-let timerIdScd30 = setInterval(readScd30Device, 1000)  // CO2,temperature,rHum
 
+if (aprisensorDevices.tgs5042!=undefined) {
+  // start processing TGS5042 CO sensor if available
+  if (ads1115Available==true) {
+    let timerIdAds1115Tgs5042 = setInterval(getAds1115Tgs5042, 2000)
+    //setTimeout(getAds1115Tgs5042, 1000);
+  }
+}
+
+if (aprisensorDevices.scd30!=undefined) {
+  let timerIdScd30 = setInterval(readScd30Device, 1000)  // CO2,temperature,rHum
+}
 
 let timerDataCycle = setInterval(processDataCycle, loopTimeCycle)
 //setTimeout(processDataCycle, loopTimeCycle);
 
-scanSerialDevices()
-let timerSerialDevices = setInterval(scanSerialDevices, 10000)
+if (aprisensorDevices=={}) {
+  scanSerialDevices()
+  let timerSerialDevices = setInterval(scanSerialDevices, 10000)
+}

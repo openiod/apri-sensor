@@ -60,7 +60,7 @@ var io	 										= require('socket.io-client');
 const exec 									= require('child_process').exec;
 const execFile							= require('child_process').execFile;
 const BME280 								= require('./BME280.js');
-const ModbusRTU
+var ModbusRTU
 try {
   ModbusRTU             = require("modbus-serial");
 }
@@ -73,7 +73,7 @@ const logConfiguration = {
         new winston.transports.Console()
     ]
 };
-const winston
+var winston
 const logger=console.log
 try {
   winston = require('winston')

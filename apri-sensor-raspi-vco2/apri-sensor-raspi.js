@@ -60,15 +60,24 @@ var io	 										= require('socket.io-client');
 const exec 									= require('child_process').exec;
 const execFile							= require('child_process').execFile;
 const BME280 								= require('./BME280.js');
+const ModbusRTU
 try {
-  const ModbusRTU             = require("modbus-serial");
+  ModbusRTU             = require("modbus-serial");
 }
 catch (err) {
   console.log('modbus-serial module (scd30) not found');
 }
+
+const logConfiguration = {
+    'transports': [
+        new winston.transports.Console()
+    ]
+};
+const winston
+const logger=console.log
 try {
-  const winston = require('winston')
-}
+  winston = require('winston')
+  logger = winston.createLogger(logConfiguration);}
 catch (err) {
   console.log('winston module (log) not found');
 }
@@ -651,7 +660,7 @@ const readSensorDataBme280 = () => {
   				counters.bme280.temperature				+= data.temperature_C;
   				counters.bme280.pressure					+= data.pressure_hPa;
   				counters.bme280.rHum							+= data.humidity;
-          console.log(' ' + data.temperature_C+ ' ' + data.pressure_hPa + ' ' + data.humidity + ' ' + counters.bme280.nrOfMeas);
+          //console.log(' ' + data.temperature_C+ ' ' + data.pressure_hPa + ' ' + data.humidity + ' ' + counters.bme280.nrOfMeas);
         }
 			} else {
 				console.log('Raspi-i2c processing is busy, measurement BME280 skipped');
@@ -691,7 +700,7 @@ const readSensorDataBme680 = async function(){
       counters.bme680.pressure					+= data.pressure;
       counters.bme680.rHum							+= data.humidity;
       counters.bme680.gasResistance  		+= data.gas_resistance;
-      console.log(' ' + data.temperature+ ' ' + data.pressure + ' ' + data.humidity + ' ' +data.gas_resistance+' ' + counters.bme680.nrOfMeas);
+      //console.log(' ' + data.temperature+ ' ' + data.pressure + ' ' + data.humidity + ' ' +data.gas_resistance+' ' + counters.bme680.nrOfMeas);
     }
   } else {
     console.log('Raspi-i2c processing is busy, measurement BME680 skipped');
@@ -760,7 +769,7 @@ var processDeviceData	= function(err,temperatureData) {
   }
   // warm-up time for ds18b20 also after reset
   if (new Date().getTime()-ds18b20InitTime.getTime()<30000) return
-	//console.log(temperatureData);
+
 	var line2 = temperatureData.toString().split(/\n/)[1];
   if (line2==undefined) return
 	var _temperature = line2.split('t=')[1];
@@ -773,7 +782,7 @@ var processDeviceData	= function(err,temperatureData) {
         counters.ds18b20.nrOfMeas++;
         counters.ds18b20.nrOfMeasTotal++;
   			counters.ds18b20.temperature			+= temperature;
-        console.log(' ' + temperature + ' ' + counters.ds18b20.nrOfMeas);
+        // console.log(' ' + temperature + ' ' + counters.ds18b20.nrOfMeas);
       }
 		}
 	};

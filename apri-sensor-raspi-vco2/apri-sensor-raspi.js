@@ -212,6 +212,12 @@ const {promisify} 					= require('util');
 const redisHmsetHashAsync 	= promisify(redisClient.hmset).bind(redisClient);
 const redisSaddAsync 				= promisify(redisClient.sadd).bind(redisClient);
 
+const sleepFunction=function(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+const isEmpty=function(obj) {
+  return Object.keys(obj).length === 0;
+}
 redisClient.on("error", function (err) {
     console.log("Redis client Error " + err);
 });
@@ -616,12 +622,13 @@ var processRaspiSerialData = function (data) {
 //----------------- raspi-i2c
 // The BME280 constructor options are optional.
 //
+var bme280
+const options = {
+  i2cBusNo   : 1, // defaults to 1
+  i2cAddress : 0x76  // BME280.BME280_DEFAULT_I2C_ADDRESS() // defaults to 0x77
+};
 if (isEmpty(aprisensorDevices)) {
-  const options = {
-    i2cBusNo   : 1, // defaults to 1
-    i2cAddress : 0x76  // BME280.BME280_DEFAULT_I2C_ADDRESS() // defaults to 0x77
-  };
-  const bme280 = new BME280(options);
+  bme280 = new BME280(options);
 }
 // Read BME280 sensor data, repeat
 //
@@ -1223,11 +1230,11 @@ var setGpioFanOff = function() {
 }
 setGpioFanOff() // fan always on but first set gpio to off
 */
-
+var i2cSps30
+var sps30ProductType=''
+var sps30SerialNr =''
 if (isEmpty(aprisensorDevices)) {
-  const i2cSps30 = new I2C();
-  var sps30ProductType=''
-  var sps30SerialNr =''
+  i2cSps30 = new I2C();
 }
 
 var calcCrcSps30=function(data1,data2) {
@@ -1435,13 +1442,6 @@ if (isEmpty(aprisensorDevices)) {
 }
 
 // =================================
-
-const sleepFunction=function(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-function isEmpty(obj) {
-    return Object.keys(obj).length === 0;
-}
 
 var initScd30Device = function() {
   scd30Client.setID(0x61)

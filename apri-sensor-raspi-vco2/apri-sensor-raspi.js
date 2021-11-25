@@ -68,16 +68,17 @@ catch (err) {
   console.log('modbus-serial module (scd30) not found');
 }
 
-const logConfiguration = {
-    'transports': [
-        new winston.transports.Console()
-    ]
-};
+var logConfiguration = {}
 var winston
 const logger=console.log
 try {
   winston = require('winston')
   logger = winston.createLogger(logConfiguration);}
+  logConfiguration = {
+      'transports': [
+          new winston.transports.Console()
+      ]
+  };
 catch (err) {
   console.log('winston module (log) not found');
 }

@@ -48,7 +48,6 @@ var initResult 							= apriConfig.init(systemModuleFolderName+"/"+systemModuleN
 // **********************************************************************************
 
 // add module specific requires
-//var request 								= require('request');
 //var express 								= require('express');
 var fs 											= require('fs');
 //var SerialPort 							= require("serialport");
@@ -62,6 +61,13 @@ const exec 									= require('child_process').exec;
 const execFile							= require('child_process').execFile;
 const BME280 								= require('./BME280.js');
 const ModbusRTU             = require("modbus-serial");
+try {
+  const winston = require('winston')
+}
+catch (err) {
+  console.log('winston module (log) not found');
+}
+
 
 var aprisensorType = ''
 var aprisensorTypeConfig={}
@@ -881,19 +887,6 @@ function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-/*
-var sendRequest = function(url) {
-	var _url			= url;
-	request.get(_url)
-		.on('response', function(response) {
-			console.log(response.statusCode + ' / ' + response.headers['content-type']) // 200
-			})
-		.on('error', function(err) {
-			console.log(err)
-		})
-	;
-}
-*/
 // send data to service
 var sendData = function() {
 		var timeStamp = new Date();
@@ -905,7 +898,6 @@ var sendData = function() {
 //						',raw0_3:'+results.pms.part0_3+',raw0_5:'+results.pms.part0_5+',raw1_0:'+results.pms.part1_0 +
 //						',raw2_5:'+results.pms.part2_5+',raw5_0:'+results.pms.part5_0+',raw10_0:'+results.pms.part10_0;
 //			console.log(url);
-//			sendRequest(url);
 			redisHmsetHashAsync(timeStamp.toISOString()+':pmsa003'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'pm1', results.pms.pm1CF1
@@ -935,7 +927,6 @@ var sendData = function() {
 //			url = openiodUrl + '/bme280'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
 //						'temperature:'+results.bme280.temperature+',pressure:'+results.bme280.pressure+',rHum:'+results.bme280.rHum ;
 //			console.log(url);
-//			sendRequest(url);
 			redisHmsetHashAsync(timeStamp.toISOString()+':bme280'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'temperature', results.bme280.temperature
@@ -957,7 +948,6 @@ var sendData = function() {
 //						'temperature:'+results.bme680.temperature+',pressure:'+results.bme680.pressure+
 //            ',rHum:'+results.bme680.rHum+',gasResistance:'+results.bme680.gasResistance ;
 //			console.log(url);
-//			sendRequest(url);
 			redisHmsetHashAsync(timeStamp.toISOString()+':bme680'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'temperature', results.bme680.temperature
@@ -1012,7 +1002,6 @@ var sendData = function() {
 //						',raw2_5:'+results.sps.part2_5+',raw4_0:'+results.sps.part4_0+
 //            ',raw10_0:'+results.sps.part10_0 + ',tps:'+results.sps.tps;
 //			console.log(url);
-//			sendRequest(url);
 			redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'pm1', results.sps.pm1
@@ -1045,7 +1034,6 @@ var sendData = function() {
 //						',raw2_5:'+results.ips7100.part2_5+',raw4_0:'+results.ips7100.part4_0+
 //            ',raw10_0:'+results.ips7100.part10_0 ;
 //			console.log(url);
-//			sendRequest(url);
       redisHmsetHashAsync(timeStamp.toISOString()+':ips7100'
         , 'foi', 'SCRP' + unit.id
         , 'pm01', results.ips7100.pm01
@@ -1078,7 +1066,6 @@ var sendData = function() {
 //			url = openiodUrl + '/scd30'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
 //						'temperature:'+results.scd30.temperature+',rHum:'+results.scd30.rHum+',co2:'+results.scd30.co2 ;
 //			console.log(url);
-//			sendRequest(url);
 			redisHmsetHashAsync(timeStamp.toISOString()+':scd30'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'temperature', results.scd30.temperature
@@ -1444,13 +1431,12 @@ if (aprisensorDevices=={}) {
 
 // =================================
 
-const sleep=function(ms) {
+const sleepFunction=function(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 var initScd30Device = function() {
   scd30Client.setID(0x61)
-  scd30Client.setTimeout(200)
 }
 
 const readScd30Device = function() {
@@ -1466,7 +1452,7 @@ const readScd30Device = function() {
   .then(async function(data) {
     if (data.data[0]==1) {
       //console.log('data available, read measurement')
-      await sleep(3)
+      await sleepFunction(3)
       readScd30Measurement()
     }
   })

@@ -189,6 +189,9 @@ var getRedisData = function(redisArray, redisArrayIndex) {
 			case 'ips7100':
         url = ips7100Attributes(res)+'&dateObserved='+dateObserved;
         break;
+			case 'scd30':
+        url = scd30Attributes(res)+'&dateObserved='+dateObserved;
+        break;
       default:
         console.log('ERROR: redis entry unknown: '+ redisKey);
     };
@@ -236,6 +239,10 @@ var ips7100Attributes = function(res) {
     ',raw0_1:'+res.raw0_1+',raw0_3:'+res.raw0_3+',raw0_5:'+res.raw0_5+',raw1_0:'+res.raw1_0 +
     ',raw2_5:'+res.raw2_5+',raw5_0:'+res.raw5_0+',raw10_0:'+res.raw10_0 +
 		',serialNr:'+res.serialNr
+}
+var scd30Attributes = function(res) {
+  return openiodUrl + '/scd30'+ '/v1/m?foi=' + res.foi + '&observation='+
+    'temperature:'+res.temperature+','+'co2:'+res.co2+','+'rHum:'+res.rHum+','+'gasResistance:'+res.gasResistance;
 }
 
 // send data to service

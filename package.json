@@ -1,6 +1,6 @@
 {
   "name": "apri-sensor",
-  "version": "2.0.4",
+  "version": "2.1.4",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -18,16 +18,17 @@
   },
   "homepage": "https://github.com/openiod/apri-sensor#readme",
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.24.0",
     "bme680-sensor": "^1.0.0",
     "express": "^4.17.1",
-    "http-terminator": "^2.0.3",
-    "onoff": "^6.0.1",
+    "http-terminator": "^3.0.3",
+    "modbus-serial": "^8.0.5",
+    "onoff": "^6.0.3",
     "raspi": "^6.0.1",
     "raspi-i2c": "^6.2.4",
     "raspi-serial": "^6.0.0",
     "redis": "^3.0.2",
-    "request": "^2.88.2",
-    "socket.io-client": "^2.3.1"
+    "socket.io-client": "^4.4.0",
+    "winston": "^3.3.3"
   }
 }

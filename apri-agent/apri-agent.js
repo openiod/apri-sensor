@@ -27,7 +27,7 @@ var initResult = apriConfig.init(systemModuleFolderName+"/"+systemModuleName);
 // **********************************************************************************
 
 // add module specific requires
-const request 			= require('request');
+//const request 			= require('request');
 var express 			= require('express');
 //const SerialPort 		= require('serialport');
 const fs 				= require('fs');
@@ -115,7 +115,7 @@ var initMenu	= function() {
 
 
 
-
+/*
 // send data to SOS service via OpenIoD REST service
 var sendData = function(data) {
 // oud //		http://openiod.com/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&inputformat=insertom&objectid=humansensor&format=xml
@@ -139,6 +139,7 @@ var sendData = function(data) {
 		;
 
 };
+*/
 
 var startActionReboot = function() {
 	exec("reboot", (error, stdout, stderr) => {

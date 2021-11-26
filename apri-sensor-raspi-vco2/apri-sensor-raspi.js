@@ -70,7 +70,7 @@ catch (err) {
 
 var logConfiguration = {}
 var winston
-const logger=console.log
+var logger=console.log
 try {
   winston = require('winston')
 }
@@ -86,7 +86,7 @@ try {
   logger = winston.createLogger(logConfiguration);
 }
 catch (err) {
-  console.log('winston module (log) not found');
+  console.log('winston.createLogger error');
 }
 
 

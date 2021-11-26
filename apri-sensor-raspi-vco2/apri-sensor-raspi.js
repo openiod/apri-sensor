@@ -70,7 +70,11 @@ catch (err) {
 
 var logConfiguration = {}
 var winston
-var logger=console.log
+var logger={
+  info:function(logmsg) {
+    console.log(logmsg)
+  }
+}
 try {
   winston = require('winston')
 }
@@ -79,9 +83,14 @@ catch (err) {
 }
 try {
   logConfiguration = {
-      'transports': [
-          new winston.transports.Console()
-      ]
+    'transports': [
+//          new winston.transports.Console()
+      new winston.transports.File({
+            //level: 'error',
+            // Create the log directory if it does not exist
+            filename: '/var/log/aprisensor/aprisensor.log'
+      })
+    ]
   };
   logger = winston.createLogger(logConfiguration);
 }

@@ -73,6 +73,11 @@ var winston
 const logger=console.log
 try {
   winston = require('winston')
+}
+catch (err) {
+  console.log('winston module (log) not found');
+}
+try {
   logConfiguration = {
       'transports': [
           new winston.transports.Console()

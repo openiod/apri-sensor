@@ -103,7 +103,8 @@ var aprisensorType = ''
 var aprisensorTypeConfig={}
 var aprisensorDevices={}
 try {
-  aprisensorType= fs.readFileSync('../config/aprisensor-type.cfg',{encoding:'utf8'}).split('\n')[0]
+  var tmpCfg=systemFolderParent+'/config/aprisensor-type.cfg'
+  aprisensorType= fs.readFileSync(tmpCfg,{encoding:'utf8'}).split('\n')[0]
 }
 catch (err) {
   aprisensorType=''
@@ -111,7 +112,7 @@ catch (err) {
 }
 if (aprisensorType!='') {
   try {
-    aprisensorTypeConfig=JSON.parse(fs.readFileSync('apri-config/aprisensor-types/'+aprisensorType+'.json',{encoding:'utf8'}))
+    aprisensorTypeConfig=JSON.parse(fs.readFileSync(startFolder+'/../apri-config/aprisensor-types/'+aprisensorType+'.json',{encoding:'utf8'}))
     for (var i=0;i<aprisensorTypeConfig.devices.length;i++) {
       var _dev=aprisensorTypeConfig.devices[i]
       aprisensorDevices[_dev.deviceType]=_dev

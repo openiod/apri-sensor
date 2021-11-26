@@ -22,6 +22,7 @@
     "bme680-sensor": "^1.0.0",
     "express": "^4.17.1",
     "http-terminator": "^2.0.3",
+    "modbus-serial": "^8.0.5",
     "onoff": "^6.0.1",
     "raspi": "^6.0.1",
     "raspi-i2c": "^6.2.4",

@@ -1465,10 +1465,10 @@ var initScd30Device = function() {
 
 const readScd30Device = function() {
   if (scd30Client.isOpen)  {
-    console.log('open')
+//    console.log('open')
     //mbsState = MBS_STATE_NEXT;
   } else {
-    console.log('not open')
+//    console.log('not open')
     return
   }
 

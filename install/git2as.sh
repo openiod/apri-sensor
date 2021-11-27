@@ -11,7 +11,8 @@ then
   # apri-config only once
   # cp -r /opt/SCAPE604/git/apri-sensor/apri-config /opt/SCAPE604/apri-sensor/.
 
-  cp -r /opt/SCAPE604/git/apri-sensor/package.json /opt/SCAPE604/apri-sensor/.
+# package alleen bij eerste installatie, later kan dit alleen tot verstoring leiden (met voorzicht gebruiken)
+#  cp -r /opt/SCAPE604/git/apri-sensor/package.json /opt/SCAPE604/apri-sensor/.
   cp -r /opt/SCAPE604/git/apri-sensor/apri-sensor-connector /opt/SCAPE604/apri-sensor/.
   cp -r /opt/SCAPE604/git/apri-sensor/apri-sensor-raspi /opt/SCAPE604/apri-sensor/.
   cp -r /opt/SCAPE604/git/apri-sensor/apri-sensor-redis /opt/SCAPE604/apri-sensor/.

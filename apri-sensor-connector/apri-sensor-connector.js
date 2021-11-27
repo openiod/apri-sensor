@@ -242,7 +242,7 @@ var ips7100Attributes = function(res) {
 }
 var scd30Attributes = function(res) {
   return openiodUrl + '/scd30'+ '/v1/m?foi=' + res.foi + '&observation='+
-    'temperature:'+res.temperature+','+'co2:'+res.co2+','+'rHum:'+res.rHum+','+'gasResistance:'+res.gasResistance;
+    'temperature:'+res.temperature+','+'co2:'+res.co2+','+'rHum:'+res.rHum;
 }
 
 // send data to service

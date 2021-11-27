@@ -2,7 +2,7 @@
 Description=SCAPE604-apri-sensor-connector - start or restart apri-sensor-connector service, respawn
 After=network.target
 [Service]
-ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-connector/apri-sensor-connector.sh /opt/SCAPE604/log/SCAPE604-apri-sensor-connector.log
+ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-connector/apri-sensor-connector.sh /var/log/aprisensor/SCAPE604-apri-sensor-connector.log
 Restart=always
 
 [Install]

@@ -2,7 +2,7 @@
 Description=SCAPE604-apri-sensor-pms7003 - start or restart apri-sensor-pms7003 service, respawn
 After=network.target
 [Service]
-ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-pms7003/apri-sensor-pms7003.sh /opt/SCAPE604/log/SCAPE604-apri-sensor-pms7003.log
+ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-pms7003/apri-sensor-pms7003.sh /var/log/aprisensor/SCAPE604-apri-sensor-pms7003.log
 Restart=always
 
 [Install]

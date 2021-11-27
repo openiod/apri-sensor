@@ -2,7 +2,7 @@
 Description=SCAPE604-apri-sensor-dylos - start or restart apri-sensor-dylos service, respawn
 After=network.target
 [Service]
-ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-dylos/apri-sensor-dylos.sh /opt/SCAPE604/log/SCAPE604-apri-sensor-dylos.log
+ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-dylos/apri-sensor-dylos.sh /var/log/aprisensor/SCAPE604-apri-sensor-dylos.log
 Restart=always
 
 [Install]

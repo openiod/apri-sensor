@@ -2,7 +2,7 @@
 Description=SCAPE604-apri-sensor-am2320 - start or restart apri-sensor-am2320 service, respawn
 After=network.target
 [Service]
-ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-am2320/apri-sensor-am2320.sh /opt/SCAPE604/log/SCAPE604-apri-sensor-am2320.log
+ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-am2320/apri-sensor-am2320.sh /var/log/aprisensor/SCAPE604-apri-sensor-am2320.log
 Restart=always
 
 [Install]

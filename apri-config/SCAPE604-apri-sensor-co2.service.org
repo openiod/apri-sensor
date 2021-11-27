@@ -2,7 +2,7 @@
 Description=SCAPE604-apri-sensor-co2 - start or restart apri-sensor-co2 service, respawn
 After=network.target
 [Service]
-ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-co2/apri-sensor-co2.sh /opt/SCAPE604/log/SCAPE604-apri-sensor-co2.log
+ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-co2/apri-sensor-co2.sh /var/log/aprisensor/SCAPE604-apri-sensor-co2.log
 Restart=always
 
 [Install]

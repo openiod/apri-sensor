@@ -2,7 +2,7 @@
 Description=SCAPE604-apri-sensor-josuino - start or restart apri-sensor-josuino service, respawn
 After=network.target
 [Service]
-ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-josuino/apri-sensor-josuino.sh /opt/SCAPE604/log/SCAPE604-apri-sensor-josuino.log
+ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-josuino/apri-sensor-josuino.sh /var/log/aprisensor/SCAPE604-apri-sensor-josuino.log
 Restart=always
 
 [Install]

@@ -2,7 +2,7 @@
 Description=SCAPE604-aprisensor-nmcli-stable - start or restart service, respawn
 After=network.target
 [Service]
-ExecStart=/opt/SCAPE604/apri-sensor/aprisensor-nmcli/aprisensor-nmcli-stable.sh /opt/SCAPE604/log/SCAPE604-aprisensor-nmcli-stable.log
+ExecStart=/opt/SCAPE604/apri-sensor/aprisensor-nmcli/aprisensor-nmcli-stable.sh /var/log/aprisensor/SCAPE604-aprisensor-nmcli-stable.log
 Restart=always
 
 [Install]

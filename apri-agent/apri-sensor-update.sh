@@ -17,25 +17,28 @@ then
   # echo "git clone ended"
 fi
 cd /opt/SCAPE604/git/apri-sensor
-
-echo Start of update proces >> /opt/SCAPE604/log/apri-agent-update.log
-date >> /opt/SCAPE604/log/apri-agent-update.log
+mkdir /var/log/aprisensor
+echo Start of update proces >> /var/log/aprisensor/apri-agent-update.log
+date >> /var/log/aprisensor/apri-agent-update.log
 
 # get software updates from github
 # git checkout package-lock.json
 # git pull >> /opt/SCAPE604/log/apri-agent-update.log 2>>/opt/SCAPE604/log/apri-agent-update2.log
 
 cd /opt/SCAPE604/log
-mv SCAPE604-apri-sensor-connector-old1.log SCAPE604-apri-sensor-connector-old2.log
-mv SCAPE604-apri-sensor-connector.log SCAPE604-apri-sensor-connector-old1.log
+mv /var/log/aprisensor/SCAPE604-apri-sensor-connector-old1.log /var/log/aprisensor/SCAPE604-apri-sensor-connector-old2.log
+mv /var/log/aprisensor/SCAPE604-apri-sensor-connector.log /var/log/aprisensor/SCAPE604-apri-sensor-connector-old1.log
+rm /opt/SCAPE604/log/SCAPE604-apri-sensor-connector*.log
 systemctl restart SCAPE604-apri-sensor-connector
 
-mv SCAPE604-apri-sensor-raspi-old1.log SCAPE604-apri-sensor-raspi-old2.log
-mv SCAPE604-apri-sensor-raspi.log SCAPE604-apri-sensor-raspi-old1.log
+mv /var/log/aprisensor/SCAPE604-apri-sensor-raspi-old1.log /var/log/aprisensor/SCAPE604-apri-sensor-raspi-old2.log
+mv /var/log/aprisensor/SCAPE604-apri-sensor-raspi.log /var/log/aprisensor/SCAPE604-apri-sensor-raspi-old1.log
+rm /opt/SCAPE604/log/SCAPE604-apri-sensor-raspi*.log
 systemctl restart SCAPE604-apri-sensor-raspi
 
-mv SCAPE604-aprisensor-nmcli-old1.log SCAPE604-aprisensor-nmcli-old2.log
-mv SCAPE604-aprisensor-nmcli.log SCAPE604-aprisensor-nmcli-old1.log
+mv /var/log/aprisensor/SCAPE604-aprisensor-nmcli-old1.log /var/log/aprisensor/SCAPE604-aprisensor-nmcli-old2.log
+mv /var/log/aprisensor/SCAPE604-aprisensor-nmcli.log /var/log/aprisensor/SCAPE604-aprisensor-nmcli-old1.log
+rm /opt/SCAPE604/log/SCAPE604-aprisensor-nmcli*.log
 systemctl restart SCAPE604-aprisensor-nmcli
 
 
@@ -43,6 +46,6 @@ systemctl restart SCAPE604-aprisensor-nmcli
 #sudo systemctl restart SCAPE604-apri-agent.service
 #sudo systemctl stop SCAPE604-apri-sensor-dylos.service
 #sudo systemctl start SCAPE604-apri-sensor-dylos.service
-echo End of update proces >> /opt/SCAPE604/log/apri-agent-update.log
+echo End of update proces >> /var/log/aprisensor/apri-agent-update.log
 
 exit 0

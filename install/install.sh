@@ -71,7 +71,8 @@
 
 # after first boot of Raspberry Pi:
 # /boot/config.txt --> dtoverlay=i2c-gpio,bus=3  (software i2c on gpio 23 sda 24 scl)
-# sudo rm /opt/SCAPE604/log/*.log
+# deze mag weg voor ApriSensorSK2 sudo rm /opt/SCAPE604/log/*.log
+# ApriSensorSK2-> sudo rm /var/log/aprisensor/*.log
 # sudo raspi-config --expand-rootfs
 # sudo reboot
 # check ID: cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2
@@ -106,7 +107,8 @@ wget -qO - https://azlux.fr/repo.gpg.key | sudo apt-key add -
 sudo apt update
 sudo apt install log2ram
 # wijzig /etc/log2ram.conf
-# PATH='/var/log;/opt/SCAPE604/log'
+# deze vervalt voor ApriSensorSK2-> PATH='/var/log;/opt/SCAPE604/log'
+# PATH='/var/log'
 
 #vi /etc/hosts:
 # laatste regel: 127.0.1.1		ID## ID##.local
@@ -170,6 +172,8 @@ usermod -a -G dialout pi
 
 ###npm install -g degit
 
+mkdir -p /var/log/aprisensor
+# de volgende kan weg in ApriSensorSK2 (sensorkit versie 2 / 2022)
 mkdir -p /opt/SCAPE604/log
 mkdir /opt/SCAPE604/config/
 mkdir /opt/SCAPE604/git/

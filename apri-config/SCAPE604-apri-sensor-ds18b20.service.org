@@ -2,7 +2,7 @@
 Description=SCAPE604-apri-sensor-ds18b20 - start or restart apri-sensor-ds18b20 service, respawn
 After=network.target
 [Service]
-ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-ds18b20/apri-sensor-ds18b20.sh /opt/SCAPE604/log/SCAPE604-apri-sensor-ds18b20.log
+ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-ds18b20/apri-sensor-ds18b20.sh /var/log/aprisensor/SCAPE604-apri-sensor-ds18b20.log
 Restart=always
 
 [Install]

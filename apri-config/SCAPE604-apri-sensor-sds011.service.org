@@ -2,7 +2,7 @@
 Description=SCAPE604-apri-sensor-sds011 - start or restart apri-sensor-sds011 service, respawn
 After=network.target
 [Service]
-ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-sds011/apri-sensor-sds011.sh /opt/SCAPE604/log/SCAPE604-apri-sensor-sds011.log
+ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-sds011/apri-sensor-sds011.sh /var/log/aprisensor/SCAPE604-apri-sensor-sds011.log
 Restart=always
 
 [Install]

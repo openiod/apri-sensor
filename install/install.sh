@@ -1,6 +1,19 @@
 #
 # start script onder sudo su -
 
+# prepare for building new image
+# start met sd-kaart op pi zero met directe aansluiting (keyboard/monitor)
+# sudo systemctl stop SCAPE604-apri-sensor-raspi
+# sudo systemctl stop SCAPE604-apri-sensor-connector
+# sudo systemctl stop SCAPE604-aprisensor-nmcli
+# redis-cli flushdb
+# sudo rm /opt/SCAPE604/log/*
+# sudo rm /var/log/aprisensor/*
+# nmcli c s
+# sudo nmcli c delete .. alle connections deleten, hotspot als laatste
+# sudo shutdown -h now
+# dan sd-kaart verwijderen en kopie maken met nieuw versienummer
+
 # prepare sdccard on Debian laptop:
 # Copy raspbian Butcher Lite img to sdcard with BalenaEtcher
 # sudo touch /media/awiel/boot/ssh
@@ -15,39 +28,42 @@
 # sudo /opt/SCAPE604/git/apri-sensor/install/git2as.sh
 ### ===== end upgrade proc
 
-#### ===== e2fsck
+#### maak nieuwe image
+# plaats sd-kaart met nieuwe versie in usb-adapter
+#===== e2fsck (controle of fs ok is)
 # df -h  # show devices
 # umount /dev/sda1 /dev/sda2
-# sudo e2fsck /dev/sda2
-# sudo e2fsck -c /dev/sda2
+# sudo e2fsck /dev/sda2  (rootfs=clean is ok)
+# sudo e2fsck -c /dev/sda2 (duurt paar minuten)
 #### ======
-
 # make truncated img (copy) of sdcard on Debian:
 # df -h  # (partitions: /dev/sda1 /dev/sda2 ; device /dev/sda)
 # sudo umount /dev/sda1 /dev/sda2
 # #eenmalig:sudo apt-get update && sudo apt-get install dcfldd
 # controleer filesystem: sudo e2fsck /dev/sda2
-# sudo dcfldd if=/dev/sda of=aprisensor_v2-0-3.img ; sudo sync
+# cd ~/opt/raspberrypi_image
+# mv apri* old-images/.
+# sudo dcfldd if=/dev/sda of=aprisensor_v2-1-5.img ; sudo sync
 # sudo sync
-# sudo chown awiel.awiel aprisensor_v2-0-3.img
+# sudo chown awiel.awiel aprisensor_v2-1-5.img
 # shrink img:
 # # eenmalig: sudo apt-get update && sudo apt-get install gparted
-# sudo fdisk -l aprisensor_v2-0-3.img
+# sudo fdisk -l aprisensor_v2-1-5.img
 # startsector of partition2 = 532480
 # mount the second partition
 # #sudo losetup /dev/loop0 aprisensor_####.img -o $((<STARTSECTOR>*512))
-# sudo losetup /dev/loop0 aprisensor_v2-0-3.img -o $((532480*512))
+# sudo losetup /dev/loop0 aprisensor_v2-1-5.img -o $((532480*512))
 # sudo gparted /dev/loop0
 # # select partion en menu: Partition / Resize/Move
-# # change minimum size to 2430 (minimum size + +-20MB) #of 3500 voor standaard voldoende ruimte!!
+# # change minimum size to 3500 (minimum size + +-20MB) #of 3500 voor standaard voldoende ruimte!!
 # click 'resize'-button
 # Menu: Edit / Apply All Operations
 #  Noteer the new size!
-#   see log details shrink file system / resize2fs -p ... (2488320K of 3584000K)
+#   see log details shrink file system / resize2fs -p 3584000K (2488320K of 3584000K)
 # close and quit gparted
 # reset loop device to total img:
 # sudo losetup -d /dev/loop0
-# sudo losetup /dev/loop0 aprisensor_v2-0-3.img
+# sudo losetup /dev/loop0 aprisensor_v2-1-5.img
 # sudo fdisk /dev/loop0
 # p<enter> for partion info
 # d<enter>2<enter> delete partition 2
@@ -61,9 +77,9 @@
 # sudo fdisk -l /dev/loop0
 # sudo losetup -d /dev/loop0
 # truncate file to ENDsector of 2e partition:
-# truncate -s $(((END+1)*512)) aprisensor_v2-0-x.img
-# ###truncate -s $(((4976640+1)*512)) aprisensor_v2-0-2.img
-# truncate -s $(((7700479+1)*512)) aprisensor_v2-0-3.img
+# truncate -s $(((END+1)*512)) aprisensor_v2-1-5.img
+# ###truncate -s $(((4976640+1)*512)) aprisensor_v2-1-5.img
+# truncate -s $(((7700479+1)*512)) aprisensor_v2-1-5.img
 
 #
 # see http://www.aoakley.com/articles/2015-10-09-resizing-sd-images.php

@@ -1089,15 +1089,16 @@ var sendData = function() {
         , 'raw5_0', results.ips7100.part5_0
         , 'raw10_0', results.ips7100.part10_0
         , 'serialNr', ips7100SerialNr
-        ).then(function(res) {
-          var _res = res;
-          redisSaddAsync('new', timeStamp.toISOString()+':ips7100')
-            .then(function(res2) {
-              var _res2=res2;
-            //	redisSaddAsync('ips7100', timeStamp.toISOString()+':ips7100')
-              console.log('ips7100 ', timeStamp.toISOString()+':ips7100'+ _res2);
-            });
-          console.log(timeStamp.toString()+':ips7100'+_res);
+        )
+        .then(function(res) {
+        var _res = res;
+        redisSaddAsync('new', timeStamp.toISOString()+':ips7100')
+        .then(function(res2) {
+          var _res2=res2;
+          //	redisSaddAsync('ips7100', timeStamp.toISOString()+':ips7100')
+          console.log('ips7100 ', timeStamp.toISOString()+':ips7100'+ _res2);
+        });
+        console.log(timeStamp.toString()+':ips7100'+_res);
       });
     }
     if (results.scd30.nrOfMeas > 0) {
@@ -1122,50 +1123,51 @@ var sendData = function() {
 		}
 
     if (results.bme280.nrOfMeas == 0 & results.bme680.nrOfMeas == 0) {
-      console.log('Both bmw280/bme680 counters zero, looks like error, next time initdevices ')
-      if (bmeInitCounter <3) {
-        bmeInitCounter++
-      } else {
-        bmeInitCounter = 0
-        resetBmeDevice()
+      if (isEmpty(aprisensorDevices)) {
+        console.log('Both bmw280/bme680 counters zero, looks like error, next time initdevices ')
+        if (bmeInitCounter <3) {
+          bmeInitCounter++
+        } else {
+          bmeInitCounter = 0
+          resetBmeDevice()
+        }
       }
     } else {
       bmeInitCounter=0
     }
     if (results.ds18b20.nrOfMeas == 0) {
-      // warm-up time for ds18b20 also after reset
-      if (new Date().getTime()-ds18b20InitTime.getTime()>=30000){
-        console.log('ds18b20 counters zero, looks like error, next time initdevices ')
+      if (isEmpty(aprisensorDevices)) {
+        // warm-up time for ds18b20 also after reset
+        if (new Date().getTime()-ds18b20InitTime.getTime()>=30000){
+          console.log('ds18b20 counters zero, looks like error, next time initdevices ')
 //        if (ds18b20InitCounter <3) {
 //          ds18b20InitCounter++
 //        } else {
 //          ds18b20InitCounter = 0
-          reset_w1_device()
+            reset_w1_device()
 //        }
+        }
       }
     } //else {
       //ds18b20InitCounter=0
     //}
 
     if (results.pms.nrOfMeas == 0 && results.pms.nrOfMeasTotal > 0 ) {
-//    if (process.argv[2]=='test') {
-      if (pmsa003InitCounter <1) {
-        console.log('pmsa003 counters zero, looks like error, next time try active mode ')
-        pmsa003InitCounter++
-      } else {
-        pmsa003InitCounter = 0
-//        if (serial != undefined) {
-//          console.log('Serial port defined')
-//        }
-        // switch active / passive mode
-        var cmdByteArray 		= new ArrayBuffer(7);
-        var cmdView8 				= new Uint8Array(cmdByteArray);
-        var cmdCheckSum=0
-        cmdView8[0] = 0x42
-        cmdView8[1] = 0x4D
-        //cmdView8[2] = 0xE4  // set sleep/wakeup
-        cmdView8[2] = 0xE1  // set passive/active
-        cmdView8[3] = 0x00
+      if (isEmpty(aprisensorDevices)) {
+        if (pmsa003InitCounter <1) {
+          console.log('pmsa003 counters zero, looks like error, next time try active mode ')
+          pmsa003InitCounter++
+        } else {
+          pmsa003InitCounter = 0
+          // switch active / passive mode
+          var cmdByteArray 		= new ArrayBuffer(7);
+          var cmdView8 				= new Uint8Array(cmdByteArray);
+          var cmdCheckSum=0
+          cmdView8[0] = 0x42
+          cmdView8[1] = 0x4D
+          //cmdView8[2] = 0xE4  // set sleep/wakeup
+          cmdView8[2] = 0xE1  // set passive/active
+          cmdView8[3] = 0x00
 //        if (sleepMode==1) {
 //          cmdView8[4] = 0x00 // set to sleep
 ////          console.log('set pmsa003 to sleep')
@@ -1177,24 +1179,15 @@ var sendData = function() {
           console.log('set pmsa003 to active')
 //          sleepMode=1
 //        }
-        cmdCheckSum = cmdView8[0]+cmdView8[1]+cmdView8[2]+cmdView8[3]+cmdView8[4]
-        cmdView8[5]=cmdCheckSum>>8
-        cmdView8[6]=cmdCheckSum-(cmdView8[5]<<8)
+          cmdCheckSum = cmdView8[0]+cmdView8[1]+cmdView8[2]+cmdView8[3]+cmdView8[4]
+          cmdView8[5]=cmdCheckSum>>8
+          cmdView8[6]=cmdCheckSum-(cmdView8[5]<<8)
 
-/*
-        console.log(cmdView8[0])
-        console.log(cmdView8[1])
-        console.log(cmdView8[2])
-        console.log(cmdView8[3])
-        console.log(cmdView8[4])
-        console.log(cmdView8[5])
-        console.log(cmdView8[6])
-        console.log(cmdView8)
-*/
-        for (var i=0; i<serialDevices.length;i++) {
-          if (serialDevices[i].deviceType == 'pmsa003') {
-            if (serialDevices[i].serial!=undefined){
-              serialDevices[i].serial.write(cmdView8);
+          for (var i=0; i<serialDevices.length;i++) {
+            if (serialDevices[i].deviceType == 'pmsa003') {
+              if (serialDevices[i].serial!=undefined){
+                serialDevices[i].serial.write(cmdView8);
+              }
             }
           }
         }

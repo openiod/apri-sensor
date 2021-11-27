@@ -2,27 +2,8 @@
 ** Module: apri-sensor-raspi
 **
 ** Main system module for handling sensor measurement data for:
-**  DS18B20, PMSA003/PMS7003, BME280, BME680, TGS5042, SPS30, IPS7100, SCD30
+**  DS18B20, PMSA003/PMS7003, BME280, BME680, TGS5042, SPS30, IPS7100
 **
-*** SCD30 only with I2C clock stretching wich is only available in software i2c on Raspberry pi
-*** in /boot/config.txt for /dev/i2c-3
-***  dtoverlay=i2c-gpio,bus=3
-*** SDA will be on GPIO23 and SCL will be on GPIO24 which are pins 16 and 18 on the GPIO header respectively.
-
-sudo vi node_modules/raspi-i2c/dist/index.js
-if (device === undefined) {
-    console.log('Raspi-i2c address:')
-    console.log(address)
-    if(address==0x61) { // software i2c for clock stretching for SCD30 Sensirion
-      console.log('Raspi-i2c device: 3')
-      device = i2c_bus_1.openSync(3);
-    } else {
-      device = i2c_bus_1.openSync(raspi_board_1.getBoardRevision() === raspi_board_1.VERSION_1_MODEL_B_REV_1 ? 0 : 1);
-    }
-    this._devices[address] = device;
-}
-
-
 */
 
 "use strict"; // This is for your code to comply with the ECMAScript 5 standard.
@@ -48,6 +29,7 @@ var initResult 							= apriConfig.init(systemModuleFolderName+"/"+systemModuleN
 // **********************************************************************************
 
 // add module specific requires
+//var request 								= require('request');
 //var express 								= require('express');
 var fs 											= require('fs');
 //var SerialPort 							= require("serialport");
@@ -60,85 +42,18 @@ var io	 										= require('socket.io-client');
 const exec 									= require('child_process').exec;
 const execFile							= require('child_process').execFile;
 const BME280 								= require('./BME280.js');
-var ModbusRTU
+
+var ADS1x15
+var ads1115Available = false
 try {
-  ModbusRTU             = require("modbus-serial");
+  ADS1x15 = require('raspi-kit-ads1x15');
+  ads1115Available = true
 }
 catch (err) {
-  console.log('modbus-serial module (scd30) not found');
+  console.log('ADS1115 module not installed');
 }
 
-var logConfiguration = {}
-var winston
-var logger={
-  info:function(logmsg) {
-    console.log(logmsg)
-  }
-}
-try {
-  winston = require('winston')
-}
-catch (err) {
-  console.log('winston module (log) not found');
-}
-try {
-  logConfiguration = {
-    'transports': [
-//          new winston.transports.Console()
-      new winston.transports.File({
-            //level: 'error',
-            // Create the log directory if it does not exist
-            filename: '/var/log/aprisensor/aprisensor.log'
-      })
-    ]
-  };
-  logger = winston.createLogger(logConfiguration);
-}
-catch (err) {
-  console.log('winston.createLogger error');
-}
-
-
-var aprisensorType = ''
-var aprisensorTypeConfig={}
-var aprisensorDevices={}
-try {
-  var tmpCfg=systemFolderParent+'/config/aprisensor-type.cfg'
-  aprisensorType= fs.readFileSync(tmpCfg,{encoding:'utf8'}).split('\n')[0]
-}
-catch (err) {
-  aprisensorType=''
-  console.log('aprisensor-type.cfg not found');
-}
-if (aprisensorType!='') {
-  try {
-    aprisensorTypeConfig=JSON.parse(fs.readFileSync(startFolder+'/../apri-config/aprisensor-types/'+aprisensorType+'.json',{encoding:'utf8'}))
-    for (var i=0;i<aprisensorTypeConfig.devices.length;i++) {
-      var _dev=aprisensorTypeConfig.devices[i]
-      aprisensorDevices[_dev.deviceType]=_dev
-    }
-  }
-  catch (err) {
-    aprisensorTypeConfig={}
-    console.log('aprisensor-type '+aprisensorType+'.json' +' not found');
-  }
-}
-
-if (aprisensorDevices.tgs5042!=undefined) {
-  var ADS1x15
-  var ads1115Available = false
-  if (aprisensorDevices.tgs5042!=undefined) {
-    try {
-      ADS1x15 = require('raspi-kit-ads1x15');
-      ads1115Available = true
-    }
-    catch (err) {
-      console.log('ADS1115 module not installed');
-    }
-  }
-
-  var adc
-}
+var adc
 
 var getAds1115Tgs5042 = function() {
 //  setTimeout(getAds1115Tgs5042, 1000);
@@ -161,27 +76,26 @@ var getAds1115Tgs5042 = function() {
     }
   });
 }
-if (aprisensorDevices.tgs5042!=undefined) {
-  if (ads1115Available==true) {
-    // Init Raspi
-    raspi.init(() => {
-      // Init Raspi-I2c
-      const i2c = new I2C();
-      // Init the ADC
-      adc = new ADS1x15({
-        i2c,                                    // i2c interface
-        //chip: ADS1x15.chips.IC_ADS1015,         // chip model
-        chip: ADS1x15.chips.IC_ADS1115,         // chip model
-        address: ADS1x15.address.ADDRESS_0x48,  // i2c address on the bus
+if (ads1115Available==true) {
+  // Init Raspi
+  raspi.init(() => {
+    // Init Raspi-I2c
+    const i2c = new I2C();
+    // Init the ADC
+    adc = new ADS1x15({
+      i2c,                                    // i2c interface
+      //chip: ADS1x15.chips.IC_ADS1015,         // chip model
+      chip: ADS1x15.chips.IC_ADS1115,         // chip model
+      address: ADS1x15.address.ADDRESS_0x48,  // i2c address on the bus
 
-        // Defaults for future readings
+      // Defaults for future readings
 //        pga: ADS1x15.pga.PGA_4_096V,            // power-gain-amplifier range
-        pga: ADS1x15.pga.PGA_2_048V,            // power-gain-amplifier range
-        sps: ADS1x15.spsADS1015.SPS_250         // data rate (samples per second)
-      });
+      pga: ADS1x15.pga.PGA_2_048V,            // power-gain-amplifier range
+      sps: ADS1x15.spsADS1015.SPS_250         // data rate (samples per second)
     });
-  }
+  });
 }
+
 var pmsa003InitCounter = 0
 var serial
 var sleepMode = 0
@@ -222,9 +136,6 @@ catch(err) {
 var indSps30=false
 var addressI2cSps30=0x69
 
-var indScd30=false
-var addressI2cScd30=0x61
-
 var ips7100SerialNr =''
 var ips7100Hash=''
 
@@ -238,12 +149,6 @@ const {promisify} 					= require('util');
 const redisHmsetHashAsync 	= promisify(redisClient.hmset).bind(redisClient);
 const redisSaddAsync 				= promisify(redisClient.sadd).bind(redisClient);
 
-const sleepFunction=function(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-const isEmpty=function(obj) {
-  return Object.keys(obj).length === 0;
-}
 redisClient.on("error", function (err) {
     console.log("Redis client Error " + err);
 });
@@ -401,13 +306,6 @@ var counters	= {
 		, part10_0		: 0
 		, nrOfMeas		: 0
     , nrOfMeasTotal	: 0
-	},
-  scd30: {
-		  temperature	: 0
-		, rHum				: 0
-    , co2		: 0
-		, nrOfMeas		: 0
-    , nrOfMeasTotal	: 0
 	}
 };
 var results			= {
@@ -475,12 +373,6 @@ var results			= {
 		, part5_0			: 0
 		, part10_0		: 0
 		, nrOfMeas		: 0
-	},
-  scd30: {
-		  temperature	: 0
-		, rHum				: 0
-    , co2		: 0
-		, nrOfMeas		: 0
 	}
 };
 
@@ -544,10 +436,6 @@ var initCounters	= function () {
 	counters.ips7100.part10_0				= 0;
 	counters.ips7100.nrOfMeas				= 0;
 
-  counters.scd30.temperature	= 0;
-	counters.scd30.rHum				= 0;
-  counters.scd30.co2		= 0;
-	counters.scd30.nrOfMeas		= 0;
 }
 
 //-------------- raspi-serial
@@ -648,14 +536,11 @@ var processRaspiSerialData = function (data) {
 //----------------- raspi-i2c
 // The BME280 constructor options are optional.
 //
-var bme280
 const options = {
   i2cBusNo   : 1, // defaults to 1
   i2cAddress : 0x76  // BME280.BME280_DEFAULT_I2C_ADDRESS() // defaults to 0x77
 };
-if (isEmpty(aprisensorDevices)) {
-  bme280 = new BME280(options);
-}
+const bme280 = new BME280(options);
 // Read BME280 sensor data, repeat
 //
 const readSensorDataBme280 = () => {
@@ -677,7 +562,7 @@ const readSensorDataBme280 = () => {
   				counters.bme280.temperature				+= data.temperature_C;
   				counters.bme280.pressure					+= data.pressure_hPa;
   				counters.bme280.rHum							+= data.humidity;
-          //console.log(' ' + data.temperature_C+ ' ' + data.pressure_hPa + ' ' + data.humidity + ' ' + counters.bme280.nrOfMeas);
+          console.log(' ' + data.temperature_C+ ' ' + data.pressure_hPa + ' ' + data.humidity + ' ' + counters.bme280.nrOfMeas);
         }
 			} else {
 				console.log('Raspi-i2c processing is busy, measurement BME280 skipped');
@@ -717,7 +602,7 @@ const readSensorDataBme680 = async function(){
       counters.bme680.pressure					+= data.pressure;
       counters.bme680.rHum							+= data.humidity;
       counters.bme680.gasResistance  		+= data.gas_resistance;
-      //console.log(' ' + data.temperature+ ' ' + data.pressure + ' ' + data.humidity + ' ' +data.gas_resistance+' ' + counters.bme680.nrOfMeas);
+      console.log(' ' + data.temperature+ ' ' + data.pressure + ' ' + data.humidity + ' ' +data.gas_resistance+' ' + counters.bme680.nrOfMeas);
     }
   } else {
     console.log('Raspi-i2c processing is busy, measurement BME680 skipped');
@@ -786,7 +671,7 @@ var processDeviceData	= function(err,temperatureData) {
   }
   // warm-up time for ds18b20 also after reset
   if (new Date().getTime()-ds18b20InitTime.getTime()<30000) return
-
+	//console.log(temperatureData);
 	var line2 = temperatureData.toString().split(/\n/)[1];
   if (line2==undefined) return
 	var _temperature = line2.split('t=')[1];
@@ -799,7 +684,7 @@ var processDeviceData	= function(err,temperatureData) {
         counters.ds18b20.nrOfMeas++;
         counters.ds18b20.nrOfMeasTotal++;
   			counters.ds18b20.temperature			+= temperature;
-        // console.log(' ' + temperature + ' ' + counters.ds18b20.nrOfMeas);
+        console.log(' ' + temperature + ' ' + counters.ds18b20.nrOfMeas);
       }
 		}
 	};
@@ -836,8 +721,7 @@ var processDataCycle	= function() {
     '; ds18b20: '+ counters.ds18b20.nrOfMeas +
     '; tgs5042: '+ counters.tgs5042.nrOfMeas +
     '; sps30: '+ counters.sps.nrOfMeas +
-    '; ips7100: '+ counters.ips7100.nrOfMeas +
-    '; scd30: '+ counters.scd30.nrOfMeas
+    '; ips7100: '+ counters.ips7100.nrOfMeas
   )
 
   results.pms.pm1CF1							= Math.round((counters.pms.pm1CF1/counters.pms.nrOfMeas)*100)/100;
@@ -902,11 +786,6 @@ var processDataCycle	= function() {
   	results.ips7100.nrOfMeas			= counters.ips7100.nrOfMeas;
   }
 
-  results.scd30.temperature			= Math.round((counters.scd30.temperature/counters.scd30.nrOfMeas)*100)/100;
-	results.scd30.rHum						= Math.round((counters.scd30.rHum/counters.scd30.nrOfMeas)*100)/100;
-  results.scd30.co2							= Math.round((counters.scd30.co2/counters.scd30.nrOfMeas)*100)/100;
-	results.scd30.nrOfMeas				= counters.scd30.nrOfMeas;
-
 	initCounters();
 	counters.busy = false;
 
@@ -925,6 +804,19 @@ function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
+/*
+var sendRequest = function(url) {
+	var _url			= url;
+	request.get(_url)
+		.on('response', function(response) {
+			console.log(response.statusCode + ' / ' + response.headers['content-type']) // 200
+			})
+		.on('error', function(err) {
+			console.log(err)
+		})
+	;
+}
+*/
 // send data to service
 var sendData = function() {
 		var timeStamp = new Date();
@@ -936,6 +828,7 @@ var sendData = function() {
 //						',raw0_3:'+results.pms.part0_3+',raw0_5:'+results.pms.part0_5+',raw1_0:'+results.pms.part1_0 +
 //						',raw2_5:'+results.pms.part2_5+',raw5_0:'+results.pms.part5_0+',raw10_0:'+results.pms.part10_0;
 //			console.log(url);
+//			sendRequest(url);
 			redisHmsetHashAsync(timeStamp.toISOString()+':pmsa003'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'pm1', results.pms.pm1CF1
@@ -965,6 +858,7 @@ var sendData = function() {
 //			url = openiodUrl + '/bme280'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
 //						'temperature:'+results.bme280.temperature+',pressure:'+results.bme280.pressure+',rHum:'+results.bme280.rHum ;
 //			console.log(url);
+//			sendRequest(url);
 			redisHmsetHashAsync(timeStamp.toISOString()+':bme280'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'temperature', results.bme280.temperature
@@ -986,6 +880,7 @@ var sendData = function() {
 //						'temperature:'+results.bme680.temperature+',pressure:'+results.bme680.pressure+
 //            ',rHum:'+results.bme680.rHum+',gasResistance:'+results.bme680.gasResistance ;
 //			console.log(url);
+//			sendRequest(url);
 			redisHmsetHashAsync(timeStamp.toISOString()+':bme680'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'temperature', results.bme680.temperature
@@ -1040,6 +935,7 @@ var sendData = function() {
 //						',raw2_5:'+results.sps.part2_5+',raw4_0:'+results.sps.part4_0+
 //            ',raw10_0:'+results.sps.part10_0 + ',tps:'+results.sps.tps;
 //			console.log(url);
+//			sendRequest(url);
 			redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'pm1', results.sps.pm1
@@ -1072,6 +968,7 @@ var sendData = function() {
 //						',raw2_5:'+results.ips7100.part2_5+',raw4_0:'+results.ips7100.part4_0+
 //            ',raw10_0:'+results.ips7100.part10_0 ;
 //			console.log(url);
+//			sendRequest(url);
       redisHmsetHashAsync(timeStamp.toISOString()+':ips7100'
         , 'foi', 'SCRP' + unit.id
         , 'pm01', results.ips7100.pm01
@@ -1100,26 +997,6 @@ var sendData = function() {
           console.log(timeStamp.toString()+':ips7100'+_res);
       });
     }
-    if (results.scd30.nrOfMeas > 0) {
-//			url = openiodUrl + '/scd30'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
-//						'temperature:'+results.scd30.temperature+',rHum:'+results.scd30.rHum+',co2:'+results.scd30.co2 ;
-//			console.log(url);
-			redisHmsetHashAsync(timeStamp.toISOString()+':scd30'
-			  , 'foi', 'SCRP' + unit.id
-			  , 'temperature', results.scd30.temperature
-				, 'rHum', results.scd30.rHum
-        , 'co2', results.scd30.co2
-			  ).then(function(res) {
-					var _res = res;
-					redisSaddAsync('new', timeStamp.toISOString()+':scd30')
-						.then(function(res2) {
-							var _res2 = res2;
-						//	redisSaddAsync('scd30', timeStamp.toISOString()+':scd30')
-							console.log('scd30 ', timeStamp.toISOString()+':scd30'+ _res2);
-						});
-		    	console.log(timeStamp.toISOString()+':scd30'+_res);
-			});
-		}
 
     if (results.bme280.nrOfMeas == 0 & results.bme680.nrOfMeas == 0) {
       console.log('Both bmw280/bme680 counters zero, looks like error, next time initdevices ')
@@ -1209,9 +1086,6 @@ var sendData = function() {
     if (results.ips7100.nrOfMeas == 0) {
       // reset ips7100 when connected ?
     }
-    if (results.scd30.nrOfMeas == 0) {
-      // reset ips7100 when connected ?
-    }
 
 };
 
@@ -1256,12 +1130,10 @@ var setGpioFanOff = function() {
 }
 setGpioFanOff() // fan always on but first set gpio to off
 */
-var i2cSps30
+
+const i2cSps30 = new I2C();
 var sps30ProductType=''
 var sps30SerialNr =''
-if (isEmpty(aprisensorDevices)) {
-  i2cSps30 = new I2C();
-}
 
 var calcCrcSps30=function(data1,data2) {
    var crc = 0xFF
@@ -1292,7 +1164,7 @@ var initSps30Device = function() {
       str12=i2cSps30.readSync(addressI2cSps30,12)
     }
     catch {
-      console.log('error initializing SPS30, maybe not available')
+      console.log('error initializing SPS30, possibly not available')
       indSps30=false
       return
     }
@@ -1313,7 +1185,7 @@ var initSps30Device = function() {
       buf48=i2cSps30.readSync(addressI2cSps30,48)
     }
     catch {
-      console.log('error initializing SPS30, maybe not available')
+      console.log('error initializing SPS30, possibly not available')
       indSps30=false
       return
     }
@@ -1334,7 +1206,7 @@ var initSps30Device = function() {
       //    i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x00,0x10,0x05,0x00,0xF6]))
     }
     catch {
-      console.log('error initializing SPS30, maybe not available')
+      console.log('error initializing SPS30, possibly not available')
       indSps30=false
       return
     }
@@ -1463,76 +1335,9 @@ var processRaspiSpsRecord = function(result) {
   counters.sps.tps			    += result[9]
 }
 
-if (isEmpty(aprisensorDevices)) {
-  initSps30Device()
-}
 
-// =================================
+initSps30Device()
 
-var initScd30Device = function() {
-  scd30Client.setID(0x61)
-}
-
-const readScd30Device = function() {
-  if (scd30Client.isOpen)  {
-//    console.log('open')
-    //mbsState = MBS_STATE_NEXT;
-  } else {
-//    console.log('not open')
-    return
-  }
-
-  scd30Client.readHoldingRegisters(0x27, 1)
-  .then(async function(data) {
-    if (data.data[0]==1) {
-      //console.log('data available, read measurement')
-      await sleepFunction(3)
-      readScd30Measurement()
-    }
-  })
-  .catch(function(err) {
-    console.log('xx error xxxx')
-    console.log(err)
-  })
-}
-
-const readScd30Measurement= function() {
-  // console.log('read measurement')
-  // read the 6 registers starting at address 0x28
-  // on device number 0x61
-  scd30Client.readHoldingRegisters(0x28, 6)
-  .then(function(data) {
-    var result = {}
-    result.co2         = data.buffer.readFloatBE(0)
-    result.temperature = data.buffer.readFloatBE(4)
-    result.rHum        = data.buffer.readFloatBE(8)
-    processRaspiScd30Record(result)
-  })
-  .catch(function(err) {
-    console.log('xx error xxxx')
-    console.log(err)
-  })
-}
-
-var processRaspiScd30Record = function(result) {
-	if (counters.busy==true) {
-		console.log('Counters busy, Scd30 measurement ignored *******************************');
-		return;
-	}
-	counters.scd30.nrOfMeas++;
-  counters.scd30.nrOfMeasTotal++;
-  counters.scd30.co2			    += result.co2
-	counters.scd30.temperature	+= result.temperature
-  counters.scd30.rHum			    += result.rHum
-}
-
-if (aprisensorDevices.scd30!=undefined) {
-  // SCD30 open modbus connection to serial port
-  var scd30Client = new ModbusRTU()
-  scd30Client.connectRTUBuffered("/dev/ttyS0", { baudRate: 19200 }, initScd30Device)
-}
-
-// ips7100
 var processRaspiIps7100Record = function(result) {
 	if (counters.busy==true) {
 		console.log('Counters busy, Ips7100 measurement ignored *******************************');
@@ -1626,10 +1431,9 @@ var check_w1_device = function() {
   }
 }
 
-if (isEmpty(aprisensorDevices)) {
-  reset_w1_device()  // check w1 device for DS18B20
-  resetBmeDevice()  // check bme280 or bme680
-}
+reset_w1_device()  // check w1 device for DS18B20
+resetBmeDevice()  // check bme280 or bme680
+
 
 
 var socket = io(socketUrl, {path:socketPath});
@@ -1813,31 +1617,21 @@ var initSerial=function(serialDeviceIndex){
   });
 }
 
-if (isEmpty(aprisensorDevices)) {
-  let timerIdBme280 = setInterval(readSensorDataBme280, 2000)
-  //setTimeout(readSensorDataBme280, 1000);
-  let timerIdBme680 = setInterval(readSensorDataBme680, 2000)
-  //setTimeout(readSensorDataBme680, 1000);
-  let timerIdDs18B20 = setInterval(readSensorDataDs18b20, 2000)
-  let timerIdSps30 = setInterval(readSps30Device, 1000)  // particulate matter
+let timerIdBme280 = setInterval(readSensorDataBme280, 2000)
+//setTimeout(readSensorDataBme280, 1000);
+let timerIdBme680 = setInterval(readSensorDataBme680, 2000)
+//setTimeout(readSensorDataBme680, 1000);
+let timerIdDs18B20 = setInterval(readSensorDataDs18b20, 2000)
+// start processing TGS5042 CO sensor if available
+if (ads1115Available==true) {
+  let timerIdAds1115Tgs5042 = setInterval(getAds1115Tgs5042, 2000)
+  //setTimeout(getAds1115Tgs5042, 1000);
 }
+let timerIdSps30 = setInterval(readSps30Device, 1000)
 
-if (aprisensorDevices.tgs5042!=undefined) {
-  // start processing TGS5042 CO sensor if available
-  if (ads1115Available==true) {
-    let timerIdAds1115Tgs5042 = setInterval(getAds1115Tgs5042, 2000)
-    //setTimeout(getAds1115Tgs5042, 1000);
-  }
-}
-
-if (aprisensorDevices.scd30!=undefined) {
-  let timerIdScd30 = setInterval(readScd30Device, 1000)  // CO2,temperature,rHum
-}
 
 let timerDataCycle = setInterval(processDataCycle, loopTimeCycle)
 //setTimeout(processDataCycle, loopTimeCycle);
 
-if (isEmpty(aprisensorDevices)) {
-  scanSerialDevices()
-  let timerSerialDevices = setInterval(scanSerialDevices, 10000)
-}
+scanSerialDevices()
+let timerSerialDevices = setInterval(scanSerialDevices, 10000)

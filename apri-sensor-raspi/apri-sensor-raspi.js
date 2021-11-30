@@ -77,19 +77,29 @@ var logger={
 }
 try {
   winston = require('winston')
+  require('winston-daily-rotate-file')
 }
 catch (err) {
   console.log('winston module (log) not found');
 }
+
 try {
   logConfiguration = {
     'transports': [
 //          new winston.transports.Console()
-      new winston.transports.File({
+      new winston.transports.DailyRotateFile({
+          filename: 'aprisensor-raspi-%DATE%.log',
+          dirname: '/var/log/aprisensor',
+          datePattern: 'YYYY-MM-DD-HH',
+          maxSize: '20m',
+          maxFiles: '2d'
+        })
+/*      new winston.transports.File({
             //level: 'error',
             // Create the log directory if it does not exist
             filename: '/var/log/aprisensor/aprisensor.log'
       })
+*/
     ]
   };
   logger = winston.createLogger(logConfiguration);

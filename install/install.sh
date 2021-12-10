@@ -87,6 +87,7 @@
 
 # after first boot of Raspberry Pi:
 # /boot/config.txt --> dtoverlay=i2c-gpio,bus=3  (software i2c on gpio 23 sda 24 scl)
+# /boot/config.txt --> dtoverlay=disable-bt (serial wordt dan ttyAMA0 ipv ttyS0, is beter)
 # deze mag weg voor ApriSensorSK2 sudo rm /opt/SCAPE604/log/*.log
 # ApriSensorSK2-> sudo rm /var/log/aprisensor/*.log
 # sudo raspi-config --expand-rootfs

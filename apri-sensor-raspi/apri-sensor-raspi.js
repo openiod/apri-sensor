@@ -11,10 +11,10 @@
 
 sudo vi node_modules/raspi-i2c/dist/index.js
 if (device === undefined) {
-    console.log('Raspi-i2c address:')
-    console.log(address)
+    logger.info('Raspi-i2c address:')
+    logger.info(address)
     if(address==0x61) { // software i2c for clock stretching for SCD30 Sensirion
-      console.log('Raspi-i2c device: 3')
+      logger.info('Raspi-i2c device: 3')
       device = i2c_bus_1.openSync(3);
     } else {
       device = i2c_bus_1.openSync(raspi_board_1.getBoardRevision() === raspi_board_1.VERSION_1_MODEL_B_REV_1 ? 0 : 1);
@@ -33,7 +33,7 @@ var startFolder 						= __dirname;
 var startFolderParent				= path.resolve(__dirname,'../..');
 var configServerModulePath	= startFolder + '/../apri-config/apri-config';
 
-console.log("Start of Config Main ", configServerModulePath);
+logger.info("Start of Config Main ", configServerModulePath);
 var apriConfig 							= require(configServerModulePath)
 
 var systemFolder 						= __dirname;
@@ -65,14 +65,14 @@ try {
   ModbusRTU             = require("modbus-serial");
 }
 catch (err) {
-  console.log('modbus-serial module (scd30) not found');
+  logger.info('modbus-serial module (scd30) not found');
 }
 
 var logConfiguration = {}
 var winston
 var logger={
   info:function(logmsg) {
-    console.log(logmsg)
+    logger.info(logmsg)
   }
 }
 try {
@@ -80,7 +80,7 @@ try {
   require('winston-daily-rotate-file')
 }
 catch (err) {
-  console.log('winston module (log) not found');
+  logger.info('winston module (log) not found');
 }
 
 try {
@@ -92,7 +92,7 @@ try {
           dirname: '/var/log/aprisensor',
           datePattern: 'YYYY-MM-DD-HH',
           maxSize: '20m',
-          maxFiles: '2d'
+          maxFiles: '1d'
         })
 /*      new winston.transports.File({
             //level: 'error',
@@ -105,7 +105,7 @@ try {
   logger = winston.createLogger(logConfiguration);
 }
 catch (err) {
-  console.log('winston.createLogger error');
+  logger.info('winston.createLogger error');
 }
 
 
@@ -118,7 +118,7 @@ try {
 }
 catch (err) {
   aprisensorType=''
-  console.log('aprisensor-type.cfg not found');
+  logger.info('aprisensor-type.cfg not found');
 }
 if (aprisensorType!='') {
   try {
@@ -130,7 +130,7 @@ if (aprisensorType!='') {
   }
   catch (err) {
     aprisensorTypeConfig={}
-    console.log('aprisensor-type '+aprisensorType+'.json' +' not found');
+    logger.info('aprisensor-type '+aprisensorType+'.json' +' not found');
   }
 }
 
@@ -143,7 +143,7 @@ if (aprisensorDevices.tgs5042!=undefined) {
       ads1115Available = true
     }
     catch (err) {
-      console.log('ADS1115 module not installed');
+      logger.info('ADS1115 module not installed');
     }
   }
 
@@ -162,7 +162,7 @@ var getAds1115Tgs5042 = function() {
       //   Er van uitgaande dat CO een zogenaamd ideaal gas is en dan geldt het standaard molair volume van 22,4 liter gas per mol gas
       var co = (Math.round(1000000*(2.004-volts)*400))/1000000
       var mgM3 = co * 1.25
-      console.log(' * CO ppm:', co, ' ',mgM3, ' mg/m3');
+      logger.info(' * CO ppm:', co, ' ',mgM3, ' mg/m3');
       if (counters.busy == false) {
         counters.tgs5042.nrOfMeas++;
         counters.tgs5042.nrOfMeasTotal++;
@@ -206,7 +206,7 @@ try {
   gpio = require('onoff').Gpio
 }
 catch (err) {
-  console.log('GPIO module onoff not installed');
+  logger.info('GPIO module onoff not installed');
 }
 if (gpio != undefined) {
   //gpioBlueLed = new gpio(19, 'out'); //use GPIO-19 pin .., and specify that it is output
@@ -226,7 +226,7 @@ try {
   bme680 = new Bme680(1, 0x77);
 }
 catch(err) {
-  console.log('module BME680-sensor not installed')
+  logger.info('module BME680-sensor not installed')
 }
 
 var indSps30=false
@@ -255,7 +255,7 @@ const isEmpty=function(obj) {
   return Object.keys(obj).length === 0;
 }
 redisClient.on("error", function (err) {
-    console.log("Redis client Error " + err);
+    logger.info("Redis client Error " + err);
 });
 
 // **********************************************************************************
@@ -269,12 +269,12 @@ var socketUrl, socketPath;
 
 //prod:
 socketUrl 									= 'https://openiod.org'; socketPath	= '/'+apriConfig.systemCode + '/socket.io';
-		//console.log(apriConfig);
+		//logger.info(apriConfig);
 //test:
 //		socketPort	= 3010; socketUrl 	= ':'+socketPort;
 //		socketPath	= apriConfig.urlSystemRoot + '/socket.io';
 
-console.log('web-socket url: '+socketUrl+socketPath);
+logger.info('web-socket url: '+socketUrl+socketPath);
 
 //const port 					= new SerialPort('/dev/ttyS0')
 
@@ -292,12 +292,12 @@ var devicesFolder = undefined;  // DS18B20 devices
 
 /*
 var deviceParam			= process.argv[2];
-console.log('Param for serial device is ' + deviceParam);
+logger.info('Param for serial device is ' + deviceParam);
 var sensorKey			= '';
 if (deviceParam != undefined) {
 	serialPortPath		= deviceParam;
 	sensorKey			= serialPortPath.substring(8);  // minus '/dev/tty'
-	console.log('SensorKey = ' + sensorKey);
+	logger.info('SensorKey = ' + sensorKey);
 } else {
 //	serialPortPath		= "/dev/ttyUSB0";
 //	serialPortPath		= "/dev/tty.wchusbserial1d1330";
@@ -571,7 +571,7 @@ var ips7100Record = 'ips7100,'
 
 var processRaspiSerialRecord = function() {
 	if (counters.busy==true) {
-		console.log('Counters busy, measurement ignored *******************************');
+		logger.info('Counters busy, measurement ignored *******************************');
 		return;
 	}
 	counters.pms.nrOfMeas++;
@@ -616,11 +616,11 @@ var processRaspiSerialData = function (data) {
     pos++;
   }
   if (pos==32) {
-//		console.log('Raspi-serial processing.');
+//		logger.info('Raspi-serial processing.');
 		if (checksum == ((view8[30]<<8)+view8[31])) {
 			processRaspiSerialRecord();
 		} else {
-			console.log('Raspi-serial checksum error');
+			logger.info('Raspi-serial checksum error');
 		}
     resetRaspiSerialArray();
   }
@@ -680,22 +680,22 @@ const readSensorDataBme280 = () => {
 
 			if (counters.busy == false) {
         if (data.pressure_hPa<900) {
-          console.log('BME280 pressure below 900. Less than 3.3V power? Measure skipped');
+          logger.info('BME280 pressure below 900. Less than 3.3V power? Measure skipped');
         } else {
           counters.bme280.nrOfMeas++;
           counters.bme280.nrOfMeasTotal++;
   				counters.bme280.temperature				+= data.temperature_C;
   				counters.bme280.pressure					+= data.pressure_hPa;
   				counters.bme280.rHum							+= data.humidity;
-          //console.log(' ' + data.temperature_C+ ' ' + data.pressure_hPa + ' ' + data.humidity + ' ' + counters.bme280.nrOfMeas);
+          //logger.info(' ' + data.temperature_C+ ' ' + data.pressure_hPa + ' ' + data.humidity + ' ' + counters.bme280.nrOfMeas);
         }
 			} else {
-				console.log('Raspi-i2c processing is busy, measurement BME280 skipped');
+				logger.info('Raspi-i2c processing is busy, measurement BME280 skipped');
 			}
       //setTimeout(readSensorDataBme280, 1000);
     })
     .catch((err) => {
-      console.log(`BME280 read error: ${err}`);
+      logger.info(`BME280 read error: ${err}`);
 
     });
 };
@@ -705,7 +705,7 @@ const readSensorDataBme280 = () => {
 /*
 bme280.init()
   .then(() => {
-    console.log('BME280 initialization succeeded');
+    logger.info('BME280 initialization succeeded');
     readSensorDataBme280();
   })
   .catch((err) => console.error(`BME280 initialization failed: ${err} `));
@@ -719,7 +719,7 @@ const readSensorDataBme680 = async function(){
   var data = bme680Data.data;
   if (counters.busy == false) {
     if (data.pressure<900) {
-      console.log('BME680 pressure below 900. Less than 3.3V power? Measure skipped');
+      logger.info('BME680 pressure below 900. Less than 3.3V power? Measure skipped');
     } else {
       counters.bme680.nrOfMeas++;
       counters.bme680.nrOfMeasTotal++;
@@ -727,10 +727,10 @@ const readSensorDataBme680 = async function(){
       counters.bme680.pressure					+= data.pressure;
       counters.bme680.rHum							+= data.humidity;
       counters.bme680.gasResistance  		+= data.gas_resistance;
-      //console.log(' ' + data.temperature+ ' ' + data.pressure + ' ' + data.humidity + ' ' +data.gas_resistance+' ' + counters.bme680.nrOfMeas);
+      //logger.info(' ' + data.temperature+ ' ' + data.pressure + ' ' + data.humidity + ' ' +data.gas_resistance+' ' + counters.bme680.nrOfMeas);
     }
   } else {
-    console.log('Raspi-i2c processing is busy, measurement BME680 skipped');
+    logger.info('Raspi-i2c processing is busy, measurement BME680 skipped');
   }
   //setTimeout(readSensorDataBme680, 1000);
 }
@@ -758,7 +758,7 @@ var initBme680	= function() {
           //console.dir(data)
           if (counters.busy == false) {
             if (data.pressure<900) {
-              console.log('BME680 pressure below 900. Less than 3.3V power? Measure skipped');
+              logger.info('BME680 pressure below 900. Less than 3.3V power? Measure skipped');
             } else {
               counters.bme680.nrOfMeas++;
               counters.bme680.nrOfMeasTotal++;
@@ -766,10 +766,10 @@ var initBme680	= function() {
               counters.bme680.pressure					+= data.pressure;
               counters.bme680.rHum							+= data.humidity;
               counters.bme680.gasResistance  		+= data.gas_resistance;
-              console.log(' ' + data.temperature+ ' ' + data.pressure + ' ' + data.humidity + ' ' +data.gas_resistance+' ' + counters.bme680.nrOfMeas);
+              logger.info(' ' + data.temperature+ ' ' + data.pressure + ' ' + data.humidity + ' ' +data.gas_resistance+' ' + counters.bme680.nrOfMeas);
             }
           } else {
-            console.log('Raspi-i2c processing is busy, measurement BME680 skipped');
+            logger.info('Raspi-i2c processing is busy, measurement BME680 skipped');
           }
       }, 3000)
       //.catch((err)=> console.error('setInterval async error'));
@@ -783,14 +783,14 @@ var initBme680	= function() {
   else{
     indBme280=false
     indBme680=false
-    console.log('BME680 module not installed')
+    logger.info('BME680 module not installed')
   }
 }
 
 var processDeviceData	= function(err,temperatureData) {
 	if (err) {
     //throw err;
-    console.log(err)
+    logger.info(err)
 //    reset_w1_device()
     return
   }
@@ -804,12 +804,12 @@ var processDeviceData	= function(err,temperatureData) {
 		var temperature = Math.round(parseFloat(_temperature)/10)/100; // round to 2 decimals
 		if (counters.busy == false) {
       if (temperature>50 | temperature < -15) {
-        console.log('Error, temerature value our of range: ' + temperature);
+        logger.info('Error, temerature value our of range: ' + temperature);
       } else {
         counters.ds18b20.nrOfMeas++;
         counters.ds18b20.nrOfMeasTotal++;
   			counters.ds18b20.temperature			+= temperature;
-        // console.log(' ' + temperature + ' ' + counters.ds18b20.nrOfMeas);
+        // logger.info(' ' + temperature + ' ' + counters.ds18b20.nrOfMeas);
       }
 		}
 	};
@@ -823,9 +823,9 @@ const readSensorDataDs18b20 = () => {
   var found=false
   for (var i=0;i<devicesFolder.length;i++) {
 		if (devicesFolder[i].split('-')[0] == '28') {  // 00 for GPIO
-//			console.log('DS18B20 device: ' +  devicesFolder[i]);
+//			logger.info('DS18B20 device: ' +  devicesFolder[i]);
 			var path = '/sys/bus/w1/devices/'+devicesFolder[i];
-			//console.log('try read ' + path+ '/w1_slave');
+			//logger.info('try read ' + path+ '/w1_slave');
 			fs.readFile(path+'/w1_slave',processDeviceData);  // start process
       found=true
 		}
@@ -840,7 +840,7 @@ const readSensorDataDs18b20 = () => {
 var processDataCycle	= function() {
 //	setTimeout(processDataCycle, loopTimeCycle);
 	counters.busy = true;
-	console.log('Counters pms: '+ counters.pms.nrOfMeas +
+	logger.info('Counters pms: '+ counters.pms.nrOfMeas +
     '; bme280: '+ counters.bme280.nrOfMeas +
     '; bme680: '+ counters.bme680.nrOfMeas  +
     '; ds18b20: '+ counters.ds18b20.nrOfMeas +
@@ -928,7 +928,7 @@ var printHex = function(buffer, tekst) {
   for (var i=0;i<buffer.length;i++) {
 	  str = str+ buffer[i].toString(16)+' ';
   }
-  console.log('log: ' + tekst +'  lengte:'+buffer.length+ " "+ str); // + data);
+  logger.info('log: ' + tekst +'  lengte:'+buffer.length+ " "+ str); // + data);
 }
 
 function isNumeric(n) {
@@ -945,7 +945,7 @@ var sendData = function() {
 //			 			',pm1amb:'+results.pms.pm1amb+',pm25amb:'+results.pms.pm25amb+',pm10amb:'+results.pms.pm10amb +
 //						',raw0_3:'+results.pms.part0_3+',raw0_5:'+results.pms.part0_5+',raw1_0:'+results.pms.part1_0 +
 //						',raw2_5:'+results.pms.part2_5+',raw5_0:'+results.pms.part5_0+',raw10_0:'+results.pms.part10_0;
-//			console.log(url);
+//			logger.info(url);
 			redisHmsetHashAsync(timeStamp.toISOString()+':pmsa003'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'pm1', results.pms.pm1CF1
@@ -966,15 +966,15 @@ var sendData = function() {
 						.then(function(res2) {
 							var _res2=res2;
 						//	redisSaddAsync('pmsa003', timeStamp.toISOString()+':pmsa003')
-							console.log('pmsa003 ', timeStamp.toISOString()+':pmsa003'+ _res2);
+							logger.info('pmsa003 ', timeStamp.toISOString()+':pmsa003'+ _res2);
 						});
-		    	console.log(timeStamp.toString()+':pmsa003'+_res);
+		    	logger.info(timeStamp.toString()+':pmsa003'+_res);
 			});
 		}
 		if (results.bme280.nrOfMeas > 0) {
 //			url = openiodUrl + '/bme280'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
 //						'temperature:'+results.bme280.temperature+',pressure:'+results.bme280.pressure+',rHum:'+results.bme280.rHum ;
-//			console.log(url);
+//			logger.info(url);
 			redisHmsetHashAsync(timeStamp.toISOString()+':bme280'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'temperature', results.bme280.temperature
@@ -986,16 +986,16 @@ var sendData = function() {
 						.then(function(res2) {
 							var _res2 = res2;
 						//	redisSaddAsync('bme280', timeStamp.toISOString()+':bme280')
-							console.log('bme280 ', timeStamp.toISOString()+':bme280'+ _res2);
+							logger.info('bme280 ', timeStamp.toISOString()+':bme280'+ _res2);
 						});
-		    	console.log(timeStamp.toISOString()+':bme280'+_res);
+		    	logger.info(timeStamp.toISOString()+':bme280'+_res);
 			});
 		}
     if (results.bme680.nrOfMeas > 0) {
 //			url = openiodUrl + '/bme680'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
 //						'temperature:'+results.bme680.temperature+',pressure:'+results.bme680.pressure+
 //            ',rHum:'+results.bme680.rHum+',gasResistance:'+results.bme680.gasResistance ;
-//			console.log(url);
+//			logger.info(url);
 			redisHmsetHashAsync(timeStamp.toISOString()+':bme680'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'temperature', results.bme680.temperature
@@ -1008,9 +1008,9 @@ var sendData = function() {
 						.then(function(res2) {
 							var _res2 = res2;
 						//	redisSaddAsync('bme680', timeStamp.toISOString()+':bme680')
-							console.log('bme680 ', timeStamp.toISOString()+':bme680'+ _res2);
+							logger.info('bme680 ', timeStamp.toISOString()+':bme680'+ _res2);
 						});
-		    	console.log(timeStamp.toISOString()+':bme680'+_res);
+		    	logger.info(timeStamp.toISOString()+':bme680'+_res);
 			});
 		}
 		if (results.ds18b20.nrOfMeas > 0) {
@@ -1023,9 +1023,9 @@ var sendData = function() {
 						.then(function(res2) {
 							var _res2 = res2;
 						//	redisSaddAsync('ds18b20', timeStamp.toISOString()+':ds18b20')
-			    		console.log('ds18b20 ', timeStamp.toISOString()+':ds18b20'+ _res2);
+			    		logger.info('ds18b20 ', timeStamp.toISOString()+':ds18b20'+ _res2);
 						});
-				console.log(timeStamp.toISOString()+':ds18b20'+_res);
+				logger.info(timeStamp.toISOString()+':ds18b20'+_res);
 			});
 		}
     if (results.tgs5042.nrOfMeas > 0) {
@@ -1038,9 +1038,9 @@ var sendData = function() {
 						.then(function(res2) {
 							var _res2 = res2;
 						//	redisSaddAsync('tgs5042', timeStamp.toISOString()+':tgs5042')
-			    		console.log('tgs5042 ', timeStamp.toISOString()+':tgs5042'+ _res2);
+			    		logger.info('tgs5042 ', timeStamp.toISOString()+':tgs5042'+ _res2);
 						});
-				console.log(timeStamp.toISOString()+':tgs5042'+_res);
+				logger.info(timeStamp.toISOString()+':tgs5042'+_res);
 			});
 		}
     if (results.sps.nrOfMeas > 0) {
@@ -1049,7 +1049,7 @@ var sendData = function() {
 //						',raw0_5:'+results.sps.part0_5+',raw1_0:'+results.sps.part1_0 +
 //						',raw2_5:'+results.sps.part2_5+',raw4_0:'+results.sps.part4_0+
 //            ',raw10_0:'+results.sps.part10_0 + ',tps:'+results.sps.tps;
-//			console.log(url);
+//			logger.info(url);
 			redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'pm1', results.sps.pm1
@@ -1068,9 +1068,9 @@ var sendData = function() {
 						.then(function(res2) {
 							var _res2=res2;
 						//	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
-							console.log('sps30 ', timeStamp.toISOString()+':sps30'+ _res2);
+							logger.info('sps30 ', timeStamp.toISOString()+':sps30'+ _res2);
 						});
-		    	console.log(timeStamp.toString()+':sps30'+_res);
+		    	logger.info(timeStamp.toString()+':sps30'+_res);
 			});
 		}
     if (results.ips7100.nrOfMeas > 0) {
@@ -1081,7 +1081,7 @@ var sendData = function() {
 //						',raw0_5:'+results.ips7100.part0_5+',raw1_0:'+results.ips7100.part1_0 +
 //						',raw2_5:'+results.ips7100.part2_5+',raw4_0:'+results.ips7100.part4_0+
 //            ',raw10_0:'+results.ips7100.part10_0 ;
-//			console.log(url);
+//			logger.info(url);
       redisHmsetHashAsync(timeStamp.toISOString()+':ips7100'
         , 'foi', 'SCRP' + unit.id
         , 'pm01', results.ips7100.pm01
@@ -1106,15 +1106,15 @@ var sendData = function() {
         .then(function(res2) {
           var _res2=res2;
           //	redisSaddAsync('ips7100', timeStamp.toISOString()+':ips7100')
-          console.log('ips7100 ', timeStamp.toISOString()+':ips7100'+ _res2);
+          logger.info('ips7100 ', timeStamp.toISOString()+':ips7100'+ _res2);
         });
-        console.log(timeStamp.toString()+':ips7100'+_res);
+        logger.info(timeStamp.toString()+':ips7100'+_res);
       });
     }
     if (results.scd30.nrOfMeas > 0) {
 //			url = openiodUrl + '/scd30'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
 //						'temperature:'+results.scd30.temperature+',rHum:'+results.scd30.rHum+',co2:'+results.scd30.co2 ;
-//			console.log(url);
+//			logger.info(url);
 			redisHmsetHashAsync(timeStamp.toISOString()+':scd30'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'temperature', results.scd30.temperature
@@ -1126,15 +1126,15 @@ var sendData = function() {
 						.then(function(res2) {
 							var _res2 = res2;
 						//	redisSaddAsync('scd30', timeStamp.toISOString()+':scd30')
-							console.log('scd30 ', timeStamp.toISOString()+':scd30'+ _res2);
+							logger.info('scd30 ', timeStamp.toISOString()+':scd30'+ _res2);
 						});
-		    	console.log(timeStamp.toISOString()+':scd30'+_res);
+		    	logger.info(timeStamp.toISOString()+':scd30'+_res);
 			});
 		}
 
     if (results.bme280.nrOfMeas == 0 & results.bme680.nrOfMeas == 0) {
       if (isEmpty(aprisensorDevices)) {
-        console.log('Both bmw280/bme680 counters zero, looks like error, next time initdevices ')
+        logger.info('Both bmw280/bme680 counters zero, looks like error, next time initdevices ')
         if (bmeInitCounter <3) {
           bmeInitCounter++
         } else {
@@ -1149,7 +1149,7 @@ var sendData = function() {
       if (isEmpty(aprisensorDevices)) {
         // warm-up time for ds18b20 also after reset
         if (new Date().getTime()-ds18b20InitTime.getTime()>=30000){
-          console.log('ds18b20 counters zero, looks like error, next time initdevices ')
+          logger.info('ds18b20 counters zero, looks like error, next time initdevices ')
 //        if (ds18b20InitCounter <3) {
 //          ds18b20InitCounter++
 //        } else {
@@ -1165,7 +1165,7 @@ var sendData = function() {
     if (results.pms.nrOfMeas == 0 && results.pms.nrOfMeasTotal > 0 ) {
       if (isEmpty(aprisensorDevices)) {
         if (pmsa003InitCounter <1) {
-          console.log('pmsa003 counters zero, looks like error, next time try active mode ')
+          logger.info('pmsa003 counters zero, looks like error, next time try active mode ')
           pmsa003InitCounter++
         } else {
           pmsa003InitCounter = 0
@@ -1180,13 +1180,13 @@ var sendData = function() {
           cmdView8[3] = 0x00
 //        if (sleepMode==1) {
 //          cmdView8[4] = 0x00 // set to sleep
-////          console.log('set pmsa003 to sleep')
-//          console.log('set pmsa003 to passive')
+////          logger.info('set pmsa003 to sleep')
+//          logger.info('set pmsa003 to passive')
 //          sleepMode=0
 //        } else {
           cmdView8[4] = 0x01 // set to wakeup
-////          console.log('set pmsa003 to wakeup')
-          console.log('set pmsa003 to active')
+////          logger.info('set pmsa003 to wakeup')
+          logger.info('set pmsa003 to active')
 //          sleepMode=1
 //        }
           cmdCheckSum = cmdView8[0]+cmdView8[1]+cmdView8[2]+cmdView8[3]+cmdView8[4]
@@ -1249,11 +1249,11 @@ getCpuInfo();
 
 /*
 var setGpioFanOn = function() {
-  console.log('set fan GPIO on')
+  logger.info('set fan GPIO on')
   gpioFan.writeSync(1); //set pin state to 1 (power DS18B20 on)
 }
 var setGpioFanOff = function() {
-  console.log('set fan GPIO off')
+  logger.info('set fan GPIO off')
   gpioFan.writeSync(0); //set pin state to 0 (power DS18B20 off)
   setTimeout(setGpioFanOn, 5000);
 }
@@ -1295,7 +1295,7 @@ var initSps30Device = function() {
       str12=i2cSps30.readSync(addressI2cSps30,12)
     }
     catch {
-      console.log('error initializing SPS30, maybe not available')
+      logger.info('error initializing SPS30, maybe not available')
       indSps30=false
       return
     }
@@ -1303,10 +1303,10 @@ var initSps30Device = function() {
     if (Buffer.compare(str12,
       Buffer.from([0x30, 0x30, 0xf6, 0x30, 0x38, 0x4f, 0x30, 0x30, 0xf6, 0x30, 0x30, 0xf6])) ==0) {
       sps30ProductType='00080000'
-      console.log('SPS30 producttype found: '+ sps30ProductType)
+      logger.info('SPS30 producttype found: '+ sps30ProductType)
       indSps30=true
     } else {
-      console.log('SPS30 producttype not found')
+      logger.info('SPS30 producttype not found')
       indSps30=false
       return
     }
@@ -1316,7 +1316,7 @@ var initSps30Device = function() {
       buf48=i2cSps30.readSync(addressI2cSps30,48)
     }
     catch {
-      console.log('error initializing SPS30, maybe not available')
+      logger.info('error initializing SPS30, maybe not available')
       indSps30=false
       return
     }
@@ -1327,8 +1327,8 @@ var initSps30Device = function() {
       if (buf48[i+1]==0) break
       sps30SerialNr+=String.fromCharCode(buf48[i+1])
     }
-    console.log(`SPS30 producttype: ${sps30ProductType}`)
-    console.log(`SPS30 serialnr: ${sps30SerialNr}`)
+    logger.info(`SPS30 producttype: ${sps30ProductType}`)
+    logger.info(`SPS30 serialnr: ${sps30SerialNr}`)
     // start measuring
     try {
       // set sensor to produce floating point values
@@ -1337,7 +1337,7 @@ var initSps30Device = function() {
       //    i2cSps30.writeSync(addressI2cSps30,Buffer.from([ 0x00,0x10,0x05,0x00,0xF6]))
     }
     catch {
-      console.log('error initializing SPS30, maybe not available')
+      logger.info('error initializing SPS30, maybe not available')
       indSps30=false
       return
     }
@@ -1352,24 +1352,24 @@ var readSps30Device = function() {
       buf60=i2cSps30.readSync(addressI2cSps30,60)
     }
     catch {
-      console.log('ERROR readSps30Device writeSync ')
+      logger.info('ERROR readSps30Device writeSync ')
       return
     }
     // floats
     for (var i=0;i<60;i=i+6) {
-//      console.log(i)
+//      logger.info(i)
       if (buf60[i+2]!=calcCrcSps30(buf60[i],buf60[i+1])) {
-        console.log('checksum error')
+        logger.info('checksum error')
         break
       }
       if (buf60[i+5]!=calcCrcSps30(buf60[i+3],buf60[i+4])) {
-        console.log('checksum error')
+        logger.info('checksum error')
         break
       }
       var data=[buf60[i],buf60[i+1],buf60[i+3],buf60[i+4]]
 //      console.dir(data)
-//      console.log(buf30[i])
-//      console.log(buf30[i+1])
+//      logger.info(buf30[i])
+//      logger.info(buf30[i+1])
       // Create a buffer
       var buf = new ArrayBuffer(4);
       // Create a data view of it
@@ -1390,10 +1390,10 @@ var readSps30Device = function() {
       // the nodejs procedure to convert float (4 bytes) into double
 
       // const bufTest = Buffer.from([buf60[i], buf60[i+1], buf60[i+3], buf60[i+4]]);
-      // console.log('test: '+i)
-      // console.log(value);
-      // dit geeft dezelfde resultaat als de bovenstaande float omrekening: console.log(bufTest.readFloatBE(0));
-      // deze geeft foutieve waarden: console.log(bufTest.readFloatLE(0));
+      // logger.info('test: '+i)
+      // logger.info(value);
+      // dit geeft dezelfde resultaat als de bovenstaande float omrekening: logger.info(bufTest.readFloatBE(0));
+      // deze geeft foutieve waarden: logger.info(bufTest.readFloatLE(0));
 //        return f;
 //      }
 
@@ -1405,21 +1405,21 @@ var readSps30Device = function() {
       console.dir(view)
 
       var value= view[0]
-      console.log(view[0])
+      logger.info(view[0])
 */
       // Read the bits as a float; note that by doing this, we're implicitly
       // converting it from a 32-bit float into JavaScript's native 64-bit double
 //      var value = view.getFloat32(0);
       // Done
-//      console.log(value);
+//      logger.info(value);
 
 //      var buffer = new ArrayBuffer(4);
 //      var intView = new Int32Array(buffer);
 //      var floatView = new Float32Array(buffer);
 
 //      floatView[0] = Math.PI
-//      console.log(intView[0].toString(2)); //bits of the 32 bit float
-//      console.log(floatView[0])
+//      logger.info(intView[0].toString(2)); //bits of the 32 bit float
+//      logger.info(floatView[0])
 
       // convert number of particles from cm3 into 0.1L (multiply by 100)
       if (result.length>=4 && result.length<=8) {
@@ -1431,11 +1431,11 @@ var readSps30Device = function() {
     var buf30=i2cSps30.readSync(addressI2cSps30,30)
     for (var i=0;i<30;i=i+3) {
       if (buf30[i+2]!=calcCrcSps30(buf30[i],buf30[i+1])) {
-        console.log('checksum error')
+        logger.info('checksum error')
         break
       }
-//      console.log(buf30[i])
-//      console.log(buf30[i+1])
+//      logger.info(buf30[i])
+//      logger.info(buf30[i+1])
       var value = buf30[i]<<8
       value+=buf30[i+1]
       result.push(value)
@@ -1449,7 +1449,7 @@ var readSps30Device = function() {
 
 var processRaspiSpsRecord = function(result) {
 	if (counters.busy==true) {
-		console.log('Counters busy, sps30 measurement ignored *******************************');
+		logger.info('Counters busy, sps30 measurement ignored *******************************');
 		return;
 	}
 	counters.sps.nrOfMeas++;
@@ -1478,29 +1478,29 @@ var initScd30Device = function() {
 
 const readScd30Device = function() {
   if (scd30Client.isOpen)  {
-//    console.log('open')
+//    logger.info('open')
     //mbsState = MBS_STATE_NEXT;
   } else {
-//    console.log('not open')
+//    logger.info('not open')
     return
   }
 
   scd30Client.readHoldingRegisters(0x27, 1)
   .then(async function(data) {
     if (data.data[0]==1) {
-      //console.log('data available, read measurement')
+      //logger.info('data available, read measurement')
       await sleepFunction(3)
       readScd30Measurement()
     }
   })
   .catch(function(err) {
-    console.log('xx error xxxx')
-    console.log(err)
+    logger.info('xx error xxxx')
+    logger.info(err)
   })
 }
 
 const readScd30Measurement= function() {
-  // console.log('read measurement')
+  // logger.info('read measurement')
   // read the 6 registers starting at address 0x28
   // on device number 0x61
   scd30Client.readHoldingRegisters(0x28, 6)
@@ -1512,14 +1512,14 @@ const readScd30Measurement= function() {
     processRaspiScd30Record(result)
   })
   .catch(function(err) {
-    console.log('xx error xxxx')
-    console.log(err)
+    logger.info('xx error xxxx')
+    logger.info(err)
   })
 }
 
 var processRaspiScd30Record = function(result) {
 	if (counters.busy==true) {
-		console.log('Counters busy, Scd30 measurement ignored *******************************');
+		logger.info('Counters busy, Scd30 measurement ignored *******************************');
 		return;
 	}
 	counters.scd30.nrOfMeas++;
@@ -1538,7 +1538,7 @@ if (aprisensorDevices.scd30!=undefined) {
 // ips7100
 var processRaspiIps7100Record = function(result) {
 	if (counters.busy==true) {
-		console.log('Counters busy, Ips7100 measurement ignored *******************************');
+		logger.info('Counters busy, Ips7100 measurement ignored *******************************');
 		return;
 	}
 	counters.ips7100.nrOfMeas++;
@@ -1562,17 +1562,17 @@ var processRaspiIps7100Record = function(result) {
 }
 
 var initBmeDevice = function(){
-  console.log('initBmeDevice')
+  logger.info('initBmeDevice')
   bme280.init()
     .then(() => {
-      console.log('BME280 initialization succeeded');
+      logger.info('BME280 initialization succeeded');
       indBme280=true
       indBme680=false
       //readSensorDataBme280();
     })
     .catch((err) => {
       console.error(`BME280 initialization failed: ${err} `);
-      console.log('BME680 init') //
+      logger.info('BME680 init') //
       indBme280=false
       indBme680=false
       initBme680()
@@ -1581,35 +1581,35 @@ var initBmeDevice = function(){
 
 }
 var setGpioBmeOn = function() {
-  console.log('set BME280/BME680 GPIO on')
+  logger.info('set BME280/BME680 GPIO on')
   gpioBme.writeSync(1); //set pin state to 1 (power DS18B20 on)
   setTimeout(initBmeDevice, 5000);
 }
 var setGpioBmeOff = function() {
-  console.log('set BME280/BME680 GPIO off')
+  logger.info('set BME280/BME680 GPIO off')
   gpioBme.writeSync(0); //set pin state to 0 (power DS18B20 off)
   setTimeout(setGpioBmeOn, 5000);
 }
 var resetBmeDevice = function() {
-  console.log('resetBmeDevice')
+  logger.info('resetBmeDevice')
   if (gpioBme != undefined) {  // only try to reset when gpio module available
     setGpioBmeOff()
   }
 }
 
 var setGpioDs18b20On = function() {
-  console.log('set DS18B20 GPIO on')
+  logger.info('set DS18B20 GPIO on')
   gpioDs18b20.writeSync(1); //set pin state to 1 (power DS18B20 on)
   setTimeout(check_w1_device, 5000);
 }
 var setGpioDs18b20Off = function() {
-  console.log('set DS18B20 GPIO off')
+  logger.info('set DS18B20 GPIO off')
   gpioDs18b20.writeSync(0); //set pin state to 0 (power DS18B20 off)
   setTimeout(setGpioDs18b20On, 5000);
 }
 
 var reset_w1_device = function() {
-  console.log('reset_w1_device')
+  logger.info('reset_w1_device')
   if (gpioDs18b20 != undefined) {  // only try to reset when gpio module available
     ds18b20InitTime=new Date()
     setGpioDs18b20Off()
@@ -1617,13 +1617,13 @@ var reset_w1_device = function() {
 }
 
 var check_w1_device = function() {
-  console.log('check_w1_device')
+  logger.info('check_w1_device')
   try {
   	devicesFolder = fs.readdirSync('/sys/bus/w1/devices');
 //  	readSensorDataDs18b20();
   } catch (err) {
   	devicesFolder = undefined;
-    console.log('Directory for W1 not found. No GPIO available? (/sys/bus/w1/devices');
+    logger.info('Directory for W1 not found. No GPIO available? (/sys/bus/w1/devices');
     //setTimeout(reset_w1_device, 60000);
     //return;
   }
@@ -1639,15 +1639,15 @@ var socket = io(socketUrl, {path:socketPath});
 
 socket.on('connection', function (socket) {
 	var currTime = new Date();
-	console.log(currTime +': connect from '+ socket.request.connection.remoteAddress + ' / '+ socket.handshake.headers['x-forwarded-for'] || socket.handshake.address.address);
+	logger.info(currTime +': connect from '+ socket.request.connection.remoteAddress + ' / '+ socket.handshake.headers['x-forwarded-for'] || socket.handshake.address.address);
 });
 
 socket.on('disconnect', function() {
-	console.log('Disconnected from web-socket ');
+	logger.info('Disconnected from web-socket ');
 });
 
 socket.on('info', function(data) {
-	console.log('websocket info: ');
+	logger.info('websocket info: ');
 	console.dir(data);
 	//io.sockets.emit('aireassignal', { data: data } );
 	//socket.broadcast.emit('aireassignal', { data: data } );
@@ -1689,7 +1689,7 @@ var processRaspiSerialData7100=function(data){
 */
   if (data==13) return // \r carriage return
   if (data==10) { // \n line feed
-//    console.log('process ips7100 record '+ ips7100Record)
+//    logger.info('process ips7100 record '+ ips7100Record)
     var items = ips7100Record.split(',')
     if (items.length == 31
       && items[1]=='PC0.1'
@@ -1732,10 +1732,10 @@ var serialDevices=[
 ]
 
 var scanSerialDevices=function() {
-//  console.log('Scan serial devices')
+//  logger.info('Scan serial devices')
   var inUseDevices=[]
   for (var i=0;i<serialDevices.length;i++){
-//    console.log('Device '+i)
+//    logger.info('Device '+i)
     var serialDevice=serialDevices[i]
 //    console.dir(serialDevice)
 //    console.dir(inUseDevices)
@@ -1769,26 +1769,26 @@ var scanSerialDevices=function() {
       }
       serialDevice.scanTime=new Date()
     }
-//    console.log('next ===============')
+//    logger.info('next ===============')
   }
 //  console.dir(inUseDevices)
 //  console.dir(serialDevices)
 }
 
 var initSerial=function(serialDeviceIndex){
-  console.log('init serial '+serialDevices[serialDeviceIndex].device+' '+
+  logger.info('init serial '+serialDevices[serialDeviceIndex].device+' '+
     serialDevices[serialDeviceIndex].deviceType)
   raspi.init(() => {
     var options={portId:serialDevices[serialDeviceIndex].device,baudRate:serialDevices[serialDeviceIndex].baudRate}
     serialDevices[serialDeviceIndex].serial = new Serial(options);
     serialDevices[serialDeviceIndex].serial.serialDeviceIndex=serialDeviceIndex
     serialDevices[serialDeviceIndex].serial.open(() => {
-      //console.log('serial open')
+      //logger.info('serial open')
       if (serialDevices[serialDeviceIndex].deviceType=='pmsa003') {
-        console.log('serial device for pmsa003 opened')
+        logger.info('serial device for pmsa003 opened')
         serialDevices[serialDeviceIndex].serial.on('data', (data) => {
-          //console.log('serial on data')
-          //console.log(data)
+          //logger.info('serial on data')
+          //logger.info(data)
           //printHex(data,'T');
           for (var i=0;i<data.length;i++) {
             processRaspiSerialData(data[i]);
@@ -1796,10 +1796,10 @@ var initSerial=function(serialDeviceIndex){
         });
       }
       if (serialDevices[serialDeviceIndex].deviceType=='ips7100') {
-        console.log('serial device for ips7100 opened')
+        logger.info('serial device for ips7100 opened')
         console.dir(options)
         serialDevices[serialDeviceIndex].serial.on('data', (data) => {
-          //console.log('serial on data')
+          //logger.info('serial on data')
           //printHex(data,'T');
           //process.stdout.write(data);
           for (var i=0;i<data.length;i++) {
@@ -1807,7 +1807,7 @@ var initSerial=function(serialDeviceIndex){
           }
         });
         var command ='$Won=200\r\n'
-        console.log('write start measurement ips7100: '+command)
+        logger.info('write start measurement ips7100: '+command)
 
         serialDevices[serialDeviceIndex].serial.write(command)
       }

@@ -64,7 +64,7 @@ var logConfiguration = {}
 var winston
 var logger={
   info:function(logmsg) {
-    logger.info(logmsg)
+    console.log(logmsg)
   }
 }
 try {

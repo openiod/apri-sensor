@@ -33,7 +33,6 @@ var startFolder 						= __dirname;
 var startFolderParent				= path.resolve(__dirname,'../..');
 var configServerModulePath	= startFolder + '/../apri-config/apri-config';
 
-logger.info("Start of Config Main ", configServerModulePath);
 var apriConfig 							= require(configServerModulePath)
 
 var systemFolder 						= __dirname;
@@ -60,13 +59,6 @@ var io	 										= require('socket.io-client');
 const exec 									= require('child_process').exec;
 const execFile							= require('child_process').execFile;
 const BME280 								= require('./BME280.js');
-var ModbusRTU
-try {
-  ModbusRTU             = require("modbus-serial");
-}
-catch (err) {
-  logger.info('modbus-serial module (scd30) not found');
-}
 
 var logConfiguration = {}
 var winston
@@ -107,7 +99,15 @@ try {
 catch (err) {
   logger.info('winston.createLogger error');
 }
+logger.info("Start of Config Main ", configServerModulePath);
 
+var ModbusRTU
+try {
+  ModbusRTU             = require("modbus-serial");
+}
+catch (err) {
+  logger.info('modbus-serial module (scd30) not found');
+}
 
 var aprisensorType = ''
 var aprisensorTypeConfig={}

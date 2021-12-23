@@ -14,6 +14,21 @@
 # sudo shutdown -h now
 # dan sd-kaart verwijderen en kopie maken met nieuw versienummer
 
+# prepare tested sensorkit for transport to client:
+# ssh pi <id>.local
+#
+sudo systemctl stop SCAPE604-apri-sensor-raspi
+sudo systemctl stop SCAPE604-apri-sensor-connector
+sudo systemctl stop SCAPE604-aprisensor-nmcli
+sudo rm /var/log/aprisensor/*
+sudo systemctl start SCAPE604-aprisensor-nmcli
+sudo nmcli c delete ap-24
+# daarna via mobiel shutdown uitvoeren
+# foto maken
+# inpakken
+# postnl pakket
+# versturen
+
 # prepare sdccard on Debian laptop:
 # Copy raspbian Butcher Lite img to sdcard with BalenaEtcher
 # sudo touch /media/awiel/boot/ssh
@@ -43,16 +58,16 @@
 # controleer filesystem: sudo e2fsck /dev/sda2
 # cd ~/opt/raspberrypi_image
 # mv apri* old-images/.
-# sudo dcfldd if=/dev/sda of=aprisensor_v2-1-5.img ; sudo sync
+# sudo dcfldd if=/dev/sda of=aprisensor_v2-1-x.img ; sudo sync
 # sudo sync
-# sudo chown awiel.awiel aprisensor_v2-1-5.img
+# sudo chown awiel.awiel aprisensor_v2-1-x.img
 # shrink img:
 # # eenmalig: sudo apt-get update && sudo apt-get install gparted
-# sudo fdisk -l aprisensor_v2-1-5.img
+# sudo fdisk -l aprisensor_v2-1-x.img
 # startsector of partition2 = 532480
 # mount the second partition
 # #sudo losetup /dev/loop0 aprisensor_####.img -o $((<STARTSECTOR>*512))
-# sudo losetup /dev/loop0 aprisensor_v2-1-5.img -o $((532480*512))
+# sudo losetup /dev/loop0 aprisensor_v2-1-x.img -o $((532480*512))
 # sudo gparted /dev/loop0
 # # select partion en menu: Partition / Resize/Move
 # # change minimum size to 3500 (minimum size + +-20MB) #of 3500 voor standaard voldoende ruimte!!
@@ -63,7 +78,7 @@
 # close and quit gparted
 # reset loop device to total img:
 # sudo losetup -d /dev/loop0
-# sudo losetup /dev/loop0 aprisensor_v2-1-5.img
+# sudo losetup /dev/loop0 aprisensor_v2-1-x.img
 # sudo fdisk /dev/loop0
 # p<enter> for partion info
 # d<enter>2<enter> delete partition 2
@@ -79,7 +94,7 @@
 # truncate file to ENDsector of 2e partition:
 # truncate -s $(((END+1)*512)) aprisensor_v2-1-5.img
 # ###truncate -s $(((4976640+1)*512)) aprisensor_v2-1-5.img
-# truncate -s $(((7700479+1)*512)) aprisensor_v2-1-5.img
+# truncate -s $(((7700479+1)*512)) aprisensor_v2-1-x.img
 
 #
 # see http://www.aoakley.com/articles/2015-10-09-resizing-sd-images.php

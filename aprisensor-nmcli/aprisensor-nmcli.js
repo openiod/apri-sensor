@@ -868,7 +868,7 @@ const tryCandidateConnection2 =function(conIndex) {
     unit.connectionStatus[tmpConnection]={status:null}
   }
 
-// todo: delete connection when password error
+// todo: delete connection when password error??
   if (unit.connectionStatus[tmpConnection].passwordError == true &&
     new Date() - unit.connectionStatus[tmpConnection].statusSince< 120000) {
     console.log('Wait time for connection '+tmpConnection+' less than 120 seconds (password error) ')
@@ -944,7 +944,7 @@ const tryCandidateConnection2 =function(conIndex) {
       var msg='Wachtwoord niet juist, connectie opnieuw aanmaken a.u.b.'
       unit.connectionStatus[tmpConnection].message.push(msg)
       unit.connectionStatus[tmpConnection].passwordError = true
-      // todo: delete connection
+      // todo: delete connection ???
     }
 
     tryCandidateConnection2(_conIndex+1)
@@ -953,8 +953,7 @@ const tryCandidateConnection2 =function(conIndex) {
 
 const createHotspot = function() {
   console.log(`Create hotspot for ssid ${unit.ssid}`)
-  // todo: not delete but up the accesspoint ??
-  console.log('1. Delete existing hotspot connection')
+  console.log('1. 'Up' existing hotspot connection')
   if (processStatus.connectionBusy.status==false){
     processStatus.connectionBusy.status=true
     processStatus.connectionBusy.statusSince=new Date()
@@ -1728,7 +1727,6 @@ const statusCheck = async function() {
     // not connected to internet
     console.log('statusCheck catch: '+error)
 
-    //todo:
     // minimal one previous internet connection check was successfull ?
     if (unit.connectionCount>0) {
       // give connection time to recover

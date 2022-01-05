@@ -970,11 +970,17 @@ const createHotspot = function() {
   unit.hotspotTill=new Date(new Date().getTime()+120000 )
 
 
-// todo: connection up instead of delete?
-// todo:   resolve then: do nothing?
-  execPromise("LC_ALL=C nmcli connection delete '"+unit.ssid+"'")
+// done: connection up instead of delete?
+// done:  resolve then: do nothing?
+  execPromise("LC_ALL=C nmcli connection up '"+unit.ssid+"'")
   .then((result)=>{
-    createHotspotConnection()
+    setHotspotStatus('OK',200)
+    unit.connection=unit.ssid
+    processStatus.hotspot.statusSince=new Date()
+    processStatus.connectionBusy.status=false
+    processStatus.connectionBusy.statusSince=new Date()
+    processStatus.gateway.status='INIT'
+    processStatus.gateway.statusSince=new Date()
   })
   .catch((error)=>{
     createHotspotConnection()

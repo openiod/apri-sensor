@@ -953,7 +953,7 @@ const tryCandidateConnection2 =function(conIndex) {
 
 const createHotspot = function() {
   console.log(`Create hotspot for ssid ${unit.ssid}`)
-  console.log('1. 'Up' existing hotspot connection')
+  console.log('1. "Up" existing hotspot connection')
   if (processStatus.connectionBusy.status==false){
     processStatus.connectionBusy.status=true
     processStatus.connectionBusy.statusSince=new Date()

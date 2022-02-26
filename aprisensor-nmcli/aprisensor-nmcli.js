@@ -141,7 +141,15 @@ const returnResultJson=function(result, req, res) {
 const returnError=function(error, req, res) {
 	res.writeHead(400)
 	// set response content
-	res.write(error);
+
+  var errorStr='ERROR unknown'
+  try {
+    errorStr=JSON.stringify(error)
+  }
+  catch (error) {
+    errorStr='ERROR unknown'
+  }
+	res.write(errorStr);
 	//res.write('executed');
 	res.end();
 }

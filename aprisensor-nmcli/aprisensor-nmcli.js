@@ -243,15 +243,10 @@ const requestListener = function (req, res) {
 	}
 }
 
-//const server = http.createServer(requestListener);
-//const httpTerminator = createHttpTerminator({
-//  server,
-//});
 var server
 var httpTerminator
 const initHttpServer = function() {
 	server = http.createServer(requestListener)
-//	server = https.createServer(httpsOptions,requestListener)
 	httpTerminator = createHttpTerminator({
 	  server,
 	});
@@ -331,20 +326,14 @@ const getConnectionShow = function(req,res,callback) {
 			// console.error(`exec error: ${error}`);
 			return callback(error, req,res);
 		}
-    if (stdout=='') {
-      console.log('No connections available, hotspot will be created')
-      createHotspot()
-    }
 		var resultJson = columnsToJsonArray(stdout)
-//    console.log(resultJson)
+
     for (var i=0;i<resultJson.length;i++) {
       var tmpCon = resultJson[i].NAME
       if (unit.connectionStatus[tmpCon]!=undefined) {
         resultJson[i].status = unit.connectionStatus[tmpCon]
       }
-//      console.dir(unit.connectionStatus[tmpCon])
     }
-//    console.dir(resultJson)
 
 		return callback(resultJson, req,res)
 	});
@@ -374,35 +363,6 @@ const getDeviceHotspot = function(req,res,callback) {
     res.end();
     createHotspot()
   }
-
-/*
-  var hotspotCommand= "LC_ALL=C nmcli connection add type wifi ifname 'wlp7s0' con-name hotspot autoconnect yes wifi.mode ap \
-     ssid '"+unit.ssid+"' mode ap \
-     ipv4.method shared 802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk 'iam@Home' \
-     ipv6.method shared"
-  console.log(`start hotspot ${unit.ssid}`)
-
-//  nmcli connection add type wifi ifname wlan0 con-name local-ap autoconnect yes ssid test-ap mode ap
-//  nmcli connection modify local-ap 802-11-wireless.mode ap 802-11-wireless-security.key-mgmt wpa-psk ipv4.method shared 802-11-wireless-security.psk 'PASSWORD'
-//  nmcli connection up local-ap
-
-
-
-//  exec("LC_ALL=C nmcli --show-secrets device wifi hotspot ssid "+ssid+" password '"+defaultPassword+"'", (error, stdout, stderr) => {
-	exec(hotspotCommand, (error, stdout, stderr) => {
-		if (error) {
-			// console.error(`exec error: ${error}`);
-      console.error(`exec error: ${error}`);
-      res.writeHead(400);
-      res.write(`{error:400,message: '${error}'}`);
-      res.end();
-			return
-		}
-    console.log(stdout)
-		var resultJson = columnsToJsonArray(stdout)
-		return callback(resultJson, req,res)
-	});
-*/
 }
 
 function sleep(ms) {
@@ -1392,50 +1352,6 @@ var createService	= function(sensor, sensorKey) {
 	});
 }
 
-
-const checkHotspotActivation= async function() {
-  // hotspot only for ApriSensor (SCRP*)
-//  if (unit.serial.substr(0,4) == 'SCRP') {
-//    await getGateway()
-//    if (processStatus.gateway.status != 'OK') {
-//      if (processStatus.timeSync.status!='ERROR') {
-//        processStatus.timeSync.status='ERROR'
-//        processStatus.timeSync.statusSince=new Date()
-//      }
-      console.log(`ApriSensor unit, starting hotspot for ${unit.serial} with ssid ${unit.ssid}`)
-      createHotspot()
-//    } else {
-//      console.log(`gateway: ${unit.gateway}`)
-//    }
-
-//  } else {
-//    console.log(`Not an ApriSensor unit, no automatic start as hotspot for ${unit.serial}`)
-//  }
-}
-
-/*
-// when online no automatic activation of the hotspot necessary
-const getGateway = async function() {
-  await execPromise('ip route | grep "default via" ')
-  .then((result)=>{
-    var stdoutArray	= result.stdout.split(' ');
-    unit.gateway=stdoutArray[2]
-    if (processStatus.gateway.status!='OK') {
-      processStatus.gateway.status='OK'
-      processStatus.gateway.statusSince=new Date()
-    }
-  })
-  .catch((error)=>{
-//    console.log('catch gateway')
-//    console.dir(error)
-    unit.gateway=''
-    if (processStatus.gateway.status!='ERROR') {
-      processStatus.gateway.status='ERROR'
-      processStatus.gateway.statusSince=new Date()
-    }
-  })
-}
-*/
 const checkTimeSync = async function() {
   // get file attributes for last time synchronization date & time
   fs.stat("/var/lib/systemd/timesync/clock", async (err, stat) => {
@@ -1492,35 +1408,6 @@ const getActiveConnection = function() {
 const initiateConnectionOrHotspot = function() {
   console.log('initiateConnectionOrHotspot')
   console.log('SSID:'+unit.ssid+' con:'+unit.connection+' cons:'+JSON.stringify(unit.connections))
-
-
-/*
-  if (unit.connection==''){
-    console.log('No connection, checkHotspotActivation')
-    // give process some time
-//    processStatus.gateway.statusSince=new Date()
-//    checkHotspotActivation()
-    createHotspot()
-
-    return
-  }
-  */
-/*
-  if (unit.connection!=unit.ssid){
-//    console.log('No gateway for ' + unit.connection)
-//    if (new Date().getTime() - processStatus.gateway.statusSince.getTime() > 20000) {
-      console.log('No gateway for ' + unit.connection + ', activating hotspot')
-      // give process some time
-//      processStatus.gateway.statusSince=new Date()
-//      checkHotspotActivation()
-      createHotspot()
-//    }
-    return
-  }
-*/
-//  if (unit.connection==unit.ssid){
-    // hotspot status will last at least x time and will stay active as long wifi-config-web page active
-
 
 //    if (unit.connections.length > 0 ){
       console.log('tryCandidateConnection starting with index 0')
@@ -1775,14 +1662,6 @@ const statusCheck = async function() {
 }
 const updateCrypto = function(){
 	unitCrypto.key = 	key
-
-/*
-	unitCrypto.iv = crypto.randomBytes(16);
-	unitCrypto.ivDate=new Date()
-	unitCrypto.cipher = crypto.createCipheriv(algoritm, Buffer.from(key), unitCrypto.iv)
-	unitCrypto.decipher = crypto.createDecipheriv(algoritm, Buffer.from(key), unitCrypto.iv)
-*/
-
 }
 const encrypt=function(data){
 	var encrypted = unitCrypto.cipher.update(data,'utf8','hex')

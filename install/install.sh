@@ -2,6 +2,7 @@
 # start script onder sudo su -
 
 # prepare for building new image
+# assuming: lateste software installed and package.json in place
 # start met sd-kaart op pi zero met directe aansluiting (keyboard/monitor)
 # sudo systemctl stop SCAPE604-apri-sensor-raspi
 # sudo systemctl stop SCAPE604-apri-sensor-connector
@@ -95,7 +96,7 @@ sudo nmcli c delete ap-24
 # truncate -s $(((END+1)*512)) aprisensor_v2-1-5.img
 # ###truncate -s $(((4976640+1)*512)) aprisensor_v2-1-5.img
 # truncate -s $(((7700479+1)*512)) aprisensor_v2-1-x.img
-
+# mv aprisensor_v2-1-x.img aprisensor_v2-1-7.img
 #
 # see http://www.aoakley.com/articles/2015-10-09-resizing-sd-images.php
 #-----------------------------------------------

@@ -146,7 +146,8 @@ const returnError=function(error, req, res) {
   try {
     errorStr=JSON.stringify(error)
   }
-  catch (error) {
+  catch (err) {
+    console.log(err)
     errorStr='ERROR unknown'
   }
 	res.write(errorStr);
@@ -1089,6 +1090,22 @@ actions.push(function() {
     nextAction()
 	}
 )})
+actions.push(function() {
+  console.log('delete hotspot')
+  hotspotDelete()
+  .then( async (result)=>{
+    console.log(`hotspot delete then`)
+    //restartHotspot=true
+    //await sleep(2000);
+    nextAction()
+  })
+  .catch(async (error)=>{
+    console.log(`hotspot delete catch`)
+    //restartHotspot=true
+    //await sleep(2000);
+    nextAction()
+  })
+})
 actions.push(function() {
   // reset /etc/hosts filw
   var hostsFileStandard = "127.0.0.1 localhost "+unit.ssid+" "+unit.ssid+".local\n" +

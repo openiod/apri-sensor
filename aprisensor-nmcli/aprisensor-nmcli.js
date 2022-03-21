@@ -393,17 +393,6 @@ const getDeviceWifiListCache = function(req,res) {
       console.log('----------------------------')
       console.log(result.stdout)
     }
-    if (restartHotspot==true) {
-      createHotspotConnection()
-      console.log('http server restart')
-      //server.listen(apiPort);
-
-      initHttpServer()
-
-      return
-    }
-    // when restarting as hotspot the connection is broken,
-    // writes to res have do not succeed.
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.write(JSON.stringify(localWifiList));
     res.end();

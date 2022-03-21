@@ -586,13 +586,13 @@ const parseWifiScan = function(wifiData) {
     regex = /Quality/;
     var p=line.search(regex)
     if (p>0) {
-      ssid."SIGNAL"=line.substr(p+8,5)
+      ssid["SIGNAL"]=line.substr(p+8,5)
       continue
     };
     regex = /Channel/;
     var pc=line.search(regex)
     if (pc>0) {
-      ssid."CHAN"=line.substr(pc+8,2)
+      ssid["CHAN"]=line.substr(pc+8,2)
       continue
     };
   }

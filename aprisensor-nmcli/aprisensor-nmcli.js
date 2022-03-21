@@ -563,31 +563,40 @@ const parseWifiScan = function(wifiData) {
   // XXX:
   var lines = wifiData.split('\n')
   var ssids=[]
-  var ssid={quality:''}
+  var ssid={"SIGNAL":''}
   var regex=/a/ ;
-  console.log(wifiData)
-  console.dir(lines)
+  //console.log(wifiData)
+  //console.dir(lines)
   for (var i=0;i<lines.length;i++) {
     var line = lines[i]
-    console.log(line)
+    //console.log(line)
     regex = /Cell/;
     if (line.search(regex)>0) { // new ssid
-      if (ssid.ssid) {
+      if (ssid.SSID) {
         ssids.push(ssid) // add ssid to ssids
       }
-      ssid={quality:''}
+      ssid={"SIGNAL":''}
+      continue
     };
     regex = /ESSID/;
     if (line.search(regex)>0) { // ssid
-      ssid.ssid=line.split('"')[1]
+      ssid.SSID=line.split('"')[1]
+      continue
     };
     regex = /Quality/;
     var p=line.search(regex)
-    if (p>0) { // ssid
-      ssid.quality=line.substr(p+8,5)
+    if (p>0) {
+      ssid."SIGNAL"=line.substr(p+8,5)
+      continue
+    };
+    regex = /Channel/;
+    var pc=line.search(regex)
+    if (pc>0) {
+      ssid."CHAN"=line.substr(pc+8,2)
+      continue
     };
   }
-  if (ssid.ssid) {
+  if (ssid.SSID) {
     ssids.push(ssid) // add (last) ssid to ssids
   }
   return ssids;

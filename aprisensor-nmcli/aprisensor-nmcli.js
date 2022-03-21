@@ -579,16 +579,12 @@ const parseWifiScan = function(wifiData) {
     };
     regex = /ESSID/;
     if (line.search(regex)>0) { // ssid
-      if (ssid.ssid) {
-        ssid.ssid=line.split('"')[1]
-      }
+      ssid.ssid=line.split('"')[1]
     };
     regex = /Quality/;
     var p=line.search(regex)
     if (p>0) { // ssid
-      if (ssid.ssid) {
-        ssid.quality=line.substr(p+8,5)
-      }
+      ssid.quality=line.substr(p+8,5)
     };
   }
   if (ssid.ssid) {

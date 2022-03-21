@@ -193,10 +193,10 @@ const requestListener = function (req, res) {
 			    getDeviceWifiList(req,res)
 					break
 				}
-				if (req.url == '/nmcli/api/v1/device/wifilistcache') {
-			    getDeviceWifiListCache(req,res)
-					break
-				}
+//				if (req.url == '/nmcli/api/v1/device/wifilistcache') {
+//			    getDeviceWifiListCache(req,res)
+//					break
+//				}
 				res.writeHead(400);
 				res.write(`{error:400,message: 'Invalid API-call: ${methodType} ${url}'}`);
 				res.end();
@@ -379,6 +379,7 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/*
 const getDeviceWifiListCache = function(req,res) {
   retrieveWifiList()
   .then((result) => {
@@ -508,6 +509,8 @@ const restartNetworkManager = function(){
 	console.log(`restart network-manager`)
 	return execPromise("LC_ALL=C systemctl restart network-manager")
 }
+*/
+/*
 const retrieveWifiList = async function(){
 	console.log(`retrieveWifiList`)
   await execPromise("LC_ALL=C nmcli device wifi rescan")
@@ -518,6 +521,76 @@ const retrieveWifiList = async function(){
     console.log(`wifi rescan catch`)
   })
 	return execPromise("LC_ALL=C nmcli device wifi list")
+}
+*/
+const getDeviceWifiList = async function(req,res) {
+  wifiScan()
+  .then( async (result)=>{
+    console.log(`wifi rescan then`)
+    localWifiList=parseWifiScan(result.stdout)
+    res.writeHead(201, { 'Content-Type': 'application/json' });
+    res.write(JSON.stringify(localWifiList));
+    res.end();
+  })
+  .catch(async (error)=>{
+    console.log(`iwlist scan catch`)
+    localWifiList=[]
+    res.writeHead(201, { 'Content-Type': 'application/json' });
+    res.write(JSON.stringify(localWifiList));
+    res.end();
+  })
+}}
+/*
+const retrieveWifiList = async function(){
+  wifiScan()
+  .then( async (result)=>{
+    console.log(`wifi rescan then`)
+    localWifiList=parseWifiScan(result.stdout)
+  })
+  .catch(async (error)=>{
+    console.log(`iwlist scan catch`)
+    localWifiList=[]
+  })
+}
+*/
+
+const wifiScan = function() {
+  return execPromise("LC_ALL=C iwlist wlan0 scan | egrep 'Cell|Quality|ESSID' ")
+}
+
+const parseWifiScan = function(wifiData) {
+  // XXX:
+  var lines = wifiData.split('\n')
+  var ssids=[]
+  var ssid={quality:''}
+  var regexp=//
+  for (var i=0;i<lines.length;i++) {
+    var line = lines[i]
+    regex = /Cell/;
+    if (line.search(regex)>0) { // new ssid
+      if (ssid.ssid) {
+        ssids.push(ssid) // add ssid to ssids
+      }
+      ssid={quality:''}
+    };
+    regex = /ESSID/;
+    if (line.search(regex)>0) { // ssid
+      if (ssid.ssid) {
+        ssid.ssid=line.split('"')[1]
+      }
+    };
+    regex = /Quality/;
+    var p=line.search(regex)
+    if (p>0) { // ssid
+      if (ssid.ssid) {
+        ssid.quality=line.substr(p+8,5)
+      }
+    };
+  }
+  if (ssid.ssid) {
+    ssids.push(ssid) // add (last) ssid to ssids
+  }
+  return ssids;
 }
 
 const deleteMethodHandler = ( url, req, res) => {
@@ -1198,6 +1271,7 @@ actions.push(function() {
 	})
 })
 
+/*
 actions.push(function() {
 //  console.log('Retrieve wifilist')
 	retrieveWifiList()
@@ -1213,7 +1287,7 @@ actions.push(function() {
 	nextAction()
 }
 )
-
+*/
 async function readFile(path) {
     return new Promise((resolve, reject) => {
       fs.readFile(path, 'utf8', function (err, data) {

@@ -17,6 +17,8 @@ node apri-sensor-redis/apri-sensor-redis.js >>$LOGFILE 2>>$LOGFILE
 
 rm /var/log/*gz
 rm /var/log/*.1
+# eenmalig voor oudere versies
+rm /opt/SCAPE604/log/apri-sensor-redis.log
 
 # opruimen logfiles zolang winston nog niet volledig ingericht is
 # ook de oude map voorlopig meenmenen (tot ApriSensorSK2)

@@ -1,5 +1,9 @@
 #
-# 2.1.9 - intruduced nmcli device wifi rescan - before wifi list
+# 2.1.9 - introduced nmcli device wifi rescan - before wifi list
+# 2.1.7 - workaround cleanup log in redis.sh (crontab 15 minutes)
+# 2.1.7 - introduced winston as log manager (not all processes)
+#         depends on available package (not for older images)
+
 
 # start script onder sudo su -
 

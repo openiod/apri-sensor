@@ -380,9 +380,41 @@ function sleep(ms) {
 }
 
 const getDeviceWifiListCache = function(req,res) {
-	res.writeHead(200, { 'Content-Type': 'application/json' });
-	res.write(JSON.stringify(localWifiList));
-	res.end();
+  retrieveWifiList()
+  .then((result) => {
+    console.log(`retrieveWifiList then`)
+//    console.log(result.stdout)
+    var tmpList=columnsToJsonArray(result.stdout)
+    if (tmpList.length!=0) {
+      console.log('============================')
+      localWifiList=tmpList
+      console.log(localWifiList)
+    } else {
+      console.log('----------------------------')
+      console.log(result.stdout)
+    }
+    if (restartHotspot==true) {
+      createHotspotConnection()
+      console.log('http server restart')
+      //server.listen(apiPort);
+
+      initHttpServer()
+
+      return
+    }
+    // when restarting as hotspot the connection is broken,
+    // writes to res have do not succeed.
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.write(JSON.stringify(localWifiList));
+    res.end();
+  })
+  .catch((error)=>{
+    console.log(`getDeviceWifiList catch`)
+    console.log(error)
+    res.writeHead(201, { 'Content-Type': 'application/json' });
+    res.write(JSON.stringify(localWifiList));
+    res.end();
+  })
 }
 const getDeviceWifiList = async function(req,res) {
   var restartHotspot=false

@@ -565,8 +565,11 @@ const parseWifiScan = function(wifiData) {
   var ssids=[]
   var ssid={quality:''}
   var regex=/a/ ;
+  console.log(wifiData)
+  console.dir(lines)
   for (var i=0;i<lines.length;i++) {
     var line = lines[i]
+    console.log(line)
     regex = /Cell/;
     if (line.search(regex)>0) { // new ssid
       if (ssid.ssid) {

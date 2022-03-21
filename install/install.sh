@@ -1,4 +1,6 @@
 #
+# 2.1.9 - intruduced nmcli device wifi rescan - before wifi list
+
 # start script onder sudo su -
 
 # prepare for building new image

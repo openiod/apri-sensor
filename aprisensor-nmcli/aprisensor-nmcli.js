@@ -385,7 +385,6 @@ const getDeviceWifiListCache = function(req,res) {
 	res.end();
 }
 const getDeviceWifiList = async function(req,res) {
-//  console.log(`getDeviceWifiList`)
   var restartHotspot=false
 
   if (unit.ssid==unit.connection) { //hotspot active
@@ -450,7 +449,6 @@ const getDeviceWifiList = async function(req,res) {
       console.log(result.stdout)
     }
     if (restartHotspot==true) {
-//      console.log(`getDeviceWifiList reactivate hotspot`)
       createHotspotConnection()
       console.log('http server restart')
       //server.listen(apiPort);
@@ -489,8 +487,15 @@ const restartNetworkManager = function(){
 	console.log(`restart network-manager`)
 	return execPromise("LC_ALL=C systemctl restart network-manager")
 }
-const retrieveWifiList = function(){
+const retrieveWifiList = async function(){
 	console.log(`retrieveWifiList`)
+  await execPromise("LC_ALL=C nmcli device wifi rescan")
+  .then( async (result)=>{
+    console.log(`wifi rescan then`)
+  })
+  .catch(async (error)=>{
+    console.log(`wifi rescan catch`)
+  })
 	return execPromise("LC_ALL=C nmcli device wifi list")
 }
 

@@ -556,7 +556,7 @@ const getDeviceWifiList = function(req,res) {
 }
 
 const wifiScan = function() {
-  return execPromise("LC_ALL=C iwlist wlan0 scan | egrep 'Cell|Quality|ESSID|Channel' ")
+  return execPromise("LC_ALL=C iwlist wlan0 scan | egrep 'Cell|Quality|ESSID|Channel:' ")
 }
 
 const parseWifiScan = function(wifiData) {

@@ -539,7 +539,7 @@ const getDeviceWifiList = async function(req,res) {
     res.write(JSON.stringify(localWifiList));
     res.end();
   })
-}}
+}
 /*
 const retrieveWifiList = async function(){
   wifiScan()

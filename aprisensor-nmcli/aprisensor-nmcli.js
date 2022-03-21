@@ -523,23 +523,6 @@ const retrieveWifiList = async function(){
 	return execPromise("LC_ALL=C nmcli device wifi list")
 }
 */
-const getDeviceWifiList = async function(req,res) {
-  wifiScan()
-  .then( async (result)=>{
-    console.log(`wifi rescan then`)
-    localWifiList=parseWifiScan(result.stdout)
-    res.writeHead(201, { 'Content-Type': 'application/json' });
-    res.write(JSON.stringify(localWifiList));
-    res.end();
-  })
-  .catch(async (error)=>{
-    console.log(`iwlist scan catch`)
-    localWifiList=[]
-    res.writeHead(201, { 'Content-Type': 'application/json' });
-    res.write(JSON.stringify(localWifiList));
-    res.end();
-  })
-}
 /*
 const retrieveWifiList = async function(){
   wifiScan()
@@ -553,6 +536,24 @@ const retrieveWifiList = async function(){
   })
 }
 */
+const getDeviceWifiList = function(req,res) {
+  wifiScan()
+  .then((result)=>{
+    console.log(`iwlist scan then`)
+    localWifiList=parseWifiScan(result.stdout)
+    res.writeHead(201, { 'Content-Type': 'application/json' });
+    res.write(JSON.stringify(localWifiList));
+    res.end();
+  })
+  .catch((error)=>{
+    console.log(`iwlist scan catch`)
+    console.dir(error)
+    localWifiList=[]
+    res.writeHead(201, { 'Content-Type': 'application/json' });
+    res.write(JSON.stringify(localWifiList));
+    res.end();
+  })
+}
 
 const wifiScan = function() {
   return execPromise("LC_ALL=C iwlist wlan0 scan | egrep 'Cell|Quality|ESSID' ")

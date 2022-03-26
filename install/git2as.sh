@@ -21,6 +21,7 @@ then
   cp -r /opt/SCAPE604/git/apri-sensor/aprisensor-netmanager-runtime /opt/SCAPE604/apri-sensor/.
   cp -r /opt/SCAPE604/git/apri-sensor/aprisensor-nmcli /opt/SCAPE604/apri-sensor/.
   cp -r /opt/SCAPE604/git/apri-sensor/images /opt/SCAPE604/apri-sensor/.
+  cp -r /opt/SCAPE604/git/apri-sensor/apri-config/aprisensor-types /opt/SCAPE604/apri-sensor/apri-config/aprisensor-types 
 
   sudo systemctl restart SCAPE604-aprisensor-nmcli
   echo "git2as files copied"

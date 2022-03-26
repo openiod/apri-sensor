@@ -1605,6 +1605,8 @@ var resetBmeDevice = function() {
   logger.info('resetBmeDevice')
   if (gpioBme != undefined) {  // only try to reset when gpio module available
     setGpioBmeOff()
+  } else {
+    initBmeDevice()
   }
 }
 

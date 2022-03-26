@@ -1126,7 +1126,7 @@ var sendData = function() {
 			});
 		}
 
-    if (aprisensorDevices.bme280)) {
+    if (aprisensorDevices.bme280) {
       if (results.bme280.nrOfMeas == 0) {
         logger.info('bme280 counters zero, looks like error, next time initdevice')
         if (bmeInitCounter <3) {
@@ -1139,7 +1139,7 @@ var sendData = function() {
         bmeInitCounter=0
       }
     }
-    if (aprisensorDevices.bme680)) {
+    if (aprisensorDevices.bme680) {
       if (results.bme680.nrOfMeas == 0) {
         logger.info('bme680 counters zero, looks like error, next time initdevice')
         if (bmeInitCounter <3) {

@@ -789,7 +789,7 @@ var processDeviceData	= function(err,temperatureData) {
 //    reset_w1_device()
     return
   }
-  logger.info('processDeviceData (DS18B20) ')
+//  logger.info('processDeviceData (DS18B20) ')
   // warm-up time for ds18b20 also after reset
   if (new Date().getTime()-ds18b20InitTime.getTime()<30000) return
 

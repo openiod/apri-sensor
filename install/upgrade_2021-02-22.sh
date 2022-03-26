@@ -3,7 +3,7 @@
 # execute as su
 
 mkdir -p /opt/SCAPE604/git ; rm -r /opt/SCAPE604/git/apri-sensor
-cd /opt/SCAPE604/git ; npx degit openiod/apri-sensor apri-sensor
+cd /opt/SCAPE604/git ; git clone --depth 1 https://github.com/openiod/apri-sensor.git
 
 /opt/SCAPE604/git/apri-sensor/install/git2as.sh
 

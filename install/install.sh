@@ -1,4 +1,6 @@
-#
+# 2.2.0 - sockect removed from apri-sensor-raspi
+#         device type changes for aprisensor-type-standard (pmsa003/bme280/ds18b20)
+#         in apri-sensor-raspi 
 # 2.1.9 - introduced nmcli device wifi rescan - before wifi list
 # 2.1.7 - workaround cleanup log in redis.sh (crontab 15 minutes)
 # 2.1.7 - introduced winston as log manager (not all processes)
@@ -218,8 +220,7 @@ mkdir /opt/SCAPE604/config/
 mkdir /opt/SCAPE604/git/
 mkdir /opt/SCAPE604/apri-sensor/
 cd /opt/SCAPE604/git/apri-sensor
-###npx degit openiod/apri-sensor apri-sensor
-git clone https://github.com/openiod/apri-sensor.git
+git clone --depth 1 https://github.com/openiod/apri-sensor.git
 /opt/SCAPE604/apri-sensor/install/git2as.sh
 cd /opt/SCAPE604/apri-sensor/
 #bij upgrade kan deze rm nog wel eens een blockade voorkomen

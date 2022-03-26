@@ -20,6 +20,7 @@ git status
 git push
 
 # on/for proxy2 server:
+cd /data/Alfresco/opt/aprisensor-netmanager
 scp aprisensor-netmanager.tar.gz proxy2:.
 ssh proxy2
 cd /var/www/netmanager.aprisensor.nl

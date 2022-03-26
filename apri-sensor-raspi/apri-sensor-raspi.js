@@ -109,7 +109,7 @@ catch (err) {
   logger.info('modbus-serial module (scd30) not found');
 }
 
-var aprisensorType = ''
+var aprisensorType = ''  // standard: aprisensorType=='aprisensor-typ-standard'
 var aprisensorTypeConfig={}
 var aprisensorDevices={}
 try {
@@ -134,9 +134,10 @@ if (aprisensorType!='') {
   }
 }
 
+var ADS1x15
+var ads1115Available = false
+var adc
 if (aprisensorDevices.tgs5042!=undefined) {
-  var ADS1x15
-  var ads1115Available = false
   if (aprisensorDevices.tgs5042!=undefined) {
     try {
       ADS1x15 = require('raspi-kit-ads1x15');
@@ -146,8 +147,6 @@ if (aprisensorDevices.tgs5042!=undefined) {
       logger.info('ADS1115 module not installed');
     }
   }
-
-  var adc
 }
 
 var getAds1115Tgs5042 = function() {
@@ -663,11 +662,10 @@ const options = {
   i2cBusNo   : 1, // defaults to 1
   i2cAddress : 0x76  // BME280.BME280_DEFAULT_I2C_ADDRESS() // defaults to 0x77
 };
-if (isEmpty(aprisensorDevices)) {
+if (isEmpty(aprisensorDevices) || aprisensorDevices.bme280) {
   bme280 = new BME280(options);
 }
 // Read BME280 sensor data, repeat
-//
 const readSensorDataBme280 = () => {
   if (indBme280==false) return
   bme280.readSensorData()
@@ -1132,8 +1130,34 @@ var sendData = function() {
 			});
 		}
 
-    if (results.bme280.nrOfMeas == 0 & results.bme680.nrOfMeas == 0) {
-      if (isEmpty(aprisensorDevices)) {
+    if (aprisensorDevices.bme280)) {
+      if (results.bme280.nrOfMeas == 0) {
+        logger.info('bme280 counters zero, looks like error, next time initdevice')
+        if (bmeInitCounter <3) {
+          bmeInitCounter++
+        } else {
+          bmeInitCounter = 0
+          resetBmeDevice()
+        }
+      } else {
+        bmeInitCounter=0
+      }
+    }
+    if (aprisensorDevices.bme680)) {
+      if (results.bme680.nrOfMeas == 0) {
+        logger.info('bme680 counters zero, looks like error, next time initdevice')
+        if (bmeInitCounter <3) {
+          bmeInitCounter++
+        } else {
+          bmeInitCounter = 0
+          resetBmeDevice()
+        }
+      } else {
+        bmeInitCounter=0
+      }
+    }
+    if (isEmpty(aprisensorDevices)) {
+      if (results.bme280.nrOfMeas == 0 && results.bme680.nrOfMeas == 0){
         logger.info('Both bmw280/bme680 counters zero, looks like error, next time initdevices ')
         if (bmeInitCounter <3) {
           bmeInitCounter++
@@ -1141,29 +1165,23 @@ var sendData = function() {
           bmeInitCounter = 0
           resetBmeDevice()
         }
+      } else {
+        bmeInitCounter=0
       }
-    } else {
-      bmeInitCounter=0
     }
-    if (results.ds18b20.nrOfMeas == 0) {
-      if (isEmpty(aprisensorDevices)) {
+
+    if (isEmpty(aprisensorDevices) || aprisensorDevices.ds18b20) {
+      if (results.ds18b20.nrOfMeas == 0) {
         // warm-up time for ds18b20 also after reset
         if (new Date().getTime()-ds18b20InitTime.getTime()>=30000){
           logger.info('ds18b20 counters zero, looks like error, next time initdevices ')
-//        if (ds18b20InitCounter <3) {
-//          ds18b20InitCounter++
-//        } else {
-//          ds18b20InitCounter = 0
             reset_w1_device()
-//        }
         }
       }
-    } //else {
-      //ds18b20InitCounter=0
-    //}
+    }
 
-    if (results.pms.nrOfMeas == 0 && results.pms.nrOfMeasTotal > 0 ) {
-      if (isEmpty(aprisensorDevices)) {
+    if (isEmpty(aprisensorDevices) || aprisensorDevices.pmsa003) {
+      if (results.pms.nrOfMeas == 0 && results.pms.nrOfMeasTotal > 0 ) {
         if (pmsa003InitCounter <1) {
           logger.info('pmsa003 counters zero, looks like error, next time try active mode ')
           pmsa003InitCounter++
@@ -1629,8 +1647,10 @@ var check_w1_device = function() {
   }
 }
 
-if (isEmpty(aprisensorDevices)) {
+if (isEmpty(aprisensorDevices) || aprisensorDevices.ds18b20) {
   reset_w1_device()  // check w1 device for DS18B20
+}
+if (isEmpty(aprisensorDevices) || aprisensorDevices.bme280 || aprisensorDevices.bme680) {
   resetBmeDevice()  // check bme280 or bme680
 }
 
@@ -1816,16 +1836,20 @@ var initSerial=function(serialDeviceIndex){
   });
 }
 
-if (isEmpty(aprisensorDevices)) {
+if (isEmpty(aprisensorDevices) || aprisensorDevices.bme280) {
   let timerIdBme280 = setInterval(readSensorDataBme280, 2000)
-  //setTimeout(readSensorDataBme280, 1000);
+}
+if (isEmpty(aprisensorDevices) || aprisensorDevices.bme680) {
   let timerIdBme680 = setInterval(readSensorDataBme680, 2000)
-  //setTimeout(readSensorDataBme680, 1000);
+}
+if (isEmpty(aprisensorDevices) || aprisensorDevices.ds18b20) {
   let timerIdDs18B20 = setInterval(readSensorDataDs18b20, 2000)
-  let timerIdSps30 = setInterval(readSps30Device, 1000)  // particulate matter
+}
+if (isEmpty(aprisensorDevices) || aprisensorDevices.sps30) {
+  let timerIdSps30 = setInterval(readSps30Device, 1000)
 }
 
-if (aprisensorDevices.tgs5042!=undefined) {
+if (aprisensorDevices.tgs5042) {
   // start processing TGS5042 CO sensor if available
   if (ads1115Available==true) {
     let timerIdAds1115Tgs5042 = setInterval(getAds1115Tgs5042, 2000)
@@ -1833,14 +1857,14 @@ if (aprisensorDevices.tgs5042!=undefined) {
   }
 }
 
-if (aprisensorDevices.scd30!=undefined) {
+if (aprisensorDevices.scd30) {
   let timerIdScd30 = setInterval(readScd30Device, 1000)  // CO2,temperature,rHum
 }
 
 let timerDataCycle = setInterval(processDataCycle, loopTimeCycle)
 //setTimeout(processDataCycle, loopTimeCycle);
 
-if (isEmpty(aprisensorDevices)) {
+if (isEmpty(aprisensorDevices) || aprisensorDevices.pmsa003) {
   scanSerialDevices()
   let timerSerialDevices = setInterval(scanSerialDevices, 10000)
 }

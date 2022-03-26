@@ -55,7 +55,7 @@ const I2C = require('raspi-i2c').I2C;
 var redis										= require("redis");
 const Serial								= require('raspi-serial').Serial;
 //const ByteLength 						= require('@serialport/parser-byte-length')
-var io	 										= require('socket.io-client');
+//var io	 										= require('socket.io-client');
 const exec 									= require('child_process').exec;
 const execFile							= require('child_process').execFile;
 const BME280 								= require('./BME280.js');
@@ -258,13 +258,8 @@ redisClient.on("error", function (err) {
 });
 
 // **********************************************************************************
-		/* web-socket */
+		/* web-socket
 var socketUrl, socketPath;
-//		socketUrl 	= 'http://localhost:3010';
-//		socketUrl 	= 'http://openiod.org';
-//		socketUrl 	= 'https://openiod.org';
-//		socketUrl 	= '';
-//		socketPath	= apriConfig.urlSystemRoot + '/socket.io';
 
 //prod:
 socketUrl 									= 'https://openiod.org'; socketPath	= '/'+apriConfig.systemCode + '/socket.io';
@@ -274,6 +269,7 @@ socketUrl 									= 'https://openiod.org'; socketPath	= '/'+apriConfig.systemCo
 //		socketPath	= apriConfig.urlSystemRoot + '/socket.io';
 
 logger.info('web-socket url: '+socketUrl+socketPath);
+*/
 
 //const port 					= new SerialPort('/dev/ttyS0')
 
@@ -1655,6 +1651,7 @@ if (isEmpty(aprisensorDevices) || aprisensorDevices.bme280 || aprisensorDevices.
 }
 
 
+/*
 var socket = io(socketUrl, {path:socketPath});
 
 socket.on('connection', function (socket) {
@@ -1672,6 +1669,7 @@ socket.on('info', function(data) {
 	//io.sockets.emit('aireassignal', { data: data } );
 	//socket.broadcast.emit('aireassignal', { data: data } );
 });
+*/
 
 var processRaspiSerialData7100=function(data){
 /*

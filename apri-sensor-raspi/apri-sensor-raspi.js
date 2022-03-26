@@ -815,7 +815,10 @@ var processDeviceData	= function(err,temperatureData) {
 
 const readSensorDataDs18b20 = () => {
 	//console.dir(devicesFolder  )
-  if (devicesFolder==undefined) return
+  if (devicesFolder==undefined) {
+    check_w1_device()  // only for older sensorkit (without gpio onof-module)
+    return
+  }
   for (var i=0;i<devicesFolder.length;i++) {
 		if (devicesFolder[i].split('-')[0] == '28') {  // 00 for GPIO
 //			logger.info('DS18B20 device: ' +  devicesFolder[i]);
@@ -1621,6 +1624,8 @@ var reset_w1_device = function() {
   if (gpioDs18b20 != undefined) {  // only try to reset when gpio module available
     ds18b20InitTime=new Date()
     setGpioDs18b20Off()
+  } else {
+    check_w1_device()
   }
 }
 

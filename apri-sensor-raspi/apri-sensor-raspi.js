@@ -789,6 +789,7 @@ var processDeviceData	= function(err,temperatureData) {
 //    reset_w1_device()
     return
   }
+  logger.info('processDeviceData (DS18B20) ')
   // warm-up time for ds18b20 also after reset
   if (new Date().getTime()-ds18b20InitTime.getTime()<30000) return
 
@@ -815,22 +816,14 @@ var processDeviceData	= function(err,temperatureData) {
 const readSensorDataDs18b20 = () => {
 	//console.dir(devicesFolder  )
   if (devicesFolder==undefined) return
-  var found=false
   for (var i=0;i<devicesFolder.length;i++) {
 		if (devicesFolder[i].split('-')[0] == '28') {  // 00 for GPIO
 //			logger.info('DS18B20 device: ' +  devicesFolder[i]);
 			var path = '/sys/bus/w1/devices/'+devicesFolder[i];
-			//logger.info('try read ' + path+ '/w1_slave');
 			fs.readFile(path+'/w1_slave',processDeviceData);  // start process
-      found=true
 		}
 	}
-//  if (found == true) {
-//    setTimeout(readSensorDataDs18b20, 1000);
-//  }
 };
-
-
 
 var processDataCycle	= function() {
 //	setTimeout(processDataCycle, loopTimeCycle);

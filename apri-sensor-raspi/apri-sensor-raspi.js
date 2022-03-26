@@ -115,6 +115,7 @@ var aprisensorDevices={}
 try {
   var tmpCfg=systemFolderParent+'/config/aprisensor-type.cfg'
   aprisensorType= fs.readFileSync(tmpCfg,{encoding:'utf8'}).split('\n')[0]
+  logger.info('aprisensor-type: '+aprisensorType);
 }
 catch (err) {
   aprisensorType=''

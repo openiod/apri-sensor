@@ -36,7 +36,9 @@ sudo rm /var/log/*
 # empty log2ram hdd:
 sudo rm /var/hdd.log/aprisensor/*
 sudo rm  /var/hdd.log/*
-sudo mkdir /var/log/nginx /var/hdd.log/nginx
+#sudo mkdir /var/log/nginx /var/hdd.log/nginx
+#sudo mkdir /var/log/redis /var/hdd.log/redis
+#sudo chown -R redis:redis /var/log/redis /var/hdd.log/redis
 sudo systemctl start SCAPE604-aprisensor-nmcli
 sudo nmcli c delete ap-24
 # daarna via mobiel shutdown uitvoeren
@@ -52,7 +54,7 @@ sudo nmcli c delete ap-24
 # cd /opt/SCAPE604/git/apri-sensor
 # sudo git pull
 # ./install/git2as.sh
-# /apri-agent/apri-sensor-update.sh
+# /opt/SCAPE604/apri-sensor/apri-agent/apri-sensor-update.sh
 
 # prepare sdccard on Debian laptop:
 # Copy raspbian Butcher Lite img to sdcard with BalenaEtcher

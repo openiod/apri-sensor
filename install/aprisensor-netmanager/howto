@@ -31,7 +31,9 @@ ls -l *er/public/build
 
 
 # on sensorkit:
-run 'sudo git pull' or default update on sensorkit in /opt/SCAPE604/apri-sensor
+run 'sudo git pull' or default update on sensorkit in /opt/SCAPE604/git/apri-sensor
+sudo install/git2as.sh
+sudo /opt/SCAPE604/apri-sensor/apri-agent/apri-sensor-update.sh
 sudo systemctl restart SCAPE604-aprisensor-nmcli
 # when upgrade stable version:
 # sudo rm -rf /opt/SCAPE604/aprisensor-netmanager-runtime-stable

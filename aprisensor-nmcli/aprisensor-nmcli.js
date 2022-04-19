@@ -762,8 +762,13 @@ const postApConnect = async ( url, req, res) => {
 			res.end()
 			return
     }
-//		if (result.ssid==undefined) {
-//		}
+		if (result.ssid==undefined || result.ssid=='') {
+      res.writeHead(400);
+      let msgBody={error:400,message: 'invalid data, no SSID received'}
+			res.write(JSON.stringify(msgBody));
+			res.end()
+			return
+		}
     var ssid =result.ssid
     var passwd=result.passwd
     if (result.passwd.substr(0,3)=='SCP') {

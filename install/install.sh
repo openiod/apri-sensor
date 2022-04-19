@@ -1,6 +1,8 @@
+# 2.2.1 - rm -r /var/hdd.log/* and rm -r /var/log/* as laste step preparing
+#         fresh SD-card
 # 2.2.0 - sockect removed from apri-sensor-raspi
 #         device type changes for aprisensor-type-standard (pmsa003/bme280/ds18b20)
-#         in apri-sensor-raspi 
+#         in apri-sensor-raspi
 # 2.1.9 - introduced nmcli device wifi rescan - before wifi list
 # 2.1.7 - workaround cleanup log in redis.sh (crontab 15 minutes)
 # 2.1.7 - introduced winston as log manager (not all processes)
@@ -23,13 +25,18 @@
 # sudo shutdown -h now
 # dan sd-kaart verwijderen en kopie maken met nieuw versienummer
 
-# prepare tested sensorkit for transport to client:
+# prepare tested sensorkit for sending to client:
 # ssh pi <id>.local
 #
 sudo systemctl stop SCAPE604-apri-sensor-raspi
 sudo systemctl stop SCAPE604-apri-sensor-connector
 sudo systemctl stop SCAPE604-aprisensor-nmcli
 sudo rm /var/log/aprisensor/*
+sudo rm /var/log/*
+# empty log2ram hdd:
+sudo rm /var/hdd.log/aprisensor/*
+sudo rm  /var/hdd.log/*
+sudo mkdir /var/log/nginx /var/hdd.log/nginx
 sudo systemctl start SCAPE604-aprisensor-nmcli
 sudo nmcli c delete ap-24
 # daarna via mobiel shutdown uitvoeren
@@ -37,6 +44,15 @@ sudo nmcli c delete ap-24
 # inpakken
 # postnl pakket
 # versturen
+
+# prepare duplicate of sd-card with new image:
+# Balena Etcher img-> sdcard
+# start Pi with sd-card
+# ssh pi@.....local
+# cd /opt/SCAPE604/git/apri-sensor
+# sudo git pull
+# ./install/git2as.sh
+# /apri-agent/apri-sensor-update.sh
 
 # prepare sdccard on Debian laptop:
 # Copy raspbian Butcher Lite img to sdcard with BalenaEtcher

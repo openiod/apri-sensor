@@ -1,5 +1,5 @@
-# 2.2.1 - rm -r /var/hdd.log/* and rm -r /var/log/* as laste step preparing
-#         fresh SD-card
+# 2.2.1 - rm /var/hdd.log/* /var/log/* /var/hdd.log/* /var/log/hdd.log/aprisensor/*
+#         as last step preparingfresh SD-card
 # 2.2.0 - sockect removed from apri-sensor-raspi
 #         device type changes for aprisensor-type-standard (pmsa003/bme280/ds18b20)
 #         in apri-sensor-raspi
@@ -11,7 +11,7 @@
 
 # start script onder sudo su -
 
-# prepare for building new image
+# preparations for building new image
 # assuming: lateste software installed and package.json in place
 # start met sd-kaart op pi zero met directe aansluiting (keyboard/monitor)
 # sudo systemctl stop SCAPE604-apri-sensor-raspi
@@ -20,6 +20,9 @@
 # redis-cli flushdb
 # sudo rm /opt/SCAPE604/log/*
 # sudo rm /var/log/aprisensor/*
+# sudo rm /var/log/*
+# sudo rm /var/hdd.log/*
+# sudo rm /var/hdd.log/aprisensor/*
 # nmcli c s
 # sudo nmcli c delete .. alle connections deleten, hotspot als laatste
 # sudo shutdown -h now
@@ -27,7 +30,6 @@
 
 # prepare tested sensorkit for sending to client:
 # ssh pi <id>.local
-#
 sudo systemctl stop SCAPE604-apri-sensor-raspi
 sudo systemctl stop SCAPE604-apri-sensor-connector
 sudo systemctl stop SCAPE604-aprisensor-nmcli
@@ -40,8 +42,10 @@ sudo rm  /var/hdd.log/*
 #sudo mkdir /var/log/redis /var/hdd.log/redis
 #sudo chown -R redis:redis /var/log/redis /var/hdd.log/redis
 sudo systemctl start SCAPE604-aprisensor-nmcli
-sudo nmcli c delete ap-24
-# daarna via mobiel shutdown uitvoeren
+sudo nmcli c s
+sudo nmcli c delete <hier alles wat nog aanwezig is behalve connected router>
+sudo nmcli c delete <connected router>
+# daarna via mobiel (als accesspoint) shutdown uitvoeren
 # foto maken
 # inpakken
 # postnl pakket
@@ -50,27 +54,30 @@ sudo nmcli c delete ap-24
 # prepare duplicate of sd-card with new image:
 # Balena Etcher img-> sdcard
 # start Pi with sd-card
-# ssh pi@.....local
+# ssh pi@<id>.local
 # cd /opt/SCAPE604/git/apri-sensor
 # sudo git pull
 # ./install/git2as.sh
 # /opt/SCAPE604/apri-sensor/apri-agent/apri-sensor-update.sh
 
-# prepare sdccard on Debian laptop:
+# prepare sdcard on Debian laptop for initial install OS:
 # Copy raspbian Butcher Lite img to sdcard with BalenaEtcher
 # sudo touch /media/awiel/boot/ssh
 # unmount sdcard from within debian Places
 # start Raspberry Pi with ethernet usb adapter
 # ssh to pi@ipaddress
+# sudo apt update
+# sudo apt upgrade
+# vanaf hier alle installatie stappen voor software doorlopen
 
 ### ===== upgrade to V2-20210726 or later
-# mkdir -p /opt/SCAPE604/git
-# rm -r /opt/SCAPE604/git/apri-sensor  # remove old version if exists
-# cd /opt/SCAPE604/git ; npx degit openiod/apri-sensor
+# sudo mkdir -p /opt/SCAPE604/git
+# sudo rm -r /opt/SCAPE604/git/apri-sensor  # remove old version if exists
+# cd /opt/SCAPE604/git ; sudo git clone --depth 1 https://github.com/openiod/apri-sensor.git
 # sudo /opt/SCAPE604/git/apri-sensor/install/git2as.sh
 ### ===== end upgrade proc
 
-#### maak nieuwe image
+#### kopieer SD-kaart naar image bestand
 # plaats sd-kaart met nieuwe versie in usb-adapter
 #===== e2fsck (controle of fs ok is)
 # df -h  # show devices
@@ -85,17 +92,17 @@ sudo nmcli c delete ap-24
 # controleer filesystem: sudo e2fsck /dev/sda2
 # cd ~/opt/raspberrypi_image
 # mv apri* old-images/.
-# sudo dcfldd if=/dev/sda of=aprisensor_v2-1-x.img ; sudo sync
+# sudo dcfldd if=/dev/sda of=aprisensor_v2-2-x.img ; sudo sync
 # sudo sync
-# sudo chown awiel.awiel aprisensor_v2-1-x.img
+# sudo chown awiel.awiel aprisensor_v2-2-x.img
 # shrink img:
 # # eenmalig: sudo apt-get update && sudo apt-get install gparted
-# sudo fdisk -l aprisensor_v2-1-x.img
+# sudo fdisk -l aprisensor_v2-2-x.img
 # startsector of partition2 = 532480
 # mount the second partition
-# #sudo losetup /dev/loop0 aprisensor_####.img -o $((<STARTSECTOR>*512))
-# sudo losetup /dev/loop0 aprisensor_v2-1-x.img -o $((532480*512))
-# sudo gparted /dev/loop0
+# #sudo losetup /dev/loop10 aprisensor_####.img -o $((<STARTSECTOR>*512))
+# sudo losetup /dev/loop10 aprisensor_v2-2-x.img -o $((532480*512))
+# sudo gparted /dev/loop10
 # # select partion en menu: Partition / Resize/Move
 # # change minimum size to 3500 (minimum size + +-20MB) #of 3500 voor standaard voldoende ruimte!!
 # click 'resize'-button
@@ -104,9 +111,9 @@ sudo nmcli c delete ap-24
 #   see log details shrink file system / resize2fs -p 3584000K (2488320K of 3584000K)
 # close and quit gparted
 # reset loop device to total img:
-# sudo losetup -d /dev/loop0
-# sudo losetup /dev/loop0 aprisensor_v2-1-x.img
-# sudo fdisk /dev/loop0
+# sudo losetup -d /dev/loop10
+# sudo losetup /dev/loop10 aprisensor_v2-2-x.img
+# sudo fdisk /dev/loop10
 # p<enter> for partion info
 # d<enter>2<enter> delete partition 2
 # create new partion 2 with partion start address
@@ -116,16 +123,20 @@ sudo nmcli c delete ap-24
 # remove signature? N(o)
 #? w<enter>  write partion tabel
 # show loop device and delete it:
-# sudo fdisk -l /dev/loop0
-# sudo losetup -d /dev/loop0
+# sudo fdisk -l /dev/loop10
+# sudo losetup -d /dev/loop10
 # truncate file to ENDsector of 2e partition:
 # truncate -s $(((END+1)*512)) aprisensor_v2-1-5.img
 # ###truncate -s $(((4976640+1)*512)) aprisensor_v2-1-5.img
-# truncate -s $(((7700479+1)*512)) aprisensor_v2-1-x.img
-# mv aprisensor_v2-1-x.img aprisensor_v2-1-7.img
+# truncate -s $(((7700479+1)*512)) aprisensor_v2-2-x.img
+# mv aprisensor_v2-2-x.img aprisensor_v2-1-7.img
 #
 # see http://www.aoakley.com/articles/2015-10-09-resizing-sd-images.php
 #-----------------------------------------------
+# verplaats img daarna naar proxy2 (best met netwerkkabel aangesloten)
+# scp aprisensor_v2-2-x.img proxy2:.
+# op proxy2: mv ~/aprisensor_v2-2-x.img /var/www/img.aprisensor.nl/public/img
+
 
 # after first boot of Raspberry Pi:
 # /boot/config.txt --> dtoverlay=i2c-gpio,bus=3  (software i2c on gpio 23 sda 24 scl)

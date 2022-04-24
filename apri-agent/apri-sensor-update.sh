@@ -18,7 +18,7 @@ then
 fi
 cd /opt/SCAPE604/git/apri-sensor
 mkdir /var/log/aprisensor
-echo Start of update proces >> /var/log/aprisensor/apri-agent-update.log
+echo Start of update process >> /var/log/aprisensor/apri-agent-update.log
 date >> /var/log/aprisensor/apri-agent-update.log
 
 # get software updates from github

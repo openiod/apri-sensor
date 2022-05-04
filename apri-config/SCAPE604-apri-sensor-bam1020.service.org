@@ -1,0 +1,9 @@
+[Unit]
+Description=SCAPE604-apri-sensor-bam1020 - start or restart apri-sensor-bam1020 service, respawn
+After=network.target
+[Service]
+ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-bam1020/apri-sensor-bam1020.sh /var/log/aprisensor/SCAPE604-apri-sensor-bam1020.log
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

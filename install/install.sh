@@ -173,16 +173,22 @@ apt -y install network-manager
 #systemctl enable NetworkManager.service
 
 # log2ram https://github.com/azlux/log2ram
+Buster:
 echo "deb http://packages.azlux.fr/debian/ buster main" | sudo tee /etc/apt/sources.list.d/azlux.list
 wget -qO - https://azlux.fr/repo.gpg.key | sudo apt-key add -
+Bullseye:
+echo "deb [signed-by=/usr/share/keyrings/azlux-archive-keyring.gpg] http://packages.azlux.fr/debian/ bullseye main" | sudo tee /etc/apt/sources.list.d/azlux.list
+sudo wget -O /usr/share/keyrings/azlux-archive-keyring.gpg  https://azlux.fr/repo.gpg
 sudo apt update
 sudo apt install log2ram
 # wijzig /etc/log2ram.conf
+# SIZE=60M
 # deze vervalt voor ApriSensorSK2-> PATH='/var/log;/opt/SCAPE604/log'
 # PATH='/var/log'
 
 #vi /etc/hosts:
 # laatste regel: 127.0.1.1		ID## ID##.local
+# eg 127.0.1.1     41BD  41BD.local
 # nmcli general hostname ID##.local
 
 # voor upgrade oudere installaties
@@ -191,9 +197,9 @@ sudo apt install log2ram
 #apt -y remove comitup
 
 #avahi, redis, nginx
-apt -y install avahi-utils
+sudo apt -y install avahi-utils
 #see install/avahi/avahi-deamon.conf
-apt -y install redis-server
+sudo apt -y install redis-server
 
 #todo
 ## Edit the Redis configuration file to setup caching.
@@ -222,8 +228,12 @@ apt -y install nginx
 #| sudo apt-get install -y nodejs
 #| sudo apt autoremove
 
+# for Raspberry Pi 3:
+curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+sudo apt install nodejs
+
 # for Raspberry Pi Zero W:
-mkdir /opt/nodejs
+sudo mkdir /opt/nodejs
 cd /opt/nodejs
 wget https://nodejs.org/dist/v10.24.1/node-v10.24.1-linux-armv6l.tar.gz
 tar -C /usr/local --strip-components 1 -xzf node-v10.24.1-linux-armv6l.tar.gz
@@ -243,42 +253,45 @@ usermod -a -G dialout pi
 
 ###npm install -g degit
 
-mkdir -p /var/log/aprisensor
+sudo mkdir -p /var/log/aprisensor
 # de volgende kan weg in ApriSensorSK2 (sensorkit versie 2 / 2022)
-mkdir -p /opt/SCAPE604/log
-mkdir /opt/SCAPE604/config/
-mkdir /opt/SCAPE604/git/
-mkdir /opt/SCAPE604/apri-sensor/
+#mkdir -p /opt/SCAPE604/log
+sudo mkdir -p /opt/SCAPE604/config/
+sudo mkdir /opt/SCAPE604/git
+sudo mkdir /opt/SCAPE604/apri-sensor/
+sudo mkdir /opt/SCAPE604/apri-sensor/apri-agent
+sudo mkdir /opt/SCAPE604/apri-sensor/apri-config
 cd /opt/SCAPE604/git/apri-sensor
-git clone --depth 1 https://github.com/openiod/apri-sensor.git
-/opt/SCAPE604/apri-sensor/install/git2as.sh
-cd /opt/SCAPE604/apri-sensor/
+sudo git clone --depth 1 https://github.com/openiod/apri-sensor.git
+# voor Pi Zero:
+sudo /opt/SCAPE604/git/apri-sensor/install/git2as.sh
 #bij upgrade kan deze rm nog wel eens een blockade voorkomen
 #rm package-lock.json
 #git pull
-cp apri-config/apri-system-example.json /opt/SCAPE604/config/apri-system.json
+sudo cp apri-config/apri-system-example.json /opt/SCAPE604/config/apri-system.json
+sudo cp package.json /opt/SCAPE604/apri-sensor/.
 #onderstaande onder root uitvoeren (sudo is niet voldoende)
 sudo su -
 cd /opt/SCAPE604/apri-sensor
 npm install
 exit  # exit root
-cp /opt/SCAPE604/git/apri-sensor/install/avahi/avahi-daemon.conf /etc/avahi/avahi-daemon.conf
+sudo cp /opt/SCAPE604/git/apri-sensor/install/avahi/avahi-daemon.conf /etc/avahi/avahi-daemon.conf
 
 
 # eenmalig, als runtime stable is
-rm -r /opt/SCAPE604/aprisensor-netmanager-runtime-stable
-cp -r /opt/SCAPE604/apri-sensor/aprisensor-netmanager-runtime /opt/SCAPE604/aprisensor-netmanager-runtime-stable
-cp /opt/SCAPE604/git/apri-sensor/install/aprisensor-netmanager/aprisensor-netmanager-nginx-site-default.conf /etc/nginx/sites-available/default
+sudo rm -r /opt/SCAPE604/aprisensor-netmanager-runtime-stable
+sudo cp -r /opt/SCAPE604/apri-sensor/aprisensor-netmanager-runtime /opt/SCAPE604/aprisensor-netmanager-runtime-stable
+sudo cp /opt/SCAPE604/git/apri-sensor/install/aprisensor-netmanager/aprisensor-netmanager-nginx-site-default.conf /etc/nginx/sites-available/default
 #ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 #sudo vi /etc/nginx/sites-available/default
 #sudo nginx -t
 
-rm -r /opt/SCAPE604/aprisensor-nmcli-stable
-cp -r /opt/SCAPE604/git/apri-sensor/aprisensor-nmcli /opt/SCAPE604/aprisensor-nmcli-stable
+sudo rm -r /opt/SCAPE604/aprisensor-nmcli-stable
+sudo cp -r /opt/SCAPE604/git/apri-sensor/aprisensor-nmcli /opt/SCAPE604/aprisensor-nmcli-stable
 cd /opt/SCAPE604/aprisensor-nmcli-stable
-npm install http-terminator
+sudo npm install http-terminator
 
-service nginx restart
+sudo service nginx restart
 
 #Voor opschonen Redis archive set and wifi check:
 sudo crontab -e
@@ -289,29 +302,34 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 */15 * * * * /opt/SCAPE604/apri-sensor/apri-sensor-redis/apri-sensor-redis.sh
 <--
 
-cp /opt/SCAPE604/apri-sensor/apri-config/SCAPE604-apri-agent.service.org /etc/systemd/system/SCAPE604-apri-agent.service
-systemctl enable SCAPE604-apri-agent.service
+sudo cp /opt/SCAPE604/git/apri-sensor/apri-config/SCAPE604-apri-agent.service.org /etc/systemd/system/SCAPE604-apri-agent.service
+sudo systemctl enable SCAPE604-apri-agent.service
 #systemctl start SCAPE604-apri-agent.service
 
-cp /opt/SCAPE604/apri-sensor/apri-config/SCAPE604-aprisensor-nmcli.service.org /etc/systemd/system/SCAPE604-aprisensor-nmcli.service
-systemctl enable SCAPE604-aprisensor-nmcli.service
+sudo cp /opt/SCAPE604/git/apri-sensor/apri-config/SCAPE604-aprisensor-nmcli.service.org /etc/systemd/system/SCAPE604-aprisensor-nmcli.service
+sudo systemctl enable SCAPE604-aprisensor-nmcli.service
 #systemctl start SCAPE604-aprisensor-nmcli.service
 # depending on hardware swicth (HW-switch) disable one of these services
-cp /opt/SCAPE604/apri-sensor/apri-config/SCAPE604-aprisensor-nmcli-stable.service.org /etc/systemd/system/SCAPE604-aprisensor-nmcli-stable.service
+sudo cp /opt/SCAPE604/git/apri-sensor/apri-config/SCAPE604-aprisensor-nmcli-stable.service.org /etc/systemd/system/SCAPE604-aprisensor-nmcli-stable.service
 #systemctl enable SCAPE604-aprisensor-nmcli-stable.service
 #systemctl start SCAPE604-aprisensor-nmcli-stable.service
 
-cp /opt/SCAPE604/apri-sensor/apri-config/SCAPE604-apri-sensor-connector.service.org /etc/systemd/system/SCAPE604-apri-sensor-connector.service
-systemctl enable SCAPE604-apri-sensor-connector.service
+sudo cp /opt/SCAPE604/git/apri-sensor/apri-config/SCAPE604-apri-sensor-connector.service.org /etc/systemd/system/SCAPE604-apri-sensor-connector.service
+sudo systemctl enable SCAPE604-apri-sensor-connector.service
 #systemctl start SCAPE604-apri-sensor-connector.service
 
-cp /opt/SCAPE604/apri-sensor/apri-config/SCAPE604-apri-sensor-raspi.service.org /etc/systemd/system/SCAPE604-apri-sensor-raspi.service
-systemctl enable SCAPE604-apri-sensor-raspi.service
+# volgende niet standaard voor raspberry pi 3/4
+sudo cp /opt/SCAPE604/git/apri-sensor/apri-config/SCAPE604-apri-sensor-raspi.service.org /etc/systemd/system/SCAPE604-apri-sensor-raspi.service
+sudo systemctl enable SCAPE604-apri-sensor-raspi.service
 #systemctl start SCAPE604-apri-sensor-raspi.service
 
-#cp /opt/SCAPE604/apri-sensor/apri-config/SCAPE604-apri-sensor-tsi3007.service.org /etc/systemd/system/SCAPE604-apri-sensor-tsi3007.service
-#systemctl enable SCAPE604-apri-sensor-tsi3007.service
-#systemctl start SCAPE604-apri-sensor-tsi3007.service
+#sudo cp /opt/SCAPE604/git/apri-sensor/apri-config/SCAPE604-apri-sensor-tsi3007.service.org /etc/systemd/system/SCAPE604-apri-sensor-tsi3007.service
+#sudo systemctl enable SCAPE604-apri-sensor-tsi3007.service
+#sudo systemctl start SCAPE604-apri-sensor-tsi3007.service
+
+#sudo cp /opt/SCAPE604/git/apri-sensor/apri-config/SCAPE604-apri-sensor-bam1020.service.org /etc/systemd/system/SCAPE604-apri-sensor-bam1020.service
+#sudo systemctl enable SCAPE604-apri-sensor-bam1020.service
+#sudo systemctl start SCAPE604-apri-sensor-bam1020.service
 
 # when installed via eth0 this file will block nmcli from connecting to wifi
 rm /etc/wpa_supplicant/wpa_supplicant.conf

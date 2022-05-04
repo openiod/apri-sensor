@@ -14,18 +14,19 @@
 # preparations for building new image
 # assuming: lateste software installed and package.json in place
 # start met sd-kaart op pi zero met directe aansluiting (keyboard/monitor)
-# sudo systemctl stop SCAPE604-apri-sensor-raspi
-# sudo systemctl stop SCAPE604-apri-sensor-connector
-# sudo systemctl stop SCAPE604-aprisensor-nmcli
-# redis-cli flushdb
-# sudo rm /opt/SCAPE604/log/*
-# sudo rm /var/log/aprisensor/*
-# sudo rm /var/log/*
-# sudo rm /var/hdd.log/*
-# sudo rm /var/hdd.log/aprisensor/*
-# nmcli c s
-# sudo nmcli c delete .. alle connections deleten, hotspot als laatste
-# sudo shutdown -h now
+!!!! nog te doen ?: /etc/log2ram.conf aanpassen (50MB en '/var/log')
+sudo systemctl stop SCAPE604-apri-sensor-raspi
+sudo systemctl stop SCAPE604-apri-sensor-connector
+sudo systemctl stop SCAPE604-aprisensor-nmcli
+redis-cli flushdb
+sudo rm /opt/SCAPE604/log/*
+sudo rm /var/log/aprisensor/*
+sudo rm /var/log/*
+sudo rm /var/hdd.log/*
+sudo rm /var/hdd.log/aprisensor/*
+nmcli c s
+sudo nmcli c delete .. alle connections deleten, hotspot als laatste
+sudo shutdown -h now
 # dan sd-kaart verwijderen en kopie maken met nieuw versienummer
 
 # prepare tested sensorkit for sending to client:
@@ -44,8 +45,8 @@ sudo rm  /var/hdd.log/*
 sudo systemctl start SCAPE604-aprisensor-nmcli
 sudo nmcli c s
 sudo nmcli c delete <hier alles wat nog aanwezig is behalve connected router>
-sudo nmcli c delete <connected router>
-# daarna via mobiel (als accesspoint) shutdown uitvoeren
+sudo nmcli c delete <connected router> ; sudo shutdown -h now
+# dit niet als hiervoor al shutdown is gedaan: daarna via mobiel (als accesspoint) shutdown uitvoeren
 # foto maken
 # inpakken
 # postnl pakket
@@ -94,7 +95,7 @@ sudo nmcli c delete <connected router>
 # mv apri* old-images/.
 # sudo dcfldd if=/dev/sda of=aprisensor_v2-2-x.img ; sudo sync
 # sudo sync
-# sudo chown awiel.awiel aprisensor_v2-2-x.img
+# sudo chown awiel:awiel aprisensor_v2-2-x.img
 # shrink img:
 # # eenmalig: sudo apt-get update && sudo apt-get install gparted
 # sudo fdisk -l aprisensor_v2-2-x.img
@@ -104,7 +105,7 @@ sudo nmcli c delete <connected router>
 # sudo losetup /dev/loop10 aprisensor_v2-2-x.img -o $((532480*512))
 # sudo gparted /dev/loop10
 # # select partion en menu: Partition / Resize/Move
-# # change minimum size to 3500 (minimum size + +-20MB) #of 3500 voor standaard voldoende ruimte!!
+# # change New size to 3500 (minimum size + +-20MB) #of 3500 voor standaard voldoende ruimte!!
 # click 'resize'-button
 # Menu: Edit / Apply All Operations
 #  Noteer the new size!
@@ -126,17 +127,17 @@ sudo nmcli c delete <connected router>
 # sudo fdisk -l /dev/loop10
 # sudo losetup -d /dev/loop10
 # truncate file to ENDsector of 2e partition:
-# truncate -s $(((END+1)*512)) aprisensor_v2-1-5.img
+# #truncate -s $(((END+1)*512)) aprisensor_v2-1-5.img
 # ###truncate -s $(((4976640+1)*512)) aprisensor_v2-1-5.img
 # truncate -s $(((7700479+1)*512)) aprisensor_v2-2-x.img
-# mv aprisensor_v2-2-x.img aprisensor_v2-1-7.img
+# mv aprisensor_v2-2-x.img aprisensor_v2-2-2.img
 #
 # see http://www.aoakley.com/articles/2015-10-09-resizing-sd-images.php
 #-----------------------------------------------
 # verplaats img daarna naar proxy2 (best met netwerkkabel aangesloten)
 # scp aprisensor_v2-2-x.img proxy2:.
 # op proxy2: mv ~/aprisensor_v2-2-x.img /var/www/img.aprisensor.nl/public/img
-
+# wordpress webpagina aanpassen voor nieuwe versie
 
 # after first boot of Raspberry Pi:
 # /boot/config.txt --> dtoverlay=i2c-gpio,bus=3  (software i2c on gpio 23 sda 24 scl)
@@ -315,3 +316,17 @@ systemctl enable SCAPE604-apri-sensor-raspi.service
 # when installed via eth0 this file will block nmcli from connecting to wifi
 rm /etc/wpa_supplicant/wpa_supplicant.conf
 cp /opt/SCAPE604/git/apri-sensor/install/interfaces.org /etc/network/interfaces
+
+# make alias for usb devices:
+lsusb ; list usb-devices (after connecting a serial device)
+->Bus 001 Device 021: ID 067b:2303 Prolific Technology, Inc. PL2303 Serial Port
+ID vendor=067b
+ID product=2303
+lsusb -t ;
+sudo udevadm info /dev/ttyUSB0 ;
+udevadm info -a -p  $(udevadm info -q path -n /dev/ttyUSB0)
+ls -l /dev/serial/by-id/
+-> usb-Prolific_Technology_Inc._USB-Serial_Controller_D-if00-port0 -> ../../ttyUSB0
+sudo vi /etc/udev/rules.d/99-usb-serial.rules
+-> ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", ATTRS{serial}=="0000:00:14.0", SYMLINK+="ttybam1020"
+reconnnect the usb-device to activate the alias

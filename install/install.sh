@@ -263,6 +263,7 @@ sudo mkdir /opt/SCAPE604/apri-sensor/apri-agent
 sudo mkdir /opt/SCAPE604/apri-sensor/apri-config
 cd /opt/SCAPE604/git/apri-sensor
 sudo git clone --depth 1 https://github.com/openiod/apri-sensor.git
+sudo git config pull.rebase false (eenmalige 'default' actie, nog uitzoek waarvoor)
 # voor Pi Zero:
 sudo /opt/SCAPE604/git/apri-sensor/install/git2as.sh
 #bij upgrade kan deze rm nog wel eens een blockade voorkomen

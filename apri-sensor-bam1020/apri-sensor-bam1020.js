@@ -113,7 +113,7 @@ var mainProcess = function() {
 					console.log('data fout: "' + serialInput+'"');
 				}
 			} else {
-				console.log('data nog onvolledig: "' + serialInput+'"')
+				// console.log('data nog onvolledig: "' + serialInput+'"')
 				return
 			}
 		});

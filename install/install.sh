@@ -105,11 +105,11 @@ sudo nmcli c delete <connected router> ; sudo shutdown -h now
 # sudo losetup /dev/loop10 aprisensor_v2-2-x.img -o $((532480*512))
 # sudo gparted /dev/loop10
 # # select partion en menu: Partition / Resize/Move
-# # change New size to 3500 (minimum size + +-20MB) #of 3500 voor standaard voldoende ruimte!!
+# # change New size to 3000 (minimum size + +-20MB) #of 3500 voor standaard voldoende ruimte!!
 # click 'resize'-button
 # Menu: Edit / Apply All Operations
 #  Noteer the new size!
-#   see log details shrink file system / resize2fs -p 3584000K (2488320K of 3584000K)
+#   see log details shrink file system / resize2fs -p 3584000K (3072000K of 2488320K of 3584000K)
 # close and quit gparted
 # reset loop device to total img:
 # sudo losetup -d /dev/loop10
@@ -328,6 +328,7 @@ sudo systemctl enable SCAPE604-apri-sensor-raspi.service
 #sudo systemctl enable SCAPE604-apri-sensor-tsi3007.service
 #sudo systemctl start SCAPE604-apri-sensor-tsi3007.service
 
+#sudo mkdir /opt/SCAPE604/results/
 #sudo cp /opt/SCAPE604/git/apri-sensor/apri-config/SCAPE604-apri-sensor-bam1020.service.org /etc/systemd/system/SCAPE604-apri-sensor-bam1020.service
 #sudo systemctl enable SCAPE604-apri-sensor-bam1020.service
 #sudo systemctl start SCAPE604-apri-sensor-bam1020.service

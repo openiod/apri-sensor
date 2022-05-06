@@ -967,13 +967,13 @@ var sendData = function() {
           (
             (results.pms.pm25CF1-pmsDeltas[pmsDeltasMax-1].pm25)
            /
-           ((tmpDate.getTime()-pmsDeltas[pmsDeltasMax-1].date.getTime())/1000)
+           ((tmpDate.getTime()-pmsDeltas[pmsDeltasMax-1].date.getTime())/100000)
           )*100)/100
         ,delta2: Math.round(
           (
             (results.pms.pm25CF1-pmsDeltas[pmsDeltasMax-2].pm25)
            /
-           ((tmpDate.getTime()-pmsDeltas[pmsDeltasMax-2].date.getTime())/1000)
+           ((tmpDate.getTime()-pmsDeltas[pmsDeltasMax-2].date.getTime())/100000)
           )*100)/100
       }
       pmsDeltas[(pmsDeltasMax)]=pmsDelta

@@ -340,6 +340,7 @@ for (i=0;i<=pmsDeltasMax;i++) {
     date: new Date()
     , pm25:0
     , delta:0
+    , delta2:0
   }
   pmsDeltas.push(pmsDelta)
 }
@@ -957,14 +958,17 @@ var sendData = function() {
         date:tmpDate
         ,pm25:results.pms.pm25CF1
         ,delta: Math.round((results.pms.pm25CF1-pmsDeltas[pmsDeltasMax].pm25
-           /(tmpDate.getTime()-pmsDeltas[pmsDeltasMax].date.getTime())*100) )/100
+          /(tmpDate.getTime()-pmsDeltas[pmsDeltasMax].date.getTime())*100) )/100
+        ,delta2: Math.round((results.pms.pm25CF1-pmsDeltas[pmsDeltasMax-1].pm25
+          /(tmpDate.getTime()-pmsDeltas[pmsDeltasMax-1].date.getTime())*100) )/100
       }
       pmsDeltas[(pmsDeltasMax)]=pmsDelta
-      logger.info('delta', pmsDelta)
+//      logger.info('delta', pmsDelta)
       redisHmsetHashAsync(timeStamp.toISOString()+':pmsa003'
 			  , 'foi', 'SCRP' + unit.id
         , 'pm25', results.pms.pm25CF1
-        , 'pmDelta', pmsDelta.delta
+        , 'delta', pmsDelta.delta
+        , 'delta2', pmsDelta.delta2
       ).then(function(res) {
         var _res = res;
         redisSaddAsync('delta', timeStamp.toISOString()+':pmsa003')

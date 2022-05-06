@@ -1040,8 +1040,16 @@ var sendData = function() {
               subject: "Sensorkit signal", // Subject line
               text: "Hallo, dit is een bericht van sensorkit .... Er is een overschrijding geconstateerd!", // plain text body
               html: "<b>Er is een overschrijding geconstateerd!</b>"+ // html body
-                "<BR/><BR/>" + pmsRc.toJsonString()
+                "<BR/><BR/>Fijnstof concentratie: " + pmsRc.pm25 +
+                "<BR/>RC 1: " + pmsRc.rc1 +
+                "<BR/>RC 2: " + pmsRc.rc2 +
+                "<BR/>RC 3: " + pmsRc.rc3 +
+                "<BR/>RC 4: " + pmsRc.rc4 +
+                "<BR/>RC 5: " + pmsRc.rc5 +
+                "<BR/>RC 6: " + pmsRc.rc6 +
+                "<BR/><BR/>RC = RichtingsCoëfficiënt"
             });
+            logger.info('email: '+info.messageId)
           }
         }
         //      logger.info('rc', pmsRc)

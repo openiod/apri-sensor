@@ -959,6 +959,7 @@ var sendData = function() {
            /(tmpDate.getTime()-pmsDeltas[pmsDeltasMax-1].date.getTime())*100) )/100
       }
       pmsDeltas[pmsDeltasMax-1]=pmsDelta
+      logger.info('delta', pmsDelta)
       redisHmsetHashAsync(timeStamp.toISOString()+':pmsa003'
 			  , 'foi', 'SCRP' + unit.id
         , 'pm25', results.pms.pm25CF1

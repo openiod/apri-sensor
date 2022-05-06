@@ -101,6 +101,28 @@ catch (err) {
 }
 logger.info("Start of Config Main ", configServerModulePath);
 
+var nodemailer
+var emailAvailable=false
+var transporter
+try {
+  nodemailer = require('nodemailer')
+  emailAvailable=true
+  // create reusable transporter object using the default SMTP transport
+  transporter = nodemailer.createTransport({
+    host: "mail.scapeler.com"
+    ,port: 25
+    ,secure: false // true for 465, false for other ports
+//    auth: {
+//      user: testAccount.user, // generated ethereal user
+//      pass: testAccount.pass, // generated ethereal password
+//    },
+  });
+
+}
+catch (err) {
+  logger.info('nodemailer module not found');
+}
+
 var ModbusRTU
 try {
   ModbusRTU             = require("modbus-serial");
@@ -1010,6 +1032,18 @@ var sendData = function() {
       if ( pmsRcs[0].pm25==0 && pmsRcs[0].pm25==0 && pmsRcs[0].pm25==0) {
         // do nothing, data possible at start up fase
       } else {
+        if (emailAvailable==true) {
+          if (pmsRc.rc1>5) {
+            let info = transporter.sendMail({
+              from: '"Sensorkit" <info@scapeler.com>', // sender address
+              to: "awiel@scapeler.com, awiel@scapeler.com", // list of receivers
+              subject: "Sensorkit signal", // Subject line
+              text: "Hallo, dit is een bericht van sensorkit .... Er is een overschrijding geconstateerd!", // plain text body
+              html: "<b>Er is een overschrijding geconstateerd!</b>"+ // html body
+                "<BR/><BR/>" + pmsRc.toJsonString()
+            });
+          }
+        }
         //      logger.info('rc', pmsRc)
         redisHmsetHashAsync(timeStamp.toISOString()+':pmsa003'
           , 'foi', 'SCRP' + unit.id

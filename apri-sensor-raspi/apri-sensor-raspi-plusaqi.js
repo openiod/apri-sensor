@@ -948,7 +948,7 @@ var sendData = function() {
 //						',raw0_3:'+results.pms.part0_3+',raw0_5:'+results.pms.part0_5+',raw1_0:'+results.pms.part1_0 +
 //						',raw2_5:'+results.pms.part2_5+',raw5_0:'+results.pms.part5_0+',raw10_0:'+results.pms.part10_0;
 //			logger.info(url);
-      for (i=0;i<pmsDeltasMax-1;i++) {  // shift registers
+      for (i=0;i<=pmsDeltasMax-1;i++) {  // shift registers
         pmsDeltas[i]=pmsDeltas[i+1]
       }
       var tmpDate= new Date()
@@ -964,7 +964,7 @@ var sendData = function() {
       redisHmsetHashAsync(timeStamp.toISOString()+':pmsa003'
 			  , 'foi', 'SCRP' + unit.id
         , 'pm25', results.pms.pm25CF1
-        , 'pmDelta', pmsDelta.pmsDelta
+        , 'pmDelta', pmsDelta.delta
       ).then(function(res) {
         var _res = res;
         redisSaddAsync('delta', timeStamp.toISOString()+':pmsa003')

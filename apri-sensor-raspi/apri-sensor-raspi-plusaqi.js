@@ -334,12 +334,12 @@ var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today
 //var resultsFileName = resultsFolder + sensorFileName + '_' + dateString;
 
 var pmsDeltas =[]
-var pmsDeltasMax=10
-for (i=0;i<pmsDeltasMax-1;i++) {
+var pmsDeltasMax=10-1 // range 0-9
+for (i=0;i<pmsDeltasMax;i++) {
   var pmsDelta={
     date: new Date()
     , pm25:0
-    , pm25Delta:0
+    , delta:0
   }
   pmsDeltas.push(pmsDelta)
 }
@@ -948,17 +948,17 @@ var sendData = function() {
 //						',raw0_3:'+results.pms.part0_3+',raw0_5:'+results.pms.part0_5+',raw1_0:'+results.pms.part1_0 +
 //						',raw2_5:'+results.pms.part2_5+',raw5_0:'+results.pms.part5_0+',raw10_0:'+results.pms.part10_0;
 //			logger.info(url);
-      for (i=0;i<pmsDeltasMax-2;i++) {
-        pmsDeltas[i]=pmsDeltas[i+2]
+      for (i=0;i<pmsDeltasMax-1;i++) {  // shift registers
+        pmsDeltas[i]=pmsDeltas[i+1]
       }
       var tmpDate= new Date()
       var pmsDelta={
         date:tmpDate
         ,pm25:results.pms.pm25CF1
-        ,pmsDelta: Math.round((results.pms.pm25CF1-pmsDeltas[pmsDeltasMax-1].pm25
-           /(tmpDate.getTime()-pmsDeltas[pmsDeltasMax-1].date.getTime())*100) )/100
+        ,delta: Math.round((results.pms.pm25CF1-pmsDeltas[pmsDeltasMax].pm25
+           /(tmpDate.getTime()-pmsDeltas[pmsDeltasMax].date.getTime())*100) )/100
       }
-      pmsDeltas[pmsDeltasMax-1]=pmsDelta
+      pmsDeltas[(pmsDeltasMax)]=pmsDelta
       logger.info('delta', pmsDelta)
       redisHmsetHashAsync(timeStamp.toISOString()+':pmsa003'
 			  , 'foi', 'SCRP' + unit.id

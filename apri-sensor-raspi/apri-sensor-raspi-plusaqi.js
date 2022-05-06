@@ -333,16 +333,21 @@ var today				= new Date();
 var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today.getDate() + "_" + today.getHours(); // + ":" + today.getMinutes();
 //var resultsFileName = resultsFolder + sensorFileName + '_' + dateString;
 
-var pmsDeltas =[]
-var pmsDeltasMax=10-1 // range 0-9
-for (i=0;i<=pmsDeltasMax;i++) {
-  var pmsDelta={
+// RC = RichtingsCoëfficiënt
+var pmsRcs =[]
+var pmsRcsMax=10-1 // range 0-9
+for (i=0;i<=pmsRcsMax;i++) {
+  var pmsRc={
     date: new Date()
     , pm25:0
-    , delta:0
-    , delta2:0
+    , rc1:0
+    , rc2:0
+    , rc3:0
+    , rc4:0
+    , rc5:0
+    , rc6:0
   }
-  pmsDeltas.push(pmsDelta)
+  pmsRcs.push(pmsRc)
 }
 
 var counters	= {
@@ -949,51 +954,84 @@ var sendData = function() {
 //						',raw0_3:'+results.pms.part0_3+',raw0_5:'+results.pms.part0_5+',raw1_0:'+results.pms.part1_0 +
 //						',raw2_5:'+results.pms.part2_5+',raw5_0:'+results.pms.part5_0+',raw10_0:'+results.pms.part10_0;
 //			logger.info(url);
-      for (i=0;i<=pmsDeltasMax-1;i++) {  // shift registers
-        pmsDeltas[i]=pmsDeltas[i+1]
+      for (i=0;i<=pmsRcsMax-1;i++) {  // shift registers
+        pmsRcs[i]=pmsRcs[i+1]
       }
       var tmpDate= new Date()
 /*      console.log(results.pms.pm25CF1)
-      console.log(pmsDeltas[pmsDeltasMax].pm25)
-      console.log(pmsDeltas[pmsDeltasMax-1].pm25)
+      console.log(pmsRcs[pmsRcsMax].pm25)
+      console.log(pmsRcs[pmsRcsMax-1].pm25)
       console.log(results.pms.pm25CF1)
-      console.log(pmsDeltas[pmsDeltasMax].pm25)
-      console.log(pmsDeltas[pmsDeltasMax-1].pm25)
+      console.log(pmsRcs[pmsRcsMax].pm25)
+      console.log(pmsRcs[pmsRcsMax-1].pm25)
 */
-      var pmsDelta={
+      var pmsRc={
         date:tmpDate
         ,pm25:results.pms.pm25CF1
-        ,delta: Math.round(
+        ,rc1: Math.round(
           (
-            (results.pms.pm25CF1-pmsDeltas[pmsDeltasMax-1].pm25)
+            (results.pms.pm25CF1-pmsRcs[pmsRcsMax-1].pm25)
            /
-           ((tmpDate.getTime()-pmsDeltas[pmsDeltasMax-1].date.getTime())/100000)
+           ((tmpDate.getTime()-pmsRcs[pmsRcsMax-1].date.getTime())/100000)
           )*100)/100
-        ,delta2: Math.round(
+        ,rc2: Math.round(
           (
-            (results.pms.pm25CF1-pmsDeltas[pmsDeltasMax-2].pm25)
+            (results.pms.pm25CF1-pmsRcs[pmsRcsMax-2].pm25)
            /
-           ((tmpDate.getTime()-pmsDeltas[pmsDeltasMax-2].date.getTime())/100000)
+           ((tmpDate.getTime()-pmsRcs[pmsRcsMax-2].date.getTime())/100000)
+          )*100)/100
+        ,rc3: Math.round(
+          (
+            (results.pms.pm25CF1-pmsRcs[pmsRcsMax-3].pm25)
+           /
+           ((tmpDate.getTime()-pmsRcs[pmsRcsMax-3].date.getTime())/100000)
+          )*100)/100
+        ,rc4: Math.round(
+          (
+            (results.pms.pm25CF1-pmsRcs[pmsRcsMax-4].pm25)
+           /
+           ((tmpDate.getTime()-pmsRcs[pmsRcsMax-4].date.getTime())/100000)
+          )*100)/100
+        ,rc5: Math.round(
+          (
+            (results.pms.pm25CF1-pmsRcs[pmsRcsMax-5].pm25)
+           /
+           ((tmpDate.getTime()-pmsRcs[pmsRcsMax-5].date.getTime())/100000)
+          )*100)/100
+        ,rc6: Math.round(
+          (
+            (results.pms.pm25CF1-pmsRcs[pmsRcsMax-6].pm25)
+           /
+           ((tmpDate.getTime()-pmsRcs[pmsRcsMax-6].date.getTime())/100000)
           )*100)/100
       }
-      pmsDeltas[(pmsDeltasMax)]=pmsDelta
-      console.dir(pmsDeltas)
-//      logger.info('delta', pmsDelta)
-      redisHmsetHashAsync(timeStamp.toISOString()+':pmsa003'
-			  , 'foi', 'SCRP' + unit.id
-        , 'pm25', results.pms.pm25CF1
-        , 'delta', pmsDelta.delta
-        , 'delta2', pmsDelta.delta2
-      ).then(function(res) {
-        var _res = res;
-        redisSaddAsync('delta', timeStamp.toISOString()+':pmsa003')
-        .then(function(res2) {
-          var _res2=res2;
-          //	redisSaddAsync('pmsa003', timeStamp.toISOString()+':pmsa003')
-          logger.info('pmsa003 ', timeStamp.toISOString()+':pmsa003'+ _res2);
+      pmsRcs[(pmsRcsMax)]=pmsRc
+      console.dir(pmsRcs)
+      if ( pmsRcs[0].pm25==0 && pmsRcs[0].pm25==0 && pmsRcs[0].pm25==0) {
+        // do nothing, data possible at start up fase
+      } else {
+        //      logger.info('rc', pmsRc)
+        redisHmsetHashAsync(timeStamp.toISOString()+':pmsa003'
+          , 'foi', 'SCRP' + unit.id
+          , 'pm25', results.pms.pm25CF1
+          , 'rc1', pmsRc.rc1
+          , 'rc2', pmsRc.rc2
+          , 'rc3', pmsRc.rc3
+          , 'rc4', pmsRc.rc4
+          , 'rc5', pmsRc.rc5
+          , 'rc6', pmsRc.rc6
+        ).then(function(res) {
+          var _res = res;
+          redisSaddAsync('rc', timeStamp.toISOString()+':pmsa003')
+          .then(function(res2) {
+            var _res2=res2;
+            //	redisSaddAsync('pmsa003', timeStamp.toISOString()+':pmsa003')
+            logger.info('pmsa003 ', timeStamp.toISOString()+':pmsa003'+ _res2);
+          });
+          logger.info(timeStamp.toString()+':pmsa003'+_res);
         });
-        logger.info(timeStamp.toString()+':pmsa003'+_res);
-      });
+      }
+
       redisHmsetHashAsync(timeStamp.toISOString()+':pmsa003'
 			  , 'foi', 'SCRP' + unit.id
 			  , 'pm1', results.pms.pm1CF1

@@ -955,7 +955,7 @@ var sendData = function() {
       var pmsDelta={
         date:tmpDate
         ,pm25:results.pms.pm25CF1
-        ,pmsDelta: Math.round((results.pms.pm25CF1-pmsDeltas[pmsDeltasMax-1].results.pms.pm25CF1
+        ,pmsDelta: Math.round((results.pms.pm25CF1-pmsDeltas[pmsDeltasMax-1].pm25
            /(tmpDate.getTime()-pmsDeltas[pmsDeltasMax-1].date.getTime())*100) )/100
       }
       pmsDeltas[pmsDeltasMax-1]=pmsDelta

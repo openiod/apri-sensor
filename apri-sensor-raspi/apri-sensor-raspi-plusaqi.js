@@ -952,6 +952,7 @@ var sendData = function() {
         pmsDeltas[i]=pmsDeltas[i+1]
       }
       var tmpDate= new Date()
+      console.dir(pmsDeltas)
       var pmsDelta={
         date:tmpDate
         ,pm25:results.pms.pm25CF1

@@ -335,7 +335,7 @@ var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today
 
 var pmsDeltas =[]
 var pmsDeltasMax=10-1 // range 0-9
-for (i=0;i<pmsDeltasMax;i++) {
+for (i=0;i<=pmsDeltasMax;i++) {
   var pmsDelta={
     date: new Date()
     , pm25:0

@@ -953,20 +953,27 @@ var sendData = function() {
         pmsDeltas[i]=pmsDeltas[i+1]
       }
       var tmpDate= new Date()
+/*      console.log(results.pms.pm25CF1)
+      console.log(pmsDeltas[pmsDeltasMax].pm25)
+      console.log(pmsDeltas[pmsDeltasMax-1].pm25)
+      console.log(results.pms.pm25CF1)
+      console.log(pmsDeltas[pmsDeltasMax].pm25)
+      console.log(pmsDeltas[pmsDeltasMax-1].pm25)
+*/
       var pmsDelta={
         date:tmpDate
         ,pm25:results.pms.pm25CF1
         ,delta: Math.round(
           (
-            (results.pms.pm25CF1-pmsDeltas[pmsDeltasMax].pm25)
-           /
-           ((tmpDate.getTime()-pmsDeltas[pmsDeltasMax].date.getTime())/1000)
-          )*100)/100
-        ,delta2: Math.round(
-          (
             (results.pms.pm25CF1-pmsDeltas[pmsDeltasMax-1].pm25)
            /
            ((tmpDate.getTime()-pmsDeltas[pmsDeltasMax-1].date.getTime())/1000)
+          )*100)/100
+        ,delta2: Math.round(
+          (
+            (results.pms.pm25CF1-pmsDeltas[pmsDeltasMax-2].pm25)
+           /
+           ((tmpDate.getTime()-pmsDeltas[pmsDeltasMax-2].date.getTime())/1000)
           )*100)/100
       }
       pmsDeltas[(pmsDeltasMax)]=pmsDelta

@@ -14,7 +14,7 @@
 # preparations for building new image
 # assuming: lateste software installed and package.json in place
 # start met sd-kaart op pi zero met directe aansluiting (keyboard/monitor)
-!!!! nog te doen ?: /etc/log2ram.conf aanpassen (50MB en '/var/log')
+## niet meer nodig !!!! nog te doen ?: /etc/log2ram.conf aanpassen (50MB en '/var/log')
 sudo systemctl stop SCAPE604-apri-sensor-raspi
 sudo systemctl stop SCAPE604-apri-sensor-connector
 sudo systemctl stop SCAPE604-aprisensor-nmcli

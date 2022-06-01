@@ -108,9 +108,9 @@ var mainProcess = function() {
 				var _dataArray2	= _data.split(',');
 				if (_dataArray2.length == 2 && isNumeric(_dataArray2[0]) && isNumeric(_dataArray2[1]) ) {
 					console.log('measurement: ' + _dataArray2[0] + ' ' + _dataArray2[1]);
-					processMeasurement(_dataArray2);
+					processMeasurement(_dataArray2)
 				} else {
-					console.log('data fout: "' + serialInput+'"');
+					console.log('data fout: "' + serialInput+'"')
 				}
 			} else {
 				// console.log('data nog onvolledig: "' + serialInput+'"')

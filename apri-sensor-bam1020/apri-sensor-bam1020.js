@@ -42,8 +42,8 @@ var serialPortPath;
 var serialBaudRate;
 
 var deviceParam			= process.argv[2];
-var boudrateParam		= process.argv[3];
-console.log('Param for serial device is ' + deviceParam + ' ' + boudrateParam);
+var baudrateParam		= process.argv[3];
+console.log('Param for serial device is ' + deviceParam + ' ' + baudrateParam);
 var sensorKey			= '';
 if (deviceParam != undefined) {
 	serialPortPath		= deviceParam;
@@ -54,8 +54,8 @@ if (deviceParam != undefined) {
 }
 //var serialPortPath		= "/dev/cu.usbmodem1411";
 //var serialPortPath		= "/dev/cu.usbserial-A1056661";
-if (boudrateParam != undefined) {
-        serialBaudRate          = Number(boudrateParam);
+if (baudrateParam != undefined) {
+        serialBaudRate          = Number(baudrateParam);
 } else {
         serialBaudRate          = 9600;
 }
@@ -106,6 +106,27 @@ var mainProcess = function() {
 		//  submenu 3: last data
 		//  reponse: first line = station ID
     //    next: measurements and error bits
+		                //serialport.write('\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n6\r\n')
+                serialport.write('\r\n\r\n\r\n')
+                serialport.write('\r\n\r\n\r\n')
+//              serialport.write('')
+//              serialport.write('\x1BRV \r')  // Firmware Version
+//              serialport.write('\x1BH\r')  // esc menu command
+//              serialport.write('\x1BRV\r')  // Firmware Version
+                // next enter 'h' for menu with downloadable datasets
+                // choose dataset from menu with corresponding character
+                // menu: 3 - Display new data
+//              serialport.write('63')
+
+                // menu: 6 csv reports
+                // submenu is repsonse with last character '<'
+                //  submenu 3: last data
+                //  reponse: first line = station ID
+    //    next: measurements and error bits
+// test
+                serialport.write('\x1BPR 0\r')  // esc menu command
+//              serialport.write('\x02DA001\x0D')
+
 
 		serialport.on('data', function(data){
 			serialInput+=data.toString()

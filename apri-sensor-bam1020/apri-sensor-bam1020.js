@@ -39,9 +39,11 @@ var openiodUrl			= siteProtocol + 'openiod.org/' + apriConfig.systemCode; //SCAP
 var usbPorts			= [];
 
 var serialPortPath;
+var serialBaudRate;
 
 var deviceParam			= process.argv[2];
-console.log('Param for serial device is ' + deviceParam);
+var boudrateParam		= process.argv[3];
+console.log('Param for serial device is ' + deviceParam + ' ' + boudrateParam);
 var sensorKey			= '';
 if (deviceParam != undefined) {
 	serialPortPath		= deviceParam;
@@ -52,6 +54,12 @@ if (deviceParam != undefined) {
 }
 //var serialPortPath		= "/dev/cu.usbmodem1411";
 //var serialPortPath		= "/dev/cu.usbserial-A1056661";
+if (boudrateParam != undefined) {
+        serialBaudRate          = Number(boudrateParam);
+} else {
+        serialBaudRate          = 9600;
+}
+
 
 var unit				= {};
 
@@ -78,7 +86,7 @@ var mainProcess = function() {
 	console.log('Found usb comname: ' + serialPortPath );
 
 //	var serialport = new SerialPort(serialPortPath, {parser: SerialPort.parsers.readline('\n')} );
-	var serialport = new SerialPort({path:serialPortPath, baudRate: 9600 } );
+	var serialport = new SerialPort({path:serialPortPath, baudRate: serialBaudRate } );
 	//const parser = serialport.pipe(new ReadlineParser({ delimiter: '\n\r' }))
 	serialport.on('open', function(){
 		console.log('Serial Port connected');
@@ -101,6 +109,7 @@ var mainProcess = function() {
 
 		serialport.on('data', function(data){
 			serialInput+=data.toString()
+			console.log('data ontvangen: "' + serialInput+'"')
 			var _dataArray	= serialInput.split('\r\n');
 			if (_dataArray.length>1) {
 				serialInput=serialInput.substr(_dataArray[0].length+2)

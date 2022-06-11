@@ -96,7 +96,7 @@ var mainProcess = function() {
 			var inRec={}
 			for (var i=0; i<_dataArray.length;i++) {
 				var inputAttr = _dataArray[i].split(':')
-				if (input.length=2) {
+				if (inputAttr.length=2) {
 					var attrName=inputAttr[0]
 					if (isNumeric(inputAttr[1])) {
 						inRec[attrName]=parseFloat(inputAttr[1])

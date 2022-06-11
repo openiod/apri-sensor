@@ -89,21 +89,35 @@ var mainProcess = function() {
 		if (writeHeaders == true) writeHeaderIntoFile();
 	});
 	parser.on('data', function(data){
-		console.log(data)
-		return
-		var _dataArray	= serialInput.split(';');
-		if (_dataArray.length>1) {
-			serialInput=serialInput.substr(_dataArray[0].length+2)
-			var _data = _dataArray[0]
-//				if (_dataArray2.length == 2 && isNumeric(_dataArray2[0]) && isNumeric(_dataArray2[1]) ) {
-//					console.log('measurement: ' + _dataArray2[0] + ' ' + _dataArray2[1]);
-//				processMeasurement(_data)
-//				} else {
-//					console.log('data fout: "' + serialInput+'"')
-//				}
+		//console.log(data)
+		var _dataArray	= data.split(';');
+		if (_dataArray.length == 7) {
+			var inputOK=false
+			var inRec={}
+			for (var i=0; i<_dataArray.length) {
+				var inputAttr = _dataArray[i].split(':')
+				if (input.length=2) {
+					var attrName=inputAttr[0]
+					if (isNumeric(inputAttr[1])) {
+						inRec[attrName]=parseFloat(inputAttr[1])
+					} else inRec[attrName]=undefined
+				} else break
+			}
+			if (
+				inRec.irradiance!=undefined &&
+				inRec.raw!=undefined &&
+				inRec.amplified!=undefined &&
+				inRec.sensor!=undefined &&
+				inRec.offset!=undefined &&
+				inRec.Vfactor!=undefined &&
+				inRec.s!=undefined
+			) {
+				processMeasurement(inRec)
+			} else {
+				console.log('data attr fout : "' + data+'"')
+			}
 		} else {
-			// console.log('data nog onvolledig: "' + serialInput+'"')
-			return
+				console.log('data fout: "' + data+'"')
 		}
 	});
 	serialport.on('error', function(err) {
@@ -116,17 +130,9 @@ function isNumeric(n) {
 }
 
 var processMeasurement = function(data) {
-	var dataArray	= data.split(';');
-	var nrAttr = parseInt(dataArray[0].substring(3),10);
-	var sensorId                     = sensorId; //getSensorId(sensorId);
-	var measureMentTime              = new Date();
-	for (var i=1;i<dataArray.length-6;i=i+6) {
-		console.log(dataArray[i]+' '+dataArray[i+1]+' '+dataArray[i+2]+' '+dataArray[i+3]+' '+dataArray[i+4]+' '+dataArray[i+5])
-	}
-return;
-
-  writeResults(measureMentTime, data);
-
+	data.sensorId= sensorId;
+	data.observationDate= new Date();
+  writeResults(data);
 }
 
 var writeHeaderIntoFile = function() {
@@ -138,35 +144,34 @@ var writeHeaderIntoFile = function() {
 	writeHeaders	= false;
 }
 
-var writeResults	= function(measureTime, dataIn) {
-	console.log('Results: ' + measureTime.toISOString() );
-
+var writeResults	= function(dataIn) {
 	var data			= {};
-	data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;
-	data.foi				= 'SCRP' + unit.id;
-	if (sensorKey != '') {
-		data.foi	+= '_' + sensorKey;
-	}
+	data.foi				= 'SCRP' + dataIn.sensorId;
 
-	var pm25				= dataIn[0];
-	var pm10				= dataIn[1];
+	var data.observation=
+	 'irradiance:' + dataIn.irradiance +
+	 ',raw:' + dataIn.raw +
+	 ',amplified:' + dataIn.amplified +
+	 ',sensor:' + dataIn.sensor +
+	 ',offset:' + dataIn.offset +
+	 ',Vfactor:' + dataIn.Vfactor +
+	 ',s:' + dataIn.s
 
-	var recordOut 			= measureTime.toISOString() + ',' + pm25 + ',' + pm10 + '\n';
-
-	fs.appendFile(resultsFileName + sensorFileExtension, recordOut, function (err) {
-		if (err != null) {
-			console.log('Error writing results to file: ' + err);
-		}
-	});
-
-	data.categories			= [];
-	data.observation		= 'pm25:'+pm25+','+'pm10:'+pm10 ;
+//	fs.appendFile(resultsFileName + sensorFileExtension, recordOut, function (err) {
+//		if (err != null) {
+//			console.log('Error writing results to file: ' + err);
+//		}
+//	});
 
 	sendData(data);
 }
 
 // send data to SOS service via OpenIoD REST service
 var sendData = function(data) {
+
+//write to Redis database!!
+return
+
 // oud //		http://openiod.com/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&inputformat=insertom&objectid=humansensor&format=xml
 // oud //			&region=EHV		&lat=50.1		&lng=4.0		&category=airquality		&value=1
 
@@ -179,6 +184,7 @@ var sendData = function(data) {
 		  '&observation=' + data.observation ;
 
 		console.log(_url);
+		return
 		request.get(_url)
 			.on('response', function(response) {
 				console.log(response.statusCode) // 200
@@ -215,25 +221,5 @@ var getCpuInfo	= function() {
 	});
 };
 getCpuInfo();
-
-/*
-SerialPort.list(function(err, ports) {
-	console.log(ports);
-	console.log('Find usb comport:');
-
-	usbPorts	= ports;
-
-	if (serialPortPath != deviceParam) {
-		for (var i=0;i<usbPorts.length;i++) {
-			console.log('searching for usb comport FTDI ' + i + ' '+ usbPorts[i].manufacturer + ' ' +  usbPorts[i].comName);
-			if (usbPorts[i].manufacturer == 'FTDI' || usbPorts[i].manufacturer == 'Prolific_Technology_Inc.') {
-				serialPortPath	= usbPorts[i].comName;
-				break;
-			}
-		}
-	}
-	mainProcess();
-});
-*/
 
 mainProcess()

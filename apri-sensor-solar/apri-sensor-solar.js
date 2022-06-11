@@ -82,31 +82,29 @@ var serialInput = ''
 var mainProcess = function() {
   console.log('Found usb comname: ' + serialPortPath );
 
-  var serialport = new SerialPort(serialPortPath, {parser: SerialPort.parsers.readline('\n')} );
-  //var serialport = new SerialPort({path:serialPortPath, baudRate: serialBaudRate } );
-	//const parser = serialport.pipe(new ReadlineParser({ delimiter: '\n\r' }))
-	serialport.on('open', function(){
+	var serialport = new SerialPort({path:serialPortPath, baudRate: serialBaudRate } );
+  const parser = serialport.pipe(new ReadlineParser({ delimiter: '\r\n' }))
+	parser.on('open', function(){
 		console.log('Serial Port connected');
 		if (writeHeaders == true) writeHeaderIntoFile();
-
-		serialport.on('data', function(data){
-			console.log('data ontvangen: "' + data+'"')
-			return
-			var _dataArray	= serialInput.split('\r');
-			if (_dataArray.length>1) {
-				serialInput=serialInput.substr(_dataArray[0].length+2)
-				var _data = _dataArray[0]
+	});
+	parser.on('data', function(data){
+		console.log(data)
+		return
+		var _dataArray	= serialInput.split(';');
+		if (_dataArray.length>1) {
+			serialInput=serialInput.substr(_dataArray[0].length+2)
+			var _data = _dataArray[0]
 //				if (_dataArray2.length == 2 && isNumeric(_dataArray2[0]) && isNumeric(_dataArray2[1]) ) {
 //					console.log('measurement: ' + _dataArray2[0] + ' ' + _dataArray2[1]);
 //				processMeasurement(_data)
 //				} else {
 //					console.log('data fout: "' + serialInput+'"')
 //				}
-			} else {
-				// console.log('data nog onvolledig: "' + serialInput+'"')
-				return
-			}
-		});
+		} else {
+			// console.log('data nog onvolledig: "' + serialInput+'"')
+			return
+		}
 	});
 	serialport.on('error', function(err) {
 		console.log('Error: ', err.message);

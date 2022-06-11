@@ -1,4 +1,4 @@
-Solar/*
+/*
 ** Module: apri-sensor-solar
 **
 ** Main module for handling sensor measurement data via serial port

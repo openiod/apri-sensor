@@ -74,8 +74,7 @@ if (baudrateParam != undefined) {
 
 var unit				= {};
 
-var loopStart;
-var loopTime			= 0; // ms
+var loopTimeCycle		= 10000; //ms, 20000=20 sec
 
 var sensors				= {};
 
@@ -333,3 +332,5 @@ var getCpuInfo	= function() {
 getCpuInfo();
 
 mainProcess()
+
+setTimeout(processDataCycle, loopTimeCycle);

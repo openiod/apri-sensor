@@ -1,0 +1,9 @@
+[Unit]
+Description=SCAPE604-apri-sensor-solar - start or restart apri-sensor-solar service, respawn
+After=network.target
+[Service]
+ExecStart=/opt/SCAPE604/apri-sensor/apri-sensor-solar/apri-sensor-solar.sh /var/log/aprisensor/SCAPE604-apri-sensor-solar.log
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

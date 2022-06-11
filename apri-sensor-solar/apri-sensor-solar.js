@@ -139,7 +139,7 @@ var mainProcess = function() {
 		if (writeHeaders == true) writeHeaderIntoFile();
 	});
 	parser.on('data', function(data){
-		console.log(data)
+		//console.log(data)
 		var _dataArray	= data.split(';');
 		if (_dataArray.length == 7) {
 			var inputOK=false
@@ -206,7 +206,7 @@ var processDataCycle	= function() {
 	results.solar.amplified= Math.round((counters.solar.amplified/counters.solar.nrOfMeas)*100)/100;
 	results.solar.sensor= Math.round((counters.solar.sensor/counters.solar.nrOfMeas)*100)/100;
 	results.solar.offset= Math.round((counters.solar.offset/counters.solar.nrOfMeas)*100)/100;
-	results.solar.Vfactor= Math.round((counters.solar.Vfactor/counters.solar.nrOfMeas)*100)/100;
+	results.solar.Vfactor= Math.round((counters.solar.Vfactor/counters.solar.nrOfMeas)*100000)/100000;
 	results.solar.s= Math.round((counters.solar.s/counters.solar.nrOfMeas)*100)/100;
 	results.solar.nrOfMeas= counters.solar.nrOfMeas;
 

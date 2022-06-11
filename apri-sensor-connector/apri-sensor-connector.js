@@ -251,7 +251,7 @@ var solarAttributes = function(res) {
   return openiodUrl + '/solar'+ '/v1/m?foi=' + res.foi + '&observation='+
     'irradiance:'+res.irradiance+','+'raw:'+res.raw+','+'amplified:'+res.amplified +
 		','+'sensor:'+res.sensor+','+'offset:'+res.offset+','+'Vfactor:'+res.Vfactor+
-		','+'Vfactor:'+res.Vfactor;
+		','+'s:'+res.s;
 }
 
 // send data to service

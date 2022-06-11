@@ -93,15 +93,6 @@ var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today
 var resultsFileName = resultsFolder + sensorFileName + '_' + dateString;
 var serialInput = ''
 
-
-inRec.irradiance!=undefined &&
-inRec.raw!=undefined &&
-inRec.amplified!=undefined &&
-inRec.sensor!=undefined &&
-inRec.offset!=undefined &&
-inRec.Vfactor!=undefined &&
-inRec.s!=undefined
-
 var counters	= {
 	busy: false,  // dont/skip count when processing of results is busy (busy=true)
 	solar: 	{

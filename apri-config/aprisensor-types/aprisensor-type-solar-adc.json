@@ -1,0 +1,12 @@
+{
+  "devices":
+  [
+    {"name": "solar"
+      ,"id":"solar"
+      ,"device":"ads1115"
+      ,"protocol":"i2c"
+      ,"address":"0x48"
+      ,"deviceType":"solar"
+    }
+  ]
+}

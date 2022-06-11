@@ -138,6 +138,9 @@ if (aprisensorType!='') {
 var ADS1x15
 var ads1115Available = false
 var adc
+var indSolar
+var addressI2cSolar=0x48
+
 
 if (aprisensorDevices.tgs5042!=undefined) {
   try {
@@ -151,7 +154,7 @@ if (aprisensorDevices.tgs5042!=undefined) {
 
 if (aprisensorDevices.solar!=undefined) {
   try {
-    ADS1x15 = require('raspi-kit-ads1x15');
+    //ADS1x15 = require('raspi-kit-ads1x15');
     ads1115Available = true
   }
   catch (err) {
@@ -181,6 +184,7 @@ var getAds1115Tgs5042 = function() {
   });
 }
 var getAds1115Solar = function() {
+  return
   adc.readChannel(ADS1x15.differential.DIFF_0_1, (err, value, volts) => {
     if (err) {
       console.error('Failed to fetch value from ADC (solar)', err);
@@ -220,6 +224,56 @@ if (aprisensorDevices.tgs5042!=undefined) {
 }
 if (aprisensorDevices.solar!=undefined) {
   if (ads1115Available==true) {
+    // Init Raspi
+console.log('forced return in init')
+raspi.init(() => {
+  const i2c = new I2C();
+var adc1115Options={
+  comparatorReadings: 0x0003 // Disable the comparator and put ALERT/RDY in high state (default)
+  ,comparatorLatchingMode : 0x0000 // Non-latching comparator (default)
+  ,comparatorActiveMode : 0x0000 // ALERT/RDY pin is low when active (default)
+  ,comparatorMode : 0x0000 // Traditional comparator with hysteresis (default)
+  //,mode : 0x0000 // Continuous conversion mode
+  ,mode : 0x0100 // Power-down single-shot mode (default)
+  ,sps : 0x0000 // 8 samples per second
+  //,pga : 0x0000 // +/-6.144V range
+  //,pga : 0x0800 // +/-0.512V range
+  ,pga : 0x0A00 // +/-0.256V range
+  //,mux : 0x4000 // Single-ended AIN0
+  ,mux : 0x0000 // Differential P = AIN0, N = AIN1 (default)
+  //,start : 0x8000  // Write: Set to start a single-conversion
+  ,start : 0x0000 // Continuous conversion mode
+}
+let config = adc1115Options.comparatorReadings        // Set comparator readings (or disable)
+                  | adc1115Options.comparatorLatchingMode    // Set latching mode
+                  | adc1115Options.comparatorActiveMode      // Set active/ready mode
+                  | adc1115Options.comparatorMode            // Set comparator mode
+                  | adc1115Options.mode                      // Set operation mode (single, continuous)
+                  | adc1115Options.sps                       // Set sample per seconds
+                  | adc1115Options.pga                       // Set PGA/voltage range
+                  | adc1115Options.mux                       // Set mux (channel or differential bit)
+                  | adc1115Options.start              // ADS1015_REG_CONFIG_OS_SINGLE      // Set 'start single-conversion' bit
+const bytes = [(config >> 8) & 0xFF, config & 0xFF];
+
+try {
+  console.log('try write solar config')
+  var result=i2c.writeSync(addressI2cSolar, 0x01 ,Buffer.from(bytes))
+  console.log(result)
+ for (var i=0;i<10;i++){
+  var measurement=i2c.readSync(addressI2cSolar,0x00, 2)
+  console.log(measurement)
+ }
+}
+catch {
+  console.log('try solar error (catch)')
+  logger.info('error initializing Solar, maybe not available')
+  indSolar=false
+  //return
+}
+console.log('end of try')
+})
+return // test
+
     // Init Raspi
     raspi.init(() => {
       // Init Raspi-I2c

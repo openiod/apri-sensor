@@ -1,0 +1,56 @@
+
+
+Applicatie geplaatst in examples map:
+
+1: software source
+vi ~/pico/pico-examples/aprisensor_usb/usb/aprisensor_usb.c
+vi ~/pico/pico-examples/aprisensor_usb/usb/CMakeLists.txt
+2: build:
+cd ~/pico/pico-examples/build/aprisensor_usb
+make -j4   (-j4 staat voor: maak gebruik van 4 processors)
+
+3: plaats app op pico:
+- koppel pico aan usb laptop met ingedrukt houden bootsel button
+- cp usb/aprisensor_usb.uf2 /media/awiel/RPI-RP2/.
+
+4: test:
+cd ~/opt/apri-sensor
+node apri-sensor-bam1020/apri-sensor-bam1020.js /dev/ttyACM0 115200 (moet solar versie worden)
+
+
+voorbeeld is niet goed:
+cd pico/aprisensor-usb/aprisensor-usb
+mkdir build
+cd build
+export PICO_SDK_PATH=../../../pico-sdk
+cmake ..
+cd blink
+make -j4
+
+
+cd
+mkdir pico
+cd pico
+git clone -b master https://github.com/raspberrypi/pico-sdk.git
+cd pico-sdk
+git submodule update --init
+cd ..
+git clone -b master https://github.com/raspberrypi/pico-examples.git
+
+updating te sdk:
+cd pico-sdk
+git pull
+git submodule update
+
+building blink:
+cd pico-examples
+mkdir build
+cd build
+export PICO_SDK_PATH=../../pico-sdk
+cmake ..
+cd blink
+make -j4
+
+
+sudo apt update
+sudo apt install cmake gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential libstdc++-arm-none-eabi-newlib

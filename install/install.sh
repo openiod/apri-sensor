@@ -8,11 +8,33 @@
 # 2.1.7 - introduced winston as log manager (not all processes)
 #         depends on available package (not for older images)
 
+# prepare sd-card as replacement SD-card
+Balena Etcher img-> sdcard
+start Pi zero with sd-card
+ssh pi@<id>.local
+cd /opt/SCAPE604/git/apri-sensor
+sudo git pull
+sudo ./install/git2as.sh
+sudo /opt/SCAPE604/apri-sensor/apri-agent/apri-sensor-update.sh
+sudo systemctl stop SCAPE604-apri-sensor-raspi
+sudo systemctl stop SCAPE604-apri-sensor-connector
+sudo systemctl stop SCAPE604-aprisensor-nmcli
+redis-cli flushdb
+sudo rm /opt/SCAPE604/log/*
+sudo rm /var/log/aprisensor/*
+sudo rm /var/log/*
+sudo rm /var/hdd.log/*
+sudo rm /var/hdd.log/aprisensor/*
+on pi with  connected keyboard / monitor:
+nmcli c s
+sudo nmcli c delete .. alle connections deleten, hotspot als laatste
+sudo shutdown -h now
+# dan sd-kaart verwijderen en kopie maken met nieuw versienummer
 
 # start script onder sudo su -
 
 # preparations for building new image
-# assuming: lateste software installed and package.json in place
+# assuming: latest software installed and package.json in place
 # start met sd-kaart op pi zero met directe aansluiting (keyboard/monitor)
 ## niet meer nodig !!!! nog te doen ?: /etc/log2ram.conf aanpassen (50MB en '/var/log')
 sudo systemctl stop SCAPE604-apri-sensor-raspi
@@ -222,11 +244,18 @@ apt -y install nginx
 #sudo apt remove npm -y
 #sudo apt remove --purge node
 #sudo rm -rf /root/.node-gyp
+#sudo rm /usr/local/bin/node  #remove old version (10.x)
+#sudo npm install -g npm
 ## for Raspberry Pi 3:
 #| curl -sL http://deb.nodesource.com/setup_10.x | sudo bash -
 #| #curl -sL http://deb.nodesource.com/setup_12.x | sudo bash -
 #| sudo apt-get install -y nodejs
 #| sudo apt autoremove
+
+# for Raspberry Pi Zero:
+#curl -sL https://deb.nodesource.com/setup_17.x | sudo -E bash -
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+sudo apt install -y nodejs
 
 # for Raspberry Pi 3:
 curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -

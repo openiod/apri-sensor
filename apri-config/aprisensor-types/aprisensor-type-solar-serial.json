@@ -1,0 +1,12 @@
+{
+  "devices":
+  [
+    {"name": "solar"
+      ,"id":"solar"
+      ,"device":"/dev/ttyACM0"
+      ,"protocol":"serial"
+      ,"baudRate":1152200
+      ,"deviceType":"serial"
+    }
+  ]
+}

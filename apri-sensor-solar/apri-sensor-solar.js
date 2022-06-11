@@ -30,6 +30,19 @@ var fs = require('fs');
 const { SerialPort } = require("serialport")
 const { ReadlineParser } = require('@serialport/parser-readline')
 const exec = require('child_process').exec;
+var redis										= require("redis");
+
+var redisClient 						= redis.createClient();
+const {promisify} 					= require('util');
+//const redisGetAsync 				= promisify(redisClient.get).bind(redisClient);
+//const redisSetAsync 				= promisify(redisClient.set).bind(redisClient);
+const redisHmsetHashAsync 	= promisify(redisClient.hmset).bind(redisClient);
+const redisSaddAsync 				= promisify(redisClient.sadd).bind(redisClient);
+
+redisClient.on("error", function (err) {
+    console.log("Redis client Error " + err);
+});
+
 
 // **********************************************************************************
 
@@ -58,6 +71,7 @@ if (baudrateParam != undefined) {
   serialBaudRate = 115200;
 }
 
+
 var unit				= {};
 
 var loopStart;
@@ -79,6 +93,52 @@ var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today
 var resultsFileName = resultsFolder + sensorFileName + '_' + dateString;
 var serialInput = ''
 
+
+inRec.irradiance!=undefined &&
+inRec.raw!=undefined &&
+inRec.amplified!=undefined &&
+inRec.sensor!=undefined &&
+inRec.offset!=undefined &&
+inRec.Vfactor!=undefined &&
+inRec.s!=undefined
+
+var counters	= {
+	busy: false,  // dont/skip count when processing of results is busy (busy=true)
+	solar: 	{
+		irradiance: 0
+		, raw:0
+		, amplified:0
+		, sensor:0
+		, offset:0
+		, Vfactor:0
+		, s:0
+		, nrOfMeas		: 0
+	}
+};
+var results			= {
+	solar: 	{
+		irradiance: 0
+		, raw:0
+		, amplified:0
+		, sensor:0
+		, offset:0
+		, Vfactor:0
+		, s:0
+		, nrOfMeas		: 0
+	}
+};
+
+var initCounters	= function () {
+	counters.solar.irradiance				= 0;
+	counters.solar.raw				= 0;
+	counters.solar.amplified				= 0;
+	counters.solar.sensor				= 0;
+	counters.solar.offset				= 0;
+	counters.solar.Vfactor				= 0;
+	counters.solar.s				= 0;
+	counters.solar.nrOfMeas				= 0;
+}
+
 var mainProcess = function() {
   console.log('Found usb comname: ' + serialPortPath );
 
@@ -89,7 +149,7 @@ var mainProcess = function() {
 		if (writeHeaders == true) writeHeaderIntoFile();
 	});
 	parser.on('data', function(data){
-		//console.log(data)
+		console.log(data)
 		var _dataArray	= data.split(';');
 		if (_dataArray.length == 7) {
 			var inputOK=false
@@ -131,9 +191,67 @@ function isNumeric(n) {
 
 var processMeasurement = function(data) {
 	data.sensorId= 'test' //sensorId;
-	data.observationDate= new Date();
-  writeResults(data);
+	if (counters.busy==true) {
+		console.log('Counters busy, measurement ignored *******************************');
+		return;
+	}
+
+	counters.solar.nrOfMeas++;
+	counters.solar.irradiance	+= data.irradiance;
+	counters.solar.raw				+= data.raw;
+	counters.solar.amplified	+= data.amplified;
+	counters.solar.sensor			+= data.sensor;
+	counters.solar.offset			+= data.offset;
+	counters.solar.Vfactor		+= data.Vfactor;
+	counters.solar.s				+= data.s;
 }
+
+var processDataCycle	= function() {
+	setTimeout(processDataCycle, loopTimeCycle);
+	counters.busy = true;
+	console.log('Counters solar: '+ counters.solar.nrOfMeas );
+
+  results.solar.irradiance= Math.round((counters.solar.irradiance/counters.solar.nrOfMeas)*100)/100;
+	results.solar.raw= Math.round((counters.solar.raw/counters.solar.nrOfMeas)*100)/100;
+	results.solar.amplified= Math.round((counters.solar.amplified/counters.solar.nrOfMeas)*100)/100;
+	results.solar.sensor= Math.round((counters.solar.sensor/counters.solar.nrOfMeas)*100)/100;
+	results.solar.offset= Math.round((counters.solar.offset/counters.solar.nrOfMeas)*100)/100;
+	results.solar.Vfactor= Math.round((counters.solar.Vfactor/counters.solar.nrOfMeas)*100)/100;
+	results.solar.s= Math.round((counters.solar.s/counters.solar.nrOfMeas)*100)/100;
+	results.solar.nrOfMeas= counters.solar.nrOfMeas;
+
+	initCounters();
+	counters.busy = false;
+
+  sendData();
+}
+
+// send data to service
+var sendData = function() {
+		var timeStamp = new Date();
+		var url = '';
+		if (results.solar.nrOfMeas > 0) {
+			redisHmsetHashAsync(timeStamp.toISOString()+':solar'
+			  , 'foi', 'SCRP' + unit.id
+			  , 'irradiance', results.solar.irradiance
+				, 'raw', results.solar.raw
+				, 'amplified', results.solar.amplified
+				, 'sensor', results.solar.sensor
+				, 'offset', results.solar.offset
+				, 'Vfactor', results.solar.Vfactor
+				, 's', results.solar.s
+			  ).then(function(res) {
+					var _res = res;
+					redisSaddAsync('new', timeStamp.toISOString()+':solar')
+						.then(function(res2) {
+							var _res2=res2;
+						//	redisSaddAsync('pmsa003', timeStamp.toISOString()+':pmsa003')
+							console.log('solar ', timeStamp.toISOString()+':solar'+ _res2);
+						});
+		    	console.log(timeStamp.toString()+':solar'+_res);
+			});
+		}
+};
 
 var writeHeaderIntoFile = function() {
 	fs.appendFile(resultsFileName + '_pm' + sensorFileExtension, headercsv, function (err) {

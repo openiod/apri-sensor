@@ -74,7 +74,7 @@ if (baudrateParam != undefined) {
 
 var unit				= {};
 
-var loopTimeCycle		= 10000; //ms, 20000=20 sec
+var loopTimeCycle		= 20000; //ms, 20000=20 sec
 
 var sensors				= {};
 

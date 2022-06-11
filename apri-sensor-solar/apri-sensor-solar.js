@@ -130,7 +130,7 @@ function isNumeric(n) {
 }
 
 var processMeasurement = function(data) {
-	data.sensorId= sensorId;
+	data.sensorId= 'test' //sensorId;
 	data.observationDate= new Date();
   writeResults(data);
 }

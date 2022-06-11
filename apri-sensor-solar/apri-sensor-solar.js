@@ -54,8 +54,9 @@ var usbPorts = [];
 var serialPortPath;
 var serialBaudRate;
 
-var deviceParam	= process.argv[2];
-var baudrateParam	= process.argv[3];
+// !! argv[2] in prod is log file
+var deviceParam	= process.argv[3];
+var baudrateParam	= process.argv[4];
 console.log('Param for serial device is ' + deviceParam + ' ' + baudrateParam);
 var sensorKey	= '';
 if (deviceParam != undefined) {

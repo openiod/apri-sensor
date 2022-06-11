@@ -252,59 +252,6 @@ var writeHeaderIntoFile = function() {
 	writeHeaders	= false;
 }
 
-var writeResults	= function(dataIn) {
-	var data			= {};
-	data.foi				= 'SCRP' + dataIn.sensorId;
-
-
-	data.observation=
-	 'irradiance:' + dataIn.irradiance +
-	 ',raw:' + dataIn.raw +
-	 ',amplified:' + dataIn.amplified +
-	 ',sensor:' + dataIn.sensor +
-	 ',offset:' + dataIn.offset +
-	 ',Vfactor:' + dataIn.Vfactor +
-	 ',s:' + dataIn.s
-
-//	fs.appendFile(resultsFileName + sensorFileExtension, recordOut, function (err) {
-//		if (err != null) {
-//			console.log('Error writing results to file: ' + err);
-//		}
-//	});
-
-	sendData(data);
-}
-
-// send data to SOS service via OpenIoD REST service
-var sendData = function(data) {
-
-//write to Redis database!!
-return
-
-// oud //		http://openiod.com/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&inputformat=insertom&objectid=humansensor&format=xml
-// oud //			&region=EHV		&lat=50.1		&lng=4.0		&category=airquality		&value=1
-
-//http://localhost:4000/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=scapeler_solar&offering=offering_0439_initial&verbose=true&commit=true&observation=scapeler_solar:12.345&neighborhoodcode=BU04390402
-//https://openiod.org/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=scapeler_solar&offering=offering_0439_initial&verbose=true&commit=true&observation=scapeler_solar_pm25:12345,scapeler_solar_pm10:345&neighborhoodcode=BU04390402
-
-		var _url = openiodUrl + '/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom';
-		_url = _url +
-		  '&foi=' + data.foi +
-		  '&observation=' + data.observation ;
-
-		console.log(_url);
-		return
-		request.get(_url)
-			.on('response', function(response) {
-				console.log(response.statusCode) // 200
-				console.log(response.headers['content-type']) // 'image/png'
-  			})
-			.on('error', function(err) {
-				console.log(err)
-			})
-		;
-};
-
 var getCpuInfo	= function() {
 	//hostname --all-ip-address
 	exec("cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2", (error, stdout, stderr) => {

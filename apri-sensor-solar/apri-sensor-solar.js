@@ -148,7 +148,8 @@ var writeResults	= function(dataIn) {
 	var data			= {};
 	data.foi				= 'SCRP' + dataIn.sensorId;
 
-	var data.observation=
+
+	data.observation=
 	 'irradiance:' + dataIn.irradiance +
 	 ',raw:' + dataIn.raw +
 	 ',amplified:' + dataIn.amplified +

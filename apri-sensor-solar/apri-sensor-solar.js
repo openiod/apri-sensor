@@ -94,7 +94,7 @@ var mainProcess = function() {
 		if (_dataArray.length == 7) {
 			var inputOK=false
 			var inRec={}
-			for (var i=0; i<_dataArray.length) {
+			for (var i=0; i<_dataArray.length;i++) {
 				var inputAttr = _dataArray[i].split(':')
 				if (input.length=2) {
 					var attrName=inputAttr[0]

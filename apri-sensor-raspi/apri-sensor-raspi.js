@@ -1888,7 +1888,49 @@ if (aprisensorDevices.scd30) {
 let timerDataCycle = setInterval(processDataCycle, loopTimeCycle)
 //setTimeout(processDataCycle, loopTimeCycle);
 
-if (isEmpty(aprisensorDevices) || aprisensorDevices.pmsa003) {
+if (isEmpty(aprisensorDevices)) {
+  scanSerialDevices()
+  let timerSerialDevices = setInterval(scanSerialDevices, 10000)
+} else {
+  serialDevices=[]
+}
+if (aprisensorDevices.pmsa003) {
+  var newDevice={
+    device: aprisensorDevices.pmsa003.device
+    , baudRate: aprisensorDevices.pmsa003.baudRate
+    ,initiated:false
+    ,validData:false
+    ,deviceType:'pmsa003'
+  }
+  serialDevices.push(newDevice)
   scanSerialDevices()
   let timerSerialDevices = setInterval(scanSerialDevices, 10000)
 }
+if (aprisensorDevices.ips7100) {
+  var newDevice={
+    device: aprisensorDevices.ips7100.device
+    , baudRate: aprisensorDevices.ips7100.baudRate
+    ,initiated:false
+    ,validData:false
+    ,deviceType:'ips7100'    
+  }
+  serialDevices.push(newDevice)
+  scanSerialDevices()
+  let timerSerialDevices = setInterval(scanSerialDevices, 10000)
+}
+
+
+var serialDevices=[
+  {device:'/dev/ttyS0'
+    ,baudRate:9600
+    ,initiated:false
+    ,validData:false
+    ,deviceType:'pmsa003'
+  },
+  {device:'/dev/ttyS0'
+    ,baudRate:115200
+    ,initiated:false
+    ,validData:false
+    ,deviceType:'ips7100'
+  }
+]

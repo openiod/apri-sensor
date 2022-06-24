@@ -1574,12 +1574,14 @@ var processRaspiIps7100Record = function(result) {
 
 var initBmeDevice = function(){
   logger.info('initBmeDevice')
-  bme280.init()
+  if (isEmpty(aprisensorDevices)) {
+    bme280.init()
     .then(() => {
       logger.info('BME280 initialization succeeded');
       indBme280=true
       indBme680=false
       //readSensorDataBme280();
+      return
     })
     .catch((err) => {
       console.error(`BME280 initialization failed: ${err} `);
@@ -1587,10 +1589,33 @@ var initBmeDevice = function(){
       indBme280=false
       indBme680=false
       initBme680()
+      return
     })
+    return
+  }
+  if (aprisensorDevices.bme280) {
+    bme280.init()
+    .then(() => {
+      logger.info('BME280 initialization succeeded');
+      indBme280=true
+      //readSensorDataBme280();
+      return
+    })
+    .catch((err) => {
+      console.error(`BME280 initialization failed: ${err} `);
+      indBme280=false
+      return
+    })
+  }
+  if (aprisensorDevices.bme680) {
+    logger.info('BME680 init') //
+    indBme680=false
+    initBme680()
+    return
+  }
   //  end-of bme280 raspi-i2c variables and functions
-
 }
+
 var setGpioBmeOn = function() {
   logger.info('set BME280/BME680 GPIO on')
   gpioBme.writeSync(1); //set pin state to 1 (power DS18B20 on)

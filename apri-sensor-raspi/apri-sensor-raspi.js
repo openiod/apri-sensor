@@ -1912,25 +1912,9 @@ if (aprisensorDevices.ips7100) {
     , baudRate: aprisensorDevices.ips7100.baudRate
     ,initiated:false
     ,validData:false
-    ,deviceType:'ips7100'    
+    ,deviceType:'ips7100'
   }
   serialDevices.push(newDevice)
   scanSerialDevices()
   let timerSerialDevices = setInterval(scanSerialDevices, 10000)
 }
-
-
-var serialDevices=[
-  {device:'/dev/ttyS0'
-    ,baudRate:9600
-    ,initiated:false
-    ,validData:false
-    ,deviceType:'pmsa003'
-  },
-  {device:'/dev/ttyS0'
-    ,baudRate:115200
-    ,initiated:false
-    ,validData:false
-    ,deviceType:'ips7100'
-  }
-]

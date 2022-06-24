@@ -1273,7 +1273,7 @@ setGpioFanOff() // fan always on but first set gpio to off
 var i2cSps30
 var sps30ProductType=''
 var sps30SerialNr =''
-if (isEmpty(aprisensorDevices)) {
+if (isEmpty(aprisensorDevices) || aprisensorDevices.sps30) {
   i2cSps30 = new I2C();
 }
 

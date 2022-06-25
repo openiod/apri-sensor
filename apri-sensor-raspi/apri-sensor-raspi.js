@@ -1477,7 +1477,7 @@ var processRaspiSpsRecord = function(result) {
   counters.sps.tps			    += result[9]
 }
 
-if (isEmpty(aprisensorDevices)) {
+if (isEmpty(aprisensorDevices) || aprisensorDevices.sps30) {
   initSps30Device()
 }
 

@@ -1,0 +1,12 @@
+{
+  "devices":
+  [
+    {"name": "gps"
+      ,"id":"gps"
+      ,"device":"/dev/ttyS0"
+      ,"protocol":"serial"
+      ,"baudRate":9600
+      ,"deviceType":"serial"
+    }
+  ]
+}

@@ -194,6 +194,9 @@ apt -y install network-manager
 #systemctl start NetworkManager.service
 #systemctl enable NetworkManager.service
 
+# for Raspberry Pi 3: ivm conflict network-manager en nmcli c up 'hotspot'
+apt purge openresolv dhcpcd5
+
 # log2ram https://github.com/azlux/log2ram
 Buster:
 echo "deb http://packages.azlux.fr/debian/ buster main" | sudo tee /etc/apt/sources.list.d/azlux.list
@@ -371,6 +374,7 @@ lsusb ; list usb-devices (after connecting a serial device)
 ->Bus 001 Device 021: ID 067b:2303 Prolific Technology, Inc. PL2303 Serial Port
 ID vendor=067b
 ID product=2303
+(voorbeeld pico van solar: ID 2e8a:000a Raspberry Pi Pico -> vendor:2e8a product:000a)
 lsusb -t ;
 sudo udevadm info /dev/ttyUSB0 ;
 udevadm info -a -p  $(udevadm info -q path -n /dev/ttyUSB0)
@@ -378,4 +382,4 @@ ls -l /dev/serial/by-id/
 -> usb-Prolific_Technology_Inc._USB-Serial_Controller_D-if00-port0 -> ../../ttyUSB0
 sudo vi /etc/udev/rules.d/99-usb-serial.rules
 -> ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", ATTRS{serial}=="0000:00:14.0", SYMLINK+="ttybam1020"
-reconnnect the usb-device to activate the alias
+reconnect the usb-device to activate the alias

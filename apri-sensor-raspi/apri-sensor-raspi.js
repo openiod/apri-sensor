@@ -2,7 +2,7 @@
 ** Module: apri-sensor-raspi
 **
 ** Main system module for handling sensor measurement data for:
-**  DS18B20, PMSA003/PMS7003, BME280, BME680, TGS5042, SPS30, IPS7100, SCD30
+**  DS18B20, PMSA003/PMS7003, BME280, BME680, TGS5042, SPS30, IPS7100, SCD30, gps
 **
 *** SCD30 only with I2C clock stretching wich is only available in software i2c on Raspberry pi
 *** in /boot/config.txt for /dev/i2c-3
@@ -47,9 +47,7 @@ var initResult 							= apriConfig.init(systemModuleFolderName+"/"+systemModuleN
 // **********************************************************************************
 
 // add module specific requires
-//var express 								= require('express');
 var fs 											= require('fs');
-//var SerialPort 							= require("serialport");
 const raspi									= require('raspi');
 const I2C = require('raspi-i2c').I2C;
 var redis										= require("redis");
@@ -102,8 +100,9 @@ catch (err) {
 logger.info("Start of Config Main ", configServerModulePath);
 
 var ModbusRTU
+var scd30Client
 try {
-  ModbusRTU             = require("modbus-serial");
+  ModbusRTU = require("modbus-serial");
 }
 catch (err) {
   logger.info('modbus-serial module (scd30) not found');
@@ -1224,7 +1223,7 @@ var sendData = function() {
       // reset ips7100 when connected ?
     }
     if (results.scd30.nrOfMeas == 0) {
-      // reset ips7100 when connected ?
+      // reset scd30 when connected ?
     }
 
 };
@@ -1483,21 +1482,113 @@ if (isEmpty(aprisensorDevices) || aprisensorDevices.sps30) {
 
 // =================================
 
-var initScd30Device = function() {
+var scd30Functions= async function() {
   scd30Client.setID(0x61)
+  scd30SetInterval()
+  await sleepFunction(100)
+  //scd30GetInterval()
+  //scd30Reset()
+  scd30StartContinuous()
+  //scd30StopContinuous()
+}
+var scd30ReadFirmware=function() {
+  logger.info('read firmware')
+  scd30Client.readHoldingRegisters(0x20, 1)
+  .then(async function(data) {
+    logger.info('then read firmware')
+    logger.info(data)
+  })
+  .catch(function(err) {
+    logger.info('catch read firmware')
+    logger.info(err)
+  })
+}
+const scd30Reset=function() {
+  logger.info('reset scd30')
+  scd30Client.writeRegister(0x34, 1)   // function code 6
+  .then(async function(data) {
+    logger.info('then reset scd30')
+    logger.info(data)
+    await sleepFunction(100)
+    scd30StartContinuous()
+  })
+  .catch(function(err) {
+    logger.info('catch reset scd30')
+    logger.info(err)
+  })
+}
+const scd30GetInterval=function() {
+  logger.info('get interval')
+  scd30Client.readHoldingRegisters(0x25, [0x01])  // function code 3
+  .then(async function(data) {
+    logger.info('then get interval')
+    logger.info(data)
+  })
+  .catch(function(err) {
+    logger.info('catch get interval')
+    logger.info(err)
+  })
+}
+const scd30SetInterval=function() {
+  logger.info('set interval')
+  scd30Client.writeRegister(0x25, [0x02])  // function code 6
+  .then(async function(data) {
+    logger.info('then set interval')
+    logger.info(data)
+    //await sleepFunction(100)
+    //scd30StartContinuous()
+  })
+  .catch(function(err) {
+    logger.info('catch set interval')
+    logger.info(err)
+  })
+}
+const scd30StartContinuous=function() {
+  logger.info('start continuous measuring')
+  scd30Client.writeRegister(0x36,[ 0x00 ])   // function code 6
+  .then(async function(data) {
+    logger.info('then continuous measuring')
+    logger.info(data)
+    await sleepFunction(100)
+    scd30Client.clientReady=true
+  })
+  .catch(function(err) {
+    logger.info('catch start continuous')
+    logger.info(err)
+  })
+}
+const scd30StopContinuous=function() {
+  logger.info('stop continuous measuring')
+  scd30Client.writeRegister(0x37,[ 0x01 ])   // function code 6
+  .then(async function(data) {
+    logger.info('then stop continuous measuring')
+    logger.info(data)
+    await sleepFunction(100)
+    scd30Client.clientReady=true
+  })
+  .catch(function(err) {
+    logger.info('catch start continuous')
+    logger.info(err)
+  })
 }
 
 const readScd30Device = function() {
+  if (!scd30Client || scd30Client.clientReady!=true) {
+    logger.info('scd30 client not ready')
+    return
+  }
   if (scd30Client.isOpen)  {
-//    logger.info('open')
+    //logger.info('open')
     //mbsState = MBS_STATE_NEXT;
   } else {
-//    logger.info('not open')
+    logger.info('scd30 not open')
     return
   }
 
-  scd30Client.readHoldingRegisters(0x27, 1)
+  //logger.info('test if data available')
+  scd30Client.readHoldingRegisters(0x27, 1)  // function code 3
   .then(async function(data) {
+    //logger.info(data)
     if (data.data[0]==1) {
       //logger.info('data available, read measurement')
       await sleepFunction(3)
@@ -1505,9 +1596,10 @@ const readScd30Device = function() {
     }
   })
   .catch(function(err) {
-    logger.info('xx error xxxx')
+    logger.info('scd30 error xxxx')
     logger.info(err)
   })
+
 }
 
 const readScd30Measurement= function() {
@@ -1520,7 +1612,12 @@ const readScd30Measurement= function() {
     result.co2         = data.buffer.readFloatBE(0)
     result.temperature = data.buffer.readFloatBE(4)
     result.rHum        = data.buffer.readFloatBE(8)
-    processRaspiScd30Record(result)
+    if (result.co2==0) {
+       //logger.info('scd30 no data found')
+     } else {
+       //logger.info(result)
+       processRaspiScd30Record(result)
+     }
   })
   .catch(function(err) {
     logger.info('xx error xxxx')
@@ -1538,12 +1635,6 @@ var processRaspiScd30Record = function(result) {
   counters.scd30.co2			    += result.co2
 	counters.scd30.temperature	+= result.temperature
   counters.scd30.rHum			    += result.rHum
-}
-
-if (aprisensorDevices.scd30!=undefined) {
-  // SCD30 open modbus connection to serial port
-  var scd30Client = new ModbusRTU()
-  scd30Client.connectRTUBuffered("/dev/ttyS0", { baudRate: 19200 }, initScd30Device)
 }
 
 // ips7100
@@ -1618,12 +1709,12 @@ var initBmeDevice = function(){
 
 var setGpioBmeOn = function() {
   logger.info('set BME280/BME680 GPIO on')
-  gpioBme.writeSync(1); //set pin state to 1 (power DS18B20 on)
+  gpioBme.writeSync(1); //set pin state to 1 (power BME280/BME680 on)
   setTimeout(initBmeDevice, 5000);
 }
 var setGpioBmeOff = function() {
   logger.info('set BME280/BME680 GPIO off')
-  gpioBme.writeSync(0); //set pin state to 0 (power DS18B20 off)
+  gpioBme.writeSync(0); //set pin state to 0 (power BME280/BME680 off)
   setTimeout(setGpioBmeOn, 5000);
 }
 var resetBmeDevice = function() {
@@ -1791,10 +1882,14 @@ var scanSerialDevices=function() {
     }
     // device in use
     if (inUseDevices[serialDevice.device]!=undefined) continue
+
     if (serialDevice.deviceType=='ips7100'	&& counters.ips7100.nrOfMeasTotal>0) {
       serialDevice.validData=true
     }
     if (serialDevice.deviceType=='pmsa003' &&	counters.pms.nrOfMeasTotal>0) {
+      serialDevice.validData=true
+    }
+    if (serialDevice.deviceType=='gps'){	//&& counters.gps.nrOfMeasTotal>0) {
       serialDevice.validData=true
     }
     if (serialDevice.validData==true) {
@@ -1856,9 +1951,40 @@ var initSerial=function(serialDeviceIndex){
         serialDevices[serialDeviceIndex].serial.write(command)
       }
       //serial.write('Hello from raspi-serial');
+      if (serialDevices[serialDeviceIndex].deviceType=='gps') {
+        logger.info('serial device for gps opened')
+        console.dir(options)
+        serialDevices[serialDeviceIndex].serial.on('data', (data) => {
+          logger.info('serial on gps data')
+          //printHex(data,'T');
+          //process.stdout.write(data);
+          for (var i=0;i<data.length;i++) {
+            //processRaspiSerialData7100(data[i]);
+          }
+        });
+      }
     });
   });
 }
+
+const startScd30=async function() {
+   logger.info('SCD30 open modbus connection to serial port')
+   scd30Client = new ModbusRTU()
+   scd30Client.connectRTUBuffered(aprisensorDevices.scd30.device, { baudRate: aprisensorDevices.scd30.baudRate })
+   .then(async function() {
+     console.log("Connected");
+     await sleepFunction(100);
+     //console.log("start scd30Functions");
+     scd30Functions();
+   })
+   .catch(function(e) {
+     console.log(e.message); });
+
+}
+if (aprisensorDevices.scd30!=undefined) {
+  startScd30()
+}
+
 
 if (isEmpty(aprisensorDevices) || aprisensorDevices.bme280) {
   let timerIdBme280 = setInterval(readSensorDataBme280, 2000)
@@ -1872,7 +1998,6 @@ if (isEmpty(aprisensorDevices) || aprisensorDevices.ds18b20) {
 if (isEmpty(aprisensorDevices) || aprisensorDevices.sps30) {
   let timerIdSps30 = setInterval(readSps30Device, 1000)
 }
-
 if (aprisensorDevices.tgs5042) {
   // start processing TGS5042 CO sensor if available
   if (ads1115Available==true) {
@@ -1880,7 +2005,6 @@ if (aprisensorDevices.tgs5042) {
     //setTimeout(getAds1115Tgs5042, 1000);
   }
 }
-
 if (aprisensorDevices.scd30) {
   let timerIdScd30 = setInterval(readScd30Device, 1000)  // CO2,temperature,rHum
 }
@@ -1913,6 +2037,18 @@ if (aprisensorDevices.ips7100) {
     ,initiated:false
     ,validData:false
     ,deviceType:'ips7100'
+  }
+  serialDevices.push(newDevice)
+  scanSerialDevices()
+  let timerSerialDevices = setInterval(scanSerialDevices, 10000)
+}
+if (aprisensorDevices.gps) {
+  var newDevice={
+    device: aprisensorDevices.gps.device
+    , baudRate: aprisensorDevices.gps.baudRate
+    ,initiated:false
+    ,validData:false
+    ,deviceType:'gps'
   }
   serialDevices.push(newDevice)
   scanSerialDevices()

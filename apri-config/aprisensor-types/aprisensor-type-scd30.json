@@ -7,6 +7,13 @@
       ,"protocol":"modbus"
       ,"baudRate":19200
       ,"deviceType":"scd30"
+    },
+    {"name": "DS18B20"
+      ,"id":"ds18b20"
+      ,"device":"0x??"
+      ,"installed":"N"
+      ,"protocol":"onewire"
+      ,"deviceType":"ds18b20"
     }
   ]
 }

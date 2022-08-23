@@ -2115,7 +2115,7 @@ if (aprisensorDevices.gps) {
       parse: true
     });
     listener.on('TPV', function (tpv) {
-      console.log(tpv);
+      //console.log(tpv);
       if (tpv.mode==1) {
         // console.log('no valid gps data')
         return

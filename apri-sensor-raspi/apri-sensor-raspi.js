@@ -1046,7 +1046,7 @@ var sendData = function() {
 //            ',raw10_0:'+results.sps.part10_0 + ',tps:'+results.sps.tps;
 //			logger.info(url);
 
-      if (aprisensorDevices.gps and gpsTpv.mode!=1) {
+      if (aprisensorDevices.gps && gpsTpv.mode!=1) {
         redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
           , 'foi', 'SCRP' + unit.id
           , 'pm1', results.sps.pm1

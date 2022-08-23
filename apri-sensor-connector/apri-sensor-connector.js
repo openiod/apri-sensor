@@ -230,11 +230,30 @@ var tgs5042Attributes = function(res) {
     'co:'+res.co;
 }
 var sps30Attributes = function(res) {
+	var gps=''
+	if (res.gpsMode) {
+		gps = ',gpsMode:'+ ser.gpsMode +
+		',gpsTime:'+ ser.gpsTime +
+		',gpsEpt:'+ ser.gpsEpt +
+		',gpsLat:'+ ser.gpsLat +
+		',gpsLon:'+ ser.gpsLon +
+		',gpsAlt:'+ ser.gpsAlt +
+		',gpsEpx:'+ ser.gpsEpx +
+		',gpsEpy:'+ ser.gpsEpy +
+		',gpsEpv:'+ ser.gpsEpv +
+		',gpsTrack:'+ ser.gpsTrack +
+		',gpsSpeed:'+ ser.gpsSpeed +
+		',gpsClimb:'+ ser.gpsClimb +
+		',gpsEps:'+ ser.gpsEps +
+		',gpsEpc:'+ ser.gpsEpc
+	}
+
   return openiodUrl + '/sps30'+ '/v1/m?foi=' + res.foi + '&observation=' +
     'pm1:'+res.pm1+',pm25:'+res.pm25+',pm4:'+res.pm4+',pm10:'+res.pm10 +
     ',raw0_5:'+res.raw0_5+',raw1_0:'+res.raw1_0 +
     ',raw2_5:'+res.raw2_5+',raw4_0:'+res.raw4_0+',raw10_0:'+res.raw10_0 +
-		',tps:'+res.tps
+		',tps:'+res.tps+
+		gps
 }
 var ips7100Attributes = function(res) {
   return openiodUrl + '/ips7100'+ '/v1/m?foi=' + res.foi + '&observation=' +

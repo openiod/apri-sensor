@@ -99,6 +99,11 @@ catch (err) {
 }
 logger.info("Start of Config Main ", configServerModulePath);
 
+// gps:
+var gpsd
+var gpsDaemon
+var gpsTpv={mode:1}
+
 var ModbusRTU
 var scd30Client
 try {
@@ -1040,28 +1045,68 @@ var sendData = function() {
 //						',raw2_5:'+results.sps.part2_5+',raw4_0:'+results.sps.part4_0+
 //            ',raw10_0:'+results.sps.part10_0 + ',tps:'+results.sps.tps;
 //			logger.info(url);
-			redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
-			  , 'foi', 'SCRP' + unit.id
-			  , 'pm1', results.sps.pm1
-				, 'pm25', results.sps.pm25
-        , 'pm4', results.sps.pm4
-				, 'pm10', results.sps.pm10
-				, 'raw0_5', results.sps.part0_5
-				, 'raw1_0', results.sps.part1_0
-				, 'raw2_5', results.sps.part2_5
-				, 'raw4_0', results.sps.part4_0
-				, 'raw10_0', results.sps.part10_0
-        , 'tps', results.sps.tps
-			  ).then(function(res) {
-					var _res = res;
-					redisSaddAsync('new', timeStamp.toISOString()+':sps30')
-						.then(function(res2) {
-							var _res2=res2;
-						//	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
-							logger.info('sps30 ', timeStamp.toISOString()+':sps30'+ _res2);
-						});
-		    	logger.info(timeStamp.toString()+':sps30'+_res);
-			});
+
+      if (aprisensorDevices.gps and gpsTpv.mode!=1) {
+        redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
+          , 'foi', 'SCRP' + unit.id
+          , 'pm1', results.sps.pm1
+          , 'pm25', results.sps.pm25
+          , 'pm4', results.sps.pm4
+          , 'pm10', results.sps.pm10
+          , 'raw0_5', results.sps.part0_5
+          , 'raw1_0', results.sps.part1_0
+          , 'raw2_5', results.sps.part2_5
+          , 'raw4_0', results.sps.part4_0
+          , 'raw10_0', results.sps.part10_0
+          , 'tps', results.sps.tps
+          , 'gpsMode',gpsTpv.mode
+          , 'gpsTime',gpsTpv.time
+          , 'gpsEpt',gpsTpv.ept
+          , 'gpsLat',gpsTpv.lat
+          , 'gpsLon',gpsTpv.lon
+          , 'gpsAlt',gpsTpv.alt
+          , 'gpsEpx',gpsTpv.epx
+          , 'gpsEpy',gpsTpv.epy
+          , 'gpsEpv',gpsTpv.epv
+          , 'gpsTrack',gpsTpv.track
+          , 'gpsSpeed',gpsTpv.speed
+          , 'gpsClimb',gpsTpv.climb
+          , 'gpsEps',gpsTpv.eps
+          , 'gpsEpc',gpsTpv.epc
+          ).then(function(res) {
+            var _res = res;
+            redisSaddAsync('new', timeStamp.toISOString()+':sps30')
+              .then(function(res2) {
+                var _res2=res2;
+              //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
+                logger.info('sps30 ', timeStamp.toISOString()+':sps30'+ _res2);
+              });
+            logger.info(timeStamp.toString()+':sps30'+_res);
+        });
+      } else {
+        redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
+          , 'foi', 'SCRP' + unit.id
+          , 'pm1', results.sps.pm1
+          , 'pm25', results.sps.pm25
+          , 'pm4', results.sps.pm4
+          , 'pm10', results.sps.pm10
+          , 'raw0_5', results.sps.part0_5
+          , 'raw1_0', results.sps.part1_0
+          , 'raw2_5', results.sps.part2_5
+          , 'raw4_0', results.sps.part4_0
+          , 'raw10_0', results.sps.part10_0
+          , 'tps', results.sps.tps
+          ).then(function(res) {
+            var _res = res;
+            redisSaddAsync('new', timeStamp.toISOString()+':sps30')
+              .then(function(res2) {
+                var _res2=res2;
+              //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
+                logger.info('sps30 ', timeStamp.toISOString()+':sps30'+ _res2);
+              });
+            logger.info(timeStamp.toString()+':sps30'+_res);
+        });
+      }
 		}
     if (results.ips7100.nrOfMeas > 0) {
 //			url = openiodUrl + '/ips7100'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
@@ -2042,15 +2087,47 @@ if (aprisensorDevices.ips7100) {
   scanSerialDevices()
   let timerSerialDevices = setInterval(scanSerialDevices, 10000)
 }
+
 if (aprisensorDevices.gps) {
-  var newDevice={
-    device: aprisensorDevices.gps.device
-    , baudRate: aprisensorDevices.gps.baudRate
-    ,initiated:false
-    ,validData:false
-    ,deviceType:'gps'
-  }
-  serialDevices.push(newDevice)
-  scanSerialDevices()
-  let timerSerialDevices = setInterval(scanSerialDevices, 10000)
+  gpsd = require('node-gpsd');
+  gpsDaemon = new gpsd.Daemon({
+    program: 'gpsd',
+    device: '/dev/ttyS0',
+    port: 2947,
+    pid: '/tmp/gpsd.pid',
+    readOnly: false,
+    logger: {
+        info: function() {},
+        warn: console.warn,
+        error: console.error
+    }
+  });
+  gpsDaemon.start(function() {
+    console.log('Started');
+    var listener = new gpsd.Listener({
+      port: 2947,
+      hostname: 'localhost',
+      logger:  {
+          info: function() {},
+          warn: console.warn,
+          error: console.error
+      },
+      parse: true
+    });
+    listener.on('TPV', function (tpv) {
+      console.log(tpv);
+      if (tpv.mode==1) {
+        // console.log('no valid gps data')
+        return
+      }
+      gpsTpv=tpv
+    });
+    listener.connect(function() {
+      console.log('Connected');
+      listener.watch();
+    });
+  });
+  //listener.logger = new (winston.Logger) ({ exitOnError: false });;
 }
+
+console.log(aprisensorDevices);

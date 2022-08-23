@@ -232,20 +232,20 @@ var tgs5042Attributes = function(res) {
 var sps30Attributes = function(res) {
 	var gps=''
 	if (res.gpsMode) {
-		gps = ',gpsMode:'+ ser.gpsMode +
-		',gpsTime:'+ ser.gpsTime +
-		',gpsEpt:'+ ser.gpsEpt +
-		',gpsLat:'+ ser.gpsLat +
-		',gpsLon:'+ ser.gpsLon +
-		',gpsAlt:'+ ser.gpsAlt +
-		',gpsEpx:'+ ser.gpsEpx +
-		',gpsEpy:'+ ser.gpsEpy +
-		',gpsEpv:'+ ser.gpsEpv +
-		',gpsTrack:'+ ser.gpsTrack +
-		',gpsSpeed:'+ ser.gpsSpeed +
-		',gpsClimb:'+ ser.gpsClimb +
-		',gpsEps:'+ ser.gpsEps +
-		',gpsEpc:'+ ser.gpsEpc
+		gps = ',gpsMode:'+ res.gpsMode +
+		',gpsTime:'+ res.gpsTime +
+		',gpsEpt:'+ res.gpsEpt +
+		',gpsLat:'+ res.gpsLat +
+		',gpsLon:'+ res.gpsLon +
+		',gpsAlt:'+ res.gpsAlt +
+		',gpsEpx:'+ res.gpsEpx +
+		',gpsEpy:'+ res.gpsEpy +
+		',gpsEpv:'+ res.gpsEpv +
+		',gpsTrack:'+ res.gpsTrack +
+		',gpsSpeed:'+ res.gpsSpeed +
+		',gpsClimb:'+ res.gpsClimb +
+		',gpsEps:'+ res.gpsEps +
+		',gpsEpc:'+ res.gpsEpc
 	}
 
   return openiodUrl + '/sps30'+ '/v1/m?foi=' + res.foi + '&observation=' +

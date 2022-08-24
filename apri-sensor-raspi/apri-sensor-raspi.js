@@ -1049,7 +1049,7 @@ var sendData = function() {
 //            ',raw10_0:'+results.sps.part10_0 + ',tps:'+results.sps.tps;
 //			logger.info(url);
 
-      if (aprisensorDevices.gps && gpsTpv.mode>1) {
+      if (aprisensorDevices.gps) {
         processGps()
         if (gpsTpv.mode==2) {
           redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
@@ -1081,7 +1081,8 @@ var sendData = function() {
             logger.info('catch mode 2, Redis write')
             logger.info(err)
           })
-        } else { // mode 3
+        }
+        if (gpsTpv.mode==3) { // mode 3
           redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
             , 'foi', 'SCRP' + unit.id
             , 'pm1', results.sps.pm1
@@ -1123,7 +1124,8 @@ var sendData = function() {
             logger.info(err)
           })
         }
-      } else {
+      }
+      if (gpsTpv.mode!=2 && gpsTpv.mode!=3 ) {
         redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
           , 'foi', 'SCRP' + unit.id
           , 'pm1', results.sps.pm1
@@ -2151,6 +2153,8 @@ const processGps=function(){
     gpsTpv.lon=_lon/_coordinateCount // mean lon coordinate
     //gpsTpv.epx=gpsTpv.epx?gpsTpv.epx:0
     //gpsTpv.epy=gpsTpv.epy?gpsTpv.epy:0
+    console.dir(_gpsArray)
+    console.log(gpsTpv)
   }
 
 }

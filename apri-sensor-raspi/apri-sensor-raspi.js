@@ -105,6 +105,7 @@ var gpsDaemon
 var gpsTpv={mode:0}
 var _gpsTimeIso=''
 var _gpsTime=new Date()
+var _gpsArray=[]
 
 var ModbusRTU
 var scd30Client
@@ -1049,6 +1050,7 @@ var sendData = function() {
 //			logger.info(url);
 
       if (aprisensorDevices.gps && gpsTpv.mode>1) {
+        processGps()
         if (gpsTpv.mode==2) {
           redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
             , 'foi', 'SCRP' + unit.id
@@ -2130,6 +2132,37 @@ if (aprisensorDevices.ips7100) {
   let timerSerialDevices = setInterval(scanSerialDevices, 10000)
 }
 
+const processGps=function(){
+  gpsTpv={mode:0} // initial empty value
+  if (_gpsArray.length>0) {
+    gpsTpv=_gpsArray[_gpsArray.length-1] // use latest gps as default
+    var _lat=0
+    var _lon=0
+    var _coordinateCount=0
+    // calculate mean values
+    for (var i=0;i<_gpsArray.length;i++) {
+      if (_gpsArray[i].lat!=0) { // only when lat available
+        _coordinateCount++
+        _lat+=_gpsArray[i].lat
+        _lon+=_gpsArray[i].lon
+      }
+    }
+    gpsTpv.lat=_lat/_coordinateCount // mean lat coordinate
+    gpsTpv.lon=_lon/_coordinateCount // mean lon coordinate
+    //gpsTpv.epx=gpsTpv.epx?gpsTpv.epx:0
+    //gpsTpv.epy=gpsTpv.epy?gpsTpv.epy:0
+  }
+
+}
+
+const cleanupCacheGps = function(){
+  _gpsArray.shift(); // remove first element
+  // remove extra element when array length exceeds limit
+  // lenght 5 is approx 5 seconds (5 times) gps data
+  if (_gpsArray.length>4) _gpsArray.shift()
+}
+let timerCleanupCacheGps = setInterval(cleanupCacheGps, 1000)
+
 if (aprisensorDevices.gps) {
   gpsd = require('node-gpsd');
   gpsDaemon = new gpsd.Daemon({
@@ -2167,10 +2200,7 @@ if (aprisensorDevices.gps) {
         console.log(tpv)
         return
       }
-      gpsTpv=tpv
-      gpsTpv.epx=gpsTpv.epx?gpsTpv.epx:0
-      gpsTpv.epy=gpsTpv.epy?gpsTpv.epy:0
-      console.log(gpsTpv)
+      _gpsArray.push(tpv)
       console.log(tpv)
 
 

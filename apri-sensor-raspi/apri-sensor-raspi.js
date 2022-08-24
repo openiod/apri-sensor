@@ -284,7 +284,8 @@ logger.info('web-socket url: '+socketUrl+socketPath);
 var secureSite 			= true;
 var siteProtocol 		= secureSite?'https://':'http://';
 var openiodUrl			= siteProtocol + 'aprisensor-in.openiod.org';
-var loopTimeCycle		= 20000; //ms, 20000=20 sec
+var loopCycle = 20
+var loopTimeCycle		= loopCycle*1000; //ms, 20000=20 sec
 
 var usbPorts			= [];
 
@@ -2157,26 +2158,24 @@ const processGps=function(){
     }
     _gpsTpv.lat=_lat/_coordinateCount // mean lat coordinate
     _gpsTpv.lon=_lon/_coordinateCount // mean lon coordinate
+    _gpsTpv.ept=_gpsTpv.ept?_gpsTpv.ept:0
     _gpsTpv.epx=_gpsTpv.epx?_gpsTpv.epx:0
     _gpsTpv.epy=_gpsTpv.epy?_gpsTpv.epy:0
+    _gpsTpv.epv=_gpsTpv.epv?_gpsTpv.epv:0
     _gpsTpv.epc=_gpsTpv.epc?_gpsTpv.epc:0
     _gpsTpv.eps=_gpsTpv.eps?_gpsTpv.eps:0
 
   }
+  // empty array for next round of measurement
+  gpsArray=[]
   return _gpsTpv
 }
 
 const cleanupCacheGps = function(){
-  if (_gpsArray.length>0) _gpsArray.shift(); // cleanup first element
-  // remove extra element when array length exceeds limit
-  // lenght 5 is approx 5 seconds (5 times) gps data
-  if (_gpsArray.length>4) _gpsArray.shift() // keep cache small
-  if (_gpsArray.length>4) _gpsArray.shift()
-  if (_gpsArray.length>4) _gpsArray.shift()
-  if (_gpsArray.length>4) _gpsArray.shift()
-  if (_gpsArray.length>4) _gpsArray.shift()
+  if (_gpsArray.length>loopCycle) _gpsArray.shift(); // cleanup first element
+  // after measurement cycle array is always cleared
 }
-let timerCleanupCacheGps = setInterval(cleanupCacheGps, 3000)
+let timerCleanupCacheGps = setInterval(cleanupCacheGps,1000)
 
 if (aprisensorDevices.gps) {
   gpsd = require('node-gpsd');

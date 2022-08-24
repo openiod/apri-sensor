@@ -1072,7 +1072,11 @@ var sendData = function() {
                   logger.info('sps30 ', timeStamp.toISOString()+':sps30'+ _res2);
                 });
               logger.info(timeStamp.toString()+':sps30'+_res);
-          });
+          })
+          .catch(function(err) {
+            logger.info('catch mode 2, Redis write')
+            logger.info(err)
+          })
         } else { // mode 3
           redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
             , 'foi', 'SCRP' + unit.id
@@ -1109,7 +1113,11 @@ var sendData = function() {
                   logger.info('sps30 ', timeStamp.toISOString()+':sps30'+ _res2);
                 });
               logger.info(timeStamp.toString()+':sps30'+_res);
-          });
+          })
+          .catch(function(err) {
+            logger.info('catch mode 3, Redis write')
+            logger.info(err)
+          })
         }
       } else {
         redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
@@ -1133,7 +1141,11 @@ var sendData = function() {
                 logger.info('sps30 ', timeStamp.toISOString()+':sps30'+ _res2);
               });
             logger.info(timeStamp.toString()+':sps30'+_res);
-        });
+        })
+        .catch(function(err) {
+          logger.info('catch no gps, Redis write')
+          logger.info(err)
+        })
       }
 		}
     if (results.ips7100.nrOfMeas > 0) {

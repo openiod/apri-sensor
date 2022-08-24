@@ -2157,13 +2157,11 @@ const processGps=function(){
     }
     _gpsTpv.lat=_lat/_coordinateCount // mean lat coordinate
     _gpsTpv.lon=_lon/_coordinateCount // mean lon coordinate
-    //gpsTpv.epx=gpsTpv.epx?gpsTpv.epx:0
-    //gpsTpv.epy=gpsTpv.epy?gpsTpv.epy:0
-    console.dir(_gpsArray)
-    console.log(_gpsTpv)
-    console.log(_lat)
-    console.log(_lon)
-    console.log(_coordinateCount)
+    _gpsTpv.epx=_gpsTpv.epx?_gpsTpv.epx:0
+    _gpsTpv.epy=_gpsTpv.epy?_gpsTpv.epy:0
+    _gpsTpv.epc=_gpsTpv.epc?_gpsTpv.epc:0
+    _gpsTpv.eps=_gpsTpv.eps?_gpsTpv.eps:0
+
   }
   return _gpsTpv
 }

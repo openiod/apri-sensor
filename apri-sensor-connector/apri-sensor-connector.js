@@ -231,7 +231,12 @@ var tgs5042Attributes = function(res) {
 }
 var sps30Attributes = function(res) {
 	var gps=''
-	if (res.gpsMode) {
+	if (res.gpsMode==2) {
+		gps = ',gpsMode:'+ res.gpsMode +
+		',gpsLat:'+ res.gpsLat +
+		',gpsLon:'+ res.gpsLon +
+	}
+	if (res.gpsMode==3) {
 		gps = ',gpsMode:'+ res.gpsMode +
 		',gpsTime:'+ res.gpsTime +
 		',gpsEpt:'+ res.gpsEpt +

@@ -102,7 +102,7 @@ logger.info("Start of Config Main ", configServerModulePath);
 // gps:
 var gpsd
 var gpsDaemon
-var gpsTpv={mode:1}
+var gpsTpv={mode:0}
 
 var ModbusRTU
 var scd30Client
@@ -1046,43 +1046,71 @@ var sendData = function() {
 //            ',raw10_0:'+results.sps.part10_0 + ',tps:'+results.sps.tps;
 //			logger.info(url);
 
-      if (aprisensorDevices.gps && gpsTpv.mode!=1) {
-        redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
-          , 'foi', 'SCRP' + unit.id
-          , 'pm1', results.sps.pm1
-          , 'pm25', results.sps.pm25
-          , 'pm4', results.sps.pm4
-          , 'pm10', results.sps.pm10
-          , 'raw0_5', results.sps.part0_5
-          , 'raw1_0', results.sps.part1_0
-          , 'raw2_5', results.sps.part2_5
-          , 'raw4_0', results.sps.part4_0
-          , 'raw10_0', results.sps.part10_0
-          , 'tps', results.sps.tps
-          , 'gpsMode',gpsTpv.mode
-          , 'gpsTime',gpsTpv.time
-          , 'gpsEpt',gpsTpv.ept
-          , 'gpsLat',gpsTpv.lat
-          , 'gpsLon',gpsTpv.lon
-          , 'gpsAlt',gpsTpv.alt
-          , 'gpsEpx',gpsTpv.epx
-          , 'gpsEpy',gpsTpv.epy
-          , 'gpsEpv',gpsTpv.epv
-          , 'gpsTrack',gpsTpv.track
-          , 'gpsSpeed',gpsTpv.speed
-          , 'gpsClimb',gpsTpv.climb
-          , 'gpsEps',gpsTpv.eps
-          , 'gpsEpc',gpsTpv.epc
-          ).then(function(res) {
-            var _res = res;
-            redisSaddAsync('new', timeStamp.toISOString()+':sps30')
-              .then(function(res2) {
-                var _res2=res2;
-              //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
-                logger.info('sps30 ', timeStamp.toISOString()+':sps30'+ _res2);
-              });
-            logger.info(timeStamp.toString()+':sps30'+_res);
-        });
+      if (aprisensorDevices.gps && gpsTpv.mode>1) {
+        if (gpsTpv.mode==2) {
+          redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
+            , 'foi', 'SCRP' + unit.id
+            , 'pm1', results.sps.pm1
+            , 'pm25', results.sps.pm25
+            , 'pm4', results.sps.pm4
+            , 'pm10', results.sps.pm10
+            , 'raw0_5', results.sps.part0_5
+            , 'raw1_0', results.sps.part1_0
+            , 'raw2_5', results.sps.part2_5
+            , 'raw4_0', results.sps.part4_0
+            , 'raw10_0', results.sps.part10_0
+            , 'tps', results.sps.tps
+            , 'gpsMode',gpsTpv.mode
+            , 'gpsLat',gpsTpv.lat
+            , 'gpsLon',gpsTpv.lon
+            ).then(function(res) {
+              var _res = res;
+              redisSaddAsync('new', timeStamp.toISOString()+':sps30')
+                .then(function(res2) {
+                  var _res2=res2;
+                //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
+                  logger.info('sps30 ', timeStamp.toISOString()+':sps30'+ _res2);
+                });
+              logger.info(timeStamp.toString()+':sps30'+_res);
+          });
+        } else { // mode 3
+          redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
+            , 'foi', 'SCRP' + unit.id
+            , 'pm1', results.sps.pm1
+            , 'pm25', results.sps.pm25
+            , 'pm4', results.sps.pm4
+            , 'pm10', results.sps.pm10
+            , 'raw0_5', results.sps.part0_5
+            , 'raw1_0', results.sps.part1_0
+            , 'raw2_5', results.sps.part2_5
+            , 'raw4_0', results.sps.part4_0
+            , 'raw10_0', results.sps.part10_0
+            , 'tps', results.sps.tps
+            , 'gpsMode',gpsTpv.mode
+            , 'gpsTime',gpsTpv.time
+            , 'gpsEpt',gpsTpv.ept
+            , 'gpsLat',gpsTpv.lat
+            , 'gpsLon',gpsTpv.lon
+            , 'gpsAlt',gpsTpv.alt
+            , 'gpsEpx',gpsTpv.epx
+            , 'gpsEpy',gpsTpv.epy
+            , 'gpsEpv',gpsTpv.epv
+            , 'gpsTrack',gpsTpv.track
+            , 'gpsSpeed',gpsTpv.speed
+            , 'gpsClimb',gpsTpv.climb
+            , 'gpsEps',gpsTpv.eps
+            , 'gpsEpc',gpsTpv.epc
+            ).then(function(res) {
+              var _res = res;
+              redisSaddAsync('new', timeStamp.toISOString()+':sps30')
+                .then(function(res2) {
+                  var _res2=res2;
+                //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
+                  logger.info('sps30 ', timeStamp.toISOString()+':sps30'+ _res2);
+                });
+              logger.info(timeStamp.toString()+':sps30'+_res);
+          });
+        }
       } else {
         redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
           , 'foi', 'SCRP' + unit.id
@@ -2116,11 +2144,14 @@ if (aprisensorDevices.gps) {
     });
     listener.on('TPV', function (tpv) {
       //console.log(tpv);
-      if (tpv.mode==1) {
-        // console.log('no valid gps data')
+      if (tpv.mode<2) {
+        console.log('tpv.mode:'+tpv.mode+', no valid gps data')
         return
       }
       gpsTpv=tpv
+      gpsTpv.epx=gpsTpv.epx?gpsTpv.epx:0
+      gpsTpv.epy=gpsTpv.epy?gpsTpv.epy:0
+
     });
     listener.connect(function() {
       console.log('Connected');

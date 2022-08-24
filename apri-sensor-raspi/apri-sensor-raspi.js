@@ -1050,7 +1050,8 @@ var sendData = function() {
 //			logger.info(url);
 
       if (aprisensorDevices.gps) {
-        processGps()
+        gpsTpv= processGps()
+        console.log(gpsTpv)
         if (gpsTpv.mode==2) {
           redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
             , 'foi', 'SCRP' + unit.id
@@ -2135,9 +2136,9 @@ if (aprisensorDevices.ips7100) {
 }
 
 const processGps=function(){
-  gpsTpv={mode:0} // initial empty value
+  var _gpsTpv={mode:0} // initial empty value
   if (_gpsArray.length>0) {
-    gpsTpv=_gpsArray[_gpsArray.length-1] // use latest gps as default
+    _gpsTpv=_gpsArray[_gpsArray.length-1] // use latest gps as default
     var _lat=0
     var _lon=0
     var _coordinateCount=0
@@ -2149,18 +2150,17 @@ const processGps=function(){
         _lon+=_gpsArray[i].lon
       }
     }
-    gpsTpv.lat=_lat/_coordinateCount // mean lat coordinate
-    gpsTpv.lon=_lon/_coordinateCount // mean lon coordinate
+    _gpsTpv.lat=_lat/_coordinateCount // mean lat coordinate
+    _gpsTpv.lon=_lon/_coordinateCount // mean lon coordinate
     //gpsTpv.epx=gpsTpv.epx?gpsTpv.epx:0
     //gpsTpv.epy=gpsTpv.epy?gpsTpv.epy:0
     console.dir(_gpsArray)
-    console.log(gpsTpv)
+    console.log(_gpsTpv)
     console.log(_lat)
     console.log(_lon)
     console.log(_coordinateCount)
-
   }
-
+  return _gpsTpv
 }
 
 const cleanupCacheGps = function(){

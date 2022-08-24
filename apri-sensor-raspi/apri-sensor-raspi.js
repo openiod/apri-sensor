@@ -2158,8 +2158,8 @@ if (aprisensorDevices.gps) {
     });
     listener.on('TPV', function (tpv) {
       if (tpv.mode>0 && tpv.time){
-        _gpsTime=Date.parse(tpv.Time)
-        _gpsTimeIso=tpv.Time
+        _gpsTime=Date.parse(tpv.time)
+        _gpsTimeIso=tpv.time
         console.log(_gpsTime)
       }
       if (tpv.mode<2) {

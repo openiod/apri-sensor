@@ -103,6 +103,8 @@ logger.info("Start of Config Main ", configServerModulePath);
 var gpsd
 var gpsDaemon
 var gpsTpv={mode:0}
+var _gpsTimeIso=''
+var _gpsTime=new Date()
 
 var ModbusRTU
 var scd30Client
@@ -2155,14 +2157,22 @@ if (aprisensorDevices.gps) {
       parse: true
     });
     listener.on('TPV', function (tpv) {
-      //console.log(tpv);
+      if (tpv.mode>0 && tpv.time){
+        _gpsTime=new Date(tpv.Time)
+        _gpsTimeIso=tpv.Time
+        console.log(_gpsTime)
+      }
       if (tpv.mode<2) {
         console.log('tpv.mode:'+tpv.mode+', no valid gps data')
+        console.log(tpv)
         return
       }
       gpsTpv=tpv
       gpsTpv.epx=gpsTpv.epx?gpsTpv.epx:0
       gpsTpv.epy=gpsTpv.epy?gpsTpv.epy:0
+      console.log(gpsTpv)
+      console.log(tpv)
+
 
     });
     listener.connect(function() {

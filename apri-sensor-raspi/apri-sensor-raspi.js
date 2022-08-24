@@ -2145,15 +2145,35 @@ const processGps=function(){
   var _gpsTpv={mode:0} // initial empty value
   if (_gpsArray.length>0) {
     _gpsTpv=_gpsArray[_gpsArray.length-1] // use latest gps as default
+
+    var _epx=0
+    var _epy=0
+    var _coordinateCount=0
+    // calculate mean epx values
+    for (var i=0;i<_gpsArray.length;i++) {
+      if (_gpsArray[i].epx != undefined) { // only when epx available
+        _coordinateCount++
+        _epx+=_gpsArray[i].epx
+        _epy+=_gpsArray[i].epy
+      }
+    }
+    var _epxMean=_epx / _coordinateCount // mean epx
+    var _epyMean=_epy / _coordinateCount // mean epy 
+
+
     var _lat=0
     var _lon=0
     var _coordinateCount=0
     // calculate mean values
     for (var i=0;i<_gpsArray.length;i++) {
       if (_gpsArray[i].lat!=0) { // only when lat available
-        _coordinateCount++
-        _lat+=_gpsArray[i].lat
-        _lon+=_gpsArray[i].lon
+        if (_epxMean >= _gpsArray[i].epx &&
+            _epyMean >= _gpsArray[i].epy
+        ) {
+          _coordinateCount++
+          _lat+=_gpsArray[i].lat
+          _lon+=_gpsArray[i].lon
+        }
       }
     }
     _gpsTpv.lat=_lat/_coordinateCount // mean lat coordinate
@@ -2209,7 +2229,7 @@ if (aprisensorDevices.gps) {
         _gpsTimeIso=tpv.time
         var diff = _gpsTime - new Date().getTime()
         if (diff>0 ) {
-          console.log(_gpsTimeIso+' diff:' + diff)  
+          console.log(_gpsTimeIso+' diff:' + diff)
         }
       }
       if (tpv.mode<2) {

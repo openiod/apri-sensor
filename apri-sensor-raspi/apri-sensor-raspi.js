@@ -2209,7 +2209,7 @@ if (aprisensorDevices.gps) {
         _gpsTimeIso=tpv.time
         var diff = _gpsTime - new Date().getTime()
         if (diff>0 ) {
-          console.log(_gpsTimeIso+' diff:' diff)  
+          console.log(_gpsTimeIso+' diff:' + diff)  
         }
       }
       if (tpv.mode<2) {

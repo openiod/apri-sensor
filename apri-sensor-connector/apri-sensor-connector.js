@@ -234,7 +234,7 @@ var sps30Attributes = function(res) {
 	if (res.gpsMode==2) {
 		gps = ',gpsMode:'+ res.gpsMode +
 		',gpsLat:'+ res.gpsLat +
-		',gpsLon:'+ res.gpsLon +
+		',gpsLon:'+ res.gpsLon
 	}
 	if (res.gpsMode==3) {
 		gps = ',gpsMode:'+ res.gpsMode +

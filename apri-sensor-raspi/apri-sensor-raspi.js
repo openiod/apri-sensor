@@ -2167,7 +2167,7 @@ const processGps=function(){
 
   }
   // empty array for next round of measurement
-  gpsArray=[]
+  _gpsArray=[]
   return _gpsTpv
 }
 

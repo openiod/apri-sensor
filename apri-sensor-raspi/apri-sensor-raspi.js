@@ -2155,6 +2155,10 @@ const processGps=function(){
     //gpsTpv.epy=gpsTpv.epy?gpsTpv.epy:0
     console.dir(_gpsArray)
     console.log(gpsTpv)
+    console.log(_lat)
+    console.log(_lon)
+    console.log(_coordinateCount)
+
   }
 
 }
@@ -2209,7 +2213,7 @@ if (aprisensorDevices.gps) {
         return
       }
       _gpsArray.push(tpv)
-      console.log(tpv)
+      //console.log(tpv)
 
 
     });

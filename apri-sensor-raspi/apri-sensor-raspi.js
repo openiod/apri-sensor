@@ -2160,12 +2160,16 @@ const processGps=function(){
 }
 
 const cleanupCacheGps = function(){
-  _gpsArray.shift(); // remove first element
+  if (_gpsArray.length>0) _gpsArray.shift(); // cleanup first element
   // remove extra element when array length exceeds limit
   // lenght 5 is approx 5 seconds (5 times) gps data
+  if (_gpsArray.length>4) _gpsArray.shift() // keep cache small
+  if (_gpsArray.length>4) _gpsArray.shift()
+  if (_gpsArray.length>4) _gpsArray.shift()
+  if (_gpsArray.length>4) _gpsArray.shift()
   if (_gpsArray.length>4) _gpsArray.shift()
 }
-let timerCleanupCacheGps = setInterval(cleanupCacheGps, 1000)
+let timerCleanupCacheGps = setInterval(cleanupCacheGps, 3000)
 
 if (aprisensorDevices.gps) {
   gpsd = require('node-gpsd');

@@ -2207,7 +2207,10 @@ if (aprisensorDevices.gps) {
       if (tpv.mode>0 && tpv.time){
         _gpsTime=Date.parse(tpv.time)
         _gpsTimeIso=tpv.time
-        console.log(_gpsTime)
+        var diff = _gpsTime - new Date().getTime()
+        if (diff>0 ) {
+          console.log(_gpsTimeIso+' diff:' diff)  
+        }
       }
       if (tpv.mode<2) {
         console.log('tpv.mode:'+tpv.mode+', no valid gps data')

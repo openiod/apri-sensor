@@ -1048,11 +1048,12 @@ var sendData = function() {
 //						',raw2_5:'+results.sps.part2_5+',raw4_0:'+results.sps.part4_0+
 //            ',raw10_0:'+results.sps.part10_0 + ',tps:'+results.sps.tps;
 //			logger.info(url);
-
+      var spsProcessed=false
       if (aprisensorDevices.gps) {
         gpsTpv= processGps()
         console.log(gpsTpv)
         if (gpsTpv.mode==2) {
+          spsProcessed=true
           redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
             , 'foi', 'SCRP' + unit.id
             , 'pm1', results.sps.pm1
@@ -1068,15 +1069,16 @@ var sendData = function() {
             , 'gpsMode',gpsTpv.mode
             , 'gpsLat',gpsTpv.lat
             , 'gpsLon',gpsTpv.lon
-            ).then(function(res) {
-              var _res = res;
-              redisSaddAsync('new', timeStamp.toISOString()+':sps30')
-                .then(function(res2) {
-                  var _res2=res2;
-                //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
-                  logger.info('sps30 ', timeStamp.toISOString()+':sps30'+ _res2);
-                });
-              logger.info(timeStamp.toString()+':sps30'+_res);
+            )
+          .then(function(res) {
+            var _res = res;
+            redisSaddAsync('new', timeStamp.toISOString()+':sps30')
+            .then(function(res2) {
+              var _res2=res2;
+              //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
+              logger.info('sps30 ', timeStamp.toISOString()+':sps30'+ _res2);
+            });
+            logger.info(timeStamp.toString()+':sps30'+_res);
           })
           .catch(function(err) {
             logger.info('catch mode 2, Redis write')
@@ -1084,6 +1086,7 @@ var sendData = function() {
           })
         }
         if (gpsTpv.mode==3) { // mode 3
+          spsProcessed=true
           redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
             , 'foi', 'SCRP' + unit.id
             , 'pm1', results.sps.pm1
@@ -1110,15 +1113,16 @@ var sendData = function() {
             , 'gpsClimb',gpsTpv.climb
             , 'gpsEps',gpsTpv.eps
             , 'gpsEpc',gpsTpv.epc
-            ).then(function(res) {
-              var _res = res;
-              redisSaddAsync('new', timeStamp.toISOString()+':sps30')
-                .then(function(res2) {
-                  var _res2=res2;
-                //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
-                  logger.info('sps30 ', timeStamp.toISOString()+':sps30'+ _res2);
-                });
-              logger.info(timeStamp.toString()+':sps30'+_res);
+            )
+          .then(function(res) {
+            var _res = res;
+            redisSaddAsync('new', timeStamp.toISOString()+':sps30')
+            .then(function(res2) {
+              var _res2=res2;
+              //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
+              logger.info('sps30 ', timeStamp.toISOString()+':sps30'+ _res2);
+            });
+            logger.info(timeStamp.toString()+':sps30'+_res);
           })
           .catch(function(err) {
             logger.info('catch mode 3, Redis write')
@@ -1126,7 +1130,7 @@ var sendData = function() {
           })
         }
       }
-      if (gpsTpv.mode!=2 && gpsTpv.mode!=3 ) {
+      if (spsProcessed==false) {
         redisHmsetHashAsync(timeStamp.toISOString()+':sps30'
           , 'foi', 'SCRP' + unit.id
           , 'pm1', results.sps.pm1
@@ -1139,15 +1143,16 @@ var sendData = function() {
           , 'raw4_0', results.sps.part4_0
           , 'raw10_0', results.sps.part10_0
           , 'tps', results.sps.tps
-          ).then(function(res) {
-            var _res = res;
-            redisSaddAsync('new', timeStamp.toISOString()+':sps30')
-              .then(function(res2) {
-                var _res2=res2;
-              //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
-                logger.info('sps30 ', timeStamp.toISOString()+':sps30'+ _res2);
-              });
-            logger.info(timeStamp.toString()+':sps30'+_res);
+          )
+        .then(function(res) {
+          var _res = res;
+          redisSaddAsync('new', timeStamp.toISOString()+':sps30')
+          .then(function(res2) {
+            var _res2=res2;
+            //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
+            logger.info('sps30 ', timeStamp.toISOString()+':sps30'+ _res2);
+          });
+          logger.info(timeStamp.toString()+':sps30'+_res);
         })
         .catch(function(err) {
           logger.info('catch no gps, Redis write')

@@ -2158,7 +2158,7 @@ const processGps=function(){
       }
     }
     var _epxMean=_epx / _coordinateCount // mean epx
-    var _epyMean=_epy / _coordinateCount // mean epy 
+    var _epyMean=_epy / _coordinateCount // mean epy
 
 
     var _lat=0
@@ -2167,8 +2167,9 @@ const processGps=function(){
     // calculate mean values
     for (var i=0;i<_gpsArray.length;i++) {
       if (_gpsArray[i].lat!=0) { // only when lat available
-        if (_epxMean >= _gpsArray[i].epx &&
-            _epyMean >= _gpsArray[i].epy
+        // mean +0.5m extra marge
+        if (_epxMean+0.5 >= _gpsArray[i].epx ||
+            _epyMean+0.5 >= _gpsArray[i].epy
         ) {
           _coordinateCount++
           _lat+=_gpsArray[i].lat
@@ -2192,10 +2193,13 @@ const processGps=function(){
 }
 
 const cleanupCacheGps = function(){
-  if (_gpsArray.length>loopCycle) _gpsArray.shift(); // cleanup first element
-  // after measurement cycle array is always cleared
+  var times=_gpsArray.length-loopCycle*2
+  if times<1 return
+  for (var i=times;i>0;i--){
+    _gpsArray.shift() // cleanup first element
+  }
 }
-let timerCleanupCacheGps = setInterval(cleanupCacheGps,1000)
+let timerCleanupCacheGps = setInterval(cleanupCacheGps,10000)
 
 if (aprisensorDevices.gps) {
   gpsd = require('node-gpsd');

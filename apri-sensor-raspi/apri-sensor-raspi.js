@@ -2194,7 +2194,7 @@ const processGps=function(){
 
 const cleanupCacheGps = function(){
   var times=_gpsArray.length-loopCycle*2
-  if times<1 return
+  if (times<1) return
   for (var i=times;i>0;i--){
     _gpsArray.shift() // cleanup first element
   }

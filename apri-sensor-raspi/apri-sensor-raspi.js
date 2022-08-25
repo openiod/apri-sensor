@@ -2185,6 +2185,7 @@ const processGps=function(){
     _gpsTpv.epv=_gpsTpv.epv?_gpsTpv.epv:0
     _gpsTpv.epc=_gpsTpv.epc?_gpsTpv.epc:0
     _gpsTpv.eps=_gpsTpv.eps?_gpsTpv.eps:0
+    _gpsTpv.climb=_gpsTpv.climb?_gpsTpv.climb:0
 
   }
   // empty array for next round of measurement

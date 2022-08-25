@@ -2168,12 +2168,30 @@ const processGps=function(){
     for (var i=0;i<_gpsArray.length;i++) {
       if (_gpsArray[i].lat!=0) { // only when lat available
         // mean +0.5m extra marge
-        if (_epxMean+0.5 >= _gpsArray[i].epx ||
+        if (_epxMean+0.5 >= _gpsArray[i].epx &&
             _epyMean+0.5 >= _gpsArray[i].epy
         ) {
           _coordinateCount++
           _lat+=_gpsArray[i].lat
           _lon+=_gpsArray[i].lon
+        }
+      }
+    }
+    if (_coordinateCount==0) {
+      _lat=0
+      _lon=0
+      _coordinateCount=0
+      // calculate mean values
+      for (var i=0;i<_gpsArray.length;i++) {
+        if (_gpsArray[i].lat!=0) { // only when lat available
+          // mean +0.5m extra marge
+          if (_epxMean+0.5 >= _gpsArray[i].epx ||
+              _epyMean+0.5 >= _gpsArray[i].epy
+          ) {
+            _coordinateCount++
+            _lat+=_gpsArray[i].lat
+            _lon+=_gpsArray[i].lon
+          }
         }
       }
     }

@@ -1,3 +1,4 @@
+#
 # 2.2.1 - rm /var/hdd.log/* /var/log/* /var/hdd.log/* /var/log/hdd.log/aprisensor/*
 #         as last step preparingfresh SD-card
 # 2.2.0 - sockect removed from apri-sensor-raspi
@@ -58,7 +59,6 @@ sudo systemctl stop SCAPE604-apri-sensor-connector
 sudo systemctl stop SCAPE604-aprisensor-nmcli
 sudo rm /var/log/aprisensor/*
 sudo rm /var/log/*
-# empty log2ram hdd:
 sudo rm /var/hdd.log/aprisensor/*
 sudo rm  /var/hdd.log/*
 #sudo mkdir /var/log/nginx /var/hdd.log/nginx

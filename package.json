@@ -23,7 +23,7 @@
     "raspi-serial": "^6.0.0"
   },
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^1.1.3",
     "bme680-sensor": "^1.0.0",
     "express": "^4.17.1",
     "http-terminator": "^2.0.3",
@@ -32,7 +32,8 @@
     "redis": "^3.0.2",
     "request": "^2.88.2",
     "serialport": "^10.4.0",
-    "socket.io-client": "^2.3.1",
-    "winston": "^3.3.3"
+    "socket.io-client": "^4.5.3",
+    "winston": "^3.8.2",
+    "winston-daily-rotate-file": "^4.7.1"
   }
 }

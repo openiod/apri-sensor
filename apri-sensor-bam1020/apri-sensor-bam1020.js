@@ -391,7 +391,7 @@ var writeResults	= function(result) {
 // send data to SOS service via OpenIoD REST service
 var sendData = function(data) {
 	var url = '';
-	redisHmsetHashAsync(result.datumUtc.toISOString()+':bam1020'
+	redisHmsetHashAsync(data.datumUtc.toISOString()+':bam1020'
 	  , 'foi', 'SCRP' + unit.id
 	  , 'pm25', data.pm25
 	  , 'rHum', data.rHum
@@ -399,12 +399,12 @@ var sendData = function(data) {
 	  )
 	  .then(function(res) {
 		var _res = res;
-		redisSaddAsync('new', result.datumUtc.toISOString()+':bam1020')
+		redisSaddAsync('new', data.datumUtc.toISOString()+':bam1020')
 		.then(function(res2) {
 			var _res2=res2;					//	redisSaddAsync('pmsa003', timeStamp.toISOString()+':pmsa003')
-			console.log('bam1020 ', result.datumUtc.toISOString()+':bam1020'+ _res2);
+			console.log('bam1020 ', data.datumUtc.toISOString()+':bam1020'+ _res2);
 		});
-		console.log(result.datumUtc.toString()+':bam1020'+_res);
+		console.log(data.datumUtc.toString()+':bam1020'+_res);
 	});
 };
 

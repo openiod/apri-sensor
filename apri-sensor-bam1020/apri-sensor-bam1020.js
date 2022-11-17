@@ -63,7 +63,7 @@ if (deviceParam != undefined) {
 if (baudrateParam != undefined) {
         serialBaudRate          = Number(baudrateParam);
 } else {
-        serialBaudRate          = 38400; //9600;
+        serialBaudRate          = 19200 //38400; //9600;
 }
 
 
@@ -183,7 +183,7 @@ var mainProcess = function() {
 
 // reportType='PR';  serialport.write('\x1BPR 0\r')  // status overzicht
 // reportType='PR';  serialport.write('\x1BPR 1\r')  // data overzicht
-reportType='PR';  serialport.write('\x1BPR 1 4\r')  // data overzicht laatste 4 uren
+reportType='PR';  serialport.write('\x1BPR 1 8\r')  // data overzicht laatste 4 uren
 // reportType='PR';  serialport.write('\x1BPR 1 3\r')  // data overzicht laatste 4 uren
 // reportType='PR';  serialport.write('\x1BPR 2\r')  // error overzicht
 // reportType='PR';  serialport.write('\x1BPR 3\r')  // flow statistics
@@ -370,8 +370,6 @@ var writeHeaderIntoFile = function() {
 
 var writeResults	= function(result) {
 	console.log('Results: ' + result.datumUtc );
-
-	data.observation		= 'pm25:'+result.pm25+','+'rHum:'+result.rHum+','+'temperature:'+result.temperature ;
 
 	sendData(result);
 }

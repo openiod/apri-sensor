@@ -34,6 +34,20 @@ const { SerialPort } 	= require("serialport")
 const { ReadlineParser } = require('@serialport/parser-readline')
 const exec 			= require('child_process').exec;
 
+var redis										= require("redis");
+
+var redisClient 						= redis.createClient();
+const {promisify} 					= require('util');
+//const redisGetAsync 				= promisify(redisClient.get).bind(redisClient);
+//const redisSetAsync 				= promisify(redisClient.set).bind(redisClient);
+const redisHmsetHashAsync 	= promisify(redisClient.hmset).bind(redisClient);
+const redisSaddAsync 				= promisify(redisClient.sadd).bind(redisClient);
+
+redisClient.on("error", function (err) {
+    console.log("Redis client Error " + err);
+});
+
+
 // **********************************************************************************
 
 var siteProtocol 		= 'https://'

@@ -30,6 +30,7 @@ var initResult = apriConfig.init(systemModuleFolderName+"/"+systemModuleName);
 var request 			= require('request');
 var fs 					= require('fs');
 var {SerialPort} 			= require("serialport");
+//const { ReadlineParser } = require('@serialport/parser-readline')
 const exec 				= require('child_process').exec;
 
 var redis = require("redis");
@@ -81,7 +82,7 @@ var usbPorts			= [];
 //var serialPortPath		= "/dev/cu.usbmodem1411";
 //var serialPortPath		= "/dev/cu.usbmodem1421";
 //var serialPortPath		= "/dev/cu.wchusbserial1420";
-var serialPortPath		= "/dev/cu.wchusbserial1d1330";
+//var serialPortPath		= "/dev/cu.wchusbserial1d1330";
 //var serialPortPath		= "/dev/cu.usbserial-A904I3WJ";							
 //var serialPortPath              = "/dev/ttyACM1";
 
@@ -136,6 +137,7 @@ var getCpuInfo	= function() {
 
 getCpuInfo();
 
+/*
 SerialPort.list(function(err, ports) {
 	console.log(ports);
 
@@ -163,26 +165,29 @@ SerialPort.list(function(err, ports) {
 	}
 	mainProcess();
 });
-
+*/
 
 
 var mainProcess = function() {
-	var serialport = new SerialPort({path: serialPortPath, baudRate: serialBaudRate , parser: SerialPort.parsers.readline('\n')} );
+	var serialport = new SerialPort({path: serialPortPath, baudRate: serialBaudRate});
+	//const parser = serialport.pipe(new ReadlineParser({ delimiter: '\r\n' }))
+		// , parser: SerialPort.parsers.readline('\n')} );
 //	var serialport = new SerialPort(serialPortPath, {baudRate: 115200} );
 	serialport.on('open', function(){
 		console.log('Serial Port connected');
 		//if (writeHeaders == true) writeHeaderIntoFile();
 		serialport.on('data', function(data){
-//			if (!data.split) return;
-//            console.log('measurement: ' + data);
-			var _dataArray	= data.split(';');
+			var dataTmp=''+ data;
+			if (!dataTmp.split) return;
+            //console.log('measurement: ' + dataTmp);
+			var _dataArray	= dataTmp.split(';');
 			if (_dataArray[0] != sensorId ) return false;		
 			if (_dataArray.length == 2 && isNumeric(_dataArray[1]) && _dataArray[0] == sensorId  ) {
 //				console.log('measurement: ' + data);
 				radiationValue = _dataArray[1];
 				processMeasurement();
 			} else {
-				console.log('log not valid data: ' + data);
+				console.log('log not valid data: ' + dataTmp);
 			}
 		});
 
@@ -260,45 +265,8 @@ var sendData = function(data) {
 		});
 
 return;		
-// oud //		http://openiod.com/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&inputformat=insertom&objectid=humansensor&format=xml
-// oud //			&region=EHV		&lat=50.1		&lng=4.0		&category=airquality		&value=1
 
-//http://localhost:4000/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=scapeler_shinyei&offering=offering_0439_initial&verbose=true&commit=true&observation=scapeler_shinyei:12.345&neighborhoodcode=BU04390402
-//https://openiod.org/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=scapeler_shinyei&offering=offering_0439_initial&verbose=true&commit=true&observation=scapeler_shinyei:12.345&neighborhoodcode=BU04390402
-
-		var _url = openiodUrl + '/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&action=insertom&sensorsystem=apri-sensor-radiationd&offering=offering_0439_initial&commit=true';
-		_url = _url + '&region=0439' + '&foi=' + data.foi + '&neighborhoodcode=' + data.neighborhoodCode + '&citycode=' + data.cityCode + '&observation=' + data.observation ;
-		
-		console.log(_url);
-		request.get(_url)
-			.on('response', function(response) {
-				console.log(response.statusCode) // 200
-				console.log(response.headers['content-type']) // 'image/png'
-  			})
-			.on('error', function(err) {
-				console.log(err)
-			})
-		;
-		
 };
 
 
-
-var socket = io(socketUrl, {path:socketPath}); 
-
-socket.on('connection', function (socket) {
-	var currTime = new Date();
-	console.log(currTime +': connect from '+ socket.request.connection.remoteAddress + ' / '+ socket.handshake.headers['x-forwarded-for'] || socket.handshake.address.address);
-	
-});
-
-socket.on('disconnect', function() {
-	console.log('Disconnected from web-socket ');
-});
-
-socket.on('info', function(data) {
-	console.log('websocket info '+ data);
-	//io.sockets.emit('aireassignal', { data: data } );
-	//socket.broadcast.emit('aireassignal', { data: data } );
-});
-
+mainProcess();

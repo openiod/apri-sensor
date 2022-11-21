@@ -9,29 +9,29 @@
 
 // activate init process config-main
 var path = require('path');
-var startFolder 			= __dirname;
-var startFolderParent		= path.resolve(__dirname,'../..');
-var configServerModulePath	= startFolder + '/../apri-config/apri-config';
+var startFolder = __dirname;
+var startFolderParent = path.resolve(__dirname, '../..');
+var configServerModulePath = startFolder + '/../apri-config/apri-config';
 console.log("Start of Config Main ", configServerModulePath);
 var apriConfig = require(configServerModulePath)
 
-var systemFolder 			= __dirname;
-var systemFolderParent		= path.resolve(__dirname,'../..');
-var systemFolderRoot		= path.resolve(systemFolderParent,'..');
-var systemModuleFolderName 	= path.basename(systemFolder);
-var systemModuleName 		= path.basename(__filename);
-var systemBaseCode 			= path.basename(systemFolderParent);
+var systemFolder = __dirname;
+var systemFolderParent = path.resolve(__dirname, '../..');
+var systemFolderRoot = path.resolve(systemFolderParent, '..');
+var systemModuleFolderName = path.basename(systemFolder);
+var systemModuleName = path.basename(__filename);
+var systemBaseCode = path.basename(systemFolderParent);
 
-var initResult = apriConfig.init(systemModuleFolderName+"/"+systemModuleName);
+var initResult = apriConfig.init(systemModuleFolderName + "/" + systemModuleName);
 
 // **********************************************************************************
 
 // add module specific requires
-var request 			= require('request');
-var fs 					= require('fs');
-var {SerialPort} 			= require("serialport");
+var request = require('request');
+var fs = require('fs');
+var { SerialPort } = require("serialport");
 //const { ReadlineParser } = require('@serialport/parser-readline')
-const exec 				= require('child_process').exec;
+const exec = require('child_process').exec;
 
 var redis = require("redis");
 
@@ -48,11 +48,11 @@ redisClient.on("error", function (err) {
 
 // **********************************************************************************
 
-var siteProtocol 		= 'https://';
-var openiodUrl			= siteProtocol + 'openiod.org/' + apriConfig.systemCode; //SCAPE604';
-var loopTimeMax			= 60000; //ms, 60000=60 sec
+var siteProtocol = 'https://';
+var openiodUrl = siteProtocol + 'openiod.org/' + apriConfig.systemCode; //SCAPE604';
+var loopTimeMax = 60000; //ms, 60000=60 sec
 
-var usbComNames			= apriConfig.getSensorUsbComName();
+var usbComNames = apriConfig.getSensorUsbComName();
 console.log(usbComNames);
 
 var serialPortPath;
@@ -74,11 +74,11 @@ if (deviceParam != undefined) {
 if (baudrateParam != undefined) {
 	serialBaudRate = Number(baudrateParam);
 } else {
-	serialBaudRate = 9600 ; //19200 //38400; //9600;
+	serialBaudRate = 9600; //19200 //38400; //9600;
 }
 
 
-var usbPorts			= [];
+var usbPorts = [];
 //var serialPortPath		= "/dev/cu.usbmodem1411";
 //var serialPortPath		= "/dev/cu.usbmodem1421";
 //var serialPortPath		= "/dev/cu.wchusbserial1420";
@@ -86,52 +86,52 @@ var usbPorts			= [];
 //var serialPortPath		= "/dev/cu.usbserial-A904I3WJ";							
 //var serialPortPath              = "/dev/ttyACM1";
 
-var unit				= {};
+var unit = {};
 
 var loopStart;
-var loopTime			= 0; // ms
+var loopTime = 0; // ms
 
-var sensorId			= 'RadiationD';
+var sensorId = 'RadiationD';
 
 var measurementCount;
-var radiationValue;	
+var radiationValue;
 
 // create headers to only use ones in the result files
-var writeHeaders		= true;
-var headerAvg			= 'dateiso;duration;radiation;count\n';
+var writeHeaders = true;
+var headerAvg = 'dateiso;duration;radiation;count\n';
 
-var sensorFileName 		= 'sensor-radiationd-result';
-var sensorFileExtension	= '.csv';
+var sensorFileName = 'sensor-radiationd-result';
+var sensorFileExtension = '.csv';
 var sensorLocalPathRoot = systemFolderParent + '/sensor/';
-var fileFolder 			= 'openiod-v1';
-var resultsFolder 		= sensorLocalPathRoot + fileFolder + "/" + 'results/';
+var fileFolder = 'openiod-v1';
+var resultsFolder = sensorLocalPathRoot + fileFolder + "/" + 'results/';
 
-var today				= new Date();
-var dateString = today.getFullYear() + "-" + (today.getMonth()+1) + "-" +  today.getDate() + "_" + today.getHours(); // + ":" + today.getMinutes();
+var today = new Date();
+var dateString = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate() + "_" + today.getHours(); // + ":" + today.getMinutes();
 var resultsFileName = resultsFolder + sensorFileName + '_' + dateString;
 
-var getCpuInfo	= function() {
+var getCpuInfo = function () {
 	//hostname --all-ip-address
 	exec("cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2", (error, stdout, stderr) => {
 		if (error) {
 			console.error(`exec error: ${error}`);
 			return;
 		}
-		unit.id = stdout.substr(0,stdout.length-1);
+		unit.id = stdout.substr(0, stdout.length - 1);
 	});
 	exec("cat /proc/cpuinfo | grep Hardware | cut -d ' ' -f 2", (error, stdout, stderr) => {
 		if (error) {
 			console.error(`exec error: ${error}`);
 			return;
 		}
-		unit.hardware = stdout.substr(0,stdout.length-1);
+		unit.hardware = stdout.substr(0, stdout.length - 1);
 	});
 	exec("cat /proc/cpuinfo | grep Revision | cut -d ' ' -f 2", (error, stdout, stderr) => {
 		if (error) {
 			console.error(`exec error: ${error}`);
 			return;
 		}
-		unit.revision = stdout.substr(0,stdout.length-1);
+		unit.revision = stdout.substr(0, stdout.length - 1);
 	});
 };
 
@@ -168,22 +168,22 @@ SerialPort.list(function(err, ports) {
 */
 
 
-var mainProcess = function() {
-	var serialport = new SerialPort({path: serialPortPath, baudRate: serialBaudRate});
+var mainProcess = function () {
+	var serialport = new SerialPort({ path: serialPortPath, baudRate: serialBaudRate });
 	//const parser = serialport.pipe(new ReadlineParser({ delimiter: '\r\n' }))
-		// , parser: SerialPort.parsers.readline('\n')} );
-//	var serialport = new SerialPort(serialPortPath, {baudRate: 115200} );
-	serialport.on('open', function(){
+	// , parser: SerialPort.parsers.readline('\n')} );
+	//	var serialport = new SerialPort(serialPortPath, {baudRate: 115200} );
+	serialport.on('open', function () {
 		console.log('Serial Port connected');
 		//if (writeHeaders == true) writeHeaderIntoFile();
-		serialport.on('data', function(data){
-			var dataTmp=''+ data;
+		serialport.on('data', function (data) {
+			var dataTmp = '' + data;
 			if (!dataTmp.split) return;
-            //console.log('measurement: ' + dataTmp);
-			var _dataArray	= dataTmp.split(';');
-			if (_dataArray[0] != sensorId ) return false;		
-			if (_dataArray.length == 2 && isNumeric(_dataArray[1]) && _dataArray[0] == sensorId  ) {
-//				console.log('measurement: ' + data);
+			//console.log('measurement: ' + dataTmp);
+			var _dataArray = dataTmp.split(';');
+			if (_dataArray[0] != sensorId) return false;
+			if (_dataArray.length == 2 && isNumeric(_dataArray[1]) && _dataArray[0] == sensorId) {
+				//				console.log('measurement: ' + data);
 				radiationValue = _dataArray[1];
 				processMeasurement();
 			} else {
@@ -192,63 +192,58 @@ var mainProcess = function() {
 		});
 
 	});
-	serialport.on('error', function(err) {
-  		console.log('Error: ', err.message);
+	serialport.on('error', function (err) {
+		console.log('Error: ', err.message);
 	});
 
 }
 
 function isNumeric(n) {
-  return !isNaN(parseFloat(n)) && isFinite(n);
+	return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
 
 
-var processMeasurement = function() {
+var processMeasurement = function () {
 
 	writeResults();
-	
+
 }
 
 
-var writeHeaderIntoFile = function() {
+var writeHeaderIntoFile = function () {
 	fs.appendFile(resultsFileName + sensorFileExtension, headerAvg, function (err) {
 		if (err != null) {
 			console.log('Error writing results to file: ' + err);
 		}
 	});
-	writeHeaders	= false;
+	writeHeaders = false;
 }
 
-var writeResults	= function() {
-	var measurementTime		= new Date();
-	
-	console.log('Results: ' + measurementTime.toISOString() );
-	
-	var record	= sensorId + ';' + measurementTime.toISOString() + ';' + radiationValue + '\n';
-		
-	console.log(record);	
-	
+var writeResults = function () {
+
+
+	var record = sensorId + ';' + measurementTime.toISOString() + ';' + radiationValue + '\n';
+
+	console.log(record);
+
 	//fs.appendFile(resultsFileName + sensorFileExtension, record, function (err) {
 	//	if (err != null) {
 	//		console.log('Error writing results to file: ' + err);
 	//	}
 	//});	
 
-	var data			= {};
-	data.foi				= 'SCRP' + unit.id;
-		
-	//observation=stress:01
-		
-	//data.categories			= [];
-	data.rad		= radiationValue;
+	var data = {};
+	data.foi = 'SCRP' + unit.id;
+	data.datumUtc = new Date();
+	data.rad = radiationValue;
 
 	sendData(data);
- 
+
 }
 
 // send data to SOS service via OpenIoD REST service
-var sendData = function(data) {
+var sendData = function (data) {
 	var url = '';
 	redisHmsetHashAsync(data.datumUtc.toISOString() + ':radiationd'
 		, 'foi', 'SCRP' + unit.id
@@ -264,7 +259,7 @@ var sendData = function(data) {
 			console.log(data.datumUtc.toString() + ':radiationd' + _res);
 		});
 
-return;		
+	return;
 
 };
 

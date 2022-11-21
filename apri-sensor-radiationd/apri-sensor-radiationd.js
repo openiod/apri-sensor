@@ -28,43 +28,55 @@ var initResult = apriConfig.init(systemModuleFolderName+"/"+systemModuleName);
 
 // add module specific requires
 var request 			= require('request');
-//var express 			= require('express');
-
 var fs 					= require('fs');
-var SerialPort 			= require("serialport");
-var io	 				= require('socket.io-client');
+var {SerialPort} 			= require("serialport");
 const exec 				= require('child_process').exec;
-const execFile			= require('child_process').execFile;
 
-//var app = express();
+var redis = require("redis");
+
+var redisClient = redis.createClient();
+const { promisify } = require('util');
+//const redisGetAsync 				= promisify(redisClient.get).bind(redisClient);
+//const redisSetAsync 				= promisify(redisClient.set).bind(redisClient);
+const redisHmsetHashAsync = promisify(redisClient.hmset).bind(redisClient);
+const redisSaddAsync = promisify(redisClient.sadd).bind(redisClient);
+
+redisClient.on("error", function (err) {
+	console.log("Redis client Error " + err);
+});
 
 // **********************************************************************************
-		/* web-socket */
-	var socketUrl, socketPath;	
-//		socketUrl 	= 'http://localhost:3010';
-//		socketUrl 	= 'http://openiod.org';
-//		socketUrl 	= 'https://openiod.org';
-//		socketUrl 	= '';
-//		socketPath	= apriConfig.urlSystemRoot + '/socket.io';
 
-//prod:
-		socketUrl 	= 'https://openiod.org'; socketPath	= '/'+apriConfig.systemCode + '/socket.io';
-		//console.log(apriConfig);
-
-//test:
-//		socketPort	= 3010; socketUrl 	= ':'+socketPort; 
-//		socketPath	= apriConfig.urlSystemRoot + '/socket.io';
-
-
-		console.log('web-socket url: '+socketUrl+socketPath);
-
-var secureSite 			= true;
-var siteProtocol 		= secureSite?'https://':'http://';
+var siteProtocol 		= 'https://';
 var openiodUrl			= siteProtocol + 'openiod.org/' + apriConfig.systemCode; //SCAPE604';
 var loopTimeMax			= 60000; //ms, 60000=60 sec
 
 var usbComNames			= apriConfig.getSensorUsbComName();
 console.log(usbComNames);
+
+var serialPortPath;
+var serialBaudRate;
+
+var deviceParam = process.argv[2];
+var baudrateParam = process.argv[3];
+console.log('Param for serial device is ' + deviceParam + ' ' + baudrateParam);
+var sensorKey = '';
+if (deviceParam != undefined) {
+	serialPortPath = deviceParam;
+	sensorKey = serialPortPath.substring(8);  // minus '/dev/tty'
+	console.log('SensorKey = ' + sensorKey);
+} else {
+	serialPortPath = "/dev/ttyUSB0";
+}
+//var serialPortPath		= "/dev/cu.usbmodem1411";
+//var serialPortPath		= "/dev/cu.usbserial-A1056661";
+if (baudrateParam != undefined) {
+	serialBaudRate = Number(baudrateParam);
+} else {
+	serialBaudRate = 9600 ; //19200 //38400; //9600;
+}
+
+
 var usbPorts			= [];
 //var serialPortPath		= "/dev/cu.usbmodem1411";
 //var serialPortPath		= "/dev/cu.usbmodem1421";
@@ -155,11 +167,11 @@ SerialPort.list(function(err, ports) {
 
 
 var mainProcess = function() {
-	var serialport = new SerialPort(serialPortPath, {baudRate: 9600, parser: SerialPort.parsers.readline('\n')} );
+	var serialport = new SerialPort({path: serialPortPath, baudRate: serialBaudRate , parser: SerialPort.parsers.readline('\n')} );
 //	var serialport = new SerialPort(serialPortPath, {baudRate: 115200} );
 	serialport.on('open', function(){
 		console.log('Serial Port connected');
-		if (writeHeaders == true) writeHeaderIntoFile();
+		//if (writeHeaders == true) writeHeaderIntoFile();
 		serialport.on('data', function(data){
 //			if (!data.split) return;
 //            console.log('measurement: ' + data);
@@ -212,25 +224,19 @@ var writeResults	= function() {
 		
 	console.log(record);	
 	
-	fs.appendFile(resultsFileName + sensorFileExtension, record, function (err) {
-		if (err != null) {
-			console.log('Error writing results to file: ' + err);
-		}
-	});
-		
+	//fs.appendFile(resultsFileName + sensorFileExtension, record, function (err) {
+	//	if (err != null) {
+	//		console.log('Error writing results to file: ' + err);
+	//	}
+	//});	
 
 	var data			= {};
-	data.neighborhoodCode	= 'BU04390603'; //geoLocation.neighborhoodCode;  	
-	data.neighborhoodName	= '..'; //geoLocation.neighborhoodName;	
-	data.cityCode			= 'GM0439'; //geoLocation.cityCode;	
-	data.cityName			= '..'; //geoLocation.cityName;
 	data.foi				= 'SCRP' + unit.id;
 		
 	//observation=stress:01
 		
-	data.categories			= [];
-	data.observation		= 
-		'apri-sensor-radiationd-rad:'+ radiationValue;
+	//data.categories			= [];
+	data.rad		= radiationValue;
 
 	sendData(data);
  
@@ -238,6 +244,22 @@ var writeResults	= function() {
 
 // send data to SOS service via OpenIoD REST service
 var sendData = function(data) {
+	var url = '';
+	redisHmsetHashAsync(data.datumUtc.toISOString() + ':radiationd'
+		, 'foi', 'SCRP' + unit.id
+		, 'rad', data.rad
+	)
+		.then(function (res) {
+			var _res = res;
+			redisSaddAsync('new', data.datumUtc.toISOString() + ':radiationd')
+				.then(function (res2) {
+					var _res2 = res2;					//	redisSaddAsync('pmsa003', timeStamp.toISOString()+':pmsa003')
+					console.log('radiationd ', data.datumUtc.toISOString() + ':radiationd' + _res2);
+				});
+			console.log(data.datumUtc.toString() + ':radiationd' + _res);
+		});
+
+return;		
 // oud //		http://openiod.com/SCAPE604/openiod?SERVICE=WPS&REQUEST=Execute&identifier=transform_observation&inputformat=insertom&objectid=humansensor&format=xml
 // oud //			&region=EHV		&lat=50.1		&lng=4.0		&category=airquality		&value=1
 

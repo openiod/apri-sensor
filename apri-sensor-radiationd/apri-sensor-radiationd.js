@@ -222,17 +222,6 @@ var writeHeaderIntoFile = function () {
 
 var writeResults = function () {
 
-
-	var record = sensorId + ';' + measurementTime.toISOString() + ';' + radiationValue + '\n';
-
-	console.log(record);
-
-	//fs.appendFile(resultsFileName + sensorFileExtension, record, function (err) {
-	//	if (err != null) {
-	//		console.log('Error writing results to file: ' + err);
-	//	}
-	//});	
-
 	var data = {};
 	data.foi = 'SCRP' + unit.id;
 	data.datumUtc = new Date();

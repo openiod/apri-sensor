@@ -118,10 +118,11 @@ var serialInput = ''
 
 var mainProcess = function () {
 
-	var dateFile = JSON.parse(fs.readFileSync(dataLastDateFile, { encoding: 'utf8' }))
-	var lastDateIso = dateFile.lastDate  // yyyy-mm-ddThh:mm:ss
-	var lastDateDate = new Date(lastDateIso)
-	console.log(lastDateDate)
+	//var dateFile = JSON.parse(fs.readFileSync(dataLastDateFile, { encoding: 'utf8' }))
+	//var lastDateIso = dateFile.lastDate  // yyyy-mm-ddThh:mm:ss
+	//var lastDateDate = new Date(lastDateIso)
+	//console.log(lastDateDate)
+	
 	//	var newDate = new Date(lastDateDate.getTime()+600000)   // plus 10 minutes
 	//	var newDateIso = newDate.toISOString()
 	//	console.log(newDateIso)
@@ -313,14 +314,15 @@ var processMeasurement = function (data) {
 				var datumTmp2 = datumTmp[0]
 				var datumTmp3 = datumTmp2.split(' ')
 				var datumTmp4 = datumTmp3[0].split('/')
-				var datum = '20' + datumTmp4[2] + '-' + datumTmp4[1] + '-' + datumTmp4[0] + 'T' + datumTmp3[1] + ':00:00'
+				var datum = '20' + datumTmp4[2] + '-' + datumTmp4[0] + '-' + datumTmp4[1] + 'T' + datumTmp3[1] + ':00:00'
 				var year = 2000 + parseInt(datumTmp4[2])
 				var month = parseInt(datumTmp4[0]) - 1
 				var day = parseInt(datumTmp4[1])
 				var hour = parseInt(datumTmp3[1])
 				var minute = 0
 				var datum2 = new Date(year, month, day, hour, minute);
-				var datumUtc = new Date(datum2.getTime() + datum2.getTimezoneOffset() * 60000);
+				//var datumUtc = new Date(datum2.getTime() + datum2.getTimezoneOffset() * 60000);
+				var datumUtc = new Date(datum2.getTime() );
 				var pm25 = parseFloat(_dataArray[1]);
 				var rHum = parseFloat(_dataArray[6]);
 				var temperature = parseFloat(_dataArray[8]);

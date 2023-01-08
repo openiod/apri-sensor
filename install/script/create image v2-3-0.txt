@@ -84,10 +84,10 @@ sudo /etc/log2ram.conf
 # nmcli general hostname ID##.local
 
 
-#avahi, redis, nginx
+#avahi, redis
 sudo apt -y install avahi-utils
 sudo apt install git -y
-sudo apt -y install nginx
+# deze niet meer sudo apt -y install nginx
 
 
 Install nodejs for Raspberry pi Zero armv6 !! dus niet de Zero 2 welke armv7 is 
@@ -199,13 +199,20 @@ sudo cp /opt/SCAPE604/git/apri-sensor/install/avahi/avahi-daemon.conf /etc/avahi
 sudo cp -r /opt/SCAPE604/git/apri-sensor/apri-config /opt/SCAPE604/apri-sensor/.
 
 
-# eenmalig, als runtime stable is
-sudo rm -r /opt/SCAPE604/aprisensor-netmanager-runtime-stable
-sudo cp -r /opt/SCAPE604/apri-sensor/aprisensor-netmanager-runtime /opt/SCAPE604/aprisensor-netmanager-runtime-stable
-sudo cp /opt/SCAPE604/git/apri-sensor/install/aprisensor-netmanager/aprisensor-netmanager-nginx-site-default.conf /etc/nginx/sites-available/default
-#ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
-#sudo vi /etc/nginx/sites-available/default
-#sudo nginx -t
+deze niet meer:
+## eenmalig, als runtime stable is
+#sudo rm -r /opt/SCAPE604/aprisensor-netmanager-runtime-stable
+#sudo cp -r /opt/SCAPE604/apri-sensor/aprisensor-netmanager-runtime /opt/SCAPE604/aprisensor-netmanager-runtime-stable
+#  sudo cp /opt/SCAPE604/git/apri-sensor/install/aprisensor-netmanager/aprisensor-netmanager-nginx-site-default.conf /etc/nginx/sites-available/default
+
+## deze niet meer !!
+# ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+# sudo vi /etc/nginx/sites-available/default
+# sudo nginx -t
+
+sudo rm -r /opt/SCAPE604/aprisensor-netmanager-runtime
+sudo cp -r /opt/SCAPE604/git/apri-sensor/aprisensor-netmanager-runtime /opt/SCAPE604/aprisensor-netmanager-runtime
+sudo cp /opt/SCAPE604/git/apri-sensor/apri-config/aprisensor-netmanager-runtime.sh /opt/SCAPE604/.
 
 sudo rm -r /opt/SCAPE604/aprisensor-nmcli-stable
 sudo cp -r /opt/SCAPE604/git/apri-sensor/aprisensor-nmcli /opt/SCAPE604/aprisensor-nmcli-stable
@@ -215,13 +222,14 @@ cd /opt/SCAPE604/aprisensor-nmcli-stable
 npm install http-terminator
 exit
 
-sudo service nginx restart
+# deze niet meer: sudo service nginx restart
 
 
 
 #Voor opschonen Redis archive set and wifi check:
 sudo vi /etc/cron.d/apri-sensor-redis
 -->
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 */15 * * * * root /opt/SCAPE604/apri-sensor/apri-sensor-redis/apri-sensor-redis.sh > /dev/null 2>&1
 <--
 ##sudo crontab -e
@@ -231,6 +239,10 @@ sudo vi /etc/cron.d/apri-sensor-redis
 ### cleanup redis archive
 ##*/15 * * * * /opt/SCAPE604/apri-sensor/apri-sensor-redis/apri-sensor-redis.sh
 ###<--
+
+sudo cp /opt/SCAPE604/git/apri-sensor/apri-config/SCAPE604-aprisensor-netmanager-runtime.service.org /etc/systemd/system/SCAPE604-aprisensor-netmanager-runtime.service
+sudo systemctl enable SCAPE604-aprisensor-netmanager-runtime.service
+#systemctl start SCAPE604-aprisensor-netmanager-runtime.service
 
 sudo cp /opt/SCAPE604/git/apri-sensor/apri-config/SCAPE604-apri-agent.service.org /etc/systemd/system/SCAPE604-apri-agent.service
 sudo systemctl enable SCAPE604-apri-agent.service

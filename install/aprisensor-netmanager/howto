@@ -1,6 +1,6 @@
 
 #
-cd /data/Alfresco/opt/aprisensor-netmanager
+cd /home/awiel/stack/Alfresco/opt/aprisensor-netmanager
 
 # run netmanager for testing on port 5000
 npm run dev
@@ -8,26 +8,30 @@ npm run dev
 # build runtime and tar
 ./tarpublic.sh
 ## npm run build
-## tar cfvz aprisensor-netmanager.tar.gz ../aprisensor-netmanager/public
+## tar cfvz aprisensor-netmanager.tar.gz ../aprisensor-netmanager/build
 
 rm -r /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion2
 mv /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion2
 mv /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion
 mkdir /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime
-cp -r /data/Alfresco/opt/aprisensor-netmanager/public/* /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime
+cp -r /home/awiel/stack/Alfresco/opt/aprisensor-netmanager/build/* /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime
 cd /home/awiel/opt/apri-sensor/
 git status
 git push
 
 # on/for proxy2 server:
-cd /data/Alfresco/opt/aprisensor-netmanager
+cd /home/awiel/stack/Alfresco/opt/aprisensor-netmanager
 scp aprisensor-netmanager.tar.gz proxy2:.
 ssh proxy2
 cd /var/www/netmanager.aprisensor.nl
 sudo mv aprisensor-netmanager aprisensor-netmanager-YYYYDDMM
 sudo tar zxvf ~/aprisensor-netmanager.tar.gz
-ls -l *er/public/build
-??sudo service nginx restart
+sudo chown -R root:root aprisensor-netmanager
+ls -l aprisensor-netmanager/build
+
+!! LETOP!! oude versie was met html, nieuwe versie moet node zijn. Pas port aan naar: ....
+moet dus service worden met nieuw portnummer
+??sudo service nginx reload
 
 
 # on sensorkit:

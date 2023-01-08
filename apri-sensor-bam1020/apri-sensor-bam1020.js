@@ -122,7 +122,7 @@ var mainProcess = function () {
 	//var lastDateIso = dateFile.lastDate  // yyyy-mm-ddThh:mm:ss
 	//var lastDateDate = new Date(lastDateIso)
 	//console.log(lastDateDate)
-	
+
 	//	var newDate = new Date(lastDateDate.getTime()+600000)   // plus 10 minutes
 	//	var newDateIso = newDate.toISOString()
 	//	console.log(newDateIso)
@@ -322,7 +322,7 @@ var processMeasurement = function (data) {
 				var minute = 0
 				var datum2 = new Date(year, month, day, hour, minute);
 				//var datumUtc = new Date(datum2.getTime() + datum2.getTimezoneOffset() * 60000);
-				var datumUtc = new Date(datum2.getTime() );
+				var datumUtc = new Date(datum2.getTime());
 				var pm25 = parseFloat(_dataArray[1]);
 				var rHum = parseFloat(_dataArray[6]);
 				var temperature = parseFloat(_dataArray[8]);
@@ -336,7 +336,12 @@ var processMeasurement = function (data) {
 					, refUg: refUg
 				}
 				console.log(result);
-				writeResults(result);
+				if (isNumeric(rHum)) {  // extra controle of record wel volledig is
+					writeResults(result);
+				} else {
+					console.log("record niet volledig, gegevens genegeerd");
+				}
+
 			}
 		} //else console.log(datum)
 	}

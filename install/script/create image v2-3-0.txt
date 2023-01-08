@@ -1,0 +1,294 @@
+
+
+##  create complete new image
+
+download lite version from https://www.raspberrypi.com/software/operating-systems/
+#check checksum:
+# openssl dgst -sha256 2022-09-22-raspios-bullseye-armhf.img.xz
+
+Kopieer met Balena naar een sdkaart
+
+sudo vi /media/awiel/rootfs/etc/network/interfaces
+=======
+auto wlan0
+allow-hotplug wlan0
+iface wlan0 inet dhcp
+    wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+=======
+
+sudo vi /media/awiel/rootfs/etc/wpa_supplicant/wpa_supplicant.conf
+=======
+country=NL
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+network={
+  ssid="<SSID>"
+  psk="<password>"
+  proto=RSN
+  key_mgmt=WPA-PSK
+  pairwise=CCMP
+  auth_alg=OPEN
+}
+=======
+###sudo touch /media/awiel/rootfs/boot/ssh
+sudo touch /media/awiel/boot/ssh
+
+
+Plaats sd-card in raspberry-Pi Zero W
+login met pi/raspberry
+sudo raspi-config  (zonder '-' ! )
+- change password
+- localisation options / change locale en_GB.UTF-8 uit, en_US.UTF-8 aan en maak deze de default. (aanpassing duurt even)
+- localisation options / time zone Europe/Amsterdam
+- localisation options / Change Wi-fi Country NL
+- interfacing options
+-- ssh enable
+-- I2C enable
+-- serial login disable / hardware on
+-- 1-wire enable
+sudo reboot
+
+opnieuw inloggen:
+sudo apt update -y
+sudo apt upgrade -y
+sudo apt autoremove -y
+sudo reboot
+
+# /boot/config.txt --> dtoverlay=i2c-gpio,bus=3  (software i2c on gpio 23 sda 24 scl)
+sudo vi /boot/config.txt --> dtoverlay=disable-bt (serial wordt dan ttyAMA0 ipv ttyS0, is beter)
+sudo raspi-config --expand-rootfs
+sudo reboot
+
+
+## apt -y install network-manager  # already newest version
+#systemctl start NetworkManager.service
+#systemctl enable NetworkManager.service
+
+# for Raspberry Pi 3: ivm conflict network-manager en nmcli c up 'hotspot'
+apt purge openresolv dhcpcd5
+
+Bullseye:
+echo "deb [signed-by=/usr/share/keyrings/azlux-archive-keyring.gpg] http://packages.azlux.fr/debian/ bullseye main" | sudo tee /etc/apt/sources.list.d/azlux.list
+sudo wget -O /usr/share/keyrings/azlux-archive-keyring.gpg  https://azlux.fr/repo.gpg
+sudo apt update
+sudo apt install log2ram
+# wijzig 
+sudo /etc/log2ram.conf
+--> SIZE=60M
+# is default: PATH='/var/log'
+# deze vervalt voor ApriSensorSK2-> PATH='/var/log;/opt/SCAPE604/log'
+
+#vi /etc/hosts:
+# laatste regel: 127.0.1.1		ID## ID##.local
+# eg 127.0.1.1     41BD  41BD.local
+# nmcli general hostname ID##.local
+
+
+#avahi, redis, nginx
+sudo apt -y install avahi-utils
+sudo apt install git -y
+sudo apt -y install nginx
+
+
+Install nodejs for Raspberry pi Zero armv6 !! dus niet de Zero 2 welke armv7 is 
+aansluiten van de pi mbv de usb - ethernet adapter !!
+Install mbv nvm:
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
+logout;login
+NVM_NODEJS_ORG_MIRROR=https://unofficial-builds.nodejs.org/download/release nvm install 16
+sudo vi /root/.profile
+-->
+# set PATH so it includes nvm bin for node/npm if it exists
+if [ -d "/home/scapeler/.nvm/versions/node/v16.19.0/bin" ] ; then
+    PATH="/home/scapeler/.nvm/versions/node/v16.19.0/bin:$PATH"
+fi
+<--
+sudo ln -s  /home/scapeler/.nvm/versions/node/v16.19.0/bin/node /usr/bin/node
+sudo ln -s  /home/scapeler/.nvm/versions/node/v16.19.0/bin/npm /usr/bin/npm
+
+
+### for Raspberry Pi Zero :
+###curl -sL https://deb.nodesource.com/setup_17.x | sudo -E bash -
+##curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+##sudo apt install -y nodejs
+
+# for Raspberry Pi 3:
+curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+sudo apt install nodejs
+
+### for Raspberry Pi Zero W:
+##sudo mkdir /opt/nodejs
+##cd /opt/nodejs
+##wget https://nodejs.org/dist/v10.24.1/node-v10.24.1-linux-armv6l.tar.gz
+##tar -C /usr/local --strip-components 1 -xzf node-v10.24.1-linux-armv6l.tar.gz
+
+
+
+#see install/avahi/avahi-deamon.conf
+sudo apt -y install redis-server
+
+#todo
+# Edit the Redis configuration file to setup caching.
+sudo vi /etc/redis/redis.conf
+-->
+stop-writes-on-bgsave-error no
+#??maxmemory 50M
+#??maxmemory-policy allkeys-lru
+--<
+sudo vi /etc/sysctl.conf
+--> vm.overcommit_memory = 1
+#!! # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
+
+
+
+#reinstall node/npm:
+#sudo apt remove nodered -y
+#sudo apt remove node nodejs nodejs-legacy -y
+#sudo apt remove npm -y
+#sudo apt remove --purge node
+#sudo rm -rf /root/.node-gyp
+#sudo rm /usr/local/bin/node  #remove old version (10.x)
+#sudo npm install -g npm
+## for Raspberry Pi 3:
+#| curl -sL http://deb.nodesource.com/setup_14.x | sudo bash -
+#| #curl -sL http://deb.nodesource.com/setup_14.x | sudo bash -
+#| sudo apt-get install -y nodejs
+#| sudo apt autoremove
+
+node -v
+npm -v
+
+#PMSA003:
+# disable bluetooth:
+sudo systemctl stop hciuart
+sudo systemctl disable hciuart
+sudo systemctl status hciuart
+sudo usermod -a -G dialout pi 
+of
+sudo usermod -a -G dialout scapeler
+
+sudo mkdir -p /var/log/aprisensor
+sudo mkdir -p /opt/SCAPE604/config/
+sudo mkdir /opt/SCAPE604/git
+sudo mkdir /opt/SCAPE604/apri-sensor/
+sudo mkdir /opt/SCAPE604/apri-sensor/apri-agent
+sudo mkdir /opt/SCAPE604/apri-sensor/apri-config
+cd /opt/SCAPE604/git
+sudo git clone --depth 1 https://github.com/openiod/apri-sensor.git
+cd /opt/SCAPE604/git/apri-sensor
+sudo git config pull.rebase false (eenmalige 'default' actie, nog uitzoek waarvoor)
+# voor Pi Zero:
+sudo /opt/SCAPE604/git/apri-sensor/install/git2as.sh
+#bij upgrade kan deze rm nog wel eens een blockade voorkomen
+#rm package-lock.json
+sudo cp apri-config/apri-system-example.json /opt/SCAPE604/config/apri-system.json
+sudo cp package.json /opt/SCAPE604/apri-sensor/.
+#onderstaande onder root uitvoeren (sudo is niet voldoende)
+controleer vooraf of package.json actuele versies bevat (socket.io nu nog v2)
+sudo su -
+cd /opt/SCAPE604/apri-sensor
+npm install
+npm install raspi raspi-i2c
+
+printf '[logging]\ndomains=ALL:WARN\n' > /etc/NetworkManager/conf.d/aprisensor.conf 
+# eventueel met ; systemctl restart NetworkManager
+
+exit  # exit root
+
+sudo cp /opt/SCAPE604/git/apri-sensor/install/avahi/avahi-daemon.conf /etc/avahi/avahi-daemon.conf
+sudo cp -r /opt/SCAPE604/git/apri-sensor/apri-config /opt/SCAPE604/apri-sensor/.
+
+
+# eenmalig, als runtime stable is
+sudo rm -r /opt/SCAPE604/aprisensor-netmanager-runtime-stable
+sudo cp -r /opt/SCAPE604/apri-sensor/aprisensor-netmanager-runtime /opt/SCAPE604/aprisensor-netmanager-runtime-stable
+sudo cp /opt/SCAPE604/git/apri-sensor/install/aprisensor-netmanager/aprisensor-netmanager-nginx-site-default.conf /etc/nginx/sites-available/default
+#ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+#sudo vi /etc/nginx/sites-available/default
+#sudo nginx -t
+
+sudo rm -r /opt/SCAPE604/aprisensor-nmcli-stable
+sudo cp -r /opt/SCAPE604/git/apri-sensor/aprisensor-nmcli /opt/SCAPE604/aprisensor-nmcli-stable
+
+sudo su -
+cd /opt/SCAPE604/aprisensor-nmcli-stable
+npm install http-terminator
+exit
+
+sudo service nginx restart
+
+
+
+#Voor opschonen Redis archive set and wifi check:
+sudo vi /etc/cron.d/apri-sensor-redis
+-->
+*/15 * * * * root /opt/SCAPE604/apri-sensor/apri-sensor-redis/apri-sensor-redis.sh > /dev/null 2>&1
+<--
+##sudo crontab -e
+###-->
+##PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+##
+### cleanup redis archive
+##*/15 * * * * /opt/SCAPE604/apri-sensor/apri-sensor-redis/apri-sensor-redis.sh
+###<--
+
+sudo cp /opt/SCAPE604/git/apri-sensor/apri-config/SCAPE604-apri-agent.service.org /etc/systemd/system/SCAPE604-apri-agent.service
+sudo systemctl enable SCAPE604-apri-agent.service
+#systemctl start SCAPE604-apri-agent.service
+
+sudo cp /opt/SCAPE604/git/apri-sensor/apri-config/SCAPE604-aprisensor-nmcli.service.org /etc/systemd/system/SCAPE604-aprisensor-nmcli.service
+sudo systemctl enable SCAPE604-aprisensor-nmcli.service
+#systemctl start SCAPE604-aprisensor-nmcli.service
+# depending on hardware swicth (HW-switch) disable one of these services
+sudo cp /opt/SCAPE604/git/apri-sensor/apri-config/SCAPE604-aprisensor-nmcli-stable.service.org /etc/systemd/system/SCAPE604-aprisensor-nmcli-stable.service
+#systemctl enable SCAPE604-aprisensor-nmcli-stable.service
+#systemctl start SCAPE604-aprisensor-nmcli-stable.service
+
+sudo cp /opt/SCAPE604/git/apri-sensor/apri-config/SCAPE604-apri-sensor-connector.service.org /etc/systemd/system/SCAPE604-apri-sensor-connector.service
+sudo systemctl enable SCAPE604-apri-sensor-connector.service
+#systemctl start SCAPE604-apri-sensor-connector.service
+
+# volgende niet standaard voor raspberry pi 3/4
+sudo cp /opt/SCAPE604/git/apri-sensor/apri-config/SCAPE604-apri-sensor-raspi.service.org /etc/systemd/system/SCAPE604-apri-sensor-raspi.service
+sudo systemctl enable SCAPE604-apri-sensor-raspi.service
+#systemctl start SCAPE604-apri-sensor-raspi.service
+
+#sudo cp /opt/SCAPE604/git/apri-sensor/apri-config/SCAPE604-apri-sensor-tsi3007.service.org /etc/systemd/system/SCAPE604-apri-sensor-tsi3007.service
+#sudo systemctl enable SCAPE604-apri-sensor-tsi3007.service
+#sudo systemctl start SCAPE604-apri-sensor-tsi3007.service
+
+#sudo mkdir /opt/SCAPE604/results/
+#sudo cp /opt/SCAPE604/git/apri-sensor/apri-config/SCAPE604-apri-sensor-bam1020.service.org /etc/systemd/system/SCAPE604-apri-sensor-bam1020.service
+#sudo systemctl enable SCAPE604-apri-sensor-bam1020.service
+#sudo systemctl start SCAPE604-apri-sensor-bam1020.service
+
+# when installed via eth0 this file will block nmcli from connecting to wifi
+sudo rm /etc/wpa_supplicant/wpa_supplicant.conf
+sudo cp /opt/SCAPE604/git/apri-sensor/install/interfaces.org /etc/network/interfaces
+
+# make alias for usb devices:
+!! Reconnect the usb-device to activate the alias of 
+!! sudo udevadm trigger
+!! voeg dialout toe aan /etc/group -> dialout:x:20:<username>  (usermod -a -G dialout <username>)
+
+lsusb ; list usb-devices (after connecting a serial device)
+->Bus 001 Device 021: ID 067b:2303 Prolific Technology, Inc. PL2303 Serial Port
+ID vendor=067b
+ID product=2303
+(voorbeeld pico van solar: ID 2e8a:000a Raspberry Pi Pico -> vendor:2e8a product:000a)
+
+lsusb -t ;
+
+sudo udevadm info /dev/ttyUSB0 ;
+udevadm info -a -p  $(udevadm info -q path -n /dev/ttyUSB0)
+ls -l /dev/serial/by-id/
+-> usb-Prolific_Technology_Inc._USB-Serial_Controller_D-if00-port0 -> ../../ttyUSB0
+sudo vi /etc/udev/rules.d/99-usb-serial.rules
+-> 
+# BAM1020 via usb poort bam is niet stabiel dus nu de serieel-usb adapter van de Dylos in gebruik: DC1700 / AJ03KNV9
+
+#ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="0000:00:14.0", SYMLINK+="ttybam1020"
+#ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", ATTRS{serial}=="3f980000.usb", SYMLINK+="ttybam1020A"
+#ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", SYMLINK+="ttybam1020"
+
+ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="ttyRadiationd", GROUP="plugdev"

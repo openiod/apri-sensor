@@ -1,4 +1,6 @@
-#
+# 2.3.? - crontab update for redis cleanup
+# 2.3.? - Pi3 remove wpa_supplicant.conf
+# 2.3.? - printf '[logging]\ndomains=ALL:WARN\n' > /etc/NetworkManager/conf.d/aprisensor.conf ; systemctl restart NetworkManager
 # 2.2.1 - rm /var/hdd.log/* /var/log/* /var/hdd.log/* /var/log/hdd.log/aprisensor/*
 #         as last step preparingfresh SD-card
 # 2.2.0 - sockect removed from apri-sensor-raspi
@@ -189,6 +191,7 @@ cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2
 apt update -y
 apt upgrade -y
 apt autoremove -y
+sudo reboot
 
 apt -y install network-manager
 #systemctl start NetworkManager.service
@@ -250,8 +253,8 @@ apt -y install nginx
 #sudo rm /usr/local/bin/node  #remove old version (10.x)
 #sudo npm install -g npm
 ## for Raspberry Pi 3:
-#| curl -sL http://deb.nodesource.com/setup_10.x | sudo bash -
-#| #curl -sL http://deb.nodesource.com/setup_12.x | sudo bash -
+#| curl -sL http://deb.nodesource.com/setup_14.x | sudo bash -
+#| #curl -sL http://deb.nodesource.com/setup_14.x | sudo bash -
 #| sudo apt-get install -y nodejs
 #| sudo apt autoremove
 
@@ -370,16 +373,29 @@ rm /etc/wpa_supplicant/wpa_supplicant.conf
 cp /opt/SCAPE604/git/apri-sensor/install/interfaces.org /etc/network/interfaces
 
 # make alias for usb devices:
+!! Reconnect the usb-device to activate the alias of 
+!! sudo udevadm trigger
+!! voeg dialout toe aan /etc/group -> dialout:x:20:<username>  (usermod -a -G dialout <username>)
+
 lsusb ; list usb-devices (after connecting a serial device)
 ->Bus 001 Device 021: ID 067b:2303 Prolific Technology, Inc. PL2303 Serial Port
 ID vendor=067b
 ID product=2303
 (voorbeeld pico van solar: ID 2e8a:000a Raspberry Pi Pico -> vendor:2e8a product:000a)
+
 lsusb -t ;
+of device via ls -l /dev/serial/by-id/.  (bij bam zo uitgevoerd)
+
 sudo udevadm info /dev/ttyUSB0 ;
 udevadm info -a -p  $(udevadm info -q path -n /dev/ttyUSB0)
 ls -l /dev/serial/by-id/
 -> usb-Prolific_Technology_Inc._USB-Serial_Controller_D-if00-port0 -> ../../ttyUSB0
 sudo vi /etc/udev/rules.d/99-usb-serial.rules
--> ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", ATTRS{serial}=="0000:00:14.0", SYMLINK+="ttybam1020"
-reconnect the usb-device to activate the alias
+-> 
+# BAM1020 via usb poort bam is niet stabiel dus nu de serieel-usb adapter van de Dylos in gebruik: DC1700 / AJ03KNV9
+
+#ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="0000:00:14.0", SYMLINK+="ttybam1020"
+#ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", ATTRS{serial}=="3f980000.usb", SYMLINK+="ttybam1020A"
+#ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", SYMLINK+="ttybam1020"
+
+ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="ttyRadiationd", GROUP="plugdev"

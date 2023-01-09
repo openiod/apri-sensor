@@ -942,7 +942,7 @@ function isNumeric(n) {
 }
 
 // send data to service
-var sendData = function () {
+var sendData = async function () {
   var timeStamp = new Date();
   var url = '';
   if (results.pms.nrOfMeas > 0) {

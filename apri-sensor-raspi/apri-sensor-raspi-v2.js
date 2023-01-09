@@ -918,7 +918,17 @@ var processDataCycle = function () {
   initCounters();
   counters.busy = false;
 
-  sendData();
+  redisClient.connect().
+  then(function (res) {
+    sendData();
+  }
+  .catch(function (err) {
+    logger.info('Redis connect catch ') // already connected ?
+    logger.info(err)
+    sendData();
+  })
+  .
+  
 }
 
 var printHex = function (buffer, tekst) {
@@ -934,8 +944,7 @@ function isNumeric(n) {
 }
 
 // send data to service
-var sendData = async function () {
-  await redisClient.connect()
+var sendData = function () {
   var timeStamp = new Date();
   var url = '';
   if (results.pms.nrOfMeas > 0) {

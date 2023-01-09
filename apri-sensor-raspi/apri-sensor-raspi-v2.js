@@ -918,8 +918,8 @@ var processDataCycle = function () {
   initCounters();
   counters.busy = false;
 
-  redisClient.connect().
-  then(function (res) {
+  redisClient.connect()
+  .then(function (res) {
     sendData();
   })
   .catch(function (err) {
@@ -927,8 +927,6 @@ var processDataCycle = function () {
     logger.info(err)
     sendData();
   })
-  .
-  
 }
 
 var printHex = function (buffer, tekst) {

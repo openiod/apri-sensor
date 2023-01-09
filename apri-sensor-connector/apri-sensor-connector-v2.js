@@ -35,6 +35,7 @@ var fs = require('fs');
 var redis = require("redis");
 var io = require('socket.io-client');
 const redisClient = redis.createClient();
+
 /*
 const { promisify } = require('util');
 //const redisGetAsync 				= promisify(redisClient.get).bind(redisClient);
@@ -420,4 +421,9 @@ socket.on('info', function (data) {
 	console.dir(data);
 });
 
-processDataCycle({ repeat: true });
+const main = async function () {
+	await redisClient.connect()
+	processDataCycle({ repeat: true });
+}
+
+main()

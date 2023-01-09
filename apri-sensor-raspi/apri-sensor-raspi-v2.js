@@ -934,7 +934,8 @@ function isNumeric(n) {
 }
 
 // send data to service
-var sendData = function () {
+var sendData = async function () {
+  await redisClient.connect()
   var timeStamp = new Date();
   var url = '';
   if (results.pms.nrOfMeas > 0) {
@@ -945,7 +946,7 @@ var sendData = function () {
     //						',raw2_5:'+results.pms.part2_5+',raw5_0:'+results.pms.part5_0+',raw10_0:'+results.pms.part10_0;
     //			logger.info(url);
     // redisHmsetHashAsync(timeStamp.toISOString() + ':pmsa003'
-    redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':pmsa003'
+    await redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':pmsa003'
       , 'foi', 'SCRP' + unit.id
       , 'pm1', results.pms.pm1CF1
       , 'pm25', results.pms.pm25CF1
@@ -976,7 +977,7 @@ var sendData = function () {
     //						'temperature:'+results.bme280.temperature+',pressure:'+results.bme280.pressure+',rHum:'+results.bme280.rHum ;
     //			logger.info(url);
     // redisHmsetHashAsync(timeStamp.toISOString() + ':bme280'
-    redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':bme280'
+    await redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':bme280'
       , 'foi', 'SCRP' + unit.id
       , 'temperature', results.bme280.temperature
       , 'pressure', results.bme280.pressure
@@ -998,7 +999,7 @@ var sendData = function () {
     //						'temperature:'+results.bme680.temperature+',pressure:'+results.bme680.pressure+
     //            ',rHum:'+results.bme680.rHum+',gasResistance:'+results.bme680.gasResistance ;
     //			logger.info(url);
-    redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':bme680'
+    await redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':bme680'
       , 'foi', 'SCRP' + unit.id
       , 'temperature', results.bme680.temperature
       , 'pressure', results.bme680.pressure
@@ -1016,7 +1017,7 @@ var sendData = function () {
     });
   }
   if (results.ds18b20.nrOfMeas > 0) {
-    redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':ds18b20'
+    await redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':ds18b20'
       , 'foi', 'SCRP' + unit.id
       , 'temperature', results.ds18b20.temperature
     ).then(function (res) {
@@ -1031,7 +1032,7 @@ var sendData = function () {
     });
   }
   if (results.tgs5042.nrOfMeas > 0) {
-    redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':tgs5042'
+    await redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':tgs5042'
       , 'foi', 'SCRP' + unit.id
       , 'co', results.tgs5042.co
     ).then(function (res) {
@@ -1058,7 +1059,7 @@ var sendData = function () {
       console.log(gpsTpv)
       if (gpsTpv.mode == 2) {
         spsProcessed = true
-        redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':sps30'
+        await redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':sps30'
           , 'foi', 'SCRP' + unit.id
           , 'pm1', results.sps.pm1
           , 'pm25', results.sps.pm25
@@ -1091,7 +1092,7 @@ var sendData = function () {
       }
       if (gpsTpv.mode == 3) { // mode 3
         spsProcessed = true
-        redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':sps30'
+        await redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':sps30'
           , 'foi', 'SCRP' + unit.id
           , 'pm1', results.sps.pm1
           , 'pm25', results.sps.pm25
@@ -1135,7 +1136,7 @@ var sendData = function () {
       }
     }
     if (spsProcessed == false) {
-      redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':sps30'
+      await redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':sps30'
         , 'foi', 'SCRP' + unit.id
         , 'pm1', results.sps.pm1
         , 'pm25', results.sps.pm25
@@ -1173,7 +1174,7 @@ var sendData = function () {
     //						',raw2_5:'+results.ips7100.part2_5+',raw4_0:'+results.ips7100.part4_0+
     //            ',raw10_0:'+results.ips7100.part10_0 ;
     //			logger.info(url);
-    redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':ips7100'
+    await redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':ips7100'
       , 'foi', 'SCRP' + unit.id
       , 'pm01', results.ips7100.pm01
       , 'pm03', results.ips7100.pm03
@@ -1206,7 +1207,7 @@ var sendData = function () {
     //			url = openiodUrl + '/scd30'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
     //						'temperature:'+results.scd30.temperature+',rHum:'+results.scd30.rHum+',co2:'+results.scd30.co2 ;
     //			logger.info(url);
-    redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':scd30'
+    await redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':scd30'
       , 'foi', 'SCRP' + unit.id
       , 'temperature', results.scd30.temperature
       , 'rHum', results.scd30.rHum

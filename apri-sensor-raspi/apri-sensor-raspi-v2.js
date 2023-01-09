@@ -921,7 +921,7 @@ var processDataCycle = function () {
   redisClient.connect().
   then(function (res) {
     sendData();
-  }
+  })
   .catch(function (err) {
     logger.info('Redis connect catch ') // already connected ?
     logger.info(err)

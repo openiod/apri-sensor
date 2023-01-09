@@ -314,13 +314,14 @@ exit  # exit root
 sudo cp /opt/SCAPE604/git/apri-sensor/install/avahi/avahi-daemon.conf /etc/avahi/avahi-daemon.conf
 
 
-# eenmalig, als runtime stable is
-sudo rm -r /opt/SCAPE604/aprisensor-netmanager-runtime-stable
-sudo cp -r /opt/SCAPE604/apri-sensor/aprisensor-netmanager-runtime /opt/SCAPE604/aprisensor-netmanager-runtime-stable
-sudo cp /opt/SCAPE604/git/apri-sensor/install/aprisensor-netmanager/aprisensor-netmanager-nginx-site-default.conf /etc/nginx/sites-available/default
-#ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
-#sudo vi /etc/nginx/sites-available/default
-#sudo nginx -t
+## DEZE MOET ANDERS VOOR NIEUWE NETMANAGER (via nodejs service ipv html webservice via nginx )
+## # eenmalig, als runtime stable is
+## sudo rm -r /opt/SCAPE604/aprisensor-netmanager-runtime-stable
+## sudo cp -r /opt/SCAPE604/apri-sensor/aprisensor-netmanager-runtime /opt/SCAPE604/aprisensor-netmanager-runtime-stable
+## sudo cp /opt/SCAPE604/git/apri-sensor/install/aprisensor-netmanager/aprisensor-netmanager-nginx-site-default.conf /etc/nginx/sites-available/default
+## #ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+## #sudo vi /etc/nginx/sites-available/default
+## #sudo nginx -t
 
 sudo rm -r /opt/SCAPE604/aprisensor-nmcli-stable
 sudo cp -r /opt/SCAPE604/git/apri-sensor/aprisensor-nmcli /opt/SCAPE604/aprisensor-nmcli-stable

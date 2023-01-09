@@ -975,7 +975,7 @@ var sendData = function () {
     //			url = openiodUrl + '/bme280'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
     //						'temperature:'+results.bme280.temperature+',pressure:'+results.bme280.pressure+',rHum:'+results.bme280.rHum ;
     //			logger.info(url);
-   // redisHmsetHashAsync(timeStamp.toISOString() + ':bme280'
+    // redisHmsetHashAsync(timeStamp.toISOString() + ':bme280'
     redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':bme280'
       , 'foi', 'SCRP' + unit.id
       , 'temperature', results.bme280.temperature
@@ -1780,7 +1780,7 @@ var initBmeDevice = function () {
         logger.info('BME680 init') //
         indBme280 = false
         indBme680 = false
-        initBme680()
+        //initBme680()
         return
       })
     return
@@ -1954,14 +1954,14 @@ var processRaspiSerialData7100 = function (data) {
 
 var serialDevices = [
   {
-    device: '/dev/ttyS0'
+    device: '/dev/ttyAMA0'
     , baudRate: 9600
     , initiated: false
     , validData: false
     , deviceType: 'pmsa003'
   },
   {
-    device: '/dev/ttyS0'
+    device: '/dev/ttyAMA0'
     , baudRate: 115200
     , initiated: false
     , validData: false
@@ -2022,7 +2022,13 @@ var initSerial = function (serialDeviceIndex) {
     serialDevices[serialDeviceIndex].deviceType)
   raspi.init(() => {
     var options = { portId: serialDevices[serialDeviceIndex].device, baudRate: serialDevices[serialDeviceIndex].baudRate }
-    serialDevices[serialDeviceIndex].serial = new Serial(options);
+    try {
+      serialDevices[serialDeviceIndex].serial = new Serial(options);
+    } catch (error) {
+      console.log('Error: create new Serial for:')
+      console.log(options);
+      return
+    }
     serialDevices[serialDeviceIndex].serial.serialDeviceIndex = serialDeviceIndex
     serialDevices[serialDeviceIndex].serial.open(() => {
       //logger.info('serial open')

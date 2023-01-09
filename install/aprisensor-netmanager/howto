@@ -7,14 +7,31 @@ npm run dev
 
 # build runtime and tar
 ./tarpublic.sh
-## npm run build
-## tar cfvz aprisensor-netmanager.tar.gz ../aprisensor-netmanager/build
+- npm run build
+- sudo vi build/package.json
+ {
+    "name": "apri-sensor",
+  "version": "2.3.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "dependencies": {
+    "@fortawesome/free-solid-svg-icons": "^6.2.1"
+  }
+}
+- tar cfvz aprisensor-netmanager.tar.gz ../aprisensor-netmanager/public
+- cp aprisensor-netmanager.tar.gz /home/awiel/opt/apri-sensor/.
+ of voor v2:
+- tar cfvz aprisensor-netmanager-v2.tar.gz ../aprisensor-netmanager-v2/build
+- cp aprisensor-netmanager-v2.tar.gz /home/awiel/opt/apri-sensor/.
 
-rm -r /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion2
-mv /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion2
-mv /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion
-mkdir /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime
-cp -r /home/awiel/stack/Alfresco/opt/aprisensor-netmanager/build/* /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime
+mv aprisensor-netmanager.tar.gz /home/awiel/opt/apri-sensor/.
+
+#rm -r /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion2
+#mv /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion2
+#mv /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion
+#mkdir /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime
+#cp -r /home/awiel/stack/Alfresco/opt/aprisensor-netmanager/build/* /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime
 cd /home/awiel/opt/apri-sensor/
 git status
 git push
@@ -29,6 +46,7 @@ sudo tar zxvf ~/aprisensor-netmanager.tar.gz
 sudo chown -R root:root aprisensor-netmanager
 ls -l aprisensor-netmanager/build
 
+
 !! LETOP!! oude versie was met html, nieuwe versie moet node zijn. Pas port aan naar: ....
 moet dus service worden met nieuw portnummer
 ??sudo service nginx reload
@@ -40,6 +58,14 @@ sudo install/git2as.sh
 sudo /opt/SCAPE604/apri-sensor/apri-agent/apri-sensor-update.sh
 sudo systemctl restart SCAPE604-aprisensor-nmcli
 # when upgrade stable version:
+# v2:
+sudo cp /opt/SCAPE604/git/apri-sensor/aprisensor-netmanager-v2.tar.gz  /opt/SCAPE604/.
+cd /opt/SCAPE604
+sudo tar zxvf aprisensor-netmanager-v2.tar.gz
+/opt/SCAPE604/aprisensor-netmanager-runtime-v2/build
+npm install (for fontawesom modules)
+
+# 
 # sudo rm -rf /opt/SCAPE604/aprisensor-netmanager-runtime-stable
 # sudo cp -r /opt/SCAPE604/apri-sensor/aprisensor-netmanager-runtime /opt/SCAPE604/aprisensor-netmanager-runtime-stable
 

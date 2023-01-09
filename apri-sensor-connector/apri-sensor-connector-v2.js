@@ -111,7 +111,7 @@ var processDataCycle = function (parm) {
 
 	//log('Find new record');
 	//redisSortAsync('new', 'alpha', 'limit', 0, 60, 'asc')
-	redisClient.SORTASYNC('new', 'alpha', 'limit', 0, 60, 'asc')
+	redisClient.SORT('new', 'alpha', 'limit', 0, 60, 'asc')
 		.then(function (res) {
 			var _res = res;
 			if (_res.length > 0) {
@@ -119,10 +119,11 @@ var processDataCycle = function (parm) {
 				processRedisData(_res)
 			} else setTimeout(processDataCycle, loopTimeCycle);
 		})
-	//	.catch(function(error) {
-	//		setTimeout(processDataCycle, loopTimeCycle);
+		.catch(function(error) {
+			console.log('catch after Redis SORT')
+			setTimeout(processDataCycle, loopTimeCycle);
 	//		log('Axios catch');
-	//  });
+	  });
 
 	//	setTimeout(processDataCycle, loopTimeCycle);
 

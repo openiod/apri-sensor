@@ -1,4 +1,9 @@
-
+- node version 16 ! 
+- Redis version 6 !
+- sveltekit 1
+- new aprisensor-netmanager(-runtime-v2). Now node service (no html webservice via nginx)
+- new apri-sensor-raspi-v2, apri-sensor-connector-v2, apri-sensor-redis-v2 with Redis v6
+- nginx removed, no more webservices (aprisensor-netmanager-runtime-v2=node service)
 
 ##  create complete new image
 
@@ -52,6 +57,14 @@ opnieuw inloggen:
 sudo apt update -y
 sudo apt upgrade -y
 sudo apt autoremove -y
+
+#increase swap:
+sudo dphys-swapfile swapoff
+sudo vi /etc/dphys-swapfile
+--> CONF_SWAPSIZE=512
+sudo dphys-swapfile setup
+sudo dphys-swapfile swapon
+
 sudo reboot
 
 # /boot/config.txt --> dtoverlay=i2c-gpio,bus=3  (software i2c on gpio 23 sda 24 scl)
@@ -188,7 +201,7 @@ controleer vooraf of package.json actuele versies bevat (socket.io nu nog v2)
 sudo su -
 cd /opt/SCAPE604/apri-sensor
 npm install
-npm install raspi raspi-i2c
+npm install raspi raspi-i2c raspi-serial
 
 printf '[logging]\ndomains=ALL:WARN\n' > /etc/NetworkManager/conf.d/aprisensor.conf 
 # eventueel met ; systemctl restart NetworkManager
@@ -213,6 +226,8 @@ deze niet meer:
 sudo rm -r /opt/SCAPE604/aprisensor-netmanager-runtime
 sudo cp -r /opt/SCAPE604/git/apri-sensor/aprisensor-netmanager-runtime /opt/SCAPE604/aprisensor-netmanager-runtime
 sudo cp /opt/SCAPE604/git/apri-sensor/apri-config/aprisensor-netmanager-runtime.sh /opt/SCAPE604/.
+# runtime needs type:module in package.json
+sudo cp /opt/SCAPE604/git/apri-sensor/package.json /opt/SCAPE604/aprisensor-netmanager-runtime/.
 
 sudo rm -r /opt/SCAPE604/aprisensor-nmcli-stable
 sudo cp -r /opt/SCAPE604/git/apri-sensor/aprisensor-nmcli /opt/SCAPE604/aprisensor-nmcli-stable

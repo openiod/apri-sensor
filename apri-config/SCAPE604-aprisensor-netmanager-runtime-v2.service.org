@@ -1,0 +1,9 @@
+[Unit]
+Description=SCAPE604-aprisensor-netmanager-runtime-v2 - start or restart service, respawn
+After=network.target
+[Service]
+ExecStart=/opt/SCAPE604/aprisensor-netmanager-runtime-v2.sh /var/log/aprisensor/SCAPE604-aprisensor-netmanager-runtime-v2.log
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

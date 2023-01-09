@@ -122,6 +122,7 @@ var processDataCycle = function (parm) {
 		})
 		.catch(function(error) {
 			console.log('catch after Redis SORT')
+			console.log(error)
 			setTimeout(processDataCycle, loopTimeCycle);
 	//		log('Axios catch');
 	  });

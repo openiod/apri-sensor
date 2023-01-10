@@ -1252,7 +1252,7 @@ actions.push(function () {
 })
 actions.push(async function () {
   //  console.log('getHostname 1')
-  exec("nmcli general hostname " + unit.ssid + ".local", (error, stdout, stderr) => {
+  exec("nmcli general hostname " + unit.ssid + ".local", async (error, stdout, stderr) => {
     //    console.log('getHostname')
     if (error) {
       console.error(`exec error: ${error}`);

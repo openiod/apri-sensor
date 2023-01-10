@@ -1250,7 +1250,7 @@ actions.push(function () {
   });
   nextAction()
 })
-actions.push(function () {
+actions.push(async function () {
   //  console.log('getHostname 1')
   exec("nmcli general hostname " + unit.ssid + ".local", (error, stdout, stderr) => {
     //    console.log('getHostname')

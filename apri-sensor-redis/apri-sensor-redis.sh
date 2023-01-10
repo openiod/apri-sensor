@@ -22,6 +22,8 @@ $NODEPATH apri-sensor-redis/apri-sensor-redis.js >>$LOGFILE 2>>$LOGFILE
 
 rm /var/log/*gz
 rm /var/log/*.1
+journalctl --vacuum-time=1h
+
 # eenmalig voor oudere versies
 #rm /opt/SCAPE604/log/apri-sensor-redis.log
 

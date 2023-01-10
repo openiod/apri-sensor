@@ -169,7 +169,7 @@ var getRedisData = function (redisArray, redisArrayIndex) {
 	var url = '';
 
 	//redisHgetallAsync(_redisKey)
-	redisClient.HGETALLASYNC(_redisKey)
+	redisClient.HGETALL(_redisKey)
 		.then(function (res) {
 			var _res = res;
 			switch (keySplit[lastEntry]) {
@@ -351,7 +351,7 @@ var sendData = function (redisArray, redisArrayIndex, redisKey, url) {
 
 			if (removeRecord == true) {
 				//redisSmoveAsync('new', 'archive', _redisKey)
-				redisClient.SMOVEASYNC('new', 'archive', _redisKey)
+				redisClient.SMOVE('new', 'archive', _redisKey)
 					.then(function (e) {
 						//				logDir(response.data);
 						log('status ' + response.status + ' and service status: ' + response.data.status);

@@ -953,7 +953,7 @@ var sendData = async function () {
     //						',raw2_5:'+results.pms.part2_5+',raw5_0:'+results.pms.part5_0+',raw10_0:'+results.pms.part10_0;
     //			logger.info(url);
     // redisHmsetHashAsync(timeStamp.toISOString() + ':pmsa003'
-    await redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':pmsa003'
+    await redisClient.HSET(timeStamp.toISOString() + ':pmsa003'
       , 'foi', 'SCRP' + unit.id
       , 'pm1', results.pms.pm1CF1
       , 'pm25', results.pms.pm25CF1
@@ -970,7 +970,7 @@ var sendData = async function () {
     ).then(function (res) {
       var _res = res;
       //redisSaddAsync('new', timeStamp.toISOString() + ':pmsa003')
-      redisClient.SADDASYNC('new', timeStamp.toISOString() + ':pmsa003')
+      redisClient.SADD('new', timeStamp.toISOString() + ':pmsa003')
         .then(function (res2) {
           var _res2 = res2;
           //	redisSaddAsync('pmsa003', timeStamp.toISOString()+':pmsa003')
@@ -984,7 +984,7 @@ var sendData = async function () {
     //						'temperature:'+results.bme280.temperature+',pressure:'+results.bme280.pressure+',rHum:'+results.bme280.rHum ;
     //			logger.info(url);
     // redisHmsetHashAsync(timeStamp.toISOString() + ':bme280'
-    await redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':bme280'
+    await redisClient.HSET(timeStamp.toISOString() + ':bme280'
       , 'foi', 'SCRP' + unit.id
       , 'temperature', results.bme280.temperature
       , 'pressure', results.bme280.pressure
@@ -992,7 +992,7 @@ var sendData = async function () {
     ).then(function (res) {
       var _res = res;
       //redisSaddAsync('new', timeStamp.toISOString() + ':bme280')
-      redisClient.SADDASYNC('new', timeStamp.toISOString() + ':bme280')
+      redisClient.SADD('new', timeStamp.toISOString() + ':bme280')
         .then(function (res2) {
           var _res2 = res2;
           //	redisSaddAsync('bme280', timeStamp.toISOString()+':bme280')
@@ -1006,7 +1006,7 @@ var sendData = async function () {
     //						'temperature:'+results.bme680.temperature+',pressure:'+results.bme680.pressure+
     //            ',rHum:'+results.bme680.rHum+',gasResistance:'+results.bme680.gasResistance ;
     //			logger.info(url);
-    await redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':bme680'
+    await redisClient.HSET(timeStamp.toISOString() + ':bme680'
       , 'foi', 'SCRP' + unit.id
       , 'temperature', results.bme680.temperature
       , 'pressure', results.bme680.pressure
@@ -1014,7 +1014,7 @@ var sendData = async function () {
       , 'gasResistance', results.bme680.gasResistance
     ).then(function (res) {
       var _res = res;
-      redisClient.SADDASYNC('new', timeStamp.toISOString() + ':bme680')
+      redisClient.SADD('new', timeStamp.toISOString() + ':bme680')
         .then(function (res2) {
           var _res2 = res2;
           //	redisSaddAsync('bme680', timeStamp.toISOString()+':bme680')
@@ -1024,12 +1024,12 @@ var sendData = async function () {
     });
   }
   if (results.ds18b20.nrOfMeas > 0) {
-    await redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':ds18b20'
+    await redisClient.HSET(timeStamp.toISOString() + ':ds18b20'
       , 'foi', 'SCRP' + unit.id
       , 'temperature', results.ds18b20.temperature
     ).then(function (res) {
       var _res = res;
-      redisClient.SADDASYNC('new', timeStamp.toISOString() + ':ds18b20')
+      redisClient.SADD('new', timeStamp.toISOString() + ':ds18b20')
         .then(function (res2) {
           var _res2 = res2;
           //	redisSaddAsync('ds18b20', timeStamp.toISOString()+':ds18b20')
@@ -1039,12 +1039,12 @@ var sendData = async function () {
     });
   }
   if (results.tgs5042.nrOfMeas > 0) {
-    await redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':tgs5042'
+    await redisClient.HSET(timeStamp.toISOString() + ':tgs5042'
       , 'foi', 'SCRP' + unit.id
       , 'co', results.tgs5042.co
     ).then(function (res) {
       var _res = res;
-      redisClient.SADDASYNC('new', timeStamp.toISOString() + ':tgs5042')
+      redisClient.SADD('new', timeStamp.toISOString() + ':tgs5042')
         .then(function (res2) {
           var _res2 = res2;
           //	redisSaddAsync('tgs5042', timeStamp.toISOString()+':tgs5042')
@@ -1066,7 +1066,7 @@ var sendData = async function () {
       console.log(gpsTpv)
       if (gpsTpv.mode == 2) {
         spsProcessed = true
-        await redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':sps30'
+        await redisClient.HSET(timeStamp.toISOString() + ':sps30'
           , 'foi', 'SCRP' + unit.id
           , 'pm1', results.sps.pm1
           , 'pm25', results.sps.pm25
@@ -1084,7 +1084,7 @@ var sendData = async function () {
         )
           .then(function (res) {
             var _res = res;
-            redisClient.SADDASYNC('new', timeStamp.toISOString() + ':sps30')
+            redisClient.SADD('new', timeStamp.toISOString() + ':sps30')
               .then(function (res2) {
                 var _res2 = res2;
                 //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
@@ -1099,7 +1099,7 @@ var sendData = async function () {
       }
       if (gpsTpv.mode == 3) { // mode 3
         spsProcessed = true
-        await redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':sps30'
+        await redisClient.HSET(timeStamp.toISOString() + ':sps30'
           , 'foi', 'SCRP' + unit.id
           , 'pm1', results.sps.pm1
           , 'pm25', results.sps.pm25
@@ -1128,7 +1128,7 @@ var sendData = async function () {
         )
           .then(function (res) {
             var _res = res;
-            redisClient.SADDASYNC('new', timeStamp.toISOString() + ':sps30')
+            redisClient.SADD('new', timeStamp.toISOString() + ':sps30')
               .then(function (res2) {
                 var _res2 = res2;
                 //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
@@ -1143,7 +1143,7 @@ var sendData = async function () {
       }
     }
     if (spsProcessed == false) {
-      await redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':sps30'
+      await redisClient.HSET(timeStamp.toISOString() + ':sps30'
         , 'foi', 'SCRP' + unit.id
         , 'pm1', results.sps.pm1
         , 'pm25', results.sps.pm25
@@ -1158,7 +1158,7 @@ var sendData = async function () {
       )
         .then(function (res) {
           var _res = res;
-          redisClient.SADDASYNC('new', timeStamp.toISOString() + ':sps30')
+          redisClient.SADD('new', timeStamp.toISOString() + ':sps30')
             .then(function (res2) {
               var _res2 = res2;
               //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
@@ -1181,7 +1181,7 @@ var sendData = async function () {
     //						',raw2_5:'+results.ips7100.part2_5+',raw4_0:'+results.ips7100.part4_0+
     //            ',raw10_0:'+results.ips7100.part10_0 ;
     //			logger.info(url);
-    await redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':ips7100'
+    await redisClient.HSET(timeStamp.toISOString() + ':ips7100'
       , 'foi', 'SCRP' + unit.id
       , 'pm01', results.ips7100.pm01
       , 'pm03', results.ips7100.pm03
@@ -1201,7 +1201,7 @@ var sendData = async function () {
     )
       .then(function (res) {
         var _res = res;
-        redisClient.SADDASYNC('new', timeStamp.toISOString() + ':ips7100')
+        redisClient.SADD('new', timeStamp.toISOString() + ':ips7100')
           .then(function (res2) {
             var _res2 = res2;
             //	redisSaddAsync('ips7100', timeStamp.toISOString()+':ips7100')
@@ -1214,14 +1214,14 @@ var sendData = async function () {
     //			url = openiodUrl + '/scd30'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
     //						'temperature:'+results.scd30.temperature+',rHum:'+results.scd30.rHum+',co2:'+results.scd30.co2 ;
     //			logger.info(url);
-    await redisClient.HMSETHASHASYNC(timeStamp.toISOString() + ':scd30'
+    await redisClient.HSET(timeStamp.toISOString() + ':scd30'
       , 'foi', 'SCRP' + unit.id
       , 'temperature', results.scd30.temperature
       , 'rHum', results.scd30.rHum
       , 'co2', results.scd30.co2
     ).then(function (res) {
       var _res = res;
-      redisClient.SADDASYNC('new', timeStamp.toISOString() + ':scd30')
+      redisClient.SADD('new', timeStamp.toISOString() + ':scd30')
         .then(function (res2) {
           var _res2 = res2;
           //	redisSaddAsync('scd30', timeStamp.toISOString()+':scd30')

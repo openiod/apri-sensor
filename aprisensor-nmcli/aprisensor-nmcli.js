@@ -400,6 +400,11 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+const restartNetworkManager = function () {
+  console.log(`restart network-manager`)
+  return execPromise("LC_ALL=C systemctl restart network-manager")
+}
+
 /*
 const getDeviceWifiListCache = function(req,res) {
   retrieveWifiList()
@@ -464,15 +469,6 @@ const getDeviceWifiList = async function(req,res) {
       restartHotspot=true
       await sleep(2000);
     })
-    await restartNetworkManager()
-    .then( async (result)=>{
-      console.log(`restart network-manager then`)
-      await sleep(2000);
-    })
-    .catch(async (error)=>{
-      console.log(`restart network-manager catch`)
-      await sleep(2000);
-    })
     await sleep(1000);
   }
 
@@ -526,10 +522,7 @@ const getDeviceWifiList = async function(req,res) {
     res.end();
   })
 }
-const restartNetworkManager = function(){
-  console.log(`restart network-manager`)
-  return execPromise("LC_ALL=C systemctl restart network-manager")
-}
+
 */
 /*
 const retrieveWifiList = async function(){
@@ -1247,7 +1240,7 @@ actions.push(function () {
     "::1		localhost ip6-localhost ip6-loopback\n" +
     "ff02::1		ip6-allnodes\n" +
     "ff02::2		ip6-allrouters\n" +
-    "127.0.1.1 "+unit.ssid+"\n"
+    "127.0.1.1 " + unit.ssid + "\n"
   fs.readFile("/etc/hosts", 'utf8', function (err, data) {
     if (err || data != hostsFileStandard) {
       console.log('/etc/hosts file rewritten')
@@ -1263,6 +1256,14 @@ actions.push(function () {
     //    console.log('getHostname')
     if (error) {
       console.error(`exec error: ${error}`);
+      console.log('restart service NetworkManager!!')
+      await restartNetworkManager()
+        .then(async (result) => {
+          console.log(`restart network-manager then`)
+        })
+        .catch(async (error) => {
+          console.log(`restart network-manager catch`)
+        })
     } else {
       console.log("nmcli general hostname " + unit.ssid + ".local")
     }
@@ -1688,7 +1689,7 @@ const statusCheck = async function () {
   if (processStatus.timeSync.status != 'OK') checkTimeSync()  // only untill first OK
 
   avahiCheck()
-// not for V2  nginxCheck()
+  // not for V2  nginxCheck()
 
   // retrieve all wifi connections
   await execPromise('LC_ALL=C nmcli -f name,type connection| grep wifi')
@@ -1897,7 +1898,7 @@ const getSensorData = function (subset) {
 }
 
 var getRedisData = function (redisKey) {
-  console.log('Proces RedisData ' + redisKey )
+  console.log('Proces RedisData ' + redisKey)
   var keySplit = redisKey.split(':');
   var lastEntry = keySplit.length - 1;
   var dateObserved = redisKey.substring(0, redisKey.length - keySplit[lastEntry].length - 1);

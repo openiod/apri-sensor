@@ -923,7 +923,7 @@ var processDataCycle = function () {
     sendData();
   })
   .catch(function (err) {
-    logger.info('Redis connect catch ') // already connected ?
+    logger.info('Redis connect catch, already connected?') // already connected ?
     logger.info(err)
     sendData();
   })

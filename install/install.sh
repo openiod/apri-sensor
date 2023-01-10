@@ -195,9 +195,13 @@ sudo reboot
 
 apt -y install network-manager
 #systemctl start NetworkManager.service
-#systemctl enable NetworkManager.service
+systemctl enable NetworkManager.service
+
+sudo vi /etc/systemd/journald.conf
+SystemMaxUse=10M
 
 # for Raspberry Pi 3: ivm conflict network-manager en nmcli c up 'hotspot'
+# ook voor Pi Zero met node 16+ ????
 apt purge openresolv dhcpcd5
 
 # log2ram https://github.com/azlux/log2ram
@@ -294,16 +298,16 @@ sudo mkdir -p /var/log/aprisensor
 sudo mkdir -p /opt/SCAPE604/config/
 sudo mkdir /opt/SCAPE604/git
 sudo mkdir /opt/SCAPE604/apri-sensor/
-sudo mkdir /opt/SCAPE604/apri-sensor/apri-agent
 sudo mkdir /opt/SCAPE604/apri-sensor/apri-config
 cd /opt/SCAPE604/git/apri-sensor
 sudo git clone --depth 1 https://github.com/openiod/apri-sensor.git
 sudo git config pull.rebase false (eenmalige 'default' actie, nog uitzoek waarvoor)
 # voor Pi Zero:
 sudo /opt/SCAPE604/git/apri-sensor/install/git2as.sh
-#bij upgrade kan deze rm nog wel eens een blockade voorkomen
+#bij upgrade kan deze rm nog wel eens een blokkade voorkomen
 #rm package-lock.json
 #git pull
+sudo cp -r /opt/SCAPE604/git/apri-sensor/apri-agent /opt/SCAPE604/apri-sensor/.
 sudo cp apri-config/apri-system-example.json /opt/SCAPE604/config/apri-system.json
 sudo cp package.json /opt/SCAPE604/apri-sensor/.
 #onderstaande onder root uitvoeren (sudo is niet voldoende)

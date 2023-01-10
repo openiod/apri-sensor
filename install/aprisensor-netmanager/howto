@@ -8,22 +8,13 @@ npm run dev
 # build runtime and tar
 ./tarpublic.sh
 - npm run build
-- sudo vi build/package.json
- {
-    "name": "apri-sensor",
-  "version": "2.3.0",
-  "description": "",
-  "type": "module",
-  "main": "index.js",
-  "dependencies": {
-    "@fortawesome/free-solid-svg-icons": "^6.2.1"
-  }
-}
-- tar cfvz aprisensor-netmanager.tar.gz ../aprisensor-netmanager/public
+
+voor v1:
+- tar cfvz aprisensor-netmanager-runtime.tar.gz ../aprisensor-netmanager/public
 - cp aprisensor-netmanager.tar.gz /home/awiel/opt/apri-sensor/.
- of voor v2:
-- tar cfvz aprisensor-netmanager-v2.tar.gz ../aprisensor-netmanager-v2/build
-- cp aprisensor-netmanager-v2.tar.gz /home/awiel/opt/apri-sensor/.
+voor v2:
+- tar cfvz aprisensor-netmanager-runtime-v2.tar.gz ../aprisensor-netmanager-v2/build
+- cp aprisensor-netmanager-runtime-v2.tar.gz /home/awiel/opt/apri-sensor/.
 
 mv aprisensor-netmanager.tar.gz /home/awiel/opt/apri-sensor/.
 
@@ -53,17 +44,31 @@ moet dus service worden met nieuw portnummer
 
 
 # on sensorkit:
-run 'sudo git pull' or default update on sensorkit in /opt/SCAPE604/git/apri-sensor
+cd /opt/SCAPE604/git/apri-sensor
+sudo git pull
 sudo install/git2as.sh
 sudo /opt/SCAPE604/apri-sensor/apri-agent/apri-sensor-update.sh
 sudo systemctl restart SCAPE604-aprisensor-nmcli
 # when upgrade stable version:
 # v2:
-sudo cp /opt/SCAPE604/git/apri-sensor/aprisensor-netmanager-v2.tar.gz  /opt/SCAPE604/.
+##sudo cp /opt/SCAPE604/git/apri-sensor/aprisensor-netmanager-runtime-v2.tar.gz  /opt/SCAPE604/.
 cd /opt/SCAPE604
-sudo tar zxvf aprisensor-netmanager-v2.tar.gz
-/opt/SCAPE604/aprisensor-netmanager-runtime-v2/build
-npm install (for fontawesom modules)
+sudo tar zxvf /opt/SCAPE604/git/apri-sensor/aprisensor-netmanager-runtime-v2.tar.gz
+- sudo vi /opt/SCAPE604/package.json
+ {
+    "name": "apri-sensor",
+  "version": "2.3.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "dependencies": {
+    "@fortawesome/free-solid-svg-icons": "^6.2.1"
+  }
+}
+- sudo cp /opt/SCAPE604/package.json /opt/SCAPE604/aprisensor-netmanager-v2/build/package.json
+cd /opt/SCAPE604/aprisensor-netmanager-v2/build
+npm install (eenmalig voor fontawesom modules)
+sudo systemctl restart SCAPE604-aprisensor-netmanager-runtime-v2.service
 
 # 
 # sudo rm -rf /opt/SCAPE604/aprisensor-netmanager-runtime-stable

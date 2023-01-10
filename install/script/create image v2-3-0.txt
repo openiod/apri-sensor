@@ -75,9 +75,14 @@ sudo reboot
 
 ## apt -y install network-manager  # already newest version
 #systemctl start NetworkManager.service
-#systemctl enable NetworkManager.service
+# Deze moet nog wel of in ieder geval voor de zekerheid ;-)
+sudo systemctl enable NetworkManager.service
+
+sudo vi /etc/systemd/journald.conf
+SystemMaxUse=10M
 
 # for Raspberry Pi 3: ivm conflict network-manager en nmcli c up 'hotspot'
+# ook voor Pi Zero met node 16+ ????
 apt purge openresolv dhcpcd5
 
 Bullseye:
@@ -184,7 +189,6 @@ sudo mkdir -p /var/log/aprisensor
 sudo mkdir -p /opt/SCAPE604/config/
 sudo mkdir /opt/SCAPE604/git
 sudo mkdir /opt/SCAPE604/apri-sensor/
-sudo mkdir /opt/SCAPE604/apri-sensor/apri-agent
 sudo mkdir /opt/SCAPE604/apri-sensor/apri-config
 cd /opt/SCAPE604/git
 sudo git clone --depth 1 https://github.com/openiod/apri-sensor.git
@@ -209,6 +213,7 @@ printf '[logging]\ndomains=ALL:WARN\n' > /etc/NetworkManager/conf.d/aprisensor.c
 exit  # exit root
 
 sudo cp /opt/SCAPE604/git/apri-sensor/install/avahi/avahi-daemon.conf /etc/avahi/avahi-daemon.conf
+sudo cp -r /opt/SCAPE604/git/apri-sensor/apri-agent /opt/SCAPE604/apri-sensor/.
 sudo cp -r /opt/SCAPE604/git/apri-sensor/apri-config /opt/SCAPE604/apri-sensor/.
 
 

@@ -112,7 +112,7 @@ var processDataCycle = function (parm) {
 
 	//log('Find new record');
 	//redisSortAsync('new', 'alpha', 'limit', 0, 60, 'asc')
-	redisClient.SORT('new', 'alpha', 'limit', 0, 60, 'asc')
+	redisClient.SORT('new', {'ALPHA':true,'LIMIT':{'offset': 0,'count': 60},'DIRECTION':'ASC'})
 		.then(function (res) {
 			var _res = res;
 			if (_res.length > 0) {

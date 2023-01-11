@@ -128,7 +128,7 @@ var selectOldestRecords = function () {
 var selectKeys = async function () {
   //  log('start selectKeys');
   //  redisSCard('archive')
-  await redisClient.connect('archive')
+  await redisClient.connect()
   redisClient.SCARD('archive')
     .then(function (res) {
       var nrOfArchiveRecords = res;

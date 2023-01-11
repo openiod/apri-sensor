@@ -918,15 +918,17 @@ var processDataCycle = function () {
   initCounters();
   counters.busy = false;
 
-  redisClient.connect()
-  .then(function (res) {
-    sendData();
-  })
-  .catch(function (err) {
-    logger.info('Redis connect catch, already connected?') // already connected ?
-    logger.info(err)
-    sendData();
-  })
+  if (redisClient.isOpen==false) {
+    redisClient.connect()
+    .then(function (res) {
+      sendData();
+    })
+    .catch(function (err) {
+      logger.info('Redis connect catch, not connected?') 
+      logger.info(err)
+      sendData();
+    })    
+  } else sendData()
 }
 
 var printHex = function (buffer, tekst) {
@@ -953,6 +955,20 @@ var sendData = async function () {
     //						',raw2_5:'+results.pms.part2_5+',raw5_0:'+results.pms.part5_0+',raw10_0:'+results.pms.part10_0;
     //			logger.info(url);
     // redisHmsetHashAsync(timeStamp.toISOString() + ':pmsa003'
+    await redisClient.HSET(timeStamp.toISOString() + ':pmsa003', 'foi', 'SCRP' + unit.id)
+    await redisClient.HSET(timeStamp.toISOString() + ':pmsa003', 'pm1', results.pms.pm1CF1)
+    await redisClient.HSET(timeStamp.toISOString() + ':pmsa003', 'pm25', results.pms.pm25CF1)
+    await redisClient.HSET(timeStamp.toISOString() + ':pmsa003', 'pm10', results.pms.pm10CF1)
+    await redisClient.HSET(timeStamp.toISOString() + ':pmsa003', 'pm1amb', results.pms.pm1amb)
+    await redisClient.HSET(timeStamp.toISOString() + ':pmsa003', 'pm25amb', results.pms.pm25amb)
+    await redisClient.HSET(timeStamp.toISOString() + ':pmsa003', 'pm10amb', results.pms.pm10amb)
+    await redisClient.HSET(timeStamp.toISOString() + ':pmsa003', 'raw0_3', results.pms.part0_3)
+    await redisClient.HSET(timeStamp.toISOString() + ':pmsa003', 'raw0_5', results.pms.part0_5)
+    await redisClient.HSET(timeStamp.toISOString() + ':pmsa003', 'raw1_0', results.pms.part1_0)
+    await redisClient.HSET(timeStamp.toISOString() + ':pmsa003', 'raw2_5', results.pms.part2_5)
+    await redisClient.HSET(timeStamp.toISOString() + ':pmsa003', 'raw5_0', results.pms.part5_0)
+    await redisClient.HSET(timeStamp.toISOString() + ':pmsa003', 'raw10_0', results.pms.part10_0)
+  /*
     await redisClient.HSET(timeStamp.toISOString() + ':pmsa003'
       , 'foi', 'SCRP' + unit.id
       , 'pm1', results.pms.pm1CF1
@@ -967,7 +983,9 @@ var sendData = async function () {
       , 'raw2_5', results.pms.part2_5
       , 'raw5_0', results.pms.part5_0
       , 'raw10_0', results.pms.part10_0
-    ).then(function (res) {
+      
+    )*/
+    .then(function (res) {
       var _res = res;
       //redisSaddAsync('new', timeStamp.toISOString() + ':pmsa003')
       redisClient.SADD('new', timeStamp.toISOString() + ':pmsa003')
@@ -984,12 +1002,11 @@ var sendData = async function () {
     //						'temperature:'+results.bme280.temperature+',pressure:'+results.bme280.pressure+',rHum:'+results.bme280.rHum ;
     //			logger.info(url);
     // redisHmsetHashAsync(timeStamp.toISOString() + ':bme280'
-    await redisClient.HSET(timeStamp.toISOString() + ':bme280'
-      , 'foi', 'SCRP' + unit.id
-      , 'temperature', results.bme280.temperature
-      , 'pressure', results.bme280.pressure
-      , 'rHum', results.bme280.rHum
-    ).then(function (res) {
+    await redisClient.HSET(timeStamp.toISOString() + ':bme280','foi', 'SCRP' + unit.id)
+    await redisClient.HSET(timeStamp.toISOString() + ':bme280','temperature', results.bme280.temperature)
+    await redisClient.HSET(timeStamp.toISOString() + ':bme280','pressure', results.bme280.pressure)
+    await redisClient.HSET(timeStamp.toISOString() + ':bme280','rHum', results.bme280.rHum)
+    .then(function (res) {
       var _res = res;
       //redisSaddAsync('new', timeStamp.toISOString() + ':bme280')
       redisClient.SADD('new', timeStamp.toISOString() + ':bme280')
@@ -1006,13 +1023,12 @@ var sendData = async function () {
     //						'temperature:'+results.bme680.temperature+',pressure:'+results.bme680.pressure+
     //            ',rHum:'+results.bme680.rHum+',gasResistance:'+results.bme680.gasResistance ;
     //			logger.info(url);
-    await redisClient.HSET(timeStamp.toISOString() + ':bme680'
-      , 'foi', 'SCRP' + unit.id
-      , 'temperature', results.bme680.temperature
-      , 'pressure', results.bme680.pressure
-      , 'rHum', results.bme680.rHum
-      , 'gasResistance', results.bme680.gasResistance
-    ).then(function (res) {
+    await redisClient.HSET(timeStamp.toISOString() + ':bme680', 'foi', 'SCRP' + unit.id)
+    await redisClient.HSET(timeStamp.toISOString() + ':bme680', 'temperature', results.bme680.temperature)
+    await redisClient.HSET(timeStamp.toISOString() + ':bme680', 'pressure', results.bme680.pressure)
+    await redisClient.HSET(timeStamp.toISOString() + ':bme680', 'rHum', results.bme680.rHum)
+    await redisClient.HSET(timeStamp.toISOString() + ':bme680', 'gasResistance', results.bme680.gasResistance)
+    .then(function (res) {
       var _res = res;
       redisClient.SADD('new', timeStamp.toISOString() + ':bme680')
         .then(function (res2) {
@@ -1024,10 +1040,9 @@ var sendData = async function () {
     });
   }
   if (results.ds18b20.nrOfMeas > 0) {
-    await redisClient.HSET(timeStamp.toISOString() + ':ds18b20'
-      , 'foi', 'SCRP' + unit.id
-      , 'temperature', results.ds18b20.temperature
-    ).then(function (res) {
+    await redisClient.HSET(timeStamp.toISOString() + ':ds18b20', 'foi', 'SCRP' + unit.id)
+    await redisClient.HSET(timeStamp.toISOString() + ':ds18b20', 'temperature', results.ds18b20.temperature)
+    .then(function (res) {
       var _res = res;
       redisClient.SADD('new', timeStamp.toISOString() + ':ds18b20')
         .then(function (res2) {

@@ -103,6 +103,8 @@ sudo nmcli c delete <connected router> ; sudo shutdown -h now
 ### ===== end upgrade proc
 
 #### kopieer SD-kaart naar image bestand
+! verwijder eerst de nmcli connections
+! en leegmaken /ver/log /var/log/aprisensor 
 # plaats sd-kaart met nieuwe versie in usb-adapter
 #===== e2fsck (controle of fs ok is)
 # df -h  # show devices

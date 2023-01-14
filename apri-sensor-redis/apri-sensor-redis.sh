@@ -13,7 +13,14 @@ echo "Start procedure on: " `date` >>$LOGFILE
 mkdir -p /var/log/aprisensor
 #mkdir -p $SYSTEMPATH/$SYSTEMCODE/log
 
-systemctl stop SCAPE604-apri-sensor-connector
+
+if [ -f /etc/systemd/system/SCAPE604-apri-sensor-connector-v2.service ]
+then
+  systemctl stop SCAPE604-apri-sensor-connector-v2
+fi
+if [ -f /etc/systemd/system/SCAPE604-apri-sensor-connector.service ]
+  systemctl stop SCAPE604-apri-sensor-connector
+fi
 
 cd  $SYSTEMPATH/$SYSTEMCODE/apri-sensor
 
@@ -50,7 +57,13 @@ fi#cd /opt/SCAPE604/log
 #mv SCAPE604-apri-sensor-connector-old1.log SCAPE604-apri-sensor-connector-old2.log
 #mv SCAPE604-apri-sensor-connector.log SCAPE604-apri-sensor-connector-old1.log
 
-systemctl start SCAPE604-apri-sensor-connector
+if [ -f /etc/systemd/system/SCAPE604-apri-sensor-connector-v2.service ]
+then
+  systemctl start SCAPE604-apri-sensor-connector-v2
+fi
+if [ -f /etc/systemd/system/SCAPE604-apri-sensor-connector.service ]
+  systemctl start SCAPE604-apri-sensor-connector
+fi
 
 
 exit

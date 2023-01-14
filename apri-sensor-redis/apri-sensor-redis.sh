@@ -45,12 +45,12 @@ fi
 # opruimen logfiles zolang winston nog niet volledig ingericht is
 # ook de oude map voorlopig meenmenen (tot ApriSensorSK2)
 cd /var/log/aprisensor
-if [ -f /opt/SCAPE604/git/apri-sensor/SCAPE604-apri-sensor-connector.log ]
+if [ -f SCAPE604-apri-sensor-connector.log ]
 then
   mv SCAPE604-apri-sensor-connector-old1.log SCAPE604-apri-sensor-connector-old2.log
   mv SCAPE604-apri-sensor-connector.log SCAPE604-apri-sensor-connector-old1.log
 fi
-if [ -f /opt/SCAPE604/git/apri-sensor/SCAPE604-apri-sensor-connector-v2.log ]
+if [ -f SCAPE604-apri-sensor-connector-v2.log ]
 then
   mv SCAPE604-apri-sensor-connector-v2-old1.log SCAPE604-apri-sensor-connector-v2-old2.log
   mv SCAPE604-apri-sensor-connector-v2.log SCAPE604-apri-sensor-connector-v2-old1.log

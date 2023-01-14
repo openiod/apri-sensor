@@ -20,9 +20,16 @@ cd  $SYSTEMPATH/$SYSTEMCODE/apri-sensor
 export NODEPATH=`which node`
 $NODEPATH apri-sensor-redis/apri-sensor-redis.js >>$LOGFILE 2>>$LOGFILE
 
-rm /var/log/*gz
-rm /var/log/*.1
 journalctl --vacuum-time=1h
+
+if test -n "$(find /var/log -maxdepth 1 -name '*gz' -print -quit)"
+then
+    rm /var/log/*gz
+fi
+if test -n "$(find /var/log -maxdepth 1 -name '*.1' -print -quit)"
+then
+    rm /var/log/*1
+fi
 
 # eenmalig voor oudere versies
 #rm /opt/SCAPE604/log/apri-sensor-redis.log
@@ -35,7 +42,7 @@ then
   mv SCAPE604-apri-sensor-connector-old1.log SCAPE604-apri-sensor-connector-old2.log
   mv SCAPE604-apri-sensor-connector.log SCAPE604-apri-sensor-connector-old1.log
 fi
-if [ -f /opt/SCAPE604/git/apri-sensor/SCAPE604-apri-sensor-connector-v.log ]
+if [ -f /opt/SCAPE604/git/apri-sensor/SCAPE604-apri-sensor-connector-v2.log ]
 then
   mv SCAPE604-apri-sensor-connector-v2-old1.log SCAPE604-apri-sensor-connector-v2-old2.log
   mv SCAPE604-apri-sensor-connector-v2.log SCAPE604-apri-sensor-connector-v2-old1.log

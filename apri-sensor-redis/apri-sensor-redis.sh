@@ -19,6 +19,7 @@ then
   systemctl stop SCAPE604-apri-sensor-connector-v2
 fi
 if [ -f /etc/systemd/system/SCAPE604-apri-sensor-connector.service ]
+then
   systemctl stop SCAPE604-apri-sensor-connector
 fi
 
@@ -53,7 +54,8 @@ if [ -f /opt/SCAPE604/git/apri-sensor/SCAPE604-apri-sensor-connector-v2.log ]
 then
   mv SCAPE604-apri-sensor-connector-v2-old1.log SCAPE604-apri-sensor-connector-v2-old2.log
   mv SCAPE604-apri-sensor-connector-v2.log SCAPE604-apri-sensor-connector-v2-old1.log
-fi#cd /opt/SCAPE604/log
+fi
+#cd /opt/SCAPE604/log
 #mv SCAPE604-apri-sensor-connector-old1.log SCAPE604-apri-sensor-connector-old2.log
 #mv SCAPE604-apri-sensor-connector.log SCAPE604-apri-sensor-connector-old1.log
 
@@ -62,6 +64,7 @@ then
   systemctl start SCAPE604-apri-sensor-connector-v2
 fi
 if [ -f /etc/systemd/system/SCAPE604-apri-sensor-connector.service ]
+then
   systemctl start SCAPE604-apri-sensor-connector
 fi
 

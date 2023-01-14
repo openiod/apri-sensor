@@ -29,4 +29,5 @@ then
   then
     cp -r /opt/SCAPE604/git/apri-sensor/aprisensor-netmanager-runtime /opt/SCAPE604/apri-sensor/.
   fi
+fi
 echo "git2as files copied"

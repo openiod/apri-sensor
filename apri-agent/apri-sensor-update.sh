@@ -16,30 +16,34 @@ then
   # echo "degit ended"
   # echo "git clone ended"
 fi
+if [ ! -d /var/log/aprisensor ]
+then 
+  mkdir /var/log/aprisensor
+fi
+
 cd /opt/SCAPE604/git/apri-sensor
-mkdir /var/log/aprisensor
+
 echo Start of update process >> /var/log/aprisensor/apri-agent-update.log
 date >> /var/log/aprisensor/apri-agent-update.log
 
 # get software updates from github
-# git checkout package-lock.json
-# git pull >> /opt/SCAPE604/log/apri-agent-update.log 2>>/opt/SCAPE604/log/apri-agent-update2.log
+git pull >> /var/log/aprisensor/apri-agent-update.log 2>>/var/log/aprisensor/apri-agent-update2.log
 
-cd /opt/SCAPE604/log
-mv /var/log/aprisensor/SCAPE604-apri-sensor-connector-old1.log /var/log/aprisensor/SCAPE604-apri-sensor-connector-old2.log
-mv /var/log/aprisensor/SCAPE604-apri-sensor-connector.log /var/log/aprisensor/SCAPE604-apri-sensor-connector-old1.log
-rm /opt/SCAPE604/log/SCAPE604-apri-sensor-connector*.log
-systemctl restart SCAPE604-apri-sensor-connector
+#cd /opt/SCAPE604/log
+#mv /var/log/aprisensor/SCAPE604-apri-sensor-connector-old1.log /var/log/aprisensor/SCAPE604-apri-sensor-connector-old2.log
+#mv /var/log/aprisensor/SCAPE604-apri-sensor-connector.log /var/log/aprisensor/SCAPE604-apri-sensor-connector-old1.log
+#rm /opt/SCAPE604/log/SCAPE604-apri-sensor-connector*.log
+#systemctl restart SCAPE604-apri-sensor-connector
 
-mv /var/log/aprisensor/SCAPE604-apri-sensor-raspi-old1.log /var/log/aprisensor/SCAPE604-apri-sensor-raspi-old2.log
-mv /var/log/aprisensor/SCAPE604-apri-sensor-raspi.log /var/log/aprisensor/SCAPE604-apri-sensor-raspi-old1.log
-rm /opt/SCAPE604/log/SCAPE604-apri-sensor-raspi*.log
-systemctl restart SCAPE604-apri-sensor-raspi
+#mv /var/log/aprisensor/SCAPE604-apri-sensor-raspi-old1.log /var/log/aprisensor/SCAPE604-apri-sensor-raspi-old2.log
+#mv /var/log/aprisensor/SCAPE604-apri-sensor-raspi.log /var/log/aprisensor/SCAPE604-apri-sensor-raspi-old1.log
+#rm /opt/SCAPE604/log/SCAPE604-apri-sensor-raspi*.log
+#systemctl restart SCAPE604-apri-sensor-raspi
 
-mv /var/log/aprisensor/SCAPE604-aprisensor-nmcli-old1.log /var/log/aprisensor/SCAPE604-aprisensor-nmcli-old2.log
-mv /var/log/aprisensor/SCAPE604-aprisensor-nmcli.log /var/log/aprisensor/SCAPE604-aprisensor-nmcli-old1.log
-rm /opt/SCAPE604/log/SCAPE604-aprisensor-nmcli*.log
-systemctl restart SCAPE604-aprisensor-nmcli
+#mv /var/log/aprisensor/SCAPE604-aprisensor-nmcli-old1.log /var/log/aprisensor/SCAPE604-aprisensor-nmcli-old2.log
+#mv /var/log/aprisensor/SCAPE604-aprisensor-nmcli.log /var/log/aprisensor/SCAPE604-aprisensor-nmcli-old1.log
+#rm /opt/SCAPE604/log/SCAPE604-aprisensor-nmcli*.log
+#systemctl restart SCAPE604-aprisensor-nmcli
 
 
 # do not restart agent because loop will occur

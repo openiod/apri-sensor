@@ -54,6 +54,7 @@ sudo systemctl restart SCAPE604-aprisensor-nmcli
 ##sudo cp /opt/SCAPE604/git/apri-sensor/aprisensor-netmanager-runtime-v2.tar.gz  /opt/SCAPE604/.
 cd /opt/SCAPE604
 sudo tar zxvf /opt/SCAPE604/git/apri-sensor/aprisensor-netmanager-runtime-v2.tar.gz
+sudo chown -R root:root /opt/SCAPE604/aprisensor-netmanager-v2
 sudo cp /opt/SCAPE604/runtime-v2-package.json /opt/SCAPE604/aprisensor-netmanager-v2/build/package.json
 - sudo vi /opt/SCAPE604/runtime-v2-package.json
 {
@@ -66,11 +67,9 @@ sudo cp /opt/SCAPE604/runtime-v2-package.json /opt/SCAPE604/aprisensor-netmanage
     "@fortawesome/free-solid-svg-icons": "^6.2.1"
   }
 }
+ 
 cd /opt/SCAPE604/aprisensor-netmanager-v2/build
-sudo npm install
-- 
-cd /opt/SCAPE604/aprisensor-netmanager-v2/build
-npm install (eenmalig voor fontawesom modules)
+npm install (eenmalig? voor fontawesom modules)
 sudo systemctl restart SCAPE604-aprisensor-netmanager-runtime-v2.service
 
 # 

@@ -2292,7 +2292,7 @@ var setGpioGpsLedOn = function () {
 var setGpioGpsLedOff = function () {
   //console.log('set blue LED GPIO off')
   gpioGpsLed.writeSync(0); //set pin state to 0 (power LED off)
-  gpioGpseLedStatus = 'off'
+  gpioGpsLedStatus = 'off'
 }
 
 const processGps = function () {

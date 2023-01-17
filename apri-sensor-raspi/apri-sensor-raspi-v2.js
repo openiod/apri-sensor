@@ -1186,7 +1186,7 @@ var sendData = async function () {
     var spsProcessed = false
     if (aprisensorDevices.gps) {
       gpsTpv = processGps()
-      console.log(gpsTpv)
+      //console.log(gpsTpv)
       if (gpsTpv.mode == 2) {
         spsProcessed = true
         await redisClient.HSET(timeStamp.toISOString() + ':sps30', {
@@ -2414,7 +2414,7 @@ if (aprisensorDevices.gps) {
       if (tpv.mode < 2) {
         setGpioGpsLedOff()
         console.log('tpv.mode:' + tpv.mode + ', no valid gps data')
-        console.log(tpv)
+        //console.log(tpv)
         return
       }
       setGpioGpsLedOn()

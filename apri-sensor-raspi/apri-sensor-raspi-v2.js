@@ -206,7 +206,7 @@ var sleepMode = 0
 //var ds18b20InitCounter = 0
 var ds18b20InitTime = new Date()
 var gpio
-var gpioDs18b20, gpioBme
+var gpioDs18b20, gpioBme, gpioGpsLed
 //, gpioBlueLed
 //, gpioFan
 try {
@@ -216,7 +216,7 @@ catch (err) {
   logger.info('GPIO module onoff not installed');
 }
 if (gpio != undefined) {
-  //gpioBlueLed = new gpio(19, 'out'); //use GPIO-19 pin .., and specify that it is output
+  gpioGpsLed = new gpio(20, 'out'); //use GPIO-19 pin .., and specify that it is output
   gpioDs18b20 = new gpio(25, 'out'); //use GPIO-25 pin 22, and specify that it is output
   //gpioFan = new gpio(26, 'out'); //use GPIO-26 pin 37, and specify that it is output
   gpioBme = new gpio(27, 'out'); //use GPIO-27 pin 13, and specify that it is output
@@ -2283,6 +2283,17 @@ if (aprisensorDevices.ips7100) {
   let timerSerialDevices = setInterval(scanSerialDevices, 10000)
 }
 
+var setGpioGpsLedOn = function () {
+  //console.log('set blue LED GPIO on')
+  gpioBlueLed.writeSync(1); //set pin state to 1 (power LED on)
+  gpioBlueLedStatus = 'on'
+}
+var setGpioGpsLedOff = function () {
+  //console.log('set blue LED GPIO off')
+  gpioBlueLed.writeSync(0); //set pin state to 0 (power LED off)
+  gpioBlueLedStatus = 'off'
+}
+
 const processGps = function () {
   var _gpsTpv = { mode: 0 } // initial empty value
   if (_gpsArray.length > 0) {
@@ -2398,10 +2409,12 @@ if (aprisensorDevices.gps) {
         }
       }
       if (tpv.mode < 2) {
+        setGpioGpsLedOff()
         console.log('tpv.mode:' + tpv.mode + ', no valid gps data')
         console.log(tpv)
         return
       }
+      setGpioGpsLedOn()
       _gpsArray.push(tpv)
       //console.log(tpv)
 

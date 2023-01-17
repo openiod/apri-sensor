@@ -2376,11 +2376,10 @@ let timerCleanupCacheGps = setInterval(cleanupCacheGps, 10000)
 
 setGpioGpsLedOff()
 
-if (aprisensorDevices.gps) {
-  gpsd = require('node-gpsd');
+const gpsStart = function () {
   gpsDaemon = new gpsd.Daemon({
     program: 'gpsd',
-    device: '/dev/ttyS0',
+    device: '/dev/ttyAMA0',
     port: 2947,
     pid: '/tmp/gpsd.pid',
     readOnly: false,
@@ -2390,6 +2389,11 @@ if (aprisensorDevices.gps) {
       error: console.error
     }
   });
+  gpsDaemon.on('died', function (tpv) {
+    setGpioGpsLedOff()
+    console.log('de gpsd deamon is gestorven')
+    gpsStart()
+  })
   gpsDaemon.start(function () {
     console.log('Started');
     var listener = new gpsd.Listener({
@@ -2402,7 +2406,9 @@ if (aprisensorDevices.gps) {
       },
       parse: true
     });
+
     listener.on('TPV', function (tpv) {
+      console.log(tpv.mode)
       if (tpv.mode > 0 && tpv.time) {
         _gpsTime = Date.parse(tpv.time)
         _gpsTimeIso = tpv.time
@@ -2428,7 +2434,14 @@ if (aprisensorDevices.gps) {
       listener.watch();
     });
   });
-  //listener.logger = new (winston.Logger) ({ exitOnError: false });;
+
 }
+
+if (aprisensorDevices.gps) {
+  gpsd = require('node-gpsd');
+  gpsStart()
+}
+
+
 
 console.log(aprisensorDevices);

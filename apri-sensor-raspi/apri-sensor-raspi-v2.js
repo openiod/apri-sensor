@@ -340,6 +340,25 @@ var today = new Date();
 var dateString = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate() + "_" + today.getHours(); // + ":" + today.getMinutes();
 //var resultsFileName = resultsFolder + sensorFileName + '_' + dateString;
 
+/*
+// RC = RichtingsCoëfficiënt
+var pmsRcs =[]
+var pmsRcsMax=10-1 // range 0-9
+for (i=0;i<=pmsRcsMax;i++) {
+  var pmsRc={
+    date: new Date()
+    , pm25:0
+    , rc1:0
+    , rc2:0
+    , rc3:0
+    , rc4:0
+    , rc5:0
+    , rc6:0
+  }
+  pmsRcs.push(pmsRc)
+}
+*/
+
 var counters = {
   busy: false,  // dont/skip count when processing of results is busy (busy=true)
   pms: {
@@ -955,6 +974,101 @@ var sendData = async function () {
     //						',raw2_5:'+results.pms.part2_5+',raw5_0:'+results.pms.part5_0+',raw10_0:'+results.pms.part10_0;
     //			logger.info(url);
     // redisHmsetHashAsync(timeStamp.toISOString() + ':pmsa003'
+
+    /*
+    for (i=0;i<=pmsRcsMax-1;i++) {  // shift registers
+      pmsRcs[i]=pmsRcs[i+1]
+    }
+    var tmpDate= new Date()
+    var pmsRc={
+      date:tmpDate
+      ,pm25:results.pms.pm25CF1
+      ,rc1: Math.round(
+        (
+          (results.pms.pm25CF1-pmsRcs[pmsRcsMax-1].pm25)
+         /
+         ((tmpDate.getTime()-pmsRcs[pmsRcsMax-1].date.getTime())/100000)
+        )*100)/100
+      ,rc2: Math.round(
+        (
+          (results.pms.pm25CF1-pmsRcs[pmsRcsMax-2].pm25)
+         /
+         ((tmpDate.getTime()-pmsRcs[pmsRcsMax-2].date.getTime())/100000)
+        )*100)/100
+      ,rc3: Math.round(
+        (
+          (results.pms.pm25CF1-pmsRcs[pmsRcsMax-3].pm25)
+         /
+         ((tmpDate.getTime()-pmsRcs[pmsRcsMax-3].date.getTime())/100000)
+        )*100)/100
+      ,rc4: Math.round(
+        (
+          (results.pms.pm25CF1-pmsRcs[pmsRcsMax-4].pm25)
+         /
+         ((tmpDate.getTime()-pmsRcs[pmsRcsMax-4].date.getTime())/100000)
+        )*100)/100
+      ,rc5: Math.round(
+        (
+          (results.pms.pm25CF1-pmsRcs[pmsRcsMax-5].pm25)
+         /
+         ((tmpDate.getTime()-pmsRcs[pmsRcsMax-5].date.getTime())/100000)
+        )*100)/100
+      ,rc6: Math.round(
+        (
+          (results.pms.pm25CF1-pmsRcs[pmsRcsMax-6].pm25)
+         /
+         ((tmpDate.getTime()-pmsRcs[pmsRcsMax-6].date.getTime())/100000)
+        )*100)/100
+    }
+    pmsRcs[(pmsRcsMax)]=pmsRc
+    //console.dir(pmsRcs)
+    // dit moet anders:
+    if ( pmsRcs[0].pm25==0 && pmsRcs[0].pm25==0 && pmsRcs[0].pm25==0) {
+      // do nothing, data possible at start up fase
+    } else {
+      // geen emailfunctie meer toepassen vanaf sensorkit!!
+      if (emailAvailable==true) {
+        if (pmsRc.rc1>5) {
+          let info = transporter.sendMail({
+            from: '"Sensorkit" <info@scapeler.com>', // sender address
+            to: "awiel@scapeler.com, awiel@scapeler.com", // list of receivers
+            subject: "Sensorkit signal", // Subject line
+            text: "Hallo, dit is een bericht van sensorkit .... Er is een overschrijding geconstateerd!", // plain text body
+            html: "<b>Er is een overschrijding geconstateerd!</b>"+ // html body
+              "<BR/><BR/>Fijnstof concentratie: " + pmsRc.pm25 +
+              "<BR/>RC 1: " + pmsRc.rc1 +
+              "<BR/>RC 2: " + pmsRc.rc2 +
+              "<BR/>RC 3: " + pmsRc.rc3 +
+              "<BR/>RC 4: " + pmsRc.rc4 +
+              "<BR/>RC 5: " + pmsRc.rc5 +
+              "<BR/>RC 6: " + pmsRc.rc6 +
+              "<BR/><BR/>RC = RichtingsCoëfficiënt"
+          });
+          logger.info('email: '+info.messageId)
+        }
+      }
+      //      logger.info('rc', pmsRc)
+      redisHmsetHashAsync(timeStamp.toISOString()+':pmsa003'
+        , 'foi', 'SCRP' + unit.id
+        , 'pm25', results.pms.pm25CF1
+        , 'rc1', pmsRc.rc1
+        , 'rc2', pmsRc.rc2
+        , 'rc3', pmsRc.rc3
+        , 'rc4', pmsRc.rc4
+        , 'rc5', pmsRc.rc5
+        , 'rc6', pmsRc.rc6
+      ).then(function(res) {
+        var _res = res;
+        redisSaddAsync('rc', timeStamp.toISOString()+':pmsa003')
+        .then(function(res2) {
+          var _res2=res2;
+          //  redisSaddAsync('pmsa003', timeStamp.toISOString()+':pmsa003')
+          logger.info('pmsa003 ', timeStamp.toISOString()+':pmsa003'+ _res2);
+        });
+        logger.info(timeStamp.toString()+':pmsa003'+_res);
+      });
+    }
+*/
 
     await redisClient.HSET(timeStamp.toISOString() + ':pmsa003', {
       'foi': 'SCRP' + unit.id

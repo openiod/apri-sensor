@@ -206,6 +206,7 @@ var sleepMode = 0
 //var ds18b20InitCounter = 0
 var ds18b20InitTime = new Date()
 var gpio
+var gpioGpsLedStatus = 'off'
 var gpioDs18b20, gpioBme, gpioGpsLed
 //, gpioBlueLed
 //, gpioFan
@@ -2285,13 +2286,13 @@ if (aprisensorDevices.ips7100) {
 
 var setGpioGpsLedOn = function () {
   //console.log('set blue LED GPIO on')
-  gpioBlueLed.writeSync(1); //set pin state to 1 (power LED on)
-  gpioBlueLedStatus = 'on'
+  gpioGpsLed.writeSync(1); //set pin state to 1 (power LED on)
+  gpioGpsLedStatus = 'on'
 }
 var setGpioGpsLedOff = function () {
   //console.log('set blue LED GPIO off')
-  gpioBlueLed.writeSync(0); //set pin state to 0 (power LED off)
-  gpioBlueLedStatus = 'off'
+  gpioGpsLed.writeSync(0); //set pin state to 0 (power LED off)
+  gpioGpseLedStatus = 'off'
 }
 
 const processGps = function () {
@@ -2372,6 +2373,8 @@ const cleanupCacheGps = function () {
   }
 }
 let timerCleanupCacheGps = setInterval(cleanupCacheGps, 10000)
+
+setGpioGpsLedOff()
 
 if (aprisensorDevices.gps) {
   gpsd = require('node-gpsd');

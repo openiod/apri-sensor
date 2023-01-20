@@ -1,3 +1,6 @@
+// - nog aanpassen voor gps configuratie van de daemon start op device uit config bestand
+// - gps tijd overnemen indien aanwezig
+
 /*
 ** Module: apri-sensor-raspi
 **

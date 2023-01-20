@@ -1,8 +1,8 @@
 [Unit]
-Description=SCAPE604-aprisensor-netmanager-runtime-v2 - start or restart service, respawn
+Description=SCAPE604-aprisensor-netmanager-runtime-v2
 After=network.target
 [Service]
-ExecStart=/opt/SCAPE604/aprisensor-netmanager-runtime-v2.sh /var/log/aprisensor/SCAPE604-aprisensor-netmanager-runtime-v2.log
+ExecStart=/opt/SCAPE604/apri-sensor/apri-config/aprisensor-netmanager-runtime-v2.sh /var/log/aprisensor/SCAPE604-aprisensor-netmanager-runtime-v2.log
 Restart=always
 
 [Install]

@@ -26,6 +26,16 @@ fi
 cd  $SYSTEMPATH/$SYSTEMCODE/apri-sensor
 
 export NODEPATH=`which node`
+
+export REDISV=$(redis-cli -v | cut -d' ' -f 2 | cut -d'.' -f 1 )
+echo $REDISV
+if [ $REDISV == '6' ]
+then
+  $NODEPATH apri-sensor-redis/apri-sensor-redis-v2.js >>$LOGFILE 2>>$LOGFILE
+else
+  $NODEPATH apri-sensor-redis/apri-sensor-redis.js >>$LOGFILE 2>>$LOGFILE
+fi
+
 $NODEPATH apri-sensor-redis/apri-sensor-redis.js >>$LOGFILE 2>>$LOGFILE
 
 journalctl --vacuum-time=1h

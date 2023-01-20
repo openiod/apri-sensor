@@ -1,6 +1,13 @@
-# 2.3.? - crontab update for redis cleanup
-# 2.3.? - Pi3 remove wpa_supplicant.conf
-# 2.3.? - printf '[logging]\ndomains=ALL:WARN\n' > /etc/NetworkManager/conf.d/aprisensor.conf ; systemctl restart NetworkManager
+# 2.3.0
+- node version 16 ! 
+- Redis version 6 !
+- sveltekit 1
+- new aprisensor-netmanager(-runtime-v2). Now node service (not html webservice via nginx)
+- new apri-sensor-raspi-v2, apri-sensor-connector-v2, apri-sensor-redis-v2 with Redis v6
+- nginx removed, no more webservices (aprisensor-netmanager-runtime-v2=node service)# 2.3.? - crontab update for redis cleanup
+- Pi3 remove wpa_supplicant.conf
+- printf '[logging]\ndomains=ALL:WARN\n' > /etc/NetworkManager/conf.d/aprisensor.conf ; systemctl restart NetworkManager
+
 # 2.2.1 - rm /var/hdd.log/* /var/log/* /var/hdd.log/* /var/log/hdd.log/aprisensor/*
 #         as last step preparingfresh SD-card
 # 2.2.0 - sockect removed from apri-sensor-raspi
@@ -39,12 +46,10 @@ sudo shutdown -h now
 # preparations for building new image
 # assuming: latest software installed and package.json in place
 # start met sd-kaart op pi zero met directe aansluiting (keyboard/monitor)
-## niet meer nodig !!!! nog te doen ?: /etc/log2ram.conf aanpassen (50MB en '/var/log')
 sudo systemctl stop SCAPE604-apri-sensor-raspi
 sudo systemctl stop SCAPE604-apri-sensor-connector
 sudo systemctl stop SCAPE604-aprisensor-nmcli
 redis-cli flushdb
-sudo rm /opt/SCAPE604/log/*
 sudo rm /var/log/aprisensor/*
 sudo rm /var/log/*
 sudo rm /var/hdd.log/*

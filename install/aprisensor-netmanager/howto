@@ -16,7 +16,7 @@ voor v2:
 - tar cfvz aprisensor-netmanager-runtime-v2.tar.gz ../aprisensor-netmanager-v2/build
 - cp aprisensor-netmanager-runtime-v2.tar.gz /home/awiel/opt/apri-sensor/.
 
-mv aprisensor-netmanager.tar.gz /home/awiel/opt/apri-sensor/.
+#mv aprisensor-netmanager.tar.gz /home/awiel/opt/apri-sensor/.
 
 #rm -r /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion2
 #mv /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion /home/awiel/opt/apri-sensor/aprisensor-netmanager-runtime-previousversion2

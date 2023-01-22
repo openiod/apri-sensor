@@ -46,9 +46,14 @@ sudo shutdown -h now
 # preparations for building new image
 # assuming: latest software installed and package.json in place
 # start met sd-kaart op pi zero met directe aansluiting (keyboard/monitor)
+sudo systemctl stop SCAPE604-apri-sensor-raspi-v2
+sudo systemctl stop SCAPE604-apri-sensor-connector-v2
+sudo systemctl stop SCAPE604-aprisensor-nmcli
+of 
 sudo systemctl stop SCAPE604-apri-sensor-raspi
 sudo systemctl stop SCAPE604-apri-sensor-connector
-sudo systemctl stop SCAPE604-aprisensor-nmcli
+sudo systemctl stop SCAPE604-aprisensor-nmcli 
+
 redis-cli flushdb
 sudo rm /var/log/aprisensor/*
 sudo rm /var/log/*
@@ -306,8 +311,9 @@ sudo mkdir -p /opt/SCAPE604/config/
 sudo mkdir /opt/SCAPE604/git
 sudo mkdir /opt/SCAPE604/apri-sensor/
 sudo mkdir /opt/SCAPE604/apri-sensor/apri-config
-cd /opt/SCAPE604/git/apri-sensor
+cd /opt/SCAPE604/git
 sudo git clone --depth 1 https://github.com/openiod/apri-sensor.git
+cd /opt/SCAPE604/git/apri-sensor
 sudo git config pull.rebase false (eenmalige 'default' actie, nog uitzoek waarvoor)
 # voor Pi Zero:
 sudo /opt/SCAPE604/git/apri-sensor/install/git2as.sh

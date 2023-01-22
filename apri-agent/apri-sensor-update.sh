@@ -9,6 +9,7 @@ then
   cd /opt/SCAPE604/git
   # git clone --depth 1 instead of degit
   git clone --depth 1 https://github.com/openiod/apri-sensor.git
+  git config pull.rebase false
   # git clone https://github.com/openiod/apri-sensor.git
   # first clean up degit cache
   # rm -r /root/.degit/github/openiod/apri-sensor

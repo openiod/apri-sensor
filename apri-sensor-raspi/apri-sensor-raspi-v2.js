@@ -2144,7 +2144,7 @@ var scanSerialDevices = function () {
     if (serialDevice.deviceType == 'gps') {	//&& counters.gps.nrOfMeasTotal>0) {
       serialDevice.validData = true
     }
-    if (serialDevice.deviceType == 'atmega') {	//&& counters.gps.nrOfMeasTotal>0) {
+    if (serialDevice.deviceType == 'atmega' && counters.pms.nrOfMeasTotal>0) {
       serialDevice.validData = true
     }
     if (serialDevice.validData == true) {
@@ -2226,6 +2226,7 @@ var initSerial = function (serialDeviceIndex) {
         logger.info('serial device for atmega opened')
         console.dir(options)
         serialDevices[serialDeviceIndex].serial.on('data', (data) => {
+          if (counters.pms.nrOfMeasTotal==0) counters.pms.nrOfMeasTotal=1 // assuming ok
           //logger.info('serial on atmega data')
           //printHex(data,'T');
           //process.stdout.write(data);

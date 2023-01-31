@@ -5,7 +5,16 @@
 - new aprisensor-netmanager(-runtime-v2). Now node service (not html webservice via nginx)
 - new apri-sensor-raspi-v2, apri-sensor-connector-v2, apri-sensor-redis-v2 with Redis v6
 - nginx removed, no more webservices (aprisensor-netmanager-runtime-v2=node service)# 2.3.? - crontab update for redis cleanup
+
+- Pi3 nog op oude Redis versie
+- Pi3 nog op oude socketio versie
 - Pi3 remove wpa_supplicant.conf
+- Pi3 disable SCAPE604-aprisensor-nmcli (default)
+- Pi3 printf '[logging ...' etc
+- Pi3 cp ... install/avahi/avahi-daemon.conf ... etc
+- Pi3 ATMega via raspi 
+- Pi3 aanpassen package.json versienrs (let op Redis en socketio)
+- Pi3 sudo npm install winston-daily-rotate-file winston
 - printf '[logging]\ndomains=ALL:WARN\n' > /etc/NetworkManager/conf.d/aprisensor.conf ; systemctl restart NetworkManager
 
 # 2.2.1 - rm /var/hdd.log/* /var/log/* /var/hdd.log/* /var/log/hdd.log/aprisensor/*
@@ -61,7 +70,7 @@ sudo rm /var/hdd.log/*
 sudo rm /var/hdd.log/aprisensor/*
 nmcli c s
 sudo nmcli c delete .. alle connections deleten, hotspot als laatste
-sudo shutdown -h now
+sudo nmcli c delete ap-24 ; sudo shutdown -h now
 # dan sd-kaart verwijderen en kopie maken met nieuw versienummer
 
 # prepare tested sensorkit for sending to client:
@@ -114,13 +123,13 @@ sudo nmcli c delete <connected router> ; sudo shutdown -h now
 
 #### kopieer SD-kaart naar image bestand
 ! verwijder eerst de nmcli connections
-! en leegmaken /ver/log /var/log/aprisensor 
+! en leegmaken /var/log /var/log/aprisensor 
 # plaats sd-kaart met nieuwe versie in usb-adapter
 #===== e2fsck (controle of fs ok is)
 # df -h  # show devices
 # umount /dev/sda1 /dev/sda2
 # sudo e2fsck /dev/sda2  (rootfs=clean is ok)
-# sudo e2fsck -c /dev/sda2 (duurt paar minuten)
+# sudo e2fsck -c /dev/sda2 (duurt 15 minuten voor 32GB)
 #### ======
 # make truncated img (copy) of sdcard on Debian:
 # df -h  # (partitions: /dev/sda1 /dev/sda2 ; device /dev/sda)
@@ -129,34 +138,34 @@ sudo nmcli c delete <connected router> ; sudo shutdown -h now
 # controleer filesystem: sudo e2fsck /dev/sda2
 # cd ~/opt/raspberrypi_image
 # mv apri* old-images/.
-# sudo dcfldd if=/dev/sda of=aprisensor_v2-2-x.img ; sudo sync
+# sudo dcfldd if=/dev/sda of=aprisensor_v2-3-x.img ; sudo sync
 # sudo sync
-# sudo chown awiel:awiel aprisensor_v2-2-x.img
+# sudo chown awiel:awiel aprisensor_v2-3-x.img
 # shrink img:
 # # eenmalig: sudo apt-get update && sudo apt-get install gparted
-# sudo fdisk -l aprisensor_v2-2-x.img
+# sudo fdisk -l aprisensor_v2-3-x.img
 # startsector of partition2 = 532480
 # mount the second partition
 # #sudo losetup /dev/loop10 aprisensor_####.img -o $((<STARTSECTOR>*512))
 # sudo losetup /dev/loop10 aprisensor_v2-2-x.img -o $((532480*512))
 # sudo gparted /dev/loop10
 # # select partion en menu: Partition / Resize/Move
-# # change New size to 3000 (minimum size + +-20MB) #of 3500 voor standaard voldoende ruimte!!
+# # change New size to 3900 (minimum size + +-20MB) #of 3500 voor standaard voldoende ruimte!!
 # click 'resize'-button
 # Menu: Edit / Apply All Operations
 #  Noteer the new size!
-#   see log details shrink file system / resize2fs -p 3584000K (3072000K of 2488320K of 3584000K)
+#   see log details shrink file system / resize2fs -p 3993600K (3584000K of 3072000K of 2488320K of 3584000K)
 # close and quit gparted
 # reset loop device to total img:
 # sudo losetup -d /dev/loop10
-# sudo losetup /dev/loop10 aprisensor_v2-2-x.img
+# sudo losetup /dev/loop10 aprisensor_v2-3-x.img
 # sudo fdisk /dev/loop10
 # p<enter> for partion info
 # d<enter>2<enter> delete partition 2
 # create new partion 2 with partion start address
 # do not forget the '+'
 # ##n<enter>p<enter>2<enter>532480<enter>+2488320K<enter>
-# n<enter>p<enter>2<enter>532480<enter>+3584000K<enter>
+# n<enter>p<enter>2<enter>532480<enter>+3993600K<enter>
 # remove signature? N(o)
 #? w<enter>  write partion tabel
 # show loop device and delete it:
@@ -165,8 +174,9 @@ sudo nmcli c delete <connected router> ; sudo shutdown -h now
 # truncate file to ENDsector of 2e partition:
 # #truncate -s $(((END+1)*512)) aprisensor_v2-1-5.img
 # ###truncate -s $(((4976640+1)*512)) aprisensor_v2-1-5.img
-# truncate -s $(((7700479+1)*512)) aprisensor_v2-2-x.img
-# mv aprisensor_v2-2-x.img aprisensor_v2-2-2.img
+# ###truncate -s $(((7700479+1)*512)) aprisensor_v2-2-x.img
+# truncate -s $(((8519679+1)*512)) aprisensor_v2-3-x.img
+# mv aprisensor_v2-3-x.img aprisensor_v2-3-0.img
 #
 # see http://www.aoakley.com/articles/2015-10-09-resizing-sd-images.php
 #-----------------------------------------------
@@ -176,6 +186,16 @@ sudo nmcli c delete <connected router> ; sudo shutdown -h now
 # wordpress webpagina aanpassen voor nieuwe versie
 
 # after first boot of Raspberry Pi:
+
+Dit is nog een keer uit te proberen:
+dtoverlay=i2c-gpio,bus=4,i2c_gpio_delay_us=1,i2c_gpio_sda=23,i2c_gpio_scl=24
+This line will create an aditional i2c bus (bus 4) on GPIO 23 as SDA and GPIO 24 as SCL (GPIO 23 and 24 is defaults)
+eventueel meerdere: volgorde moet dan van hoog naar laag zijn (eerst bus 4 dan 3) en niet lager dan 3
+dtoverlay=i2c-gpio,bus=3,i2c_gpio_delay_us=1,i2c_gpio_sda=17,i2c_gpio_scl=27
+sudo i2cdetect -y 3 (voor bus 3 in dit voorbeeld)
+zie ook /sys/devices/platform/soc/*i2c
+of check het signaal met de oscilloscoop
+
 # /boot/config.txt --> dtoverlay=i2c-gpio,bus=3  (software i2c on gpio 23 sda 24 scl)
 # /boot/config.txt --> dtoverlay=disable-bt (serial wordt dan ttyAMA0 ipv ttyS0, is beter)
 # deze mag weg voor ApriSensorSK2 sudo rm /opt/SCAPE604/log/*.log
@@ -385,6 +405,8 @@ sudo systemctl enable SCAPE604-apri-sensor-raspi.service
 #sudo cp /opt/SCAPE604/git/apri-sensor/apri-config/SCAPE604-apri-sensor-bam1020.service.org /etc/systemd/system/SCAPE604-apri-sensor-bam1020.service
 #sudo systemctl enable SCAPE604-apri-sensor-bam1020.service
 #sudo systemctl start SCAPE604-apri-sensor-bam1020.service
+
+# for o.a. ATMega gekoppeld aan Pi3 (PMSA003/BME280) werkt via raspi!!
 
 # when installed via eth0 this file will block nmcli from connecting to wifi
 rm /etc/wpa_supplicant/wpa_supplicant.conf

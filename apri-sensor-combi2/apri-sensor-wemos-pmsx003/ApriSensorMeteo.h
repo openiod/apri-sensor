@@ -62,12 +62,12 @@ void sendObservations(String urlParams) {
     return;
   }
 
-  if (client.verify(fingerprint, host)) {
+/*  if (client.verify(fingerprint, host)) {
 //    Serial.println("certificate matches");
   } else {
     Serial.println("certificate doesn't match");
   }
-
+*/
   String url = URL+ "&foi=" + foi + "" + urlParams +"\0";
 //  String url = "/repos/esp8266/Arduino/commits/master/status";
 //  Serial.print("requesting URL: ");
@@ -100,5 +100,3 @@ void sendObservations(String urlParams) {
   client.stop();
   
 }
-
-

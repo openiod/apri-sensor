@@ -110,6 +110,8 @@ var _gpsTimeIso = ''
 var _gpsTime = new Date()
 var _gpsArray = []
 
+var atmegaRecordIn = ''
+
 var ModbusRTU
 var scd30Client
 try {
@@ -2086,6 +2088,19 @@ var processRaspiSerialData7100 = function (data) {
   ips7100Record += String.fromCharCode(data)
 }
 
+var processRaspiSerialDataAtmega = function (data) {
+  // M@M/U@72;102448;1726; 0;5336;1
+  // M@M/U@82;100;100;118;100;100;118;22200;7400;381;36;36;0;11
+  var items = data.split(';')
+  var recSrt = items[0].split('@')
+  if (recSrt[2] == '72') {
+    console.log('ATMega BME280')
+  }
+  if (recSrt[2] == '82') {
+    console.log('ATMega PMSA003')
+  }
+}
+
 var serialDevices = [
   {
     device: '/dev/ttyAMA0'
@@ -2127,6 +2142,9 @@ var scanSerialDevices = function () {
       serialDevice.validData = true
     }
     if (serialDevice.deviceType == 'gps') {	//&& counters.gps.nrOfMeasTotal>0) {
+      serialDevice.validData = true
+    }
+    if (serialDevice.deviceType == 'atmega') {	//&& counters.gps.nrOfMeasTotal>0) {
       serialDevice.validData = true
     }
     if (serialDevice.validData == true) {
@@ -2201,9 +2219,24 @@ var initSerial = function (serialDeviceIndex) {
           logger.info('serial on gps data')
           //printHex(data,'T');
           //process.stdout.write(data);
-          for (var i = 0; i < data.length; i++) {
-            //processRaspiSerialData7100(data[i]);
+          //processRaspiSerialData7100(data[i]);
+        });
+      }
+      if (serialDevices[serialDeviceIndex].deviceType == 'atmega') {
+        logger.info('serial device for atmega opened')
+        console.dir(options)
+        serialDevices[serialDeviceIndex].serial.on('data', (data) => {
+          //logger.info('serial on atmega data')
+          //printHex(data,'T');
+          //process.stdout.write(data);
+          atmegaRecordIn = atmegaRecordIn + data.toString()
+          var recordArray = atmegaRecordIn.split("\r");
+          if (recordArray.length > 1) {
+            var record = recordArray[0].substring(1)
+            atmegaRecordIn = atmegaRecordIn.substring(record.length + 2)
+            processRaspiSerialDataAtmega(record);
           }
+
         });
       }
     });
@@ -2281,6 +2314,18 @@ if (aprisensorDevices.ips7100) {
     , initiated: false
     , validData: false
     , deviceType: 'ips7100'
+  }
+  serialDevices.push(newDevice)
+  scanSerialDevices()
+  let timerSerialDevices = setInterval(scanSerialDevices, 10000)
+}
+if (aprisensorDevices.atmega) {
+  var newDevice = {
+    device: aprisensorDevices.atmega.device
+    , baudRate: aprisensorDevices.atmega.baudRate
+    , initiated: false
+    , validData: false
+    , deviceType: 'atmega'
   }
   serialDevices.push(newDevice)
   scanSerialDevices()

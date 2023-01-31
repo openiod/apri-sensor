@@ -2103,7 +2103,7 @@ var processRaspiSerialDataAtmega = function (data) {
       logger.info('bme280 in-recourd not ok, ignored *******************************');
       return;
     }
-    console.log('ATMega BME280')
+    //console.log('ATMega BME280')
     counters.bme280.nrOfMeas++;
     counters.bme280.nrOfMeasTotal++;
     counters.bme280.pressure += Math.round(parseFloat(items[1]) / 100)
@@ -2116,7 +2116,7 @@ var processRaspiSerialDataAtmega = function (data) {
       logger.info('pmsa003 in-recourd not ok, ignored *******************************');
       return;
     }
-    console.log('ATMega PMSA003')
+    //console.log('ATMega PMSA003')
     counters.pms.nrOfMeas++;
     counters.pms.nrOfMeasTotal++;
     counters.pms.pm1CF1 += Math.round(parseFloat(items[1]) / 100)

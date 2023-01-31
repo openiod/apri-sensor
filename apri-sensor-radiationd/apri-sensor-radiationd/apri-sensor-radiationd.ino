@@ -27,7 +27,8 @@ void tube_impulse() { // Captures count of events from Geiger counter board
 }
 
 void setup() {
-  Serial.begin(9600);                                               // Start serial monitor
+  Serial.begin(9600);  
+  Serial.print("Start RadiationD;");                                             // Start serial monitor
   pinMode(pin, INPUT);                                                // Set pin to input for capturing GM Tube events
   interrupts();                                                       // Enable interrupts (in case they were previously disabled)
   attachInterrupt(digitalPinToInterrupt(pin), tube_impulse, FALLING); // Define external interrupts

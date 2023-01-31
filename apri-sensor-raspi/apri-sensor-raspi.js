@@ -1954,13 +1954,46 @@ var processRaspiSerialData7100 = function (data) {
 var processRaspiSerialDataAtmega = function (data) {
   // M@M/U@72;102448;1726; 0;5336;1
   // M@M/U@82;100;100;118;100;100;118;22200;7400;381;36;36;0;11
+  if (counters.busy == true) {
+    logger.info('Counters busy, measurement ignored *******************************');
+    return;
+  }
+
   var items = data.split(';')
   var recSrt = items[0].split('@')
   if (recSrt[2] == '72') {
+    if (items.length != 6) {
+      logger.info('bme280 in-recourd not ok, ignored *******************************');
+      return;
+    }
     console.log('ATMega BME280')
+    counters.bme280.nrOfMeas++;
+    counters.bme280.nrOfMeasTotal++;
+    counters.bme280.pressure += Math.round(parseFloat(items[1]) / 100)
+    counters.bme280.temperature += Math.round(parseFloat(items[2]) / 100)
+    counters.bme280.rHum += Math.round(parseFloat(items[4]) / 100)
   }
+
   if (recSrt[2] == '82') {
+    if (items.length != 14) {
+      logger.info('pmsa003 in-recourd not ok, ignored *******************************');
+      return;
+    }
     console.log('ATMega PMSA003')
+    counters.pms.nrOfMeas++;
+    counters.pms.nrOfMeasTotal++;
+    counters.pms.pm1CF1 += Math.round(parseFloat(items[1]) / 100)
+    counters.pms.pm25CF1 += Math.round(parseFloat(items[2]) / 100)
+    counters.pms.pm10CF1 += Math.round(parseFloat(items[3]) / 100)
+    counters.pms.pm1amb += Math.round(parseFloat(items[4]) / 100)
+    counters.pms.pm25amb += Math.round(parseFloat(items[5]) / 100)
+    counters.pms.pm10amb += Math.round(parseFloat(items[6]) / 100)
+    counters.pms.part0_3 += Math.round(parseFloat(items[7]) / 100)
+    counters.pms.part0_5 += Math.round(parseFloat(items[8]) / 100)
+    counters.pms.part1_0 += Math.round(parseFloat(items[9]) / 100)
+    counters.pms.part2_5 += Math.round(parseFloat(items[10]) / 100)
+    counters.pms.part5_0 += Math.round(parseFloat(items[11]) / 100)
+    counters.pms.part10_0 += Math.round(parseFloat(items[12]) / 100)
   }
 }
 

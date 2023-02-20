@@ -1725,8 +1725,25 @@ var scd30Functions = async function () {
   await sleepFunction(100)
   //scd30GetInterval()
   //scd30Reset()
-  scd30StartContinuous()
-  scd30GetTemperatureOffset()
+  var scd30TemperatureOffset = 0
+  try {
+    var tmpScd30TemperatureOffset = systemFolderParent + '/config/aprisensor-scd30-temperature-offset.cfg'
+    scd30TemperatureOffset = fs.readFileSync(tmpScd30TemperatureOffset, { encoding: 'utf8' }).split('\n')[0]
+    logger.info('aprisensor-scd30-temperature-offset: ' + scd30TemperatureOffset)
+    if (scd30TemperatureOffset.substring(0,1)=='+' || scd30TemperatureOffset.substring(0,1)=='-') {
+      var scd30TemperatureOffsetNum = parseFloat(scd30TemperatureOffset)
+      if (scd30TemperatureOffsetNum != NaN) {
+        scd30GetTemperatureOffset(scd30TemperatureOffsetNum)  
+      }
+      await sleepFunction(100)
+  
+    }
+  }
+  catch (err) {
+    logger.info('Not found /config/aprisensor-scd30-temperature-offset.cfg');
+  }
+
+  await scd30StartContinuous()
   //scd30StopContinuous()
 }
 var scd30ReadFirmware = function () {
@@ -1795,21 +1812,23 @@ const scd30StartContinuous = function () {
       logger.info(err)
     })
 }
-const scd30GetTemperatureOffset = function () {
-  logger.info('Get temperature offset')
-  scd30Client.readHoldingRegisters(0x3B, [0x01])   // function code 6
+const scd30GetTemperatureOffset = async function (offsetNum) {
+  logger.info('Get temperature offset ('+offsetNum+')')
+  await scd30Client.readHoldingRegisters(0x3B, [0x01])   // function code 6
     .then(async function (data) {
       logger.info('then get temperature offset')
       logger.info(data)
       await sleepFunction(100)
+      scd30SetTemperatureOffset(offsetNum)
     })
     .catch(function (err) {
       logger.info('catch get temperature offset')
       logger.info(err)
     })
 }
-const scd30SetTemperatureOffset = function () {
-  logger.info('Set temperature offset')
+const scd30SetTemperatureOffset = function (offsetNum) {
+  logger.info('Set temperature offset ('+offsetNum+')')
+  return
   scd30Client.writeRegister(0x3B, [0x01F4])   // function code 6
     .then(async function (data) {
       logger.info('then set temperature offset')
@@ -2204,7 +2223,7 @@ var scanSerialDevices = function () {
     if (serialDevice.deviceType == 'gps') {	//&& counters.gps.nrOfMeasTotal>0) {
       serialDevice.validData = true
     }
-    if (serialDevice.deviceType == 'atmega' && counters.pms.nrOfMeasTotal>0) {
+    if (serialDevice.deviceType == 'atmega' && counters.pms.nrOfMeasTotal > 0) {
       serialDevice.validData = true
     }
     if (serialDevice.validData == true) {
@@ -2286,7 +2305,7 @@ var initSerial = function (serialDeviceIndex) {
         logger.info('serial device for atmega opened')
         console.dir(options)
         serialDevices[serialDeviceIndex].serial.on('data', (data) => {
-          if (counters.pms.nrOfMeasTotal==0) counters.pms.nrOfMeasTotal=1 // assuming ok
+          if (counters.pms.nrOfMeasTotal == 0) counters.pms.nrOfMeasTotal = 1 // assuming ok
           //logger.info('serial on atmega data')
           //printHex(data,'T');
           //process.stdout.write(data);

@@ -1726,6 +1726,7 @@ var scd30Functions = async function () {
   //scd30GetInterval()
   //scd30Reset()
   scd30StartContinuous()
+  scd30GetTemperatureOffset()
   //scd30StopContinuous()
 }
 var scd30ReadFirmware = function () {
@@ -1791,6 +1792,32 @@ const scd30StartContinuous = function () {
     })
     .catch(function (err) {
       logger.info('catch start continuous')
+      logger.info(err)
+    })
+}
+const scd30GetTemperatureOffset = function () {
+  logger.info('Get temperature offset')
+  scd30Client.readHoldingRegisters(0x3B, [0x01])   // function code 6
+    .then(async function (data) {
+      logger.info('then get temperature offset')
+      logger.info(data)
+      await sleepFunction(100)
+    })
+    .catch(function (err) {
+      logger.info('catch get temperature offset')
+      logger.info(err)
+    })
+}
+const scd30SetTemperatureOffset = function () {
+  logger.info('Set temperature offset')
+  scd30Client.writeRegister(0x3B, [0x01F4])   // function code 6
+    .then(async function (data) {
+      logger.info('then set temperature offset')
+      logger.info(data)
+      await sleepFunction(100)
+    })
+    .catch(function (err) {
+      logger.info('catch set temperature offset')
       logger.info(err)
     })
 }

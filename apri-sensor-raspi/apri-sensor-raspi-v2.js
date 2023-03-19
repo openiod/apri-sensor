@@ -1733,12 +1733,14 @@ var scd30Functions = async function () {
     var scd30TemperatureOffsetNum = Number.parseInt(scd30TemperatureOffset)
     if (!Number.isNaN(scd30TemperatureOffsetNum)) {
       scd30SetTemperatureOffset(scd30TemperatureOffsetNum)
-      fsPromises.rename(scd30TemperatureOffsetFileName, scd30TemperatureOffsetFileName+new Date().toISOString() )
+      var newFileName=scd30TemperatureOffsetFileName+'_'+new Date().toISOString()
+      console.log('rename temperature offset file into: '+newFileName)
+      fs.renameSync(scd30TemperatureOffsetFileName, newFileName )
     }
     await sleepFunction(100)
   }
   catch (err) {
-    logger.info('Not found /config/aprisensor-scd30-temperature-offset.cfg');
+    logger.info('catch temperature offset (scd30Functions)');
   }
 
   await scd30StartContinuous()

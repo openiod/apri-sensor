@@ -1732,7 +1732,7 @@ var scd30Functions = async function () {
     logger.info('aprisensor-scd30-temperature-offset: ' + scd30TemperatureOffset)
     var scd30TemperatureOffsetNum = Number.parseInt(scd30TemperatureOffset)
     if (!Number.isNaN(scd30TemperatureOffsetNum)) {
-      scd30SetTemperatureOffset(scd30TemperatureOffsetNum)
+      await scd30SetTemperatureOffset(scd30TemperatureOffsetNum)
       var newFileName=scd30TemperatureOffsetFileName+'_'+new Date().toISOString()
       console.log('rename temperature offset file into: '+newFileName)
       fs.renameSync(scd30TemperatureOffsetFileName, newFileName )
@@ -1751,7 +1751,7 @@ var scd30Functions = async function () {
     logger.info('aprisensor-scd30-FRC: ' + scd30Frc)
     var scd30FrcNum = Number.parseInt(scd30Frc)
     if (!Number.isNaN(scd30FrcNum)) {
-      scd30SetFrc(scd30FrcNum)
+      await scd30SetFrc(scd30FrcNum)
       var newFileName=scd30FrcFileName+'_'+new Date().toISOString()
       console.log('rename frc file into: '+newFileName)
       fs.renameSync(scd30FrcFileName, newFileName )

@@ -1727,17 +1727,15 @@ var scd30Functions = async function () {
   //scd30Reset()
   var scd30TemperatureOffset = 0
   try {
-    var tmpScd30TemperatureOffset = systemFolderParent + '/config/aprisensor-scd30-temperature-offset.cfg'
-    scd30TemperatureOffset = fs.readFileSync(tmpScd30TemperatureOffset, { encoding: 'utf8' }).split('\n')[0]
+    var scd30TemperatureOffsetFileName = systemFolderParent + '/config/aprisensor-scd30-temperature-offset.cfg'
+    scd30TemperatureOffset = fs.readFileSync(scd30TemperatureOffsetFileName, { encoding: 'utf8' }).split('\n')[0]
     logger.info('aprisensor-scd30-temperature-offset: ' + scd30TemperatureOffset)
-    if (scd30TemperatureOffset.substring(0,1)=='+' || scd30TemperatureOffset.substring(0,1)=='-') {
-      var scd30TemperatureOffsetNum = parseFloat(scd30TemperatureOffset)
-      if (scd30TemperatureOffsetNum != NaN) {
-        scd30GetTemperatureOffset(scd30TemperatureOffsetNum)  
-      }
-      await sleepFunction(100)
-  
+    var scd30TemperatureOffsetNum = Number.parseInt(scd30TemperatureOffset)
+    if (!Number.isNaN(scd30TemperatureOffsetNum)) {
+      scd30SetTemperatureOffset(scd30TemperatureOffsetNum)
+      fsPromises.rename(scd30TemperatureOffsetFileName, scd30TemperatureOffsetFileName+new Date().toISOString() )
     }
+    await sleepFunction(100)
   }
   catch (err) {
     logger.info('Not found /config/aprisensor-scd30-temperature-offset.cfg');
@@ -1813,23 +1811,24 @@ const scd30StartContinuous = function () {
     })
 }
 const scd30GetTemperatureOffset = async function (offsetNum) {
-  logger.info('Get temperature offset ('+offsetNum+')')
+  logger.info('Get temperature offset (' + offsetNum + ')')
   await scd30Client.readHoldingRegisters(0x3B, [0x01])   // function code 6
     .then(async function (data) {
       logger.info('then get temperature offset')
       logger.info(data)
-      await sleepFunction(100)
-      scd30SetTemperatureOffset(offsetNum)
+      //logger.info(data.data[0])
+      //logger.info(data.data[0]+offsetNum)
+      //await sleepFunction(100)
     })
     .catch(function (err) {
       logger.info('catch get temperature offset')
       logger.info(err)
     })
 }
-const scd30SetTemperatureOffset = function (offsetNum) {
-  logger.info('Set temperature offset ('+offsetNum+')')
-  return
-  scd30Client.writeRegister(0x3B, [0x01F4])   // function code 6
+// temperature offset is always a negative offset!! offsetNum 100== -1C
+const scd30SetTemperatureOffset = async function (offsetNum) {
+  logger.info('Set temperature offset (' + offsetNum + ')')
+  await scd30Client.writeRegister(0x3B, [offsetNum])   // function code 6
     .then(async function (data) {
       logger.info('then set temperature offset')
       logger.info(data)

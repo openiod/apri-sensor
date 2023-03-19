@@ -1743,6 +1743,28 @@ var scd30Functions = async function () {
     logger.info('catch temperature offset (scd30Functions)');
   }
 
+  
+  var scd30FrcNum = 0
+  try {
+    var scd30FrcFileName = systemFolderParent + '/config/aprisensor-scd30-frc.cfg'
+    scd30Frc = fs.readFileSync(scd30FrcFileName, { encoding: 'utf8' }).split('\n')[0]
+    logger.info('aprisensor-scd30-FRC: ' + scd30Frc)
+    var scd30FrcNum = Number.parseInt(scd30Frc)
+    if (!Number.isNaN(scd30FrcNum)) {
+      scd30SetFrc(scd30FrcNum)
+      var newFileName=scd30FrcFileName+'_'+new Date().toISOString()
+      console.log('rename frc file into: '+newFileName)
+      fs.renameSync(scd30FrcFileName, newFileName )
+    }
+    await sleepFunction(100)
+  }
+  catch (err) {
+    logger.info('catch FRC (scd30Functions)');
+  }
+
+
+
+
   await scd30StartContinuous()
   //scd30StopContinuous()
 }
@@ -1841,6 +1863,22 @@ const scd30SetTemperatureOffset = async function (offsetNum) {
       logger.info(err)
     })
 }
+
+// temperature offset is always a negative offset!! offsetNum 100== -1C
+const scd30SetFrc = async function (scd30FrcNum) {
+  logger.info('Set Forced Recalibration Value (FRC)  to (' + frcNum + ')')
+  await scd30Client.writeRegister(0x39, [scd30FrcNum])   // function code 6
+    .then(async function (data) {
+      logger.info('then set FRC')
+      logger.info(data)
+      await sleepFunction(100)
+    })
+    .catch(function (err) {
+      logger.info('catch set FRC')
+      logger.info(err)
+    })
+}
+
 const scd30StopContinuous = function () {
   logger.info('stop continuous measuring')
   scd30Client.writeRegister(0x37, [0x01])   // function code 6

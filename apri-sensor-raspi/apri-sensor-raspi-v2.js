@@ -1866,7 +1866,7 @@ const scd30SetTemperatureOffset = async function (offsetNum) {
 
 // temperature offset is always a negative offset!! offsetNum 100== -1C
 const scd30SetFrc = async function (scd30FrcNum) {
-  logger.info('Set Forced Recalibration Value (FRC)  to (' + scd30frcNum + ')')
+  logger.info('Set Forced Recalibration Value (FRC)  to (' + scd30FrcNum + ')')
   await scd30Client.writeRegister(0x39, [scd30FrcNum])   // function code 6
     .then(async function (data) {
       logger.info('then set FRC')

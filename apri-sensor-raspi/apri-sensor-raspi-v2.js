@@ -741,8 +741,14 @@ bme280.init()
 
 const readSensorDataBme680 = async function () {
   if (indBme680 == false) return
-  var bme680Data = await bme680.getSensorData()
-    .catch((err) => { console.error(err); return });
+  console.log('read BME680')
+  try {
+    var bme680Data = await bme680.getSensorData()
+  }
+  catch (error) {
+    console.error(error)
+    return 
+  }
   var data = bme680Data.data;
   if (counters.busy == false) {
     if (data.pressure < 900) {

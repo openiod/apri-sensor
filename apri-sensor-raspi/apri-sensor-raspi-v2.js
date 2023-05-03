@@ -741,7 +741,7 @@ bme280.init()
 
 const readSensorDataBme680 = async function () {
   if (indBme680 == false) return
-  console.log('read BME680')
+  //console.log('read BME680')
   try {
     var bme680Data = await bme680.getSensorData()
   }

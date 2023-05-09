@@ -35,7 +35,7 @@ var fs = require('fs');
 var redis = require("redis");
 var io = require('socket.io-client');
 var redisClient = redis.createClient();
-const { promisify } = require('util');
+const { promisify, isNullOrUndefined } = require('util');
 //const redisGetAsync 				= promisify(redisClient.get).bind(redisClient);
 //const redisSetAsync 				= promisify(redisClient.set).bind(redisClient);
 const redisHmsetAsync = promisify(redisClient.hmset).bind(redisClient);
@@ -44,6 +44,7 @@ const redisSortAsync = promisify(redisClient.sort).bind(redisClient);
 const redisDelAsync = promisify(redisClient.del).bind(redisClient);
 const redisSmoveAsync = promisify(redisClient.smove).bind(redisClient);
 const redisHgetallAsync = promisify(redisClient.hgetall).bind(redisClient);
+const redisSRem = promisify(redisClient.srem).bind(redisClient);
 var self = this
 
 var log = function (message) {
@@ -107,7 +108,8 @@ var processDataCycle = function (parm) {
 	}
 
 	//log('Find new record');
-	redisSortAsync('new', 'alpha', 'limit', 0, 60, 'asc')
+	//redisSortAsync('new', 'alpha', 'limit', 0, 60, 'asc')
+	redisSortAsync('new', 'alpha', 'limit', 0, 250, 'asc')
 		.then(function (res) {
 			var _res = res;
 			if (_res.length > 0) {
@@ -163,6 +165,29 @@ var getRedisData = function (redisArray, redisArrayIndex) {
 
 	redisHgetallAsync(_redisKey)
 		.then(function (res) {
+			if (!res) {
+				redisDelAsync(_redisKey)
+					.then(function (res) {
+						log('key deleted ' + _redisKey + ' ' + res);
+						redisSRem('new', _redisKey)
+							.then(function (res) {
+								log('key deleted from new' + _redisKey + ' ' + res);
+							})
+							.catch((error) => {
+								log(error);
+							});
+					})
+					.catch((error) => {
+						log(error);
+					});
+				if (_redisArrayIndex < _redisArray.length - 1) {
+					_redisArrayIndex++
+					getRedisData(_redisArray, _redisArrayIndex)
+				} else {
+					setTimeout(processDataCycle, 1000);
+				}
+				return
+			}
 			var _res = res;
 			switch (keySplit[lastEntry]) {
 				case 'bme280':
@@ -306,7 +331,7 @@ var sendData = function (redisArray, redisArrayIndex, redisKey, url) {
 	console.log(url);
 	axios.get(url, {
 		headers: headers
-		, timeout: 4000
+		, timeout: 15000
 	})
 		.then(response => {
 			//log('Response recieved');

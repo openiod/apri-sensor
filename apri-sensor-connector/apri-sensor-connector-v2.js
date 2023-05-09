@@ -112,7 +112,8 @@ var processDataCycle = function (parm) {
 
 	//log('Find new record');
 	//redisSortAsync('new', 'alpha', 'limit', 0, 60, 'asc')
-	redisClient.SORT('new', {'ALPHA':true,'LIMIT':{'offset': 0,'count': 60},'DIRECTION':'ASC'})
+	//redisClient.SORT('new', {'ALPHA':true,'LIMIT':{'offset': 0,'count': 60},'DIRECTION':'ASC'})
+	redisClient.SORT('new', {'ALPHA':true,'LIMIT':{'offset': 0,'count': 1000},'DIRECTION':'ASC'})
 		.then(function (res) {
 			var _res = res;
 			if (_res.length > 0) {
@@ -171,6 +172,29 @@ var getRedisData = function (redisArray, redisArrayIndex) {
 	//redisHgetallAsync(_redisKey)
 	redisClient.HGETALL(_redisKey)
 		.then(function (res) {
+			if (!res) {
+				redisClient.DEL(_redisKey)
+					.then(function (res) {
+						log('key deleted ' + _redisKey + ' ' + res);
+						redisClient.SREM('new', _redisKey)
+							.then(function (res) {
+								log('key deleted from new' + _redisKey + ' ' + res);
+							})
+							.catch((error) => {
+								log(error);
+							});
+					})
+					.catch((error) => {
+						log(error);
+					});
+				if (_redisArrayIndex < _redisArray.length - 1) {
+					_redisArrayIndex++
+					getRedisData(_redisArray, _redisArrayIndex)
+				} else {
+					setTimeout(processDataCycle, 1000);
+				}
+				return
+			}
 			var _res = res;
 			switch (keySplit[lastEntry]) {
 				case 'bme280':
@@ -314,7 +338,7 @@ var sendData = function (redisArray, redisArrayIndex, redisKey, url) {
 	console.log(url);
 	axios.get(url, {
 		headers: headers
-		, timeout: 4000
+		, timeout: 15000
 	})
 		.then(response => {
 			//log('Response recieved');

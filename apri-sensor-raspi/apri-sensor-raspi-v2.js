@@ -5,7 +5,7 @@
 ** Module: apri-sensor-raspi
 **
 ** Main system module for handling sensor measurement data for:
-**  DS18B20, PMSA003/PMS7003, BME280, BME680, TGS5042, SPS30, IPS7100, SCD30, gps
+**  DS18B20, PMSA003/PMS7003, BME280, BME680, TGS5042, SPS30, IPS7100, SCD30, gps, NextPM
 **
 *** SCD30 only with I2C clock stretching wich is only available in software i2c on Raspberry pi
 *** in /boot/config.txt for /dev/i2c-3
@@ -114,11 +114,12 @@ var atmegaRecordIn = ''
 
 var ModbusRTU
 var scd30Client
+var nextpmClient
 try {
   ModbusRTU = require("modbus-serial");
 }
 catch (err) {
-  logger.info('modbus-serial module (scd30) not found');
+  logger.info('modbus-serial module (scd30/NextPM) not found');
 }
 
 var aprisensorType = ''  // standard: aprisensorType=='aprisensor-typ-standard'
@@ -250,6 +251,10 @@ var addressI2cScd30 = 0x61
 
 var ips7100SerialNr = ''
 var ips7100Hash = ''
+
+var indNextpm = false
+var addressI2cNextpm = 0x81
+
 
 //const port = new SerialPort('/dev/ttyAMA0')
 //var app = express();
@@ -446,6 +451,18 @@ var counters = {
     , co2: 0
     , nrOfMeas: 0
     , nrOfMeasTotal: 0
+  },
+  nextpm: {
+    part1: 0
+    , part25: 0
+    , part10: 0
+    , pm1: 0
+    , pm25: 0
+    , pm10: 0
+    , temperature: 0
+    , rHum: 0
+    , nrOfMeas: 0
+    , nrOfMeasTotal: 0
   }
 };
 var results = {
@@ -519,6 +536,17 @@ var results = {
     , rHum: 0
     , co2: 0
     , nrOfMeas: 0
+  },
+  nextpm: {
+    part1: 0
+    , part25: 0
+    , part10: 0
+    , pm1: 0
+    , pm25: 0
+    , pm10: 0
+    , temperature: 0
+    , rHum: 0
+    , nrOfMeas: 0
   }
 };
 
@@ -586,6 +614,17 @@ var initCounters = function () {
   counters.scd30.rHum = 0;
   counters.scd30.co2 = 0;
   counters.scd30.nrOfMeas = 0;
+
+  counters.nextpm.part1 = 0;
+  counters.nextpm.part25 = 0;
+  counters.nextpm.part10 = 0;
+  counters.nextpm.pm1 = 0;
+  counters.nextpm.pm25 = 0;
+  counters.nextpm.pm10 = 0;
+  counters.nextpm.temperature = 0;
+  counters.nextpm.rHum = 0;
+  counters.nextpm.nrOfMeas = 0;
+
 }
 
 //-------------- raspi-serial
@@ -747,7 +786,7 @@ const readSensorDataBme680 = async function () {
   }
   catch (error) {
     console.error(error)
-    return 
+    return
   }
   var data = bme680Data.data;
   if (counters.busy == false) {
@@ -876,7 +915,8 @@ var processDataCycle = function () {
     '; tgs5042: ' + counters.tgs5042.nrOfMeas +
     '; sps30: ' + counters.sps.nrOfMeas +
     '; ips7100: ' + counters.ips7100.nrOfMeas +
-    '; scd30: ' + counters.scd30.nrOfMeas
+    '; scd30: ' + counters.scd30.nrOfMeas +
+    '; nextpm: ' + counters.nextpm.nrOfMeas
   )
 
   results.pms.pm1CF1 = Math.round((counters.pms.pm1CF1 / counters.pms.nrOfMeas) * 100) / 100;
@@ -945,6 +985,17 @@ var processDataCycle = function () {
   results.scd30.rHum = Math.round((counters.scd30.rHum / counters.scd30.nrOfMeas) * 100) / 100;
   results.scd30.co2 = Math.round((counters.scd30.co2 / counters.scd30.nrOfMeas) * 100) / 100;
   results.scd30.nrOfMeas = counters.scd30.nrOfMeas;
+
+  results.nextpm.part1 = Math.round((counters.nextpm.part1 / counters.nextpm.nrOfMeas) * 100) / 100;
+  results.nextpm.part25 = Math.round((counters.nextpm.part25 / counters.nextpm.nrOfMeas) * 100) / 100;
+  results.nextpm.part10 = Math.round((counters.nextpm.part10 / counters.nextpm.nrOfMeas) * 100) / 100;
+  results.nextpm.pm1 = Math.round((counters.nextpm.pm1 / counters.nextpm.nrOfMeas) * 100) / 100;
+  results.nextpm.pm25 = Math.round((counters.nextpm.pm25 / counters.nextpm.nrOfMeas) * 100) / 100;
+  results.nextpm.pm10 = Math.round((counters.nextpm.pm10 / counters.nextpm.nrOfMeas) * 100) / 100;
+  results.nextpm.temperature = Math.round((counters.nextpm.temperature / counters.nextpm.nrOfMeas) * 100) / 100;
+  results.nextpm.rHum = Math.round((counters.nextpm.rHum / counters.nextpm.nrOfMeas) * 100) / 100;
+  results.nextpm.nrOfMeas = counters.nextpm.nrOfMeas;
+
 
   initCounters();
   counters.busy = false;
@@ -1344,6 +1395,7 @@ var sendData = async function () {
         logger.info(timeStamp.toString() + ':ips7100' + _res);
       });
   }
+
   if (results.scd30.nrOfMeas > 0) {
     //			url = openiodUrl + '/scd30'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
     //						'temperature:'+results.scd30.temperature+',rHum:'+results.scd30.rHum+',co2:'+results.scd30.co2 ;
@@ -1362,6 +1414,29 @@ var sendData = async function () {
           logger.info('scd30 ', timeStamp.toISOString() + ':scd30' + _res2);
         });
       logger.info(timeStamp.toISOString() + ':scd30' + _res);
+    });
+  }
+
+  if (results.nextpm.nrOfMeas > 0) {
+    await redisClient.HSET(timeStamp.toISOString() + ':nextpm', {
+      'foi': 'SCRP' + unit.id
+      , 'part1': results.nextpm.part1
+      , 'part25': results.nextpm.part25
+      , 'part10': results.nextpm.part10
+      , 'pm1': results.nextpm.pm1
+      , 'pm25': results.nextpm.pm25
+      , 'pm10': results.nextpm.pm10
+      , 'temperature': results.nextpm.temperature
+      , 'rHum': results.nextpm.rHum
+    }).then(function (res) {
+      var _res = res;
+      redisClient.SADD('new', timeStamp.toISOString() + ':nextpm')
+        .then(function (res2) {
+          var _res2 = res2;
+          //	redisSaddAsync('nextpm', timeStamp.toISOString()+':nextpm')
+          logger.info('nextpm ', timeStamp.toISOString() + ':nextpm' + _res2);
+        });
+      logger.info(timeStamp.toISOString() + ':nextpm' + _res);
     });
   }
 
@@ -1467,6 +1542,9 @@ var sendData = async function () {
   }
   if (results.scd30.nrOfMeas == 0) {
     // reset scd30 when connected ?
+  }
+  if (results.nextpm.nrOfMeas == 0) {
+    // reset nextpm when connected ?
   }
 
 };
@@ -1739,9 +1817,9 @@ var scd30Functions = async function () {
     var scd30TemperatureOffsetNum = Number.parseInt(scd30TemperatureOffset)
     if (!Number.isNaN(scd30TemperatureOffsetNum)) {
       await scd30SetTemperatureOffset(scd30TemperatureOffsetNum)
-      var newFileName=scd30TemperatureOffsetFileName+'_'+new Date().toISOString()
-      console.log('rename temperature offset file into: '+newFileName)
-      fs.renameSync(scd30TemperatureOffsetFileName, newFileName )
+      var newFileName = scd30TemperatureOffsetFileName + '_' + new Date().toISOString()
+      console.log('rename temperature offset file into: ' + newFileName)
+      fs.renameSync(scd30TemperatureOffsetFileName, newFileName)
     }
     await sleepFunction(100)
   }
@@ -1749,7 +1827,7 @@ var scd30Functions = async function () {
     logger.info('catch temperature offset (scd30Functions)');
   }
 
-  
+
   var scd30Frc = 0
   try {
     var scd30FrcFileName = systemFolderParent + '/config/aprisensor-scd30-frc.cfg'
@@ -1758,9 +1836,9 @@ var scd30Functions = async function () {
     var scd30FrcNum = Number.parseInt(scd30Frc)
     if (!Number.isNaN(scd30FrcNum)) {
       await scd30SetFrc(scd30FrcNum)
-      var newFileName=scd30FrcFileName+'_'+new Date().toISOString()
-      console.log('rename frc file into: '+newFileName)
-      fs.renameSync(scd30FrcFileName, newFileName )
+      var newFileName = scd30FrcFileName + '_' + new Date().toISOString()
+      console.log('rename frc file into: ' + newFileName)
+      fs.renameSync(scd30FrcFileName, newFileName)
     }
     await sleepFunction(100)
   }
@@ -1953,16 +2031,47 @@ const readScd30Measurement = function () {
     })
 }
 
-var processRaspiScd30Record = function (result) {
+// ============== NextPM functions ===================
+
+var nextpmFunctions = async function () {
+  nextpmClient.setID(0x81)
+  await sleepFunction(100)
+
+  await nextpmRead10()
+}
+
+const nextpmRead10 = function () {
+  logger.info('start continuous measuring')
+  nextpmClient.writeRegister(0x11, [0x6E])   
+    .then(async function (data) {
+      logger.info('then nextpmRead10')
+      logger.info(data)
+      await sleepFunction(100)
+      nextpmClient.clientReady = true
+    })
+    .catch(function (err) {
+      logger.info('catch nextpmRead10')
+      logger.info(err)
+    })
+}
+
+// =================================
+
+var processRaspiNextpmRecord = function (result) {
   if (counters.busy == true) {
-    logger.info('Counters busy, Scd30 measurement ignored *******************************');
+    logger.info('Counters busy, nextpm measurement ignored *******************************');
     return;
   }
-  counters.scd30.nrOfMeas++;
-  counters.scd30.nrOfMeasTotal++;
-  counters.scd30.co2 += result.co2
-  counters.scd30.temperature += result.temperature
-  counters.scd30.rHum += result.rHum
+  counters.nextpm.nrOfMeas++;
+  counters.nextpm.nrOfMeasTotal++;
+  counters.nextpm.part1 += result.part1
+  counters.nextpm.part25 += result.part25
+  counters.nextpm.part10 += result.part10
+  counters.nextpm.pm1 += result.pm1
+  counters.nextpm.pm25 += result.pm25
+  counters.nextpm.pm10 += result.pm10
+  counters.nextpm.temperature += result.temperature
+  counters.nextpm.rHum += result.rHum
 }
 
 // ips7100
@@ -2387,6 +2496,25 @@ if (aprisensorDevices.scd30 != undefined) {
   startScd30()
 }
 
+const startNextpm = async function () {
+  logger.info('nextpm open modbus connection to serial port')
+  nextpmClient = new ModbusRTU()
+  nextpmClient.connectRTUBuffered(aprisensorDevices.nextpm.device, { baudRate: aprisensorDevices.nextpm.baudRate })
+    .then(async function () {
+      console.log("Connected");
+      await sleepFunction(100);
+      //console.log("start nextpmFunctions");
+      nextpmFunctions();
+    })
+    .catch(function (e) {
+      console.log(e.message);
+    });
+
+}
+if (aprisensorDevices.nextpm != undefined) {
+  startNextpm()
+}
+
 
 if (isEmpty(aprisensorDevices) || aprisensorDevices.bme280) {
   let timerIdBme280 = setInterval(readSensorDataBme280, 2000)
@@ -2409,6 +2537,9 @@ if (aprisensorDevices.tgs5042) {
 }
 if (aprisensorDevices.scd30) {
   let timerIdScd30 = setInterval(readScd30Device, 1000)  // CO2,temperature,rHum
+}
+if (aprisensorDevices.nextpm) {
+  let timerIdNextpm = setInterval(readNextpmDevice, 1000)  // part1,part25,part10,pm1,pm25,pm10,temperature,rHum
 }
 
 let timerDataCycle = setInterval(processDataCycle, loopTimeCycle)

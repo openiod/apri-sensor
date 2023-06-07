@@ -2034,15 +2034,15 @@ const readScd30Measurement = function () {
 // ============== NextPM functions ===================
 
 var nextpmFunctions = async function () {
-  nextpmClient.setID(0x81)
+  nextpmClient.setID(0x01)
   await sleepFunction(100)
 
-  await nextpmRead10()
+  //await nextpmRead10()
 }
 
-const nextpmRead10 = function () {
+const nextpmWriteToRead10 = function () {
   logger.info('start continuous measuring')
-  nextpmClient.writeRegister(0x11, [0x6E])   
+  nextpmClient.writeRegister(0x11, [0x6E])
     .then(async function (data) {
       logger.info('then nextpmRead10')
       logger.info(data)
@@ -2054,8 +2054,95 @@ const nextpmRead10 = function () {
       logger.info(err)
     })
 }
+const nextpmRead10 = function () {
+  //logger.info('nextpmRead10')
+  nextpmClient.readHoldingRegisters(51, 12)
+    .then(async function (data) {
+      //logger.info('then nextpmRead10')
+      //logger.info(data.data)
+      var result = {} 
+      result.part1 = (data.data[0] * 256 + data.data[1]) / 10000  // per 0.1L
+      result.part25 = (data.data[2] * 256 + data.data[3]) / 10000
+      result.part10 = (data.data[4] * 256 + data.data[5]) / 10000
+      result.PM1 = (data.data[6] * 256 + data.data[7]) / 1000
+      result.PM25 = (data.data[8] * 256 + data.data[9]) / 1000
+      result.PM10 = (data.data[10] * 256 + data.data[11]) / 1000
+
+      //      result.temperature = data.buffer.readFloatBE(4)
+      //      result.rHum = data.buffer.readFloatBE(8)
+      if (result.part1 == 0) {
+        //logger.info('scd30 no data found')
+      } else {
+        logger.info(result)
+        processRaspiNextpmRecord(result)
+      }
+    })
+    .catch(function (err) {
+      logger.info('catch nextpmRead10')
+      logger.info(err)
+    })
+  /* 
+ nextpmClient.writeRegister(0x11, [0x6E])   
+   .then(async function (data) {
+     logger.info('then nextpmRead10')
+     logger.info(data)
+     await sleepFunction(100)
+     nextpmClient.clientReady = true
+   })
+   .catch(function (err) {
+     logger.info('catch nextpmRead10')
+     logger.info(err)
+   })
+   */
+}
+
+/*
+const readScd30Device = function () {
+  if (!scd30Client || scd30Client.clientReady != true) {
+    logger.info('scd30 client not ready')
+    return
+  }
+  if (scd30Client.isOpen) {
+    //logger.info('open')
+    //mbsState = MBS_STATE_NEXT;
+  } else {
+    logger.info('scd30 not open')
+    return
+  }
+
+  //logger.info('test if data available')
+  scd30Client.readHoldingRegisters(0x27, 1)  // function code 3
+    .then(async function (data) {
+      //logger.info(data)
+      if (data.data[0] == 1) {
+        //logger.info('data available, read measurement')
+        await sleepFunction(3)
+        readScd30Measurement()
+      }
+    })
+    .catch(function (err) {
+      logger.info('scd30 error xxxx')
+      logger.info(err)
+    })
+
+}
+
+*/
 
 // =================================
+
+var processRaspiScd30Record = function (result) {
+  if (counters.busy == true) {
+    logger.info('Counters busy, scd30 measurement ignored *******************************');
+    return;
+  }
+  
+  counters.scd30.co2 += result.co2
+  counters.scd30.temperature += result.temperature
+  counters.scd30.rHum += result.rHum
+
+  //console.log(result.part1,result.part25,result.part10,result.pm1,result.pm25,result.pm10)
+}
 
 var processRaspiNextpmRecord = function (result) {
   if (counters.busy == true) {
@@ -2499,7 +2586,11 @@ if (aprisensorDevices.scd30 != undefined) {
 const startNextpm = async function () {
   logger.info('nextpm open modbus connection to serial port')
   nextpmClient = new ModbusRTU()
-  nextpmClient.connectRTUBuffered(aprisensorDevices.nextpm.device, { baudRate: aprisensorDevices.nextpm.baudRate })
+  nextpmClient.connectRTUBuffered(aprisensorDevices.nextpm.device,
+    {
+      baudRate: aprisensorDevices.nextpm.baudRate
+      , parity: 'even'
+    })
     .then(async function () {
       console.log("Connected");
       await sleepFunction(100);
@@ -2539,7 +2630,7 @@ if (aprisensorDevices.scd30) {
   let timerIdScd30 = setInterval(readScd30Device, 1000)  // CO2,temperature,rHum
 }
 if (aprisensorDevices.nextpm) {
-  let timerIdNextpm = setInterval(readNextpmDevice, 1000)  // part1,part25,part10,pm1,pm25,pm10,temperature,rHum
+  let timerIdNextpm = setInterval(nextpmRead10, 1000)  // part1,part25,part10,pm1,pm25,pm10,temperature,rHum
 }
 
 let timerDataCycle = setInterval(processDataCycle, loopTimeCycle)

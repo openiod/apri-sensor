@@ -2056,7 +2056,7 @@ const nextpmWriteToRead10 = function () {
 }
 const nextpmRead10 = function () {
   //logger.info('nextpmRead10')
-  nextpmClient.readHoldingRegisters(51, 12)
+  nextpmClient.readHoldingRegisters(50, 12)
     .then(async function (data) {
       //logger.info('then nextpmRead10')
       //logger.info(data.data)

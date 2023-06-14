@@ -31,7 +31,7 @@ if (device === undefined) {
 "use strict"; // This is for your code to comply with the ECMAScript 5 standard.
 
 // activate init process config-main
-var path = require('path');
+import path from 'path';
 var startFolder = __dirname;
 var startFolderParent = path.resolve(__dirname, '../..');
 var configServerModulePath = startFolder + '/../apri-config/apri-config';

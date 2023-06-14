@@ -2,7 +2,7 @@
 ** Module: apri-sensor-connector
 **
 ** Main system module for handling sensor measurement data for DS18B20,
-**  PMSA003/PMS7003, BME280, BME680, tsi3007, tgs5042, sps30, solar, bam1020, radiationd
+**  PMSA003/PMS7003, BME280, BME680, tsi3007, tgs5042, sps30, solar, bam1020, radiationd, NextPM
 **  in Redis to send to cloud service OpenIoD
 **
 */
@@ -10,7 +10,7 @@
 "use strict"; // This is for your code to comply with the ECMAScript 5 standard.
 
 // activate init process config-main
-var path = require('path');
+import path from 'path';
 var startFolder = __dirname;
 var startFolderParent = path.resolve(__dirname, '../..');
 var configServerModulePath = startFolder + '/../apri-config/apri-config';
@@ -113,7 +113,7 @@ var processDataCycle = function (parm) {
 	//log('Find new record');
 	//redisSortAsync('new', 'alpha', 'limit', 0, 60, 'asc')
 	//redisClient.SORT('new', {'ALPHA':true,'LIMIT':{'offset': 0,'count': 60},'DIRECTION':'ASC'})
-	redisClient.SORT('new', {'ALPHA':true,'LIMIT':{'offset': 0,'count': 1000},'DIRECTION':'ASC'})
+	redisClient.SORT('new', { 'ALPHA': true, 'LIMIT': { 'offset': 0, 'count': 1000 }, 'DIRECTION': 'ASC' })
 		.then(function (res) {
 			var _res = res;
 			if (_res.length > 0) {
@@ -121,12 +121,12 @@ var processDataCycle = function (parm) {
 				processRedisData(_res)
 			} else setTimeout(processDataCycle, loopTimeCycle);
 		})
-		.catch(function(error) {
+		.catch(function (error) {
 			console.log('catch after Redis SORT')
 			console.log(error)
 			setTimeout(processDataCycle, loopTimeCycle);
-	//		log('Axios catch');
-	  });
+			//		log('Axios catch');
+		});
 
 	//	setTimeout(processDataCycle, loopTimeCycle);
 
@@ -233,6 +233,9 @@ var getRedisData = function (redisArray, redisArrayIndex) {
 				case 'radiationd':
 					url = radiationdAttributes(res) + '&dateObserved=' + dateObserved;
 					break;
+				case 'nextpm':
+					url = nextpmAttributes(res) + '&dateObserved=' + dateObserved;
+					break;
 				default:
 					console.log('ERROR: redis entry unknown: ' + redisKey);
 			};
@@ -322,6 +325,11 @@ var bam1020Attributes = function (res) {
 var radiationdAttributes = function (res) {
 	return openiodUrl + '/radiationd' + '/v1/m?foi=' + res.foi + '&observation=' +
 		'rad:' + res.rad;
+}
+var nextpmAttributes = function (res) {
+	return openiodUrl + '/nextpm' + '/v1/m?foi=' + res.foi + '&observation=' +
+		'part1:' + res.part1 + ',' + 'part25:' + res.part25 + ',' + 'part10:' + res.part10 +
+		',' + 'pm1:' + res.pm1 + ',' + 'pm25:' + res.pm25 + ',' + 'pm10:' + res.pm10;
 }
 
 // send data to service

@@ -2061,13 +2061,13 @@ const nextpmRead10 = function () {
       //logger.info('then nextpmRead10')
       //logger.info(data.data)
       var result = {} 
-      result.part1 = (data.data[0] * 256 + data.data[1]) / 10000  // per 0.1L
-      result.part25 = (data.data[2] * 256 + data.data[3]) / 10000
-      result.part10 = (data.data[4] * 256 + data.data[5]) / 10000
-      result.PM1 = (data.data[6] * 256 + data.data[7]) / 1000
-      result.PM25 = (data.data[8] * 256 + data.data[9]) / 1000
-      result.PM10 = (data.data[10] * 256 + data.data[11]) / 1000
-
+      result.part1 = (data.data[1] * 65536 + data.data[0]) / 10000  // per 0.1L
+      result.part25 = (data.data[3] * 65536 + data.data[2]) / 10000
+      result.part10 = (data.data[5] * 65536 + data.data[4]) / 10000
+      result.pm1 = (data.data[7] * 65536 + data.data[6]) / 1000
+      result.pm25 = (data.data[9] * 65536 + data.data[8]) / 1000
+      result.pm10 = (data.data[11] * 65536 + data.data[10]) / 1000
+      
       //      result.temperature = data.buffer.readFloatBE(4)
       //      result.rHum = data.buffer.readFloatBE(8)
       if (result.part1 == 0) {

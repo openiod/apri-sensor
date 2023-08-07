@@ -441,17 +441,17 @@ var sendData = function (redisArray, redisArrayIndex, redisKey, url) {
 var socket = io(socketUrl, { path: socketPath });
 
 socket.on('connection', function (socket) {
-	var currTime = new Date();
-	console.log(currTime + ': connect from ' + socket.request.connection.remoteAddress + ' / ' + socket.handshake.headers['x-forwarded-for'] || socket.handshake.address.address);
+	//var currTime = new Date();
+	//console.log(currTime + ': connect from ' + socket.request.connection.remoteAddress + ' / ' + socket.handshake.headers['x-forwarded-for'] || socket.handshake.address.address);
 });
 
 socket.on('disconnect', function () {
-	console.log('Disconnected from web-socket ');
+	//console.log('Disconnected from web-socket ');
 });
 
 socket.on('info', function (data) {
-	console.log('websocket info: ');
-	console.dir(data);
+	//console.log('websocket info: ');
+	//console.dir(data);
 });
 
 const main = async function () {

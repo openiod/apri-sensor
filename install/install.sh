@@ -1,11 +1,15 @@
 # 2.4.0
-# nieuwe apri-agent (zonder http; minder logging ; diverse aanpassingen)
+# nieuwe apri-agent (zonder http & minder logging ; diverse aanpassingen)
 # bij upgrade:
+cd /opt/SCAPE604/git/apri-sensor ; sudo git pull
 sudo cp -r /opt/SCAPE604/git/apri-sensor/apri-agent /opt/SCAPE604/apri-sensor/.
 sudo cp -r /opt/SCAPE604/git/apri-sensor/apri-config /opt/SCAPE604/apri-sensor/.
 sudo cp /opt/SCAPE604/git/apri-sensor/apri-sensor-redis/apri-sensor-redis.sh /opt/SCAPE604/apri-sensor/apri-sensor-redis/.
 # redis opschonen gaat nu automatisch (maxmemory&allkeys-lru) daarom het opschonen in apri-sensor-redis.sh gedeactiveerd
 # bug in apri-sensor-redis.sh (bin/sh -> bin/bash) & dubbele start redis.js verwijderd
+# reduced logging (websocket) in apri-sensor-connector*.js
+# automatisch geplaatst na git update en install/git2as.sh
+
 # 2.3.2 logrotate daily: 
 sudo sed -i 's/weekly/daily/g' /etc/logrotate.conf
 sudo sed -i 's/rotate 4/rotate 1/g' /etc/logrotate.conf

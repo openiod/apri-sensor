@@ -1,20 +1,59 @@
+# 2.4.0
+# nieuwe apri-agent (zonder http; minder logging ; diverse aanpassingen)
+# bij upgrade:
+sudo cp -r /opt/SCAPE604/git/apri-sensor/apri-agent /opt/SCAPE604/apri-sensor/.
+sudo cp -r /opt/SCAPE604/git/apri-sensor/apri-config /opt/SCAPE604/apri-sensor/.
+sudo cp /opt/SCAPE604/git/apri-sensor/apri-sensor-redis/apri-sensor-redis.sh /opt/SCAPE604/apri-sensor/apri-sensor-redis/.
+# redis opschonen gaat nu automatisch (maxmemory&allkeys-lru) daarom het opschonen in apri-sensor-redis.sh gedeactiveerd
+# bug in apri-sensor-redis.sh (bin/sh -> bin/bash) & dubbele start redis.js verwijderd
+# 2.3.2 logrotate daily: 
+sudo sed -i 's/weekly/daily/g' /etc/logrotate.conf
+sudo sed -i 's/rotate 4/rotate 1/g' /etc/logrotate.conf
+#  - daily
+#  - rotate 1
+
+#  Redis: sudo vi /etc/redis/redis.conf  of 
+#  - maxmemory 50mb
+#  - maxmemory-policy allkeys-lru
+#  - maxmemory-samples 5
+#  - syslog-enabled yes 
+#  - syslog-ident redis
+# of
+sudo sed -i 's/^# maxmemory <bytes>/maxmemory 50mb/g' /etc/redis/redis.conf ; 
+sudo sed -i 's/^# maxmemory-policy noeviction/maxmemory-policy allkeys-lru/g' /etc/redis/redis.conf ; 
+sudo sed -i 's/^# maxmemory-samples 5/maxmemory-samples 5/g' /etc/redis/redis.conf ;  
+sudo sed -i 's/^# syslog-enabled no/syslog-enabled yes/g' /etc/redis/redis.conf ;  
+sudo sed -i 's/^# syslog-ident redis/syslog-ident redis/g' /etc/redis/redis.conf ;
+sudo sed -i 's/weekly/daily/g' /etc/logrotate.d/redis-server ;
+sudo sed -i 's/rotate 12/rotate 0/g' /etc/logrotate.d/redis-server ;
+
+# systemctl restart redis
+
+# 2.3.1
+- connector axios timeout 4 -> 15 sec
+- redis sort limit 60 -> 1000
+- CO2 sensor in raspi-v2
 # 2.3.0
 - node version 16 ! 
 - Redis version 6 !
 - sveltekit 1
 - new aprisensor-netmanager(-runtime-v2). Now node service (not html webservice via nginx)
 - new apri-sensor-raspi-v2, apri-sensor-connector-v2, apri-sensor-redis-v2 with Redis v6
-- nginx removed, no more webservices (aprisensor-netmanager-runtime-v2=node service)# 2.3.? - crontab update for redis cleanup
-
+- nginx removed, no more webservices (aprisensor-netmanager-runtime-v2=node service)# 2.3.? 
+- crontab update for redis cleanup & connector*log:
+    vi /etc/cron.d/apri-sensor-redis
+    PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    */15 * * * * root /opt/SCAPE604/apri-sensor/apri-sensor-redis/apri-sensor-redis.sh > /dev/null 2>&1
 - Pi3 nog op oude Redis versie
 - Pi3 nog op oude socketio versie
-- Pi3 remove wpa_supplicant.conf
-- Pi3 disable SCAPE604-aprisensor-nmcli (default)
-- Pi3 printf '[logging ...' etc
-- Pi3 cp ... install/avahi/avahi-daemon.conf ... etc
-- Pi3 ATMega via raspi 
-- Pi3 aanpassen package.json versienrs (let op Redis en socketio)
-- Pi3 sudo npm install winston-daily-rotate-file winston
+- Pi3 remove wpa_supplicant.conf (gedaan op 2-2-3-pi3)
+- Pi3 disable SCAPE604-aprisensor-nmcli (default)  (gedaan op 2-2-3-pi3)
+- Pi3 printf '[logging ...' etc  (gedaan op 2-2-3-pi3)
+- Pi3 cp ... install/avahi/avahi-daemon.conf ... etc  (gedaan op 2-2-3-pi3)
+- Pi3 ATMega via raspi  (gedaan op 2-2-3-pi3)
+- Pi3 aanpassen package.json versienrs (let op Redis en socketio) (gedaan op 2-2-3-pi3)
+- Pi3 sudo npm install winston-daily-rotate-file winston (gedaan op 2-2-3-pi3)
+
 - printf '[logging]\ndomains=ALL:WARN\n' > /etc/NetworkManager/conf.d/aprisensor.conf ; systemctl restart NetworkManager
 
 # 2.2.1 - rm /var/hdd.log/* /var/log/* /var/hdd.log/* /var/log/hdd.log/aprisensor/*
@@ -55,14 +94,14 @@ sudo shutdown -h now
 # preparations for building new image
 # assuming: latest software installed and package.json in place
 # start met sd-kaart op pi zero met directe aansluiting (keyboard/monitor)
+ 
+sudo systemctl stop SCAPE604-apri-sensor-raspi
+sudo systemctl stop SCAPE604-apri-sensor-connector
+sudo systemctl stop SCAPE604-aprisensor-nmcli
+of
 sudo systemctl stop SCAPE604-apri-sensor-raspi-v2
 sudo systemctl stop SCAPE604-apri-sensor-connector-v2
 sudo systemctl stop SCAPE604-aprisensor-nmcli
-of 
-sudo systemctl stop SCAPE604-apri-sensor-raspi
-sudo systemctl stop SCAPE604-apri-sensor-connector
-sudo systemctl stop SCAPE604-aprisensor-nmcli 
-
 redis-cli flushdb
 sudo rm /var/log/aprisensor/*
 sudo rm /var/log/*
@@ -70,14 +109,19 @@ sudo rm /var/hdd.log/*
 sudo rm /var/hdd.log/aprisensor/*
 nmcli c s
 sudo nmcli c delete .. alle connections deleten, hotspot als laatste
-sudo nmcli c delete ap-24 ; sudo shutdown -h now
+``````sudo nmcli c delete ap-24 ; sudo shutdown -h now``````
 # dan sd-kaart verwijderen en kopie maken met nieuw versienummer
 
 # prepare tested sensorkit for sending to client:
 # ssh pi <id>.local
+sudo systemctl stop SCAPE604-apri-sensor-raspi-v2
+sudo systemctl stop SCAPE604-apri-sensor-connector-v2
+sudo systemctl stop SCAPE604-aprisensor-nmcli
+of
 sudo systemctl stop SCAPE604-apri-sensor-raspi
 sudo systemctl stop SCAPE604-apri-sensor-connector
 sudo systemctl stop SCAPE604-aprisensor-nmcli
+
 sudo rm /var/log/aprisensor/*
 sudo rm /var/log/*
 sudo rm /var/hdd.log/aprisensor/*
@@ -85,7 +129,7 @@ sudo rm  /var/hdd.log/*
 #sudo mkdir /var/log/nginx /var/hdd.log/nginx
 #sudo mkdir /var/log/redis /var/hdd.log/redis
 #sudo chown -R redis:redis /var/log/redis /var/hdd.log/redis
-sudo systemctl start SCAPE604-aprisensor-nmcli
+#sudo systemctl start SCAPE604-aprisensor-nmcli
 sudo nmcli c s
 sudo nmcli c delete <hier alles wat nog aanwezig is behalve connected router>
 sudo nmcli c delete <connected router> ; sudo shutdown -h now
@@ -270,13 +314,19 @@ sudo apt -y install redis-server
 #sudo vi /etc/redis/redis.conf
 #-->
 #stop-writes-on-bgsave-error no
-#??maxmemory 50M
-#??maxmemory-policy allkeys-lru
+#maxmemory 50M
+#maxmemory-policy allkeys-lru
+#maxmemory-samples 5
+#syslog-enabled yes 
+#syslog-ident redis
 #--<
 #sudo vi /etc/sysctl.conf
 #--> vm.overcommit_memory = 1
 #!! # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
-
+#sudo vi /etc/logrotate.d/redis-server 
+#  sed -i 's/weekly/daily/g' /etc/logrotate.d/redis-server ;
+#  sed -i 's/rotate 12/rotate 0/g' /etc/logrotate.d/redis-server ;
+#<--
 apt install git -y
 apt -y install nginx
 

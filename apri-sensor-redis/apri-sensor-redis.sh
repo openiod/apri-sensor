@@ -1,4 +1,4 @@
-#!/usr/bin/sh
+#!/usr/bin/bash
 
 # Redis module for clienup archive
 
@@ -25,18 +25,16 @@ fi
 
 cd  $SYSTEMPATH/$SYSTEMCODE/apri-sensor
 
-export NODEPATH=`which node`
-
-export REDISV=$(redis-cli -v | cut -d' ' -f 2 | cut -d'.' -f 1 )
-echo $REDISV
-if [ $REDISV == '6' ]
-then
-  $NODEPATH apri-sensor-redis/apri-sensor-redis-v2.js >>$LOGFILE 2>>$LOGFILE
-else
-  $NODEPATH apri-sensor-redis/apri-sensor-redis.js >>$LOGFILE 2>>$LOGFILE
-fi
-
-$NODEPATH apri-sensor-redis/apri-sensor-redis.js >>$LOGFILE 2>>$LOGFILE
+# redis database now has maxmemory and allkeys-lru policy (automatic cleanup of oldest records)
+# apri-sensor-redis*.js deactivated
+#export NODEPATH=`which node`
+#export REDISV=$(redis-cli -v | cut -d' ' -f 2 | cut -d'.' -f 1 )
+#echo $REDISV
+#if [ ${REDISV} == '6' ]; then
+#  $NODEPATH apri-sensor-redis/apri-sensor-redis-v2.js >>$LOGFILE 2>>$LOGFILE
+#else
+#  $NODEPATH apri-sensor-redis/apri-sensor-redis.js >>$LOGFILE 2>>$LOGFILE
+#fi
 
 journalctl --vacuum-time=1h
 

@@ -1,4 +1,5 @@
-#
+#!/usr/bin/bash
+
 # script copies files from git/apri-sensor to apri-sensors
 
 

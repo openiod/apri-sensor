@@ -2056,7 +2056,7 @@ const nextpmRead10 = function () {
   nextpmClient.readHoldingRegisters(50, 12)
     .then(async function (data) {
       //logger.info('then nextpmRead10')
-      logger.info(data.data)
+      //logger.info(data.data)
       var result = {} 
       result.part1 = ((data.data[1] * 65536 + data.data[0]) / 1000)/10  // per liter divided by 10 -> per 0.1L
       result.part25 = ((data.data[3] * 65536 + data.data[2]) / 1000)/10
@@ -2070,7 +2070,7 @@ const nextpmRead10 = function () {
       if (result.part1 == 0) {
         //logger.info('scd30 no data found')
       } else {
-        logger.info(result)
+        //logger.info(result)
         processRaspiNextpmRecord(result)
       }
     })

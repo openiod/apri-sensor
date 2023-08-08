@@ -2,6 +2,7 @@
 # nieuwe apri-agent (zonder http & minder logging ; diverse aanpassingen)
 # bij upgrade:
 cd /opt/SCAPE604/git/apri-sensor ; sudo git pull
+sudo install/git2as.sh
 sudo cp -r /opt/SCAPE604/git/apri-sensor/apri-agent /opt/SCAPE604/apri-sensor/.
 sudo cp -r /opt/SCAPE604/git/apri-sensor/apri-config /opt/SCAPE604/apri-sensor/.
 sudo cp /opt/SCAPE604/git/apri-sensor/apri-sensor-redis/apri-sensor-redis.sh /opt/SCAPE604/apri-sensor/apri-sensor-redis/.
@@ -136,6 +137,7 @@ sudo rm  /var/hdd.log/*
 #sudo systemctl start SCAPE604-aprisensor-nmcli
 sudo nmcli c s
 sudo nmcli c delete <hier alles wat nog aanwezig is behalve connected router>
+sudo nmcli c delete ap-24 ; sudo shutdown -h now
 sudo nmcli c delete <connected router> ; sudo shutdown -h now
 # dit niet als hiervoor al shutdown is gedaan: daarna via mobiel (als accesspoint) shutdown uitvoeren
 # foto maken

@@ -1865,7 +1865,7 @@ const getSensorActual = async function (req, res) {
 
 
   // Find record in 'new' subset (not yet written to server )  
-  await redisClient.SORT('new', { 'ALPHA': true, 'LIMIT': { 'offset': 0, 'count': 5 }, 'DIRECTION': 'ASC' })
+  await redisClient.SORT('new', { 'ALPHA': true, 'LIMIT': { 'offset': 0, 'count': 5 }, 'DIRECTION': 'DESC' })
     .then(function (redisResult) {
       if (redisResult.length > 0) {
         console.log('New record available:', redisResult.length, redisResult[0]);
@@ -1880,7 +1880,7 @@ const getSensorActual = async function (req, res) {
     });
 
 
-  await redisClient.SORT('archive', { 'ALPHA': true, 'LIMIT': { 'offset': 0, 'count': 5 }, 'DIRECTION': 'ASC' })
+  await redisClient.SORT('archive', { 'ALPHA': true, 'LIMIT': { 'offset': 0, 'count': 5 }, 'DIRECTION': 'DESC' })
     .then(function (redisResult) {
       if (redisResult.length > 0) {
         console.log('Archive record available:', redisResult.length, redisResult[0]);

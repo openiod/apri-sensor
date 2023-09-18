@@ -1850,11 +1850,11 @@ const decrypt = function (data) {
 
 const getSensorActual = async function (req, res) {
 
-  let result = {}
+  let result = []
 
   
   // read Redis database pmsa003
-  result = await getSensorNew('new', result)
+  result = await getSensorNew('new', result, req, res)
   console.log('new',result)
   /*
   if (result.temperature==undefined || 
@@ -1894,21 +1894,20 @@ const getSensorNew = async function (subset) {
         logger.info(err)
       })
   } 
-  
-  var result = await redisClient.SORT('new', { 'ALPHA': true, 'LIMIT': { 'offset': 0, 'count': 5 }, 'DIRECTION': 'ASC' })
+
+  await redisClient.SORT('new', { 'ALPHA': true, 'LIMIT': { 'offset': 0, 'count': 5 }, 'DIRECTION': 'ASC' })
     .then(function (res) {
       if (res.length > 0) {
-        log('New record available: ' + res[0]);
+        log('New record available:',res.length, res[0],res[1]);
         //processRedisData(res)
         //for (var j = 0; j < res.length; j++) {
           //getRedisData(res[j])
         //}
       }
     })
-  //	.catch(function(error) {
-  //		setTimeout(processDataCycle, loopTimeCycle);
-  //		log('Axios catch');
-  //  });
+  	.catch(function(error) {
+      console.log(error)
+    });
 
   return result
 

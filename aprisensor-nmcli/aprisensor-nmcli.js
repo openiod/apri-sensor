@@ -23,7 +23,7 @@ var redis = require("redis");
 const redisClient = redis.createClient();
 
 redisClient.on("error", function (err) {
-	console.log("Redis client Error " + err);
+  console.log("Redis client Error " + err);
 });
 
 /*
@@ -1847,45 +1847,12 @@ const decrypt = function (data) {
   return decrypted
 }
 
+let actualSensorData = []
 
 const getSensorActual = async function (req, res) {
 
-  let result = []
+  actualSensorData = []
 
-  
-  // read Redis database pmsa003
-  result = await getSensorNew('new', result, req, res)
-  console.log('new',result)
-  /*
-  if (result.temperature==undefined || 
-    result.pmsa003_pm25_raw==undefined) {
-    
-    }
-    */
-  //result = getSensorNew('archive', result)
-
-  // read Redis database bme280
-  // read Redis database bme680
-  // calculate calibrated value
-  // response result
-
-  /*
-    xxxx()
-    .then((result)=>{
-      res.writeHead(201, { 'Content-Type': 'application/json' });
-      res.write(JSON.stringify(result));
-      res.end();
-    })
-    .catch((error)=>{
-      res.writeHead(201, { 'Content-Type': 'application/json' });
-      res.write(JSON.stringify(result));
-      res.end();
-    })
-  */
-}
-const getSensorNew = async function (subset) {
-  let result = []
-  //log('Find new record');
   if (redisClient.isOpen == false) {
     await redisClient.connect()
       .then(function (res) {
@@ -1894,28 +1861,48 @@ const getSensorNew = async function (subset) {
         console.log('Redis connect catch, not connected?')
         console.log(err)
       })
-  } 
+  }
 
+
+  // Find record in 'new' subset (not yet written to server )  
   await redisClient.SORT('new', { 'ALPHA': true, 'LIMIT': { 'offset': 0, 'count': 5 }, 'DIRECTION': 'ASC' })
-    .then(function (res) {
-      if (res.length > 0) {
-        console.log('New record available:',res.length, res[0],res[1]);
-        //processRedisData(res)
-        //for (var j = 0; j < res.length; j++) {
-          //getRedisData(res[j])
-        //}
+    .then(function (redisResult) {
+      if (redisResult.length > 0) {
+        console.log('New record available:', redisResult.length, redisResult[0]);
+        for (let j = 0; j < redisResult.length; j++) {
+          getRedisData(redisResult[j])
+        }
       }
+      console.log('new verwerkt')
     })
-  	.catch(function(error) {
+    .catch(function (error) {
       console.log(error)
     });
 
-  return result
+
+  await redisClient.SORT('archive', { 'ALPHA': true, 'LIMIT': { 'offset': 0, 'count': 5 }, 'DIRECTION': 'ASC' })
+    .then(function (redisResult) {
+      if (redisResult.length > 0) {
+        console.log('Archive record available:', redisResult.length, redisResult[0]);
+        for (let j = 0; j < redisResult.length; j++) {
+          getRedisData(redisResult[j])
+        }
+      }
+      console.log('archive verwerkt')
+    })
+    .catch(function (error) {
+      console.log(error)
+    });
+
+  res.writeHead(200);
+  res.write('result');
+  res.end('api call succeeded');
 
 }
 
 var getRedisData = function (redisKey) {
   console.log('Proces RedisData ' + redisKey)
+  return ()
   var keySplit = redisKey.split(':');
   var lastEntry = keySplit.length - 1;
   var dateObserved = redisKey.substring(0, redisKey.length - keySplit[lastEntry].length - 1);

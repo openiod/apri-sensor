@@ -36,9 +36,6 @@ const redisSortAsync = util.promisify(redisClient.sort).bind(redisClient);
 //const redisSmoveAsync = util.promisify(redisClient.smove).bind(redisClient);
 const redisHgetallAsync = util.promisify(redisClient.hgetall).bind(redisClient);
 
-redisClient.on("error", function (err) {
-  console.log("Redis client Error " + err);
-});
 */
 
 
@@ -1888,6 +1885,16 @@ const getSensorActual = async function (req, res) {
 }
 const getSensorNew = async function (subset) {
   //log('Find new record');
+  if (redisClient.isOpen == false) {
+    await redisClient.connect()
+      .then(function (res) {
+      })
+      .catch(function (err) {
+        logger.info('Redis connect catch, not connected?')
+        logger.info(err)
+      })
+  } 
+  
   var result = await redisClient.SORT('new', { 'ALPHA': true, 'LIMIT': { 'offset': 0, 'count': 5 }, 'DIRECTION': 'ASC' })
     .then(function (res) {
       if (res.length > 0) {

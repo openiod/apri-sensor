@@ -1891,15 +1891,15 @@ const getSensorNew = async function (subset) {
       .then(function (res) {
       })
       .catch(function (err) {
-        logger.info('Redis connect catch, not connected?')
-        logger.info(err)
+        console.log('Redis connect catch, not connected?')
+        console.log(err)
       })
   } 
 
   await redisClient.SORT('new', { 'ALPHA': true, 'LIMIT': { 'offset': 0, 'count': 5 }, 'DIRECTION': 'ASC' })
     .then(function (res) {
       if (res.length > 0) {
-        log('New record available:',res.length, res[0],res[1]);
+        console.log('New record available:',res.length, res[0],res[1]);
         //processRedisData(res)
         //for (var j = 0; j < res.length; j++) {
           //getRedisData(res[j])

@@ -1884,6 +1884,7 @@ const getSensorActual = async function (req, res) {
   */
 }
 const getSensorNew = async function (subset) {
+  let result = []
   //log('Find new record');
   if (redisClient.isOpen == false) {
     await redisClient.connect()

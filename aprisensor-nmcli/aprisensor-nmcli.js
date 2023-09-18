@@ -1902,7 +1902,7 @@ const getSensorActual = async function (req, res) {
 
 var getRedisData = function (redisKey) {
   console.log('Proces RedisData ' + redisKey)
-  return ()
+  return
   var keySplit = redisKey.split(':');
   var lastEntry = keySplit.length - 1;
   var dateObserved = redisKey.substring(0, redisKey.length - keySplit[lastEntry].length - 1);

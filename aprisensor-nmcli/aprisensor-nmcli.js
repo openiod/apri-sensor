@@ -1853,7 +1853,7 @@ const decrypt = function (data) {
 
 const getSensorActual = async function (req, res) {
 
-  result = {}
+  let result = {}
 
   
   // read Redis database pmsa003

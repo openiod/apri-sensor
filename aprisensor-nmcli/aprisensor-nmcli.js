@@ -19,6 +19,13 @@ const execPromise = util.promisify(require('child_process').exec);
 //const execSync			= require('child_process').execSync;
 //const execFile			= require('child_process').execFile;
 
+var redis = require("redis");
+const redisClient = redis.createClient();
+
+redisClient.on("error", function (err) {
+	console.log("Redis client Error " + err);
+});
+
 /*
 var redis = require("redis");
 var redisClient = redis.createClient();
@@ -211,7 +218,7 @@ const requestListener = function (req, res) {
           break
         }
         if (req.url == '/nmcli/api/v1/sensor/actual') {
-          //getSensorActual(req, res)
+          getSensorActual(req, res)
           break
         }
         //				if (req.url == '/nmcli/api/v1/device/wifilistcache') {
@@ -1844,19 +1851,21 @@ const decrypt = function (data) {
 }
 
 
-const getSensorActual = function (req, res) {
+const getSensorActual = async function (req, res) {
 
   result = {}
 
+  
   // read Redis database pmsa003
-  result = getSensorNew('new', result)
+  result = await getSensorNew('new', result)
+  console.log('new',result)
   /*
   if (result.temperature==undefined || 
     result.pmsa003_pm25_raw==undefined) {
     
     }
     */
-  result = getSensorNew('archive', result)
+  //result = getSensorNew('archive', result)
 
   // read Redis database bme280
   // read Redis database bme680
@@ -1877,23 +1886,24 @@ const getSensorActual = function (req, res) {
     })
   */
 }
-const getSensorData = function (subset) {
+const getSensorNew = async function (subset) {
   //log('Find new record');
-  redisSortAsync(subset, 'alpha', 'limit', 0, 4, 'desc')  // get 4 latest records (ApriSensor Duo=4 sensors)
+  var result = await redisClient.SORT('new', { 'ALPHA': true, 'LIMIT': { 'offset': 0, 'count': 5 }, 'DIRECTION': 'ASC' })
     .then(function (res) {
       if (res.length > 0) {
         log('New record available: ' + res[0]);
-        processRedisData(res)
-        for (var j = 0; j < res.length; j++) {
+        //processRedisData(res)
+        //for (var j = 0; j < res.length; j++) {
           //getRedisData(res[j])
-        }
-
+        //}
       }
     })
   //	.catch(function(error) {
   //		setTimeout(processDataCycle, loopTimeCycle);
   //		log('Axios catch');
   //  });
+
+  return result
 
 }
 

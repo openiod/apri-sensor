@@ -1,5 +1,6 @@
 # 2.4.0
 # nieuwe apri-agent (zonder http & minder logging ; diverse aanpassingen)
+# NextPM
 # bij upgrade:
 cd /opt/SCAPE604/git/apri-sensor ; sudo git pull
 sudo install/git2as.sh

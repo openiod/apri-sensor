@@ -1023,11 +1023,13 @@ function isNumeric(n) {
 }
 
 let localBackupFolder = '/opt/aprisensor_backup' 
-function writeLocalCsv(rec, folderName, fileName) {
+function writeLocalCsv(rec, folderName, fileName,h) {
   let path = localBackupFolder +'/'+ folderName
   
   try {
-    fs.mkdirSync(path, { recursive: true });
+    if (fs.mkdirSync(path, { recursive: true })==undefined) {
+      fs.appendFileSync(localBackupFolder+'/'+ folderName+'/'+fileName +'.csv', h + '\r\n');
+    }
     fs.appendFileSync(localBackupFolder+'/'+ folderName+'/'+fileName +'.csv', rec + '\r\n');
   } catch (err) {
   }
@@ -1040,6 +1042,7 @@ var sendData = async function () {
   let url = '';
   let csvRec = ""
   let sensorType
+  let header=''
 
   if (results.pms.nrOfMeas > 0) {
     //			url = openiodUrl + '/pmsa003'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
@@ -1161,8 +1164,12 @@ var sendData = async function () {
       "," + results.pms.part2_5 +
       "," + results.pms.part5_0 +
       "," + results.pms.part10_0
+
+    header = "sensorId,dateObserved,sensorType,pm1Cf1,pm25Cf1,pm10Cf1,pm1amb,pm25amb,pm10amb" +
+      ",part0_3,part0_5,part1_0,part2_5,part5_0,part10_0"  
       
-    writeLocalCsv(csvRec, timeStamp.toISOString().substring(0,7), 'SCRP' + unit.id + '_'+sensorType + '_' + timeStamp.toISOString().substring(0,10))
+    writeLocalCsv(csvRec, timeStamp.toISOString().substring(0,7), 'SCRP' + unit.id + 
+         '_'+sensorType + '_' + timeStamp.toISOString().substring(0,10), header)
 
     await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
       'foi': 'SCRP' + unit.id

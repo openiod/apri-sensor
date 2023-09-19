@@ -13,6 +13,7 @@ const http = require('http');
 //const https = require('https');
 const { createHttpTerminator } = require('http-terminator');
 const fs = require('fs');
+//const parseUrl = require('url')
 const exec = require('child_process').exec;
 const util = require('util');
 const execPromise = util.promisify(require('child_process').exec);
@@ -188,9 +189,12 @@ const requestListener = function (req, res) {
   try {
     entryCheck(req);
     const methodType = req.method.toUpperCase();
-    console.log(req.url)
-    const url = new URL(req.protocol+'//'+req.headers.host+':'+req.port+req.url)
-    console.log(url)
+    let url = req.url;
+    req.urlPath = req.url.split('?')[0]
+    if (req.url.split('?').length>0) {
+      req.urlQuery = req.url.split('?')[1]
+    }
+    
     switch (methodType) {
       case 'OPTIONS':
         res.end();
@@ -216,7 +220,7 @@ const requestListener = function (req, res) {
           getDeviceWifiList(req, res)
           break
         }
-        if (url.pathname == '/nmcli/api/v1/sensor/latest') {
+        if (req.urlPath == '/nmcli/api/v1/sensor/latest') {
           getSensorLatest(req, res)
           break
         }
@@ -225,50 +229,50 @@ const requestListener = function (req, res) {
         //					break
         //				}
         res.writeHead(400);
-        res.write(`{error:400,message: 'Invalid API-call: ${methodType} ${url.href}'}`);
+        res.write(`{error:400,message: 'Invalid API-call: ${methodType} ${url}'}`);
         res.end();
         break;
       case 'POST':
         if (req.url == '/nmcli/api/v1/key') {
-          postPublicKey(url.href, req, res)
+          postPublicKey(url, req, res)
           break
         }
         if (req.url == '/nmcli/api/v1/device/connect') {
-          postDeviceConnect(url.href, req, res)
+          postDeviceConnect(url, req, res)
           break
         }
         if (req.url == '/nmcli/api/v1/accesspoint/connect') {
-          postApConnect(url.href, req, res)
+          postApConnect(url, req, res)
           break
         }
         if (req.url == '/nmcli/api/v1/reboot') {
-          postReboot(url.href, req, res)
+          postReboot(url, req, res)
           break
         }
         if (req.url == '/nmcli/api/v1/shutdown') {
-          postShutDown(url.href, req, res)
+          postShutDown(url, req, res)
           break
         }
         if (req.url == '/nmcli/api/v1/upgrade') {
-          postUpGrade(url.href, req, res)
+          postUpGrade(url, req, res)
           break
         }
         res.writeHead(400);
-        res.write(`{error:400,message: 'Invalid API-call: ${methodType} ${url.href}'}`);
+        res.write(`{error:400,message: 'Invalid API-call: ${methodType} ${url}'}`);
         res.end();
         break;
       case 'PUT':
         res.writeHead(400);
-        res.write(`{error:400,message: 'Invalid API-call: ${methodType} ${url.href}'}`);
+        res.write(`{error:400,message: 'Invalid API-call: ${methodType} ${url}'}`);
         res.end();
         break;
       case 'DELETE':
         if (req.url == '/nmcli/api/v1/connection/delete') {
-          deleteMethodHandler(url.href, req, res)
+          deleteMethodHandler(url, req, res)
           break
         }
         res.writeHead(400);
-        res.write(`{error:400,message: 'Invalid API-call: ${methodType} ${url.href}'}`);
+        res.write(`{error:400,message: 'Invalid API-call: ${methodType} ${url}'}`);
         res.end();
         break;
     }
@@ -1914,6 +1918,7 @@ const getSensorLatest = async function (req, res) {
   //console.log(latestSensorData)
   let sorted = latestSensorData.sort((a, b) => a.dateObserved - b.dateObserved)
   console.log(sorted)
+  console.log(req.urlQuery)
   for (let i = 0; i < sorted.length; i++) {
     if (sorted[i].sensorType == 'pmsa003' || sorted[i].sensorType == 'sps30') {
       endResult = sorted[i]

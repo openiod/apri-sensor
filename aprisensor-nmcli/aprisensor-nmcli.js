@@ -1897,7 +1897,9 @@ const getSensorActual = async function (req, res) {
   }
 
   let endResult = {}
+  console.log(actualSensorData)
   let sorted = actualSensorData.sort((a, b) => a.dateObserved - b.dateObserved)
+  console.log(sorted)
   for (let i=0; i<sorted.length;i++) {
     if (sorted[i].sensorType == 'pmsa003' || sorted[i].sensorType == 'sps30') {
       endResult = sorted[i]
@@ -1992,12 +1994,13 @@ var getRedisData = async function (redisKey) {
           default:
             console.log('ERROR: redis entry unknown: ' + redisKey);
         };
+        console.log(rec)
         actualSensorData.push(rec)
       }
     }
     //.catch(function (error) {
     //  console.log(error)
     //})
-    
+
     )
 }

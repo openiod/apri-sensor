@@ -13,6 +13,7 @@ const http = require('http');
 //const https = require('https');
 const { createHttpTerminator } = require('http-terminator');
 const fs = require('fs');
+//const parseUrl = require('url')
 const exec = require('child_process').exec;
 const util = require('util');
 const execPromise = util.promisify(require('child_process').exec);
@@ -214,8 +215,8 @@ const requestListener = function (req, res) {
           getDeviceWifiList(req, res)
           break
         }
-        if (req.url == '/nmcli/api/v1/sensor/actual') {
-          getSensorActual(req, res)
+        if (req.url == '/nmcli/api/v1/sensor/latest') {
+          getSensorLatest(req, res)
           break
         }
         //				if (req.url == '/nmcli/api/v1/device/wifilistcache') {
@@ -1847,11 +1848,11 @@ const decrypt = function (data) {
   return decrypted
 }
 
-let actualSensorData = []
+let latestSensorData = []
 
-const getSensorActual = async function (req, res) {
+const getSensorLatest = async function (req, res) {
 
-  actualSensorData = []
+  latestSensorData = []
 
   if (redisClient.isOpen == false) {
     await redisClient.connect()
@@ -1863,16 +1864,16 @@ const getSensorActual = async function (req, res) {
       })
   }
 
-  console.log('sort new')
+  //console.log('sort new')
   // Find record in 'new' subset (not yet written to server )  
   await redisClient.SORT('new', { 'ALPHA': true, 'LIMIT': { 'offset': 0, 'count': 4 }, 'DIRECTION': 'DESC' })
     .then(async function (redisResult) {
       if (redisResult.length > 0) {
-        console.log('New record available:', redisResult.length, redisResult[0]);
+        //console.log('New record available:', redisResult.length, redisResult[0]);
         for (let j = 0; j < redisResult.length; j++) {
           let rNew = await getRedisData(redisResult[j])
           if (rNew) {
-            actualSensorData.push(rNew)
+            latestSensorData.push(rNew)
           }
         }
       }
@@ -1882,17 +1883,17 @@ const getSensorActual = async function (req, res) {
       console.log(error)
     });
 
-  console.log('sort archive')
+  //console.log('sort archive')
 
-  if (actualSensorData.length < 4) {
+  if (latestSensorData.length < 4) {
     await redisClient.SORT('archive', { 'ALPHA': true, 'LIMIT': { 'offset': 0, 'count': 4 }, 'DIRECTION': 'DESC' })
       .then(async function (redisResult) {
         if (redisResult.length > 0) {
-          console.log('Archive record available:', redisResult.length, redisResult[0]);
+          //console.log('Archive record available:', redisResult.length, redisResult[0]);
           for (let j = 0; j < redisResult.length; j++) {
             let rArchive = await getRedisData(redisResult[j])
             if (rArchive) {
-              actualSensorData.push(rArchive)
+              latestSensorData.push(rArchive)
             }
           }
         }
@@ -1903,11 +1904,14 @@ const getSensorActual = async function (req, res) {
       });
   }
 
-  console.log('process data', actualSensorData.length)
+  //console.log('process data', latestSensorData.length)
+
+//  parseUrl.parse(req.url,true
+  console.log(req)
 
   let endResult = {}
-  console.log(actualSensorData)
-  let sorted = actualSensorData.sort((a, b) => a.dateObserved - b.dateObserved)
+  //console.log(latestSensorData)
+  let sorted = latestSensorData.sort((a, b) => a.dateObserved - b.dateObserved)
   console.log(sorted)
   for (let i = 0; i < sorted.length; i++) {
     if (sorted[i].sensorType == 'pmsa003' || sorted[i].sensorType == 'sps30') {
@@ -1932,7 +1936,7 @@ var getRedisData = async function (redisKey) {
 
   await redisClient.HGETALL(redisKey)
     .then(function (res) {
-      console.log(res)
+      //console.log(res)
       rec = {}
       if (res) {
         rec.dateObserved = dateObserved
@@ -1940,65 +1944,65 @@ var getRedisData = async function (redisKey) {
         rec.sensorType = keySplit[lastEntry]
         switch (rec.sensorType) {
           case 'bme280':
-            rec.temperature = res.temperature
-            rec.pressure = res.pressure
-            rec.rHum = res.rHum
+            rec.temperature = Number(res.temperature)
+            rec.pressure = Number(res.pressure)
+            rec.rHum = Number(res.rHum)
             break;
           case 'bme680':
-            rec.temperature = res.temperature
-            rec.pressure = res.pressure
-            rec.rHum = res.rHum
-            rec.gasResistance = res.gasResistance
+            rec.temperature = Number(res.temperature)
+            rec.pressure = Number(res.pressure)
+            rec.rHum = Number(res.rHum)
+            rec.gasResistance = Number(res.gasResistance)
             break;
           case 'pmsa003':
-            rec.pm1 = res.pm1
-            rec.pm25 = res.pm25
-            rec.pm10 = res.pm10
+            rec.pm1 = Number(res.pm1)
+            rec.pm25 = Number(res.pm25)
+            rec.pm10 = Number(res.pm10)
             break;
           case 'ds18b20':
-            rec.temperature = res.temperature
+            rec.temperature = Number(res.temperature)
             break;
           case 'tsi3007':
-            rec.part = res.part
+            rec.part = Number(res.part)
             break;
           case 'tgs5042':
-            rec.co = res.co
+            rec.co = Number(res.co)
             break;
           case 'sps30':
-            rec.pm1 = res.pm1
-            rec.pm25 = res.pm25
-            rec.pm4 = res.pm4
-            rec.pm10 = res.pm10
+            rec.pm1 = Number(res.pm1)
+            rec.pm25 = Number(res.pm25)
+            rec.pm4 = Number(res.pm4)
+            rec.pm10 = Number(res.pm10)
             break;
           case 'ips7100':
-            rec.pm01 = res.pm01
-            rec.pm03 = res.pm03
-            rec.pm05 = res.pm05
-            rec.pm1 = res.pm1
-            rec.pm25 = res.pm25
-            rec.pm5 = res.pm5
-            rec.pm10 = res.pm10
+            rec.pm01 = Number(res.pm01)
+            rec.pm03 = Number(res.pm03)
+            rec.pm05 = Number(res.pm05)
+            rec.pm1 = Number(res.pm1)
+            rec.pm25 = Number(res.pm25)
+            rec.pm5 = Number(res.pm5)
+            rec.pm10 = Number(res.pm10)
             break;
           case 'scd30':
-            rec.temperature = res.temperature
-            rec.co2 = res.co2
-            rec.rHum = res.rHum
+            rec.temperature = Number(res.temperature)
+            rec.co2 = Number(res.co2)
+            rec.rHum = Number(res.rHum)
             break;
           case 'solar':
-            rec.irradiance = res.irradiance
+            rec.irradiance = Number(res.irradiance)
             break;
           case 'bam1020':
-            rec.temperature = res.temperature
-            rec.pm25 = res.pm25
-            rec.rHum = res.rHum
+            rec.temperature = Number(res.temperature)
+            rec.pm25 = Number(res.pm25)
+            rec.rHum = Number(res.rHum)
             break;
           case 'radiationd':
-            rec.rad = res.rad
+            rec.rad = Number(res.rad)
             break;
           case 'nextpm':
-            rec.pm1 = res.pm1
-            rec.pm25 = res.pm25
-            rec.pm10 = res.pm10
+            rec.pm1 = Number(res.pm1)
+            rec.pm25 = Number(res.pm25)
+            rec.pm10 = Number(res.pm10)
             break;
           default:
             console.log('ERROR: redis entry unknown: ' + redisKey);

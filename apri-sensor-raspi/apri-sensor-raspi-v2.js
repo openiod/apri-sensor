@@ -1166,7 +1166,7 @@ var sendData = async function () {
       "," + results.pms.part10_0
 
     header = "sensorId,dateObserved,sensorType,pm1Cf1,pm25Cf1,pm10Cf1,pm1amb,pm25amb,pm10amb" +
-      ",part0_3,part0_5,part1_0,part2_5,part5_0,part10_0"  
+      ",part0_3,part0_5,part1_0,part2_5,part5_0,part10_0\r\n"  
       
     writeLocalCsv(csvRec, timeStamp.toISOString().substring(0,7), 'SCRP' + unit.id + 
          '_'+sensorType + '_' + timeStamp.toISOString().substring(0,10), header)

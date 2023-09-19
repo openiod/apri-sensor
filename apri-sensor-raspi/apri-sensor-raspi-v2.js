@@ -1022,10 +1022,28 @@ function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
+let localBackupFolder = '/var/aprisensor_backup/' 
+function writeLocalCsv(rec, folderName, fileName) {
+  let path = localBackupFolder + folderName
+  
+  fs.writeFileSync(localBackupFolder+'/'+fileName,rec)
+  try {
+    mkdir(path, { recursive: true }, (err) => {
+      if (err) console.log(err);
+    });
+    appendFileSync(localBackupFolder+'/'+fileName, rec + '\r\n');
+  } catch (err) {
+  }
+
+}
 // send data to service
 var sendData = async function () {
-  var timeStamp = new Date();
-  var url = '';
+  let timeStamp = new Date();
+  let timeStampTime = timeStamp.getTime()
+  let url = '';
+  let csvRec = ""
+  let sensorType
+
   if (results.pms.nrOfMeas > 0) {
     //			url = openiodUrl + '/pmsa003'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
     //						'pm1:'+results.pms.pm1CF1+',pm25:'+results.pms.pm25CF1+',pm10:'+results.pms.pm10CF1 +
@@ -1129,9 +1147,30 @@ var sendData = async function () {
       });
     }
 */
+    sensorType = 'pmsa003'
 
-    await redisClient.HSET(timeStamp.toISOString() + ':pmsa003', {
+    csvRec = 'SCRP' + unit.id + 
+      "," + timeStamp.toISOString() + 
+      "," + sensorType +
+      "," + results.pms.pm1CF1 +
+      "," + results.pms.pm25CF1 +
+      "," + results.pms.pm10CF1 +
+      "," + results.pms.pm1amb +
+      "," + results.pms.pm25amb +
+      "," + results.pms.pm10amb +
+      "," + results.pms.part0_3 +
+      "," + results.pms.part0_5 +
+      "," + results.pms.part1_0 +
+      "," + results.pms.part2_5 +
+      "," + results.pms.part5_0 +
+      "," + results.pms.part10_0
+      
+    writeLocalCsv(csvRec, timeStamp.toISOString().substring(0,7), 'SCRP' + unit.id + '_'+sensorType + '_' + timeStamp.toISOString().substring(0,10))
+
+    await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
       'foi': 'SCRP' + unit.id
+      , 'time': timeStampTime
+      , 'sensorType': sensorType
       , 'pm1': results.pms.pm1CF1
       , 'pm25': results.pms.pm25CF1
       , 'pm10': results.pms.pm10CF1
@@ -1148,22 +1187,25 @@ var sendData = async function () {
       .then(function (res) {
         var _res = res;
         //redisSaddAsync('new', timeStamp.toISOString() + ':pmsa003')
-        redisClient.SADD('new', timeStamp.toISOString() + ':pmsa003')
+        redisClient.SADD('new', timeStamp.toISOString() + ':'+sensorType)
           .then(function (res2) {
             var _res2 = res2;
             //	redisSaddAsync('pmsa003', timeStamp.toISOString()+':pmsa003')
-            logger.info('pmsa003 ', timeStamp.toISOString() + ':pmsa003' + _res2);
+            logger.info('pmsa003 ', timeStamp.toISOString() + ':'+sensorType + _res2);
           });
-        logger.info(timeStamp.toString() + ':pmsa003' + _res);
+        logger.info(timeStamp.toString() + ':'+sensorType + _res);
       });
   }
   if (results.bme280.nrOfMeas > 0) {
+    sensorType = 'bme280'
     //			url = openiodUrl + '/bme280'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
     //						'temperature:'+results.bme280.temperature+',pressure:'+results.bme280.pressure+',rHum:'+results.bme280.rHum ;
     //			logger.info(url);
     // redisHmsetHashAsync(timeStamp.toISOString() + ':bme280'
-    await redisClient.HSET(timeStamp.toISOString() + ':bme280', {
+    await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
       'foi': 'SCRP' + unit.id
+      , 'time': timeStampTime
+      , 'sensorType': sensorType
       , 'temperature': results.bme280.temperature
       , 'pressure': results.bme280.pressure
       , 'rHum': results.bme280.rHum
@@ -1171,22 +1213,25 @@ var sendData = async function () {
       .then(function (res) {
         var _res = res;
         //redisSaddAsync('new', timeStamp.toISOString() + ':bme280')
-        redisClient.SADD('new', timeStamp.toISOString() + ':bme280')
+        redisClient.SADD('new', timeStamp.toISOString() + ':'+sensorType)
           .then(function (res2) {
             var _res2 = res2;
             //	redisSaddAsync('bme280', timeStamp.toISOString()+':bme280')
-            logger.info('bme280 ', timeStamp.toISOString() + ':bme280' + _res2);
+            logger.info('bme280 ', timeStamp.toISOString() + ':'+sensorType + _res2);
           });
-        logger.info(timeStamp.toISOString() + ':bme280' + _res);
+        logger.info(timeStamp.toISOString() + ':'+sensorType + _res);
       });
   }
   if (results.bme680.nrOfMeas > 0) {
+    sensorType = 'bme680'
     //			url = openiodUrl + '/bme680'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
     //						'temperature:'+results.bme680.temperature+',pressure:'+results.bme680.pressure+
     //            ',rHum:'+results.bme680.rHum+',gasResistance:'+results.bme680.gasResistance ;
     //			logger.info(url);
-    await redisClient.HSET(timeStamp.toISOString() + ':bme680', {
+    await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
       'foi': 'SCRP' + unit.id
+      , 'time': timeStampTime
+      , 'sensorType': sensorType
       , 'temperature': results.bme680.temperature
       , 'pressure': results.bme680.pressure
       , 'rHum': results.bme680.rHum
@@ -1194,48 +1239,55 @@ var sendData = async function () {
     })
       .then(function (res) {
         var _res = res;
-        redisClient.SADD('new', timeStamp.toISOString() + ':bme680')
+        redisClient.SADD('new', timeStamp.toISOString() + ':'+sensorType)
           .then(function (res2) {
             var _res2 = res2;
             //	redisSaddAsync('bme680', timeStamp.toISOString()+':bme680')
-            logger.info('bme680 ', timeStamp.toISOString() + ':bme680' + _res2);
+            logger.info('bme680 ', timeStamp.toISOString() + ':'+sensorType + _res2);
           });
-        logger.info(timeStamp.toISOString() + ':bme680' + _res);
+        logger.info(timeStamp.toISOString() + ':'+sensorType + _res);
       });
   }
   if (results.ds18b20.nrOfMeas > 0) {
-    await redisClient.HSET(timeStamp.toISOString() + ':ds18b20', {
+    sensorType = 'ds18b20'
+    await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
       'foi': 'SCRP' + unit.id
+      , 'time': timeStampTime
+      , 'sensorType': sensorType
       , 'temperature': results.ds18b20.temperature
     })
       .then(function (res) {
         var _res = res;
-        redisClient.SADD('new', timeStamp.toISOString() + ':ds18b20')
+        redisClient.SADD('new', timeStamp.toISOString() + ':'+sensorType)
           .then(function (res2) {
             var _res2 = res2;
             //	redisSaddAsync('ds18b20', timeStamp.toISOString()+':ds18b20')
-            logger.info('ds18b20 ', timeStamp.toISOString() + ':ds18b20' + _res2);
+            logger.info('ds18b20 ', timeStamp.toISOString() + ':'+sensorType + _res2);
           });
-        logger.info(timeStamp.toISOString() + ':ds18b20' + _res);
+        logger.info(timeStamp.toISOString() + ':'+sensorType + _res);
       });
   }
   if (results.tgs5042.nrOfMeas > 0) {
-    await redisClient.HSET(timeStamp.toISOString() + ':tgs5042', {
+    sensorType = 'tgs5042'
+    await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
       'foi': 'SCRP' + unit.id
+      , 'time': timeStampTime
+      , 'sensorType': sensorType
       , 'co': results.tgs5042.co
     })
       .then(function (res) {
         var _res = res;
-        redisClient.SADD('new', timeStamp.toISOString() + ':tgs5042')
+        redisClient.SADD('new', timeStamp.toISOString() + ':'+sensorType)
           .then(function (res2) {
             var _res2 = res2;
             //	redisSaddAsync('tgs5042', timeStamp.toISOString()+':tgs5042')
-            logger.info('tgs5042 ', timeStamp.toISOString() + ':tgs5042' + _res2);
+            logger.info('tgs5042 ', timeStamp.toISOString() + ':'+sensorType + _res2);
           });
-        logger.info(timeStamp.toISOString() + ':tgs5042' + _res);
+        logger.info(timeStamp.toISOString() + ':'+sensorType + _res);
       });
   }
   if (results.sps.nrOfMeas > 0) {
+    sensorType = 'sps30'
     //			url = openiodUrl + '/sps30'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
     //						'pm1:'+results.sps.pm1+',pm25:'+results.sps.pm25+',pm4:'+results.sps.pm4+',pm10:'+results.sps.pm10 +
     //						',raw0_5:'+results.sps.part0_5+',raw1_0:'+results.sps.part1_0 +
@@ -1248,8 +1300,10 @@ var sendData = async function () {
       //console.log(gpsTpv)
       if (gpsTpv.mode == 2) {
         spsProcessed = true
-        await redisClient.HSET(timeStamp.toISOString() + ':sps30', {
+        await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
           'foi': 'SCRP' + unit.id
+          , 'time': timeStampTime
+          , 'sensorType': sensorType   
           , 'pm1': results.sps.pm1
           , 'pm25': results.sps.pm25
           , 'pm4': results.sps.pm4
@@ -1266,13 +1320,13 @@ var sendData = async function () {
         })
           .then(function (res) {
             var _res = res;
-            redisClient.SADD('new', timeStamp.toISOString() + ':sps30')
+            redisClient.SADD('new', timeStamp.toISOString() + ':'+sensorType)
               .then(function (res2) {
                 var _res2 = res2;
                 //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
-                logger.info('sps30 ', timeStamp.toISOString() + ':sps30' + _res2);
+                logger.info('sps30 ', timeStamp.toISOString() + ':'+sensorType+ _res2);
               });
-            logger.info(timeStamp.toString() + ':sps30' + _res);
+            logger.info(timeStamp.toString() + ':'+sensorType + _res);
           })
           .catch(function (err) {
             logger.info('catch mode 2, Redis write')
@@ -1281,8 +1335,10 @@ var sendData = async function () {
       }
       if (gpsTpv.mode == 3) { // mode 3
         spsProcessed = true
-        await redisClient.HSET(timeStamp.toISOString() + ':sps30', {
+        await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
           'foi': 'SCRP' + unit.id
+          , 'time': timeStampTime
+          , 'sensorType': sensorType   
           , 'pm1': results.sps.pm1
           , 'pm25': results.sps.pm25
           , 'pm4': results.sps.pm4
@@ -1310,11 +1366,11 @@ var sendData = async function () {
         })
           .then(function (res) {
             var _res = res;
-            redisClient.SADD('new', timeStamp.toISOString() + ':sps30')
+            redisClient.SADD('new', timeStamp.toISOString() + ':'+sensorType)
               .then(function (res2) {
                 var _res2 = res2;
                 //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
-                logger.info('sps30 ', timeStamp.toISOString() + ':sps30' + _res2);
+                logger.info('sps30 ', timeStamp.toISOString() + ':'+sensorType + _res2);
               });
             logger.info(timeStamp.toString() + ':sps30' + _res);
           })
@@ -1325,8 +1381,10 @@ var sendData = async function () {
       }
     }
     if (spsProcessed == false) {
-      await redisClient.HSET(timeStamp.toISOString() + ':sps30', {
+      await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
         'foi': 'SCRP' + unit.id
+        , 'time': timeStampTime
+        , 'sensorType': sensorType  
         , 'pm1': results.sps.pm1
         , 'pm25': results.sps.pm25
         , 'pm4': results.sps.pm4
@@ -1340,13 +1398,13 @@ var sendData = async function () {
       })
         .then(function (res) {
           var _res = res;
-          redisClient.SADD('new', timeStamp.toISOString() + ':sps30')
+          redisClient.SADD('new', timeStamp.toISOString() + ':'+sensorType)
             .then(function (res2) {
               var _res2 = res2;
               //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
-              logger.info('sps30 ', timeStamp.toISOString() + ':sps30' + _res2);
+              logger.info('sps30 ', timeStamp.toISOString() + ':'+sensorType + _res2);
             });
-          logger.info(timeStamp.toString() + ':sps30' + _res);
+          logger.info(timeStamp.toString() + ':'+sensorType + _res);
         })
         .catch(function (err) {
           logger.info('catch no gps, Redis write')
@@ -1355,6 +1413,7 @@ var sendData = async function () {
     }
   }
   if (results.ips7100.nrOfMeas > 0) {
+    sensorType = 'ips7100'
     //			url = openiodUrl + '/ips7100'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
     //						'pm01:'+results.ips7100.pm01+',pm03:'+results.ips7100.pm03+',pm05:'+results.ips7100.pm05+', +
     //						'pm1:'+results.ips7100.pm1+',pm25:'+results.ips7100.pm25+',pm5:'+results.ips7100.pm5+',pm10:'+results.ips7100.pm10 +
@@ -1363,8 +1422,10 @@ var sendData = async function () {
     //						',raw2_5:'+results.ips7100.part2_5+',raw4_0:'+results.ips7100.part4_0+
     //            ',raw10_0:'+results.ips7100.part10_0 ;
     //			logger.info(url);
-    await redisClient.HSET(timeStamp.toISOString() + ':ips7100', {
+    await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
       'foi': 'SCRP' + unit.id
+      , 'time': timeStampTime
+      , 'sensorType': sensorType
       , 'pm01': results.ips7100.pm01
       , 'pm03': results.ips7100.pm03
       , 'pm05': results.ips7100.pm05
@@ -1383,40 +1444,46 @@ var sendData = async function () {
     })
       .then(function (res) {
         var _res = res;
-        redisClient.SADD('new', timeStamp.toISOString() + ':ips7100')
+        redisClient.SADD('new', timeStamp.toISOString() + ':'+sensorType)
           .then(function (res2) {
             var _res2 = res2;
             //	redisSaddAsync('ips7100', timeStamp.toISOString()+':ips7100')
-            logger.info('ips7100 ', timeStamp.toISOString() + ':ips7100' + _res2);
+            logger.info('ips7100 ', timeStamp.toISOString() + ':'+sensorType + _res2);
           });
-        logger.info(timeStamp.toString() + ':ips7100' + _res);
+        logger.info(timeStamp.toString() + ':'+sensorType + _res);
       });
   }
 
   if (results.scd30.nrOfMeas > 0) {
+    sensorType = 'scd30'
     //			url = openiodUrl + '/scd30'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
     //						'temperature:'+results.scd30.temperature+',rHum:'+results.scd30.rHum+',co2:'+results.scd30.co2 ;
     //			logger.info(url);
-    await redisClient.HSET(timeStamp.toISOString() + ':scd30', {
+    await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
       'foi': 'SCRP' + unit.id
+      , 'time': timeStampTime
+      , 'sensorType': sensorType
       , 'temperature': results.scd30.temperature
       , 'rHum': results.scd30.rHum
       , 'co2': results.scd30.co2
     }).then(function (res) {
       var _res = res;
-      redisClient.SADD('new', timeStamp.toISOString() + ':scd30')
+      redisClient.SADD('new', timeStamp.toISOString() + ':'+sensorType)
         .then(function (res2) {
           var _res2 = res2;
           //	redisSaddAsync('scd30', timeStamp.toISOString()+':scd30')
-          logger.info('scd30 ', timeStamp.toISOString() + ':scd30' + _res2);
+          logger.info('scd30 ', timeStamp.toISOString() + ':'+sensorType + _res2);
         });
-      logger.info(timeStamp.toISOString() + ':scd30' + _res);
+      logger.info(timeStamp.toISOString() + ':'+sensorType + _res);
     });
   }
 
   if (results.nextpm.nrOfMeas > 0) {
-    await redisClient.HSET(timeStamp.toISOString() + ':nextpm', {
+    sensorType = 'nextpm'
+    await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
       'foi': 'SCRP' + unit.id
+      , 'time': timeStampTime
+      , 'sensorType': sensorType
       , 'part1': results.nextpm.part1
       , 'part25': results.nextpm.part25
       , 'part10': results.nextpm.part10
@@ -1427,13 +1494,13 @@ var sendData = async function () {
       , 'rHum': results.nextpm.rHum
     }).then(function (res) {
       var _res = res;
-      redisClient.SADD('new', timeStamp.toISOString() + ':nextpm')
+      redisClient.SADD('new', timeStamp.toISOString() + ':'+sensorType)
         .then(function (res2) {
           var _res2 = res2;
           //	redisSaddAsync('nextpm', timeStamp.toISOString()+':nextpm')
-          logger.info('nextpm ', timeStamp.toISOString() + ':nextpm' + _res2);
+          logger.info('nextpm ', timeStamp.toISOString() + ':'+sensorType + _res2);
         });
-      logger.info(timeStamp.toISOString() + ':nextpm' + _res);
+      logger.info(timeStamp.toISOString() + ':'+sensorType + _res);
     });
   }
 
@@ -2057,14 +2124,14 @@ const nextpmRead10 = function () {
     .then(async function (data) {
       //logger.info('then nextpmRead10')
       //logger.info(data.data)
-      var result = {} 
-      result.part1 = ((data.data[1] * 65536 + data.data[0]) / 1000)/10  // per liter divided by 10 -> per 0.1L
-      result.part25 = ((data.data[3] * 65536 + data.data[2]) / 1000)/10
-      result.part10 = ((data.data[5] * 65536 + data.data[4]) / 1000)/10
+      var result = {}
+      result.part1 = ((data.data[1] * 65536 + data.data[0]) / 1000) / 10  // per liter divided by 10 -> per 0.1L
+      result.part25 = ((data.data[3] * 65536 + data.data[2]) / 1000) / 10
+      result.part10 = ((data.data[5] * 65536 + data.data[4]) / 1000) / 10
       result.pm1 = (data.data[7] * 65536 + data.data[6]) / 1000
       result.pm25 = (data.data[9] * 65536 + data.data[8]) / 1000
       result.pm10 = (data.data[11] * 65536 + data.data[10]) / 1000
-      
+
       //      result.temperature = data.buffer.readFloatBE(4)
       //      result.rHum = data.buffer.readFloatBE(8)
       if (result.part1 == 0) {
@@ -2133,7 +2200,7 @@ var processRaspiScd30Record = function (result) {
     logger.info('Counters busy, scd30 measurement ignored *******************************');
     return;
   }
-  
+
   counters.scd30.co2 += result.co2
   counters.scd30.temperature += result.temperature
   counters.scd30.rHum += result.rHum

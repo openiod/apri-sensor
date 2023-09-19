@@ -28,7 +28,7 @@ if (device === undefined) {
 "use strict"; // This is for your code to comply with the ECMAScript 5 standard.
 
 // activate init process config-main
-var path = require('path');
+import path from 'path';
 var startFolder = __dirname;
 var startFolderParent = path.resolve(__dirname, '../..');
 var configServerModulePath = startFolder + '/../apri-config/apri-config';
@@ -938,8 +938,12 @@ function isNumeric(n) {
 
 // send data to service
 var sendData = function () {
-  var timeStamp = new Date();
-  var url = '';
+  let timeStamp = new Date();
+  let timeStampTime = timeStamp.getTime()
+  let url = '';
+  let csvRec = ""
+  let sensorType
+
   if (results.pms.nrOfMeas > 0) {
     //			url = openiodUrl + '/pmsa003'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
     //						'pm1:'+results.pms.pm1CF1+',pm25:'+results.pms.pm25CF1+',pm10:'+results.pms.pm10CF1 +
@@ -949,6 +953,8 @@ var sendData = function () {
     //			logger.info(url);
     redisHmsetHashAsync(timeStamp.toISOString() + ':pmsa003'
       , 'foi', 'SCRP' + unit.id
+      , 'time', timeStampTime
+      , 'sensorType', 'pmsa003'
       , 'pm1', results.pms.pm1CF1
       , 'pm25', results.pms.pm25CF1
       , 'pm10', results.pms.pm10CF1
@@ -978,6 +984,8 @@ var sendData = function () {
     //			logger.info(url);
     redisHmsetHashAsync(timeStamp.toISOString() + ':bme280'
       , 'foi', 'SCRP' + unit.id
+      , 'time', timeStampTime
+      , 'sensorType', 'bme280'
       , 'temperature', results.bme280.temperature
       , 'pressure', results.bme280.pressure
       , 'rHum', results.bme280.rHum
@@ -999,6 +1007,8 @@ var sendData = function () {
     //			logger.info(url);
     redisHmsetHashAsync(timeStamp.toISOString() + ':bme680'
       , 'foi', 'SCRP' + unit.id
+      , 'time', timeStampTime
+      , 'sensorType', 'bme680'
       , 'temperature', results.bme680.temperature
       , 'pressure', results.bme680.pressure
       , 'rHum', results.bme680.rHum
@@ -1017,6 +1027,8 @@ var sendData = function () {
   if (results.ds18b20.nrOfMeas > 0) {
     redisHmsetHashAsync(timeStamp.toISOString() + ':ds18b20'
       , 'foi', 'SCRP' + unit.id
+      , 'time', timeStampTime
+      , 'sensorType', 'ds18b20'
       , 'temperature', results.ds18b20.temperature
     ).then(function (res) {
       var _res = res;
@@ -1032,6 +1044,8 @@ var sendData = function () {
   if (results.tgs5042.nrOfMeas > 0) {
     redisHmsetHashAsync(timeStamp.toISOString() + ':tgs5042'
       , 'foi', 'SCRP' + unit.id
+      , 'time', timeStampTime
+      , 'sensorType', 'tgs5042'
       , 'co', results.tgs5042.co
     ).then(function (res) {
       var _res = res;
@@ -1059,6 +1073,8 @@ var sendData = function () {
         spsProcessed = true
         redisHmsetHashAsync(timeStamp.toISOString() + ':sps30'
           , 'foi', 'SCRP' + unit.id
+          , 'time', timeStampTime
+          , 'sensorType', 'sps30'
           , 'pm1', results.sps.pm1
           , 'pm25', results.sps.pm25
           , 'pm4', results.sps.pm4
@@ -1092,6 +1108,8 @@ var sendData = function () {
         spsProcessed = true
         redisHmsetHashAsync(timeStamp.toISOString() + ':sps30'
           , 'foi', 'SCRP' + unit.id
+          , 'time', timeStampTime
+          , 'sensorType', 'sps30'
           , 'pm1', results.sps.pm1
           , 'pm25', results.sps.pm25
           , 'pm4', results.sps.pm4
@@ -1136,6 +1154,8 @@ var sendData = function () {
     if (spsProcessed == false) {
       redisHmsetHashAsync(timeStamp.toISOString() + ':sps30'
         , 'foi', 'SCRP' + unit.id
+        , 'time', timeStampTime
+        , 'sensorType', 'sps30'
         , 'pm1', results.sps.pm1
         , 'pm25', results.sps.pm25
         , 'pm4', results.sps.pm4
@@ -1174,6 +1194,8 @@ var sendData = function () {
     //			logger.info(url);
     redisHmsetHashAsync(timeStamp.toISOString() + ':ips7100'
       , 'foi', 'SCRP' + unit.id
+      , 'time', timeStampTime
+      , 'sensorType', 'ips7100'
       , 'pm01', results.ips7100.pm01
       , 'pm03', results.ips7100.pm03
       , 'pm05', results.ips7100.pm05
@@ -1207,6 +1229,8 @@ var sendData = function () {
     //			logger.info(url);
     redisHmsetHashAsync(timeStamp.toISOString() + ':scd30'
       , 'foi', 'SCRP' + unit.id
+      , 'time', timeStampTime
+      , 'sensorType', 'scd30'
       , 'temperature', results.scd30.temperature
       , 'rHum', results.scd30.rHum
       , 'co2', results.scd30.co2
@@ -2041,7 +2065,7 @@ var scanSerialDevices = function () {
     if (serialDevice.deviceType == 'gps') {	//&& counters.gps.nrOfMeasTotal>0) {
       serialDevice.validData = true
     }
-    if (serialDevice.deviceType == 'atmega' && counters.pms.nrOfMeasTotal>0) {
+    if (serialDevice.deviceType == 'atmega' && counters.pms.nrOfMeasTotal > 0) {
       serialDevice.validData = true
     }
     if (serialDevice.validData == true) {
@@ -2111,7 +2135,7 @@ var initSerial = function (serialDeviceIndex) {
           //printHex(data,'T');
           //process.stdout.write(data);
           //for (var i = 0; i < data.length; i++) {
-            //processRaspiSerialData7100(data[i]);
+          //processRaspiSerialData7100(data[i]);
           //}
         });
       }
@@ -2119,7 +2143,7 @@ var initSerial = function (serialDeviceIndex) {
         logger.info('serial device for atmega opened')
         console.dir(options)
         serialDevices[serialDeviceIndex].serial.on('data', (data) => {
-          if (counters.pms.nrOfMeasTotal==0) counters.pms.nrOfMeasTotal=1 // assuming ok
+          if (counters.pms.nrOfMeasTotal == 0) counters.pms.nrOfMeasTotal = 1 // assuming ok
           //logger.info('serial on atmega data')
           //printHex(data,'T');
           //process.stdout.write(data);

@@ -1912,15 +1912,17 @@ const getSensorLatest = async function (req, res) {
   //console.log('process data', latestSensorData.length)
 
 //  parseUrl.parse(req.url,true
-  console.log(req)
 
   let endResult = {}
   //console.log(latestSensorData)
   let sorted = latestSensorData.sort((a, b) => a.dateObserved - b.dateObserved)
-  console.log(sorted)
-  console.log(req.urlQuery)
+  console.log(req.urlQuery) // sensorType=pmsa003
+  let sensorType
+  if (req.urlQuery.split('=')[0]=='sensorType') {
+    sensorType = req.urlQuery.split('=')[1]
+  }
   for (let i = 0; i < sorted.length; i++) {
-    if (sorted[i].sensorType == 'pmsa003' || sorted[i].sensorType == 'sps30') {
+    if (sorted[i].sensorType == sensorType) {
       endResult = sorted[i]
       break
     }

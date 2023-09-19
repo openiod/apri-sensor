@@ -1022,7 +1022,7 @@ function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-let localBackupFolder = '/var/aprisensor_backup/' 
+let localBackupFolder = '/opt/aprisensor_backup/' 
 function writeLocalCsv(rec, folderName, fileName) {
   let path = localBackupFolder + folderName
   

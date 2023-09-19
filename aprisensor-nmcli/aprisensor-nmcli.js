@@ -1995,8 +1995,9 @@ var getRedisData = async function (redisKey) {
         actualSensorData.push(rec)
       }
     }
-    .catch(function (error) {
-      console.log(error)
-    })
+    //.catch(function (error) {
+    //  console.log(error)
+    //})
+    
     )
 }

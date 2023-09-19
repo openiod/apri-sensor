@@ -189,7 +189,7 @@ const requestListener = function (req, res) {
     entryCheck(req);
     const methodType = req.method.toUpperCase();
     console.log(req.url)
-    const url = new URL(`${req.protocol}://${req.host}${req.originalUrl}`)
+    const url = new URL(req.protocol+'//'+req.headers.host+':'+req.port+req.url)
     console.log(url)
     switch (methodType) {
       case 'OPTIONS':

@@ -1022,15 +1022,13 @@ function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-let localBackupFolder = '/opt/aprisensor_backup/' 
+let localBackupFolder = '/opt/aprisensor_backup' 
 function writeLocalCsv(rec, folderName, fileName) {
-  let path = localBackupFolder + folderName
+  let path = localBackupFolder +'/'+ folderName
   
   try {
-    mkdir(path, { recursive: true }, (err) => {
-      if (err) console.log(err);
-    });
-    appendFileSync(localBackupFolder+'/'+fileName, rec + '\r\n');
+    fs.mkdirSync(path, { recursive: true });
+    fs.appendFileSync(localBackupFolder+'/'+ folderName+'/'+fileName +'.csv', rec + '\r\n');
   } catch (err) {
   }
 

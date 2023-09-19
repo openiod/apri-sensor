@@ -188,7 +188,9 @@ const requestListener = function (req, res) {
   try {
     entryCheck(req);
     const methodType = req.method.toUpperCase();
+    console.log(req.url)
     const url = new URL(req.url)
+    console.log(url)
     switch (methodType) {
       case 'OPTIONS':
         res.end();

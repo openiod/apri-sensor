@@ -1865,7 +1865,7 @@ const getSensorActual = async function (req, res) {
 
 
   // Find record in 'new' subset (not yet written to server )  
-  await redisClient.SORT('new', { 'ALPHA': true, 'LIMIT': { 'offset': 0, 'count': 5 }, 'DIRECTION': 'DESC' })
+  await redisClient.SORT('new', { 'ALPHA': true, 'LIMIT': { 'offset': 0, 'count': 4 }, 'DIRECTION': 'DESC' })
     .then(function (redisResult) {
       if (redisResult.length > 0) {
         console.log('New record available:', redisResult.length, redisResult[0]);
@@ -1873,168 +1873,125 @@ const getSensorActual = async function (req, res) {
           getRedisData(redisResult[j])
         }
       }
-      console.log('new verwerkt')
+      //console.log('new verwerkt')
     })
     .catch(function (error) {
       console.log(error)
     });
 
 
-  await redisClient.SORT('archive', { 'ALPHA': true, 'LIMIT': { 'offset': 0, 'count': 5 }, 'DIRECTION': 'DESC' })
-    .then(function (redisResult) {
-      if (redisResult.length > 0) {
-        console.log('Archive record available:', redisResult.length, redisResult[0]);
-        for (let j = 0; j < redisResult.length; j++) {
-          getRedisData(redisResult[j])
+  if (actualSensorData.length < 4) {
+    await redisClient.SORT('archive', { 'ALPHA': true, 'LIMIT': { 'offset': 0, 'count': 4 }, 'DIRECTION': 'DESC' })
+      .then(function (redisResult) {
+        if (redisResult.length > 0) {
+          console.log('Archive record available:', redisResult.length, redisResult[0]);
+          for (let j = 0; j < redisResult.length; j++) {
+            getRedisData(redisResult[j])
+          }
         }
-      }
-      console.log('archive verwerkt')
-    })
-    .catch(function (error) {
-      console.log(error)
-    });
+        //console.log('archive verwerkt')
+      })
+      .catch(function (error) {
+        console.log(error)
+      });
+  }
+
+  let endResult = {}
+  let sorted = actualSensorData.sort((a, b) => a.dateObserved - b.dateObserved)
+  for (let i=0; i<sorted.length;i++) {
+    if (sorted[i].sensorType == 'pmsa003') {
+      endResult = sorted[i]
+      break
+    }
+  }
+
 
   res.writeHead(200);
-  res.write('result');
-  res.end('api call succeeded');
+  res.write(JSON.stringify(endResult));
+  res.end();
 
 }
 
-var getRedisData = function (redisKey) {
-  console.log('Proces RedisData ' + redisKey)
-  return
-  var keySplit = redisKey.split(':');
-  var lastEntry = keySplit.length - 1;
-  var dateObserved = redisKey.substring(0, redisKey.length - keySplit[lastEntry].length - 1);
-  //  console.log(dateObserved);
-  redisHgetallAsync(redisKey)
+var getRedisData = async function (redisKey) {
+  //console.log('Proces RedisData ' + redisKey)
+  let keySplit = redisKey.split(':');
+  let lastEntry = keySplit.length - 1;
+  let dateObserved = redisKey.substring(0, redisKey.length - keySplit[lastEntry].length - 1);
+  let rec
+
+  await redisClient.HGETALL(redisKey)
     .then(function (res) {
-      var _res = res;
-      switch (keySplit[lastEntry]) {
-        case 'bme280':
-          url = bme280Attributes(res) + '&dateObserved=' + dateObserved;
-          break;
-        case 'bme680':
-          url = bme680Attributes(res) + '&dateObserved=' + dateObserved;
-          break;
-        case 'pmsa003':
-          url = pmsa003Attributes(res) + '&dateObserved=' + dateObserved;
-          break;
-        case 'ds18b20':
-          url = ds18b20Attributes(res) + '&dateObserved=' + dateObserved;
-          break;
-        case 'tsi3007':
-          url = tsi3007Attributes(res) + '&dateObserved=' + dateObserved;
-          break;
-        case 'tgs5042':
-          url = tgs5042Attributes(res) + '&dateObserved=' + dateObserved;
-          break;
-        case 'sps30':
-          url = sps30Attributes(res) + '&dateObserved=' + dateObserved;
-          break;
-        case 'ips7100':
-          url = ips7100Attributes(res) + '&dateObserved=' + dateObserved;
-          break;
-        case 'scd30':
-          url = scd30Attributes(res) + '&dateObserved=' + dateObserved;
-          break;
-        case 'solar':
-          url = solarAttributes(res) + '&dateObserved=' + dateObserved;
-          break;
-        case 'bam1020':
-          url = bam1020Attributes(res) + '&dateObserved=' + dateObserved;
-          break;
-        case 'radiationd':
-          url = radiationdAttributes(res) + '&dateObserved=' + dateObserved;
-          break;
-        default:
-          console.log('ERROR: redis entry unknown: ' + redisKey);
-      };
-      //sendData(_redisArray, _redisArrayIndex, _redisKey, url);
+      rec = {}
+      if (res) {
+        rec.dateObserved = dateObserved
+        rec.sensorId= res.foi
+        rec.sensorType = keySplit[lastEntry]
+        switch (rec.sensorType) {
+          case 'bme280':
+            rec.temperature = res.temperature
+            rec.pressure = res.pressure
+            rec.rHum = res.rHum
+            break;
+          case 'bme680':
+            rec.temperature = res.temperature
+            rec.pressure = res.pressure
+            rec.rHum = res.rHum
+            rec.gasResistance = res.gasResistance
+            break;
+          case 'pmsa003':
+            rec.pm1 = res.pm1
+            rec.pm25 = res.pm25
+            rec.pm10 = res.pm10
+            break;
+          case 'ds18b20':
+            rec.temperature = res.temperature
+            break;
+          case 'tsi3007':
+            rec.part = res.part
+            break;
+          case 'tgs5042':
+            rec.co = res.co
+            break;
+          case 'sps30':
+            rec.pm1 = res.pm1
+            rec.pm25 = res.pm25
+            rec.pm4 = res.pm4
+            rec.pm10 = res.pm10
+            break;
+          case 'ips7100':
+            rec.pm01 = res.pm01
+            rec.pm03 = res.pm03
+            rec.pm05 = res.pm05
+            rec.pm1 = res.pm1
+            rec.pm25 = res.pm25
+            rec.pm5 = res.pm5
+            rec.pm10 = res.pm10
+            break;
+          case 'scd30':
+            rec.temperature = res.temperature
+            rec.co2 = res.co2
+            rec.rHum = res.rHum
+            break;
+          case 'solar':
+            rec.irradiance = res.irradiance
+            break;
+          case 'bam1020':
+            rec.temperature = res.temperature
+            rec.pm25 = res.pm25
+            rec.rHum = res.rHum
+            break;
+          case 'radiationd':
+            rec.rad = res.rad
+            break;
+          case 'nextpm':
+            rec.pm1 = res.pm1
+            rec.pm25 = res.pm25
+            rec.pm10 = res.pm10
+            break;
+          default:
+            console.log('ERROR: redis entry unknown: ' + redisKey);
+        };
+        actualSensorData.push(rec)
+      }
     });
-}
-
-
-var bme280Attributes = function (res) {
-  return openiodUrl + '/bme280' + '/v1/m?foi=' + res.foi + '&observation=' +
-    'temperature:' + res.temperature + ',' + 'pressure:' + res.pressure + ',' + 'rHum:' + res.rHum;
-}
-var bme680Attributes = function (res) {
-  return openiodUrl + '/bme680' + '/v1/m?foi=' + res.foi + '&observation=' +
-    'temperature:' + res.temperature + ',' + 'pressure:' + res.pressure + ',' + 'rHum:' + res.rHum + ',' + 'gasResistance:' + res.gasResistance;
-}
-var pmsa003Attributes = function (res) {
-  return openiodUrl + '/pmsa003' + '/v1/m?foi=' + res.foi + '&observation=' +
-    'pm1:' + res.pm1 + ',pm25:' + res.pm25 + ',pm10:' + res.pm10 +
-    ',pm1amb:' + res.pm1amb + ',pm25amb:' + res.pm25amb + ',pm10amb:' + res.pm10amb +
-    ',raw0_3:' + res.raw0_3 + ',raw0_5:' + res.raw0_5 + ',raw1_0:' + res.raw1_0 +
-    ',raw2_5:' + res.raw2_5 + ',raw5_0:' + res.raw5_0 + ',raw10_0:' + res.raw10_0;
-}
-var ds18b20Attributes = function (res) {
-  return openiodUrl + '/ds18b20' + '/v1/m?foi=' + res.foi + '&observation=' +
-    'temperature:' + res.temperature;
-}
-var tsi3007Attributes = function (res) {
-  return openiodUrl + '/tsi3007' + '/v1/m?foi=' + res.foi + '&observation=' +
-    'part:' + res.part;
-}
-var tgs5042Attributes = function (res) {
-  return openiodUrl + '/tgs5042' + '/v1/m?foi=' + res.foi + '&observation=' +
-    'co:' + res.co;
-}
-var sps30Attributes = function (res) {
-  var gps = ''
-  if (res.gpsMode == 2) {
-    gps = ',gpsMode:' + res.gpsMode +
-      ',gpsLat:' + res.gpsLat +
-      ',gpsLon:' + res.gpsLon
-  }
-  if (res.gpsMode == 3) {
-    gps = ',gpsMode:' + res.gpsMode +
-      ',gpsTime:' + res.gpsTime +
-      ',gpsEpt:' + res.gpsEpt +
-      ',gpsLat:' + res.gpsLat +
-      ',gpsLon:' + res.gpsLon +
-      ',gpsAlt:' + res.gpsAlt +
-      ',gpsEpx:' + res.gpsEpx +
-      ',gpsEpy:' + res.gpsEpy +
-      ',gpsEpv:' + res.gpsEpv +
-      ',gpsTrack:' + res.gpsTrack +
-      ',gpsSpeed:' + res.gpsSpeed +
-      ',gpsClimb:' + res.gpsClimb +
-      ',gpsEps:' + res.gpsEps +
-      ',gpsEpc:' + res.gpsEpc
-  }
-
-  return openiodUrl + '/sps30' + '/v1/m?foi=' + res.foi + '&observation=' +
-    'pm1:' + res.pm1 + ',pm25:' + res.pm25 + ',pm4:' + res.pm4 + ',pm10:' + res.pm10 +
-    ',raw0_5:' + res.raw0_5 + ',raw1_0:' + res.raw1_0 +
-    ',raw2_5:' + res.raw2_5 + ',raw4_0:' + res.raw4_0 + ',raw10_0:' + res.raw10_0 +
-    ',tps:' + res.tps +
-    gps
-}
-var ips7100Attributes = function (res) {
-  return openiodUrl + '/ips7100' + '/v1/m?foi=' + res.foi + '&observation=' +
-    'pm01:' + res.pm01 + ',pm03:' + res.pm03 + ',pm05:' + res.pm05 + ',pm1:' + res.pm1 + ',pm25:' + res.pm25 + ',pm5:' + res.pm5 + ',pm10:' + res.pm10 +
-    ',raw0_1:' + res.raw0_1 + ',raw0_3:' + res.raw0_3 + ',raw0_5:' + res.raw0_5 + ',raw1_0:' + res.raw1_0 +
-    ',raw2_5:' + res.raw2_5 + ',raw5_0:' + res.raw5_0 + ',raw10_0:' + res.raw10_0 +
-    ',serialNr:' + res.serialNr
-}
-var scd30Attributes = function (res) {
-  return openiodUrl + '/scd30' + '/v1/m?foi=' + res.foi + '&observation=' +
-    'temperature:' + res.temperature + ',' + 'co2:' + res.co2 + ',' + 'rHum:' + res.rHum;
-}
-var solarAttributes = function (res) {
-  return openiodUrl + '/solar' + '/v1/m?foi=' + res.foi + '&observation=' +
-    'irradiance:' + res.irradiance + ',' + 'raw:' + res.raw + ',' + 'amplified:' + res.amplified +
-    ',' + 'sensor:' + res.sensor + ',' + 'offset:' + res.offset + ',' + 'Vfactor:' + res.Vfactor +
-    ',' + 's:' + res.s;
-}
-var bam1020Attributes = function (res) {
-  return openiodUrl + '/bam1020' + '/v1/m?foi=' + res.foi + '&observation=' +
-    'temperature:' + res.temperature + ',' + 'pm25:' + res.pm25 + ',' + 'rHum:' + res.rHum;
-}
-var radiationdAttributes = function (res) {
-  return openiodUrl + '/radiationd' + '/v1/m?foi=' + res.foi + '&observation=' +
-    'rad:' + res.rad;
 }

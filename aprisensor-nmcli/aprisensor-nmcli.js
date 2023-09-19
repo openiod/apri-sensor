@@ -1921,6 +1921,7 @@ var getRedisData = async function (redisKey) {
 
   await redisClient.HGETALL(redisKey)
     .then(function (res) {
+      console.log(res)
       rec = {}
       if (res) {
         rec.dateObserved = dateObserved
@@ -1993,5 +1994,9 @@ var getRedisData = async function (redisKey) {
         };
         actualSensorData.push(rec)
       }
-    });
+    }
+    .catch(function (error) {
+      console.log(error)
+    })
+    )
 }

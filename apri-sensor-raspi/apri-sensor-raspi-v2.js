@@ -1027,7 +1027,7 @@ function writeLocalCsv(rec, folderName, fileName,h) {
   let path = localBackupFolder +'/'+ folderName
   
   try {
-    if (fs.mkdirSync(path, { recursive: true })==undefined) {
+    if (fs.mkdirSync(path, { recursive: true })!=undefined) {
       fs.appendFileSync(localBackupFolder+'/'+ folderName+'/'+fileName +'.csv', h + '\r\n');
     }
     fs.appendFileSync(localBackupFolder+'/'+ folderName+'/'+fileName +'.csv', rec + '\r\n');

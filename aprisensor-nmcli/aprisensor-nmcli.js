@@ -1899,7 +1899,7 @@ const getSensorActual = async function (req, res) {
   let endResult = {}
   let sorted = actualSensorData.sort((a, b) => a.dateObserved - b.dateObserved)
   for (let i=0; i<sorted.length;i++) {
-    if (sorted[i].sensorType == 'pmsa003') {
+    if (sorted[i].sensorType == 'pmsa003' || sorted[i].sensorType == 'sps30') {
       endResult = sorted[i]
       break
     }

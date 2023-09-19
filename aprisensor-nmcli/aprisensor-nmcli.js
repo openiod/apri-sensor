@@ -1863,14 +1863,17 @@ const getSensorActual = async function (req, res) {
       })
   }
 
-
+  console.log('sort new')
   // Find record in 'new' subset (not yet written to server )  
   await redisClient.SORT('new', { 'ALPHA': true, 'LIMIT': { 'offset': 0, 'count': 4 }, 'DIRECTION': 'DESC' })
     .then(function (redisResult) {
       if (redisResult.length > 0) {
         console.log('New record available:', redisResult.length, redisResult[0]);
         for (let j = 0; j < redisResult.length; j++) {
-          getRedisData(redisResult[j])
+          let rNew = getRedisData(redisResult[j])
+          if (rNew) {
+            actualSensorData.push(rNew)
+          }
         }
       }
       //console.log('new verwerkt')
@@ -1879,6 +1882,7 @@ const getSensorActual = async function (req, res) {
       console.log(error)
     });
 
+  console.log('sort archive')
 
   if (actualSensorData.length < 4) {
     await redisClient.SORT('archive', { 'ALPHA': true, 'LIMIT': { 'offset': 0, 'count': 4 }, 'DIRECTION': 'DESC' })
@@ -1886,7 +1890,10 @@ const getSensorActual = async function (req, res) {
         if (redisResult.length > 0) {
           console.log('Archive record available:', redisResult.length, redisResult[0]);
           for (let j = 0; j < redisResult.length; j++) {
-            getRedisData(redisResult[j])
+            let rArchive = getRedisData(redisResult[j])
+            if (rArchive) {
+              actualSensorData.push(rArchive)
+            }
           }
         }
         //console.log('archive verwerkt')
@@ -1896,18 +1903,20 @@ const getSensorActual = async function (req, res) {
       });
   }
 
+  console.log('process data', actualSensorData.length)
+
   let endResult = {}
   console.log(actualSensorData)
   let sorted = actualSensorData.sort((a, b) => a.dateObserved - b.dateObserved)
   console.log(sorted)
-  for (let i=0; i<sorted.length;i++) {
+  for (let i = 0; i < sorted.length; i++) {
     if (sorted[i].sensorType == 'pmsa003' || sorted[i].sensorType == 'sps30') {
       endResult = sorted[i]
       break
     }
   }
 
-
+  console.log('response')
   res.writeHead(200);
   res.write(JSON.stringify(endResult));
   res.end();
@@ -1927,7 +1936,7 @@ var getRedisData = async function (redisKey) {
       rec = {}
       if (res) {
         rec.dateObserved = dateObserved
-        rec.sensorId= res.foi
+        rec.sensorId = res.foi
         rec.sensorType = keySplit[lastEntry]
         switch (rec.sensorType) {
           case 'bme280':
@@ -1994,13 +2003,11 @@ var getRedisData = async function (redisKey) {
           default:
             console.log('ERROR: redis entry unknown: ' + redisKey);
         };
-        console.log(rec)
-        actualSensorData.push(rec)
       }
-    }
-    //.catch(function (error) {
-    //  console.log(error)
-    //})
+    })
+    .catch(function (error) {
+      console.log(error)
+    })
 
-    )
+  return rec
 }

@@ -1026,7 +1026,6 @@ let localBackupFolder = '/opt/aprisensor_backup/'
 function writeLocalCsv(rec, folderName, fileName) {
   let path = localBackupFolder + folderName
   
-  fs.writeFileSync(localBackupFolder+'/'+fileName,rec)
   try {
     mkdir(path, { recursive: true }, (err) => {
       if (err) console.log(err);

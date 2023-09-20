@@ -1022,15 +1022,15 @@ function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-let localBackupFolder = '/opt/aprisensor_backup' 
-function writeLocalCsv(rec, folderName, fileName,h) {
-  let path = localBackupFolder +'/'+ folderName
-  
+let localBackupFolder = '/opt/aprisensor_backup'
+function writeLocalCsv(rec, folderName, fileName, h) {
+  let path = localBackupFolder + '/' + folderName
+
   try {
-    if (fs.mkdirSync(path, { recursive: true })!=undefined) {
-      fs.appendFileSync(localBackupFolder+'/'+ folderName+'/'+fileName +'.csv', h + '\r\n');
+    if (fs.mkdirSync(path, { recursive: true }) != undefined) {
+      fs.appendFileSync(localBackupFolder + '/' + folderName + '/' + fileName + '.csv', h + '\r\n');
     }
-    fs.appendFileSync(localBackupFolder+'/'+ folderName+'/'+fileName +'.csv', rec + '\r\n');
+    fs.appendFileSync(localBackupFolder + '/' + folderName + '/' + fileName + '.csv', rec + '\r\n');
   } catch (err) {
   }
 
@@ -1042,7 +1042,7 @@ var sendData = async function () {
   let url = '';
   let csvRec = ""
   let sensorType
-  let header=''
+  let header = ''
 
   if (results.pms.nrOfMeas > 0) {
     //			url = openiodUrl + '/pmsa003'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
@@ -1149,8 +1149,8 @@ var sendData = async function () {
 */
     sensorType = 'pmsa003'
 
-    csvRec = 'SCRP' + unit.id + 
-      "," + timeStamp.toISOString() + 
+    csvRec = 'SCRP' + unit.id +
+      "," + timeStamp.toISOString() +
       "," + sensorType +
       "," + results.pms.pm1CF1 +
       "," + results.pms.pm25CF1 +
@@ -1166,12 +1166,12 @@ var sendData = async function () {
       "," + results.pms.part10_0
 
     header = "sensorId,dateObserved,sensorType,pm1Cf1,pm25Cf1,pm10Cf1,pm1amb,pm25amb,pm10amb" +
-      ",part0_3,part0_5,part1_0,part2_5,part5_0,part10_0\r\n"  
-      
-    writeLocalCsv(csvRec, timeStamp.toISOString().substring(0,7), 'SCRP' + unit.id + 
-         '_'+sensorType + '_' + timeStamp.toISOString().substring(0,10), header)
+      ",part0_3,part0_5,part1_0,part2_5,part5_0,part10_0"
 
-    await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
+    writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
+      '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header)
+
+    await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
       'foi': 'SCRP' + unit.id
       , 'time': timeStampTime
       , 'sensorType': sensorType
@@ -1191,22 +1191,36 @@ var sendData = async function () {
       .then(function (res) {
         var _res = res;
         //redisSaddAsync('new', timeStamp.toISOString() + ':pmsa003')
-        redisClient.SADD('new', timeStamp.toISOString() + ':'+sensorType)
+        redisClient.SADD('new', timeStamp.toISOString() + ':' + sensorType)
           .then(function (res2) {
             var _res2 = res2;
             //	redisSaddAsync('pmsa003', timeStamp.toISOString()+':pmsa003')
-            logger.info('pmsa003 ', timeStamp.toISOString() + ':'+sensorType + _res2);
+            logger.info('pmsa003 ', timeStamp.toISOString() + ':' + sensorType + _res2);
           });
-        logger.info(timeStamp.toString() + ':'+sensorType + _res);
+        logger.info(timeStamp.toString() + ':' + sensorType + _res);
       });
   }
+
   if (results.bme280.nrOfMeas > 0) {
     sensorType = 'bme280'
+
+    csvRec = 'SCRP' + unit.id +
+      "," + timeStamp.toISOString() +
+      "," + sensorType +
+      "," + results.bme280.temperature +
+      "," + results.bme280.pressure +
+      "," + results.bme280.rHum
+
+    header = "sensorId,dateObserved,sensorType,temperature,pressure,rHum"
+
+    writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
+      '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header)
+
     //			url = openiodUrl + '/bme280'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
     //						'temperature:'+results.bme280.temperature+',pressure:'+results.bme280.pressure+',rHum:'+results.bme280.rHum ;
     //			logger.info(url);
     // redisHmsetHashAsync(timeStamp.toISOString() + ':bme280'
-    await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
+    await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
       'foi': 'SCRP' + unit.id
       , 'time': timeStampTime
       , 'sensorType': sensorType
@@ -1217,22 +1231,39 @@ var sendData = async function () {
       .then(function (res) {
         var _res = res;
         //redisSaddAsync('new', timeStamp.toISOString() + ':bme280')
-        redisClient.SADD('new', timeStamp.toISOString() + ':'+sensorType)
+        redisClient.SADD('new', timeStamp.toISOString() + ':' + sensorType)
           .then(function (res2) {
             var _res2 = res2;
             //	redisSaddAsync('bme280', timeStamp.toISOString()+':bme280')
-            logger.info('bme280 ', timeStamp.toISOString() + ':'+sensorType + _res2);
+            logger.info('bme280 ', timeStamp.toISOString() + ':' + sensorType + _res2);
           });
-        logger.info(timeStamp.toISOString() + ':'+sensorType + _res);
+        logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
       });
   }
+
   if (results.bme680.nrOfMeas > 0) {
     sensorType = 'bme680'
+
+    csvRec = 'SCRP' + unit.id +
+      "," + timeStamp.toISOString() +
+      "," + sensorType +
+      "," + results.bme680.temperature +
+      "," + results.bme680.pressure +
+      "," + results.bme680.rHum +
+      "," + results.bme680.gasResistance
+
+    header = "sensorId,dateObserved,sensorType,temperature,pressure,rHum,gasResistance"
+
+    writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
+      '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header)
+
+
+
     //			url = openiodUrl + '/bme680'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
     //						'temperature:'+results.bme680.temperature+',pressure:'+results.bme680.pressure+
     //            ',rHum:'+results.bme680.rHum+',gasResistance:'+results.bme680.gasResistance ;
     //			logger.info(url);
-    await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
+    await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
       'foi': 'SCRP' + unit.id
       , 'time': timeStampTime
       , 'sensorType': sensorType
@@ -1243,18 +1274,31 @@ var sendData = async function () {
     })
       .then(function (res) {
         var _res = res;
-        redisClient.SADD('new', timeStamp.toISOString() + ':'+sensorType)
+        redisClient.SADD('new', timeStamp.toISOString() + ':' + sensorType)
           .then(function (res2) {
             var _res2 = res2;
             //	redisSaddAsync('bme680', timeStamp.toISOString()+':bme680')
-            logger.info('bme680 ', timeStamp.toISOString() + ':'+sensorType + _res2);
+            logger.info('bme680 ', timeStamp.toISOString() + ':' + sensorType + _res2);
           });
-        logger.info(timeStamp.toISOString() + ':'+sensorType + _res);
+        logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
       });
   }
+
   if (results.ds18b20.nrOfMeas > 0) {
     sensorType = 'ds18b20'
-    await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
+
+    csvRec = 'SCRP' + unit.id +
+      "," + timeStamp.toISOString() +
+      "," + sensorType +
+      "," + results.ds18b20.temperature
+
+    header = "sensorId,dateObserved,sensorType,temperature"
+
+    writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
+      '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header)
+
+
+    await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
       'foi': 'SCRP' + unit.id
       , 'time': timeStampTime
       , 'sensorType': sensorType
@@ -1262,18 +1306,33 @@ var sendData = async function () {
     })
       .then(function (res) {
         var _res = res;
-        redisClient.SADD('new', timeStamp.toISOString() + ':'+sensorType)
+        redisClient.SADD('new', timeStamp.toISOString() + ':' + sensorType)
           .then(function (res2) {
             var _res2 = res2;
             //	redisSaddAsync('ds18b20', timeStamp.toISOString()+':ds18b20')
-            logger.info('ds18b20 ', timeStamp.toISOString() + ':'+sensorType + _res2);
+            logger.info('ds18b20 ', timeStamp.toISOString() + ':' + sensorType + _res2);
           });
-        logger.info(timeStamp.toISOString() + ':'+sensorType + _res);
+        logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
       });
   }
+
   if (results.tgs5042.nrOfMeas > 0) {
+
     sensorType = 'tgs5042'
-    await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
+
+    csvRec = 'SCRP' + unit.id +
+      "," + timeStamp.toISOString() +
+      "," + sensorType +
+      "," + results.tgs5042.co 
+
+    header = "sensorId,dateObserved,sensorType,co"
+
+    writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
+      '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header)
+
+
+
+    await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
       'foi': 'SCRP' + unit.id
       , 'time': timeStampTime
       , 'sensorType': sensorType
@@ -1281,13 +1340,13 @@ var sendData = async function () {
     })
       .then(function (res) {
         var _res = res;
-        redisClient.SADD('new', timeStamp.toISOString() + ':'+sensorType)
+        redisClient.SADD('new', timeStamp.toISOString() + ':' + sensorType)
           .then(function (res2) {
             var _res2 = res2;
             //	redisSaddAsync('tgs5042', timeStamp.toISOString()+':tgs5042')
-            logger.info('tgs5042 ', timeStamp.toISOString() + ':'+sensorType + _res2);
+            logger.info('tgs5042 ', timeStamp.toISOString() + ':' + sensorType + _res2);
           });
-        logger.info(timeStamp.toISOString() + ':'+sensorType + _res);
+        logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
       });
   }
   if (results.sps.nrOfMeas > 0) {
@@ -1304,10 +1363,10 @@ var sendData = async function () {
       //console.log(gpsTpv)
       if (gpsTpv.mode == 2) {
         spsProcessed = true
-        await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
+        await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
           'foi': 'SCRP' + unit.id
           , 'time': timeStampTime
-          , 'sensorType': sensorType   
+          , 'sensorType': sensorType
           , 'pm1': results.sps.pm1
           , 'pm25': results.sps.pm25
           , 'pm4': results.sps.pm4
@@ -1324,13 +1383,13 @@ var sendData = async function () {
         })
           .then(function (res) {
             var _res = res;
-            redisClient.SADD('new', timeStamp.toISOString() + ':'+sensorType)
+            redisClient.SADD('new', timeStamp.toISOString() + ':' + sensorType)
               .then(function (res2) {
                 var _res2 = res2;
                 //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
-                logger.info('sps30 ', timeStamp.toISOString() + ':'+sensorType+ _res2);
+                logger.info('sps30 ', timeStamp.toISOString() + ':' + sensorType + _res2);
               });
-            logger.info(timeStamp.toString() + ':'+sensorType + _res);
+            logger.info(timeStamp.toString() + ':' + sensorType + _res);
           })
           .catch(function (err) {
             logger.info('catch mode 2, Redis write')
@@ -1339,10 +1398,10 @@ var sendData = async function () {
       }
       if (gpsTpv.mode == 3) { // mode 3
         spsProcessed = true
-        await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
+        await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
           'foi': 'SCRP' + unit.id
           , 'time': timeStampTime
-          , 'sensorType': sensorType   
+          , 'sensorType': sensorType
           , 'pm1': results.sps.pm1
           , 'pm25': results.sps.pm25
           , 'pm4': results.sps.pm4
@@ -1370,11 +1429,11 @@ var sendData = async function () {
         })
           .then(function (res) {
             var _res = res;
-            redisClient.SADD('new', timeStamp.toISOString() + ':'+sensorType)
+            redisClient.SADD('new', timeStamp.toISOString() + ':' + sensorType)
               .then(function (res2) {
                 var _res2 = res2;
                 //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
-                logger.info('sps30 ', timeStamp.toISOString() + ':'+sensorType + _res2);
+                logger.info('sps30 ', timeStamp.toISOString() + ':' + sensorType + _res2);
               });
             logger.info(timeStamp.toString() + ':sps30' + _res);
           })
@@ -1385,10 +1444,10 @@ var sendData = async function () {
       }
     }
     if (spsProcessed == false) {
-      await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
+      await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
         'foi': 'SCRP' + unit.id
         , 'time': timeStampTime
-        , 'sensorType': sensorType  
+        , 'sensorType': sensorType
         , 'pm1': results.sps.pm1
         , 'pm25': results.sps.pm25
         , 'pm4': results.sps.pm4
@@ -1402,13 +1461,13 @@ var sendData = async function () {
       })
         .then(function (res) {
           var _res = res;
-          redisClient.SADD('new', timeStamp.toISOString() + ':'+sensorType)
+          redisClient.SADD('new', timeStamp.toISOString() + ':' + sensorType)
             .then(function (res2) {
               var _res2 = res2;
               //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
-              logger.info('sps30 ', timeStamp.toISOString() + ':'+sensorType + _res2);
+              logger.info('sps30 ', timeStamp.toISOString() + ':' + sensorType + _res2);
             });
-          logger.info(timeStamp.toString() + ':'+sensorType + _res);
+          logger.info(timeStamp.toString() + ':' + sensorType + _res);
         })
         .catch(function (err) {
           logger.info('catch no gps, Redis write')
@@ -1426,7 +1485,7 @@ var sendData = async function () {
     //						',raw2_5:'+results.ips7100.part2_5+',raw4_0:'+results.ips7100.part4_0+
     //            ',raw10_0:'+results.ips7100.part10_0 ;
     //			logger.info(url);
-    await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
+    await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
       'foi': 'SCRP' + unit.id
       , 'time': timeStampTime
       , 'sensorType': sensorType
@@ -1448,13 +1507,13 @@ var sendData = async function () {
     })
       .then(function (res) {
         var _res = res;
-        redisClient.SADD('new', timeStamp.toISOString() + ':'+sensorType)
+        redisClient.SADD('new', timeStamp.toISOString() + ':' + sensorType)
           .then(function (res2) {
             var _res2 = res2;
             //	redisSaddAsync('ips7100', timeStamp.toISOString()+':ips7100')
-            logger.info('ips7100 ', timeStamp.toISOString() + ':'+sensorType + _res2);
+            logger.info('ips7100 ', timeStamp.toISOString() + ':' + sensorType + _res2);
           });
-        logger.info(timeStamp.toString() + ':'+sensorType + _res);
+        logger.info(timeStamp.toString() + ':' + sensorType + _res);
       });
   }
 
@@ -1463,7 +1522,7 @@ var sendData = async function () {
     //			url = openiodUrl + '/scd30'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
     //						'temperature:'+results.scd30.temperature+',rHum:'+results.scd30.rHum+',co2:'+results.scd30.co2 ;
     //			logger.info(url);
-    await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
+    await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
       'foi': 'SCRP' + unit.id
       , 'time': timeStampTime
       , 'sensorType': sensorType
@@ -1472,19 +1531,19 @@ var sendData = async function () {
       , 'co2': results.scd30.co2
     }).then(function (res) {
       var _res = res;
-      redisClient.SADD('new', timeStamp.toISOString() + ':'+sensorType)
+      redisClient.SADD('new', timeStamp.toISOString() + ':' + sensorType)
         .then(function (res2) {
           var _res2 = res2;
           //	redisSaddAsync('scd30', timeStamp.toISOString()+':scd30')
-          logger.info('scd30 ', timeStamp.toISOString() + ':'+sensorType + _res2);
+          logger.info('scd30 ', timeStamp.toISOString() + ':' + sensorType + _res2);
         });
-      logger.info(timeStamp.toISOString() + ':'+sensorType + _res);
+      logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
     });
   }
 
   if (results.nextpm.nrOfMeas > 0) {
     sensorType = 'nextpm'
-    await redisClient.HSET(timeStamp.toISOString() + ':'+sensorType, {
+    await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
       'foi': 'SCRP' + unit.id
       , 'time': timeStampTime
       , 'sensorType': sensorType
@@ -1498,13 +1557,13 @@ var sendData = async function () {
       , 'rHum': results.nextpm.rHum
     }).then(function (res) {
       var _res = res;
-      redisClient.SADD('new', timeStamp.toISOString() + ':'+sensorType)
+      redisClient.SADD('new', timeStamp.toISOString() + ':' + sensorType)
         .then(function (res2) {
           var _res2 = res2;
           //	redisSaddAsync('nextpm', timeStamp.toISOString()+':nextpm')
-          logger.info('nextpm ', timeStamp.toISOString() + ':'+sensorType + _res2);
+          logger.info('nextpm ', timeStamp.toISOString() + ':' + sensorType + _res2);
         });
-      logger.info(timeStamp.toISOString() + ':'+sensorType + _res);
+      logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
     });
   }
 

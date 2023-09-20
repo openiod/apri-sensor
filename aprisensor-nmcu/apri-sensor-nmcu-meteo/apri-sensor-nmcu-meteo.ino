@@ -31,8 +31,8 @@
 const byte  VersionMajor = 0;
 const byte  VersionMinor = 1;
 
-//#include <Wire.h>
-//#define USE_SERIAL Serial
+#include <Wire.h>
+#define USE_SERIAL Serial
 
 
 //#include <PubSubClient.h>
@@ -58,7 +58,7 @@ WiFiClient wifiClient;
 
 //-----------------------------------------------------------------------------
 
-//#include <AM2320.h>
+#include <AM2320.h>
 
 
 const uint8_t UNIT_ID = 5; // todo: dipswitch or otherwise? >100 for recievers/pulsers/repeaters
@@ -82,26 +82,26 @@ const uint8_t MSG_ID = channelId4b << 4; // default channelId use setChannel/get
   // RF
 */
 #include "ApriSensorMeteo.h"
-//#include "ApriSensorBmp280.h"
-//#include "ApriSensorAm2320.h"
-//#include "ApriSensorDs18b20.h"
-#include "ApriSensorPmsx003.h"
+#include "ApriSensorBmp280.h"
+#include "ApriSensorAm2320.h"
+#include "ApriSensorDs18b20.h"
+//#include "ApriSensorPmsx003.h"
 
 //#include <AES.h> //todo encryption
 
-//aprisensor_ns::Bmp280Sensor bmp280Sensor;
-//aprisensor_ns::Am2320Sensor am2320Sensor;
-//aprisensor_ns::Ds18b20Sensor ds18b20Sensor;
-aprisensor_ns::Pmsx003Sensor pmsx003Sensor;
+aprisensor_ns::Bmp280Sensor bmp280Sensor;
+aprisensor_ns::Am2320Sensor am2320Sensor;
+aprisensor_ns::Ds18b20Sensor ds18b20Sensor;
+//aprisensor_ns::Pmsx003Sensor pmsx003Sensor;
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-//  USE_SERIAL.begin(9600);
+  USE_SERIAL.begin(9600);
   // USE_SERIAL.setDebugOutput(true);
   //printPrefix(INFO); 
   Serial.print("Setup start\r\n");
-//  Wire.begin(D1, D2);
+  Wire.begin(D1, D2);
   //  if (!rfDriver.init()) {
   //    printPrefix(INFO);Serial.print("RF init failed\r\n");
   //  }
@@ -114,10 +114,10 @@ void setup() {
 
   printPrefix(INFO); Serial.print("Sensors ready\r\n");
 
- // bmp280Sensor.init();
-//  am2320Sensor.init();
-//  ds18b20Sensor.init();
-  pmsx003Sensor.init();
+  bmp280Sensor.init();
+  am2320Sensor.init();
+  ds18b20Sensor.init();
+  //pmsx003Sensor.init();
 
 
   //  delay(1000); // 1 sec delay for sensors to start / initiate
@@ -134,12 +134,12 @@ void loop() {
   //  while (1) {
 
   //    printPrefix(INFO);Serial.print("BMP280");
-  //bmp280Sensor.readData();
+  bmp280Sensor.readData();
   //   printPrefix(INFO);Serial.print("AM2320");
-//  am2320Sensor.readData();
+  am2320Sensor.readData();
     //   printPrefix(INFO);Serial.print("DS18B20");
-//  ds18b20Sensor.readData();
-  pmsx003Sensor.readData();
+  ds18b20Sensor.readData();
+  //pmsx003Sensor.readData();
 
   return;
 
@@ -316,3 +316,6 @@ void loop() {
         }
     */
 }
+
+
+

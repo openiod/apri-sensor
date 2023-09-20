@@ -1,4 +1,8 @@
 /*
+
+###  oude module niet meer gebruiken
+
+
 ** Module: apri-sensor-combi2
 **
 ** Main system module for handling sensor measurement data via serial port

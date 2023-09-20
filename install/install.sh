@@ -1,3 +1,10 @@
+# 2.5.0 
+# redis indexing nog niet in gebruik maar als voorbereiding op.
+sudo apt update
+sudo apt -y install redis-redisearch
+
+# Home Assistant api http://192.168.178.76:4000/nmcli/api/v1/sensor/latest?sensorType=pmsa003
+
 # 2.4.0
 # nieuwe apri-agent (zonder http & minder logging ; diverse aanpassingen)
 # NextPM
@@ -18,6 +25,7 @@ sudo sed -i 's/rotate 4/rotate 1/g' /etc/logrotate.conf
 #  - daily
 #  - rotate 1
 
+# Redis memory gebruik staat in /var/log/redis/redis-server.log: "RDB memory usage when created 17.91 Mb"
 #  Redis: sudo vi /etc/redis/redis.conf  of 
 #  - maxmemory 50mb
 #  - maxmemory-policy allkeys-lru
@@ -34,6 +42,7 @@ sudo sed -i 's/weekly/daily/g' /etc/logrotate.d/redis-server ;
 sudo sed -i 's/rotate 12/rotate 0/g' /etc/logrotate.d/redis-server ;
 
 # systemctl restart redis
+sudo systemctl restart redis
 
 # 2.3.1
 - connector axios timeout 4 -> 15 sec
@@ -162,7 +171,7 @@ sudo nmcli c delete <connected router> ; sudo shutdown -h now
 # start Raspberry Pi with ethernet usb adapter
 # ssh to pi@ipaddress
 # sudo apt update
-# sudo apt upgrade
+# sudo apt -y upgrade
 # vanaf hier alle installatie stappen voor software doorlopen
 
 ### ===== upgrade to V2-20210726 or later
@@ -315,6 +324,10 @@ sudo apt install log2ram
 sudo apt -y install avahi-utils
 #see install/avahi/avahi-deamon.conf
 sudo apt -y install redis-server
+sudo apt -y install redis-redisearch
+sudo vi /etc/redis/redis.conf
+--> loadmodule /usr/lib/redis/modules/redisearch.so
+Controleer in redsi-cli: module list  (of server log)
 
 #todo
 ## Edit the Redis configuration file to setup caching.

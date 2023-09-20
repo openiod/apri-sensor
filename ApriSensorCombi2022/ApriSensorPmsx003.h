@@ -1,13 +1,16 @@
 #pragma once
 
-#define PMSOUTPUTS 3 // nr of outputs like 1=PM0.3, 2=PM0.5, etc.
-#define PMSRESULTS 3 
+//#include <RH_ASK.h>
+//#include <SPI.h> // Not actually used but needed to compile
+//RH_ASK rfDriver;
+// RH_ASK rfDriver(2000, 2, 4, 5); // ESP8266: do not use pin 11
+// RF
 
-const uint8_t SERPORT_RX = D6; 
-// D8 werkt niet
-// D7 gaat goed 
-// D6 gaat goed - deze wordt toegepast
-const uint8_t SERPORT_TX = D5;
+#define PMSOUTPUTS 3 //12 // nr of outputs like 1=PM0.3, 2=PM0.5, etc.
+#define PMSRESULTS 3 //12
+
+const uint8_t SERPORT_RX = 9;
+const uint8_t SERPORT_TX = 8;
 
 #include <SoftwareSerial.h>
 uint16_t serialPmsAvailable;
@@ -21,29 +24,24 @@ namespace aprisensor_ns {
 class Pmsx003Sensor {
 
   private:
-    String sensorSystem = "apri-sensor-pmsa003\0";
-    long pmsx003InitTime;
-    long pmsx003InitInterval = 1000; //1 seconden init wait time
-//    long pmsx003MeasureTime;
-//    long pmsx003MeasureInterval = 500;  // measurement interval in millisecs
-
-    float pm1;
-    float pm25;
-    float pm10;
-
     long nrOfMeasurements;
     unsigned long nowTime;
+    long pmsx003MeasureTime;
+    long pmsx003MeasureInterval = 400;  // measurement interval in millisecs
     long measurements[PMSOUTPUTS];
-    float totals[PMSOUTPUTS];
-    float lowest[PMSOUTPUTS];
-    float highest[PMSOUTPUTS];
-    float results[PMSOUTPUTS];
+    long totals[PMSOUTPUTS];
+    long lowest[PMSOUTPUTS];
+    long highest[PMSOUTPUTS];
+    long results[PMSOUTPUTS];
     unsigned long transactionTime; // 20 seconds per transaction, send measurement
-    const unsigned long transactionTimeMax = 60000; // milliseconds per transaction period, then send message
+    const unsigned long transactionTimeMax = 20000; // milliseconds per transaction period, then send message
     unsigned long rfRepeatTime;
     const unsigned long rfRepeatTimeMax = 5000; // milliseconds waittime for repeating message
     unsigned long rfSentMsgTime;  // to calculate delay for repeat message
     const unsigned long rfDelayTimeMax = 60000; // maximum delaytime in millisec for repeating messages
+//    uint8_t channelId = 123; // default channelId use setChannel/getChannel methodes to set/get channel id
+    // unitid. Sub-number or identification of remote sensor in star-network.
+//    uint8_t unitId = 0; // default unitId. Use setUnitId()/getUnitId() to set/get unitId
     byte messageNr;
     char rfBuf[MSGLENGTH_PMSX003]; // was 15
     byte sensorType; // = "PMSx003"; //Plantower PMS7003 or PMSA003
@@ -61,21 +59,51 @@ class Pmsx003Sensor {
       return this->messageNr;
     };
 
+//  public:
+//    enum State {
+//      On,
+//      Off
+//    };
+//  public:
+//    struct SensorData {
+//      uint8_t type;
+//      uint8_t msgLength;
+//      byte messageNr;
+//      char rfBuf[15];
+//    } sensorData;
   public:
-    Pmsx003Sensor() {};
+    Sensor() {};
     void init() {
-     // rfDriverPtr = &rfDriver;
       this->messageNr = 0;
-      this->sensorType = S_PMSA003;  // default
-      
-      this->pmsx003InitTime = millis();
       SerialPms.begin(9600);
       this->rfRepeatTime = 0;  //
       this->transactionTime = millis();
-//      this->pmsx003MeasureTime = millis();
       this->initTotals();
-//      resetLastMeasurementTime = millis()+resetAfterSilenceTime;
+ //     if (!rfDriver.init()) {
+ //       //Serial.println("RF init failed");
+ //     }
     };
+//    uint8_t getChannelId() {
+//      return this->channelId;
+//    };
+//    void setChannelId(uint8_t channelId) {
+//      this->channelId = channelId;
+//      return;
+//    };
+//    uint8_t getUnitId() {
+//      return this->unitId;
+//    };
+//    void setUnitId(uint8_t unitId) {
+//      this->unitId = unitId;
+//      return;
+//    };
+/*    
+ *     
+    void getMsgNr() {
+      return this->sensorData.messageNr;
+    };
+*/
+//    void setState(State state) {};
     void readUInt16(uint16_t* value, uint16_t* inputChecksum) {
       int inputHigh = SerialPms.read();
       int inputLow = SerialPms.read();
@@ -88,131 +116,81 @@ class Pmsx003Sensor {
       return;
     };
     void processPmsRF() {
-      Serial.print(" process RF \r\n");
       this->nrOfMeasurements++;
       for (int i = 0; i < PMSOUTPUTS; i++) {
         if (measurements[i] < this->lowest[i]) this->lowest[i] = measurements[i];
         if (measurements[i] > this->highest[i]) this->highest[i] = measurements[i];
         this->totals[i] += measurements[i];
       }
-   
-     nowTime = millis();
+      nowTime = millis();
       // repeat last sent RF messagde during transaction building process
+
+      /*
+
+        Serial.print("\ntransaction RF message");
+           Serial.print(" nowTime:");
+           Serial.print(nowTime);
+           Serial.print(" transactionTime:");
+           Serial.print(this->transactionTime);
+           Serial.print(" this->transactionTimeMax:");
+           Serial.println(this->transactionTimeMax);
+           Serial.print(" rfRepeatTimeMax:");
+           Serial.println(this->rfRepeatTimeMax);
+      */
       unsigned long diffTime = nowTime - this->transactionTime;
       if ( diffTime < this->transactionTimeMax ) {
-/*        if (this->rfRepeatTime == 0) return; // no transaction finished yet or max repeattime exceeded, no action to repeat
+        if (this->rfRepeatTime == 0) return; // no transaction finished yet or max repeattime exceeded, no action to repeat
         diffTime = nowTime - this->rfRepeatTime;
         if (diffTime >= this->rfRepeatTimeMax &&
             rfRepeatTimeMax < (transactionTimeMax - 1000) // stop repeating just before new message
            ) {
           sendRfMessage(rfBuf, MSGLENGTH_PMSX003, MSGTYPE_REPEAT); // repeat message
-          printPrefix(INFO);
-          Serial.print(" C/U:");
-          Serial.print(MSG_ID);
-          Serial.print("/");
-          Serial.print(UNIT_ID);
-          Serial.print(", T:");
-          Serial.print(this->sensorType);
-          Serial.print(" #");
-          Serial.print(this->nrOfMeasurements);
-          Serial.print(" repeat message");
-          Serial.print("\r\n");
-        } else {
-*/
-/*          
- *           
-          printPrefix(INFO);
-          Serial.print(" C/U:");
-          Serial.print(MSG_ID);
-          Serial.print("/");
-          Serial.print(UNIT_ID);
-          Serial.print(", T:");
-          Serial.print(this->sensorType);
-          Serial.print(" #");
-          Serial.print(this->nrOfMeasurements);
-          Serial.print(" not repeating message difftime:");
-          Serial.print(diffTime);
-          Serial.print("\r\n");
-*/
-//       }
+        }
         return;
       }
-      sendResults();
-    };
-    void sendResults() {
-      if (this->nrOfMeasurements ==0) return; // no measurements recieved so far
-//      printPrefix(INFO);
-//      Serial.print(" C/U:");
-//      Serial.print(MSG_ID);
-//      Serial.print("/");
-//      Serial.print(UNIT_ID);
-//      Serial.print(", T:");
-//      Serial.print(this->sensorType);
-//      Serial.print(" #");
-//      Serial.print(this->nrOfMeasurements);
-//      Serial.print(" Preparing new message. difftime:");
-//      Serial.print(nowTime - this->transactionTime);
-//      Serial.print(" freeSRam:");
-//      Serial.print(getFreeSram());
-//      Serial.print("\r\n");
-      
+
       // process data once per transactiontime limit
       computeResults();
- 
+ //     for (int i = 0; i < PMSRESULTS; i++) {
+ //       Serial.print(this->totals[i]);
+ //       Serial.print(";\t");
+ //     }
+ //     Serial.print("\n");
+ //     for (int i = 0; i < PMSRESULTS; i++) {
+ //       Serial.print(this->lowest[i]);
+ //       Serial.print(";\t");
+ //     }
+ //     Serial.print("\n");
+ //     for (int i = 0; i < PMSRESULTS; i++) {
+ //       Serial.print(this->highest[i]);
+ //       Serial.print(";\t");
+ //     }
+ //     Serial.print("\n");
+ //     for (int i = 0; i < PMSRESULTS; i++) {
+ //       Serial.print(this->results[i]);
+ //       Serial.print(";\t");
+ //     }
+ //     Serial.print("\n");
 
-      rfBuf[0] = MSG_ID;
+      rfBuf[0] = CHANNEL_ID;
       rfBuf[1] = UNIT_ID;
       rfBuf[2] = this->sensorType;
       rfBuf[3] = 0; // msgType initiated when calling function sendRfMessage
       rfBuf[4] = this->getNewMsgNr();
       rfBuf[5] = 0;  // delaytime equal zero for first time sending message. In seconds.
-//      this->rfSentMsgTime = millis();
-//      rfBuf[6] = highByte(this->results[0]); // PM1
-//      rfBuf[7] = lowByte(this->results[0]);  //
-//      rfBuf[8] = highByte(this->results[1]); // PM2.5
-//      rfBuf[9] = lowByte(this->results[1]);  //
-//      rfBuf[10] = highByte(this->results[2]);// PM10
-//      rfBuf[11] = lowByte(this->results[2]); //
+      this->rfSentMsgTime = millis();
+  //    rfBuf[6] = highByte(this->results[0]); // PM1
+  //    rfBuf[7] = lowByte(this->results[0]);  //
+      rfBuf[6] = highByte(this->results[0]); // PM2.5
+      rfBuf[7] = lowByte(this->results[0]);  //
+      rfBuf[8] = highByte(this->results[1]);// PM10
+      rfBuf[9] = lowByte(this->results[1]); //
 
-
-//      sendRfMessage(rfBuf, MSGLENGTH_PMSX003, MSGTYPE_NEW); // new message
+      sendRfMessage(rfBuf, MSGLENGTH_PMSX003, MSGTYPE_NEW); // new message
 
       this->transactionTime = millis();
-
-      printPrefix(MEASUREMENT);
-      Serial.print(this->sensorType);
-      Serial.print(";");
-      Serial.print(this->results[0]);
-      Serial.print(";");
-      Serial.print(this->results[1]);
-      Serial.print(";");
-      Serial.print(this->results[2]);
-      Serial.print(";");
-      Serial.print(this->nrOfMeasurements);
-//      Serial.print(" freeSRam:");
-//      Serial.print(getFreeSram());
-      Serial.print("\r\n");
-
-
-      String urlParams = "&observation=apri-sensor-pmsa003-concPM1_0_CF1:\0";
-      double pm1 = this->results[0];  // double for String conversion and decimals)
-      double pm25 = this->results[1];
-      double pm10 = this->results[2];
-      //double altitude = this->results[3];
-      urlParams += String(pm1, 2) + ",";
-      urlParams += "apri-sensor-pmsa003-concPM2_5_CF1:\0";
-      urlParams += String(pm25, 2)+ ","; 
-      urlParams += "apri-sensor-pmsa003-concPM10_0_CF1:\0";
-      urlParams += String(pm10, 2); 
-      urlParams += "&sensorsystem=" + this->sensorSystem; 
-      sendObservations(urlParams);
-      
       initTotals();
 
-//      if (millis() > periodicResetTime) {  // reset for cleanup stack etc.
-//        resetArduino();
-//      }
-      
     };
 
     void initTotals() {
@@ -222,48 +200,31 @@ class Pmsx003Sensor {
         this->highest[i] = -999999;
       }
       this->nrOfMeasurements = 0;
-    };
+    }
+    void sendRfMessage(byte rfBuffer[], int msgLength, char msgType) {
+      //char buf[60];
+      //sprintf(buf, "%lu;%s", messageNr, rfBuf);  // %lu = long  %i = int %s = string
+      //Serial.println("RF sending test message");
+      //Serial.println(buf);
+      //rfDriver.send("test", 4);
+      //rfDriver.waitPacketSent();
 
-/*
-    void readSyncMsg() {
-      if ((*rfDriverPtr).recv(syncBuf, &syncBuflen)) { // Non-blocking receiveSyncMsg();
-//Serial.print(" process Sync \r\n");
-//      if (rfDriver.recv(syncBuf, &syncBuflen)) { // Non-blocking receiveSyncMsg();
-        receiveSyncMsg();
-      };
-    };
-*/        
-/*    void sendRfMessage(byte rfBuffer[], int msgLength, char msgType) {
       // fille message type (New, Repeat)
       rfBuffer[3] = msgType;
 
       if (msgType == MSGTYPE_REPEAT) {
         unsigned long rfDelayTime = millis() - this->rfSentMsgTime;
         if (rfDelayTime > this->rfDelayTimeMax) { // max delaytime exceeded, end processing repeat
-          //Serial.print("RF max repeat time exceeded, stop repeating this message");Serial.print("\r\n");
-          //Serial.print(rfDelayTime);Serial.print("\r\n");
+          //Serial.println("RF max repeat time exceeded, stop repeating this message");
+          //Serial.println(rfDelayTime);
           this->rfRepeatTime = 0; // stop repeating this message
-          printPrefix(INFO);
-          Serial.print("RF l:");
-          Serial.print(msgLength);
-          Serial.print(", C/U:");
-          Serial.print(rfBuffer[0]);
-          Serial.print("/");
-          Serial.print(rfBuffer[1]);
-          Serial.print(", T:");
-          Serial.print(rfBuffer[2]);
-          Serial.print(msgType);
-          Serial.print(" #");
-          Serial.print(this->nrOfMeasurements);
-          Serial.print(" stop repeating message");
-          Serial.print("\r\n");
           return;
         }
         // fill delaytime in seconds
         rfBuffer[5] = rfDelayTime / 1000;
       }
 
-      printPrefix(INFO);Serial.print("RF l:");
+      Serial.print("\nRF l:");
       Serial.print(msgLength);
       Serial.print(", C/U:");
       Serial.print(rfBuffer[0]);
@@ -274,18 +235,31 @@ class Pmsx003Sensor {
       Serial.print(msgType);
       Serial.print(" #");
       Serial.print(this->nrOfMeasurements);
-      Serial.print("\r\n");
       
+      /*
+          Serial.println(rfBuffer[0]);
+          Serial.println(rfBuffer[1]);
+          Serial.println(rfBuffer[2]);
+          Serial.println(rfBuffer[3]);
+          Serial.println(rfBuffer[4]);
+          Serial.println(rfBuffer[5]);
+          Serial.println(rfBuffer[6]);
+          Serial.println(rfBuffer[7]);
+          Serial.println(rfBuffer[8]);
+          Serial.println(rfBuffer[9]);
+          Serial.println(rfBuffer[10]);
+          Serial.println(rfBuffer[11]);
+      */
       rfDriver.send(rfBuffer, msgLength);
       rfDriver.waitPacketSent();
 
       this->rfRepeatTime = millis();
-
-      resetLastMeasurementTime = millis();
     }
-*/
     void computeResults() {
       int i;
+      //  for(i==0;i<PMSRESULTSRF;i++) {  // only first x measurements for RF transmit
+      //    pmsResultsRF[i] = round(this->totals[i]/this->nrOfMeasurements);
+      //  }
       bool corrLowHigh = false;
       long _nrOfMeasurements = this->nrOfMeasurements;
       if (_nrOfMeasurements>3) { // ignore highest / lowest values
@@ -298,30 +272,24 @@ class Pmsx003Sensor {
           this->totals[i] -= this->highest[i];
           this->totals[i] -= this->lowest[i];          
         }
-        //this->results[i] = (((this->totals[i] * 100) / _nrOfMeasurements ) + .49) / 10;
-        this->results[i] = this->totals[i] / _nrOfMeasurements ;
+        this->results[i] = (((this->totals[i] * 100) / _nrOfMeasurements ) + .49) / 10;
+        //    long tmpResult = round(this->totals[i] / this->nrOfMeasurements);
+        //    long tmpResult = round((this->totals[i]*10) / this->nrOfMeasurements);
+        //    this->results[i] = tmpResult;
+        //    Serial.println(i);
+        //    Serial.println(tmpResult);
+        //    Serial.println(this->rfRepeatTimeMax);
       }
 
     };
     bool serialReady() {
       if (SerialPms) return true; else return false;
     }
-    void readData() {
-//      if ( millis() - this->pmsx003MeasureTime < this->pmsx003MeasureInterval ) {
-//        //printPrefix(INFO);Serial.print("pmsx003 interval ");Serial.print("\r\n"); //delay(100);
-//        return;
-//      }
-      // wait some time while in init fase (also during soft reset)
-
-      if ( millis() - this->pmsx003InitTime < this->pmsx003InitInterval ) {
-        //printPrefix(INFO);Serial.print("pmsx003 init fase");Serial.print("\r\n");
-//        resetLastMeasurementTime=millis() + resetAfterSilenceTime*2;
+    bool readData() {
+       if ( millis() - this->pmsx003MeasureTime < this->pmsx003MeasureInterval ) {
+        //Serial.println("pmsx003 interval "); //delay(100);
         return;
       }
-
- //     if ( millis() > resetLastMeasurementTime + resetAfterSilenceTime) {
-       // resetArduino();
- //     }
       
 
 //      uint16_t concPM1_0_CF1;
@@ -337,16 +305,27 @@ class Pmsx003Sensor {
 //      uint16_t rawGt5_0um;
 //      uint16_t rawGt10_0um;
 
-      
       serialPmsAvailable = SerialPms.available();
-      //Serial.print(serialPmsAvailable);
-
       if (serialPmsAvailable < 32) {
-        delay(10);
+        //delay(10);
         return;
+//        if (serialPmsAvailable < 1) {
+//          return;
+//        };
+//        Serial.println(serialPmsAvailable);
+//        if (serialPmsAvailable > 16) {
+//          //delay(30);
+//          return;
+//        };
+//        if (serialPmsAvailable > 0) {
+//          //delay(30);
+//          return;
+//        };
+//        //delay(100);
+//        return;
       }
 
-      //Serial.print(serialPmsAvailable);
+      //Serial.println(serialPmsAvailable);
 
       inputChecksum = 0;
 
@@ -360,12 +339,12 @@ class Pmsx003Sensor {
       if (controleCodes != 0x001c) return;
 
       // read all sensor output values and sum Checksum
-      uint16_t value;
+      int value;
       readUInt16(&value, &inputChecksum );  //pm1
       this->measurements[0] = value;
       readUInt16(&value, &inputChecksum );  //pm2.5
       this->measurements[1] = value;
-            //Serial.print("\r\n");
+            //Serial.print("\n");
             //Serial.print(value);
       readUInt16(&value, &inputChecksum );  //pm10
       this->measurements[2] = value;
@@ -428,18 +407,13 @@ class Pmsx003Sensor {
 //            Serial.print(checksum);
 //            Serial.print(";");
 //            Serial.print(inputChecksum);
-            Serial.print("PMSx003 checksum error");
-            Serial.print("\r\n");
+            Serial.print("\nPMSx003 checksum error");
       } else {
         if (errorCode == 0) {
           // send message via RF
-//          this->measurements[0] = this->pm1;
-//          this->measurements[1] = this->pm25;
-//          this->measurements[2] = this->pm10;
-          Serial.print("processing data PMSx003 RF");Serial.print("\r\n");
+      Serial.println("processing data PMSx003 RF");
           processPmsRF();
         }
-          Serial.print(errorCode);Serial.print("\r\n");
       }
 
       while (SerialPms.read() != -1) {}; //clear buffer

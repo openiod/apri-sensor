@@ -88,7 +88,7 @@ class Pmsx003Sensor {
       return;
     };
     void processPmsRF() {
-      Serial.print(" process RF \r\n");
+      //Serial.print(" process RF \r\n");
       this->nrOfMeasurements++;
       for (int i = 0; i < PMSOUTPUTS; i++) {
         if (measurements[i] < this->lowest[i]) this->lowest[i] = measurements[i];
@@ -342,7 +342,7 @@ class Pmsx003Sensor {
       //Serial.print(serialPmsAvailable);
 
       if (serialPmsAvailable < 32) {
-        delay(10);
+        //delay(10);
         return;
       }
 
@@ -436,10 +436,9 @@ class Pmsx003Sensor {
 //          this->measurements[0] = this->pm1;
 //          this->measurements[1] = this->pm25;
 //          this->measurements[2] = this->pm10;
-          Serial.print("processing data PMSx003 RF");Serial.print("\r\n");
+//          Serial.print("processing data PMSx003 RF");Serial.print("\r\n");
           processPmsRF();
         }
-          Serial.print(errorCode);Serial.print("\r\n");
       }
 
       while (SerialPms.read() != -1) {}; //clear buffer

@@ -1033,7 +1033,7 @@ function writeLocalCsv(rec, folderName, fileName, h) {
   let filePath = localBackupFolder + '/' + folderName + '/' + fileName + '.csv'
 
   try {
-    fs.access(filePath, fs.F_OK, (err) => {
+    fs.access(filePath, fs.constants.F_OK, (err) => {
       if (err) {
         fs.writeFile(filePath, h + '\n', (err) => {
           if (err)

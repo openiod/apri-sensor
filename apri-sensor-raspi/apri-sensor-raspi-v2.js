@@ -1028,11 +1028,11 @@ let localLatestResultFolder = '/var/log/aprisensor/latest-results'
 // write results to local files per day in csv-format, folders per yyyy-mm. /opt/backup/yyyy-mm/. 
 //   files can be used for download to local computer (via web-manager of may be direct by api)
 // also writes latest results to /var/log/aprisensor/latest-results/. (for Home Assistant thru api) 
-function writeLocalCsv(rec, folderName, fileName, h) {
+function writeLocalCsv(rec, folderName, fileName, h, sensorType) {
 
   // make folder's if path not exists and write the latest results to the file plus header in csv format
   fs.mkdirSync(localLatestResultFolder, { recursive: true })
-  let latestResultFilePath = localLatestResultFolder + '/' + fileName + '.csv'
+  let latestResultFilePath = localLatestResultFolder + '/' + sensorType + '.csv'
   try {
     fs.writeFile(latestResultFilePath, h + '\n' + rec + '\n', (err) => {
       if (err)
@@ -1204,7 +1204,7 @@ var sendData = async function () {
       ',"part0_3","part0_5","part1_0","part2_5","part5_0","part10_0"'
 
     writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
-      '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header)
+      '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
 
     await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
       'foi': 'SCRP' + unit.id
@@ -1249,7 +1249,7 @@ var sendData = async function () {
     header = '"sensorId","dateObserved","sensorType","temperature","pressure","rHum"'
 
     writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
-      '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header)
+      '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
 
     //			url = openiodUrl + '/bme280'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
     //						'temperature:'+results.bme280.temperature+',pressure:'+results.bme280.pressure+',rHum:'+results.bme280.rHum ;
@@ -1290,7 +1290,7 @@ var sendData = async function () {
     header = '"sensorId","dateObserved","sensorType","temperature","pressure","rHum","gasResistance"'
 
     writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
-      '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header)
+      '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
 
 
 
@@ -1330,7 +1330,7 @@ var sendData = async function () {
     header = '"sensorId","dateObserved","sensorType","temperature"'
 
     writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
-      '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header)
+      '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
 
 
     await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
@@ -1363,7 +1363,7 @@ var sendData = async function () {
     header = '"sensorId","dateObserved","sensorType","co"'
 
     writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
-      '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header)
+      '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
 
 
 
@@ -1419,7 +1419,7 @@ var sendData = async function () {
           '"part0_5","part1_0","part2_5","part4_0","part10_0","tps","gpsMode","gpsLat","gpsLon"'
 
         writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
-          '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header)
+          '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
 
         spsProcessed = true
         await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
@@ -1491,7 +1491,7 @@ var sendData = async function () {
           '"gpsAlt","gpsEpx","gpsEpy","gpsEpv","gpsTrack","gpsSpeed","gpsClimb","gpsEps","gpsEpc"'
 
         writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
-          '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header)
+          '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
 
         await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
           'foi': 'SCRP' + unit.id
@@ -1558,7 +1558,7 @@ var sendData = async function () {
         '"part0_5","part1_0","part2_5","part4_0","part10_0","tps"'
 
       writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
-        '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header)
+        '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
 
       await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
         'foi': 'SCRP' + unit.id
@@ -1617,7 +1617,7 @@ var sendData = async function () {
       '"part0_1","part0_3","part0_5","part1_0","part2_5","part5_0","part10_0","ips7100SerialNr"'
 
     writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
-      '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header)
+      '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
 
 
     //			url = openiodUrl + '/ips7100'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
@@ -1673,7 +1673,7 @@ var sendData = async function () {
     header = '"sensorId","dateObserved","sensorType","temperature","rHum","co2"'
 
     writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
-      '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header)
+      '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
 
     //			url = openiodUrl + '/scd30'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
     //						'temperature:'+results.scd30.temperature+',rHum:'+results.scd30.rHum+',co2:'+results.scd30.co2 ;
@@ -1715,7 +1715,7 @@ var sendData = async function () {
     header = '"sensorId","dateObserved","sensorType","part1","part25","part10","pm1","pm25","pm10","temperature","rHum"'
 
     writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
-      '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header)
+      '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
 
     await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
       'foi': 'SCRP' + unit.id

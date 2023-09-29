@@ -1023,8 +1023,28 @@ function isNumeric(n) {
 }
 
 let localBackupFolder = '/opt/aprisensor_backup'
+let localLatestResultFolder = '/var/log/aprisensor/latest-results'
 
+// write results to local files per day in csv-format, folders per yyyy-mm. /opt/backup/yyyy-mm/. 
+//   files can be used for download to local computer (via web-manager of may be direct by api)
+// also writes latest results to /var/log/aprisensor/latest-results/. (for Home Assistant thru api) 
 function writeLocalCsv(rec, folderName, fileName, h) {
+
+  // make folder's if path not exists and write the latest results to the file plus header in csv format
+  fs.mkdirSync(localLatestResultFolder, { recursive: true })
+  let latestResultFilePath = localLatestResultFolder + fileName + '.csv'
+  try {
+        fs.writeFile(latestResultFilePath, h + '\n' + rec +'\n' , (err) => {
+          if (err)
+            console.log(err);
+        })
+  } 
+  catch (err) {
+    console.log(err);
+  }
+
+
+  // from here the backup files
   let path = localBackupFolder + '/' + folderName
 
   // make dir's if path not exists

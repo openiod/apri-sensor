@@ -401,13 +401,17 @@ var sendData = function (redisArray, redisArrayIndex, redisKey, url) {
 						redisClient.SREM('new', _redisKey)
 							.then(function (res) {
 								// log('key remove from new set '+_redisKey+ ' ' + res);
+								log('status ' + response.status + ' and service status: ' + response.data.status);
+								lastResponse = new Date().getTime();
 							})
 							.catch((error) => {
 								log(error);
+								lastResponse = new Date().getTime();
 							});
 					})
 					.catch((error) => {
 						log(error);
+						lastResponse = new Date().getTime();
 					});
 			} else {
 				//      console.log(response.status + ' / ' + response.headers['content-type'] + ' / ' +response.data);

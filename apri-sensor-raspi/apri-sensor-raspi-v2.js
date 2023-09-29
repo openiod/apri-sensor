@@ -1023,14 +1023,29 @@ function isNumeric(n) {
 }
 
 let localBackupFolder = '/opt/aprisensor_backup'
+
 function writeLocalCsv(rec, folderName, fileName, h) {
   let path = localBackupFolder + '/' + folderName
 
+  // make dir's if path not exists
+  fs.mkdirSync(path, { recursive: true })
+
+  let filePath = localBackupFolder + '/' + folderName + '/' + fileName + '.csv'
+
   try {
-    if (fs.mkdirSync(path, { recursive: true }) != undefined) {
-      fs.appendFileSync(localBackupFolder + '/' + folderName + '/' + fileName + '.csv', h + '\r\n');
-    }
-    fs.appendFileSync(localBackupFolder + '/' + folderName + '/' + fileName + '.csv', rec + '\r\n');
+    fs.access(filePath, fs.F_OK, (err) => {
+      if (err) {
+        fs.writeFile(filePath, h + '\n', (err) => {
+          if (err)
+            console.log(err);
+          else {
+            fs.appendFileSync(filePath, rec + '\n');
+          }
+        });
+      } else {
+        fs.appendFileSync(filePath, rec + '\n');
+      }
+    })
   } catch (err) {
   }
 
@@ -1364,8 +1379,8 @@ var sendData = async function () {
       if (gpsTpv.mode == 2) {
 
         csvRec = '"SCRP' + unit.id +
-      '","' + timeStamp.toISOString() +
-      '","' + sensorType + '"' +
+          '","' + timeStamp.toISOString() +
+          '","' + sensorType + '"' +
           ',' + results.sps.pm1 +
           ',' + results.sps.pm25 +
           ',' + results.sps.pm4 +
@@ -1378,7 +1393,7 @@ var sendData = async function () {
           ',' + results.sps.tps +
           ',' + gpsTpv.mode +
           ',' + gpsTpv.lat +
-          ',' + gpsTpv.lon 
+          ',' + gpsTpv.lon
 
         header = '"sensorId","dateObserved","sensorType","pm1","pm25","pm4","pm10",' +
           '"part0_5","part1_0","part2_5","part4_0","part10_0","tps","gpsMode","gpsLat","gpsLon"'
@@ -1424,22 +1439,22 @@ var sendData = async function () {
         spsProcessed = true
 
         csvRec = '"SCRP' + unit.id +
-      '","' + timeStamp.toISOString() +
-      '","' + sensorType + '"' +
-        ',' + results.sps.pm1 +
-        ',' + results.sps.pm25 +
-        ',' + results.sps.pm4 +
-        ',' + results.sps.pm10 +
-        ',' + results.sps.part0_5 +
-        ',' + results.sps.part1_0 +
-        ',' + results.sps.part2_5 +
-        ',' + results.sps.part4_0 +
-        ',' + results.sps.part10_0 +
-        ',' + results.sps.tps +
-        ',' + gpsTpv.mode +
-        ',' + gpsTpv.time +
-        ',' + gpsTpv.ept +
-        ',' + gpsTpv.lat +
+          '","' + timeStamp.toISOString() +
+          '","' + sensorType + '"' +
+          ',' + results.sps.pm1 +
+          ',' + results.sps.pm25 +
+          ',' + results.sps.pm4 +
+          ',' + results.sps.pm10 +
+          ',' + results.sps.part0_5 +
+          ',' + results.sps.part1_0 +
+          ',' + results.sps.part2_5 +
+          ',' + results.sps.part4_0 +
+          ',' + results.sps.part10_0 +
+          ',' + results.sps.tps +
+          ',' + gpsTpv.mode +
+          ',' + gpsTpv.time +
+          ',' + gpsTpv.ept +
+          ',' + gpsTpv.lat +
           ',' + gpsTpv.lon +
           ',' + gpsTpv.alt +
           ',' + gpsTpv.epx +
@@ -1451,9 +1466,9 @@ var sendData = async function () {
           ',' + gpsTpv.eps +
           ',' + gpsTpv.epc
 
-      header = '"sensorId","dateObserved","sensorType","pm1","pm25","pm4","pm10",' +
-        '"part0_5","part1_0","part2_5","part4_0","part10_0","tps","gpsMode","gpsTime","gpsEpt","gpsLat","gpsLon",' +
-        '"gpsAlt","gpsEpx","gpsEpy","gpsEpv","gpsTrack","gpsSpeed","gpsClimb","gpsEps","gpsEpc"'
+        header = '"sensorId","dateObserved","sensorType","pm1","pm25","pm4","pm10",' +
+          '"part0_5","part1_0","part2_5","part4_0","part10_0","tps","gpsMode","gpsTime","gpsEpt","gpsLat","gpsLon",' +
+          '"gpsAlt","gpsEpx","gpsEpy","gpsEpv","gpsTrack","gpsSpeed","gpsClimb","gpsEps","gpsEpc"'
 
         await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
           'foi': 'SCRP' + unit.id
@@ -1503,21 +1518,21 @@ var sendData = async function () {
     if (spsProcessed == false) {
 
       csvRec = '"SCRP' + unit.id +
-      '","' + timeStamp.toISOString() +
-      '","' + sensorType + '"' +
-      ',' + results.sps.pm1 +
-      ',' + results.sps.pm25 +
-      ',' + results.sps.pm4 +
-      ',' + results.sps.pm10 +
-      ',' + results.sps.part0_5 +
-      ',' + results.sps.part1_0 +
-      ',' + results.sps.part2_5 +
-      ',' + results.sps.part4_0 +
-      ',' + results.sps.part10_0 +
-      ',' + results.sps.tps
+        '","' + timeStamp.toISOString() +
+        '","' + sensorType + '"' +
+        ',' + results.sps.pm1 +
+        ',' + results.sps.pm25 +
+        ',' + results.sps.pm4 +
+        ',' + results.sps.pm10 +
+        ',' + results.sps.part0_5 +
+        ',' + results.sps.part1_0 +
+        ',' + results.sps.part2_5 +
+        ',' + results.sps.part4_0 +
+        ',' + results.sps.part10_0 +
+        ',' + results.sps.tps
 
-    header = '"sensorId","dateObserved","sensorType","pm1","pm25","pm4","pm10",' +
-      '"part0_5","part1_0","part2_5","part4_0","part10_0","tps"'
+      header = '"sensorId","dateObserved","sensorType","pm1","pm25","pm4","pm10",' +
+        '"part0_5","part1_0","part2_5","part4_0","part10_0","tps"'
 
       await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
         'foi': 'SCRP' + unit.id
@@ -1556,24 +1571,24 @@ var sendData = async function () {
     csvRec = '"SCRP' + unit.id +
       '","' + timeStamp.toISOString() +
       '","' + sensorType + '"' +
-    ',' + results.ips7100.pm01 +
-    ',' + results.ips7100.pm03 +
-    ',' + results.ips7100.pm05 +
-    ',' + results.ips7100.pm1 +
-    ',' + results.ips7100.pm25 +
-    ',' + results.ips7100.pm5 +
-    ',' + results.ips7100.pm10 +
-    ',' + results.ips7100.part0_1 +
-    ',' + results.ips7100.part0_3 +
-    ',' + results.ips7100.part0_5 +
-    ',' + results.ips7100.part1_0 +
-    ',' + results.ips7100.part2_5 +
-    ',' + results.ips7100.part5_0 +
-    ',' + results.ips7100.part10_0 +
-    ',' + results.ips7100.ips7100SerialNr
+      ',' + results.ips7100.pm01 +
+      ',' + results.ips7100.pm03 +
+      ',' + results.ips7100.pm05 +
+      ',' + results.ips7100.pm1 +
+      ',' + results.ips7100.pm25 +
+      ',' + results.ips7100.pm5 +
+      ',' + results.ips7100.pm10 +
+      ',' + results.ips7100.part0_1 +
+      ',' + results.ips7100.part0_3 +
+      ',' + results.ips7100.part0_5 +
+      ',' + results.ips7100.part1_0 +
+      ',' + results.ips7100.part2_5 +
+      ',' + results.ips7100.part5_0 +
+      ',' + results.ips7100.part10_0 +
+      ',' + results.ips7100.ips7100SerialNr
 
-  header = '"sensorId","dateObserved","sensorType","pm01","pm03","pm05","pm1","pm25","pm5","pm10",' +
-    '"part0_1","part0_3","part0_5","part1_0","part2_5","part5_0","part10_0","ips7100SerialNr"'
+    header = '"sensorId","dateObserved","sensorType","pm01","pm03","pm05","pm1","pm25","pm5","pm10",' +
+      '"part0_1","part0_3","part0_5","part1_0","part2_5","part5_0","part10_0","ips7100SerialNr"'
 
     //			url = openiodUrl + '/ips7100'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
     //						'pm01:'+results.ips7100.pm01+',pm03:'+results.ips7100.pm03+',pm05:'+results.ips7100.pm05+', +
@@ -1623,7 +1638,7 @@ var sendData = async function () {
       '","' + sensorType + '"' +
       ',' + results.scd30.temperature +
       ',' + results.scd30.rHum +
-      ',' + results.scd30.co2 
+      ',' + results.scd30.co2
 
     header = '"sensorId","dateObserved","sensorType","temperature","rHum","co2"'
 
@@ -1665,7 +1680,7 @@ var sendData = async function () {
       ',' + results.nextpm.pm25 +
       ',' + results.nextpm.pm10 +
       ',' + results.nextpm.temperature
-      ',' + results.nextpm.rHum
+    ',' + results.nextpm.rHum
 
     header = '"sensorId","dateObserved","sensorType","part1","part25","part10","pm1","pm25","pm10","temperature","rHum"'
 

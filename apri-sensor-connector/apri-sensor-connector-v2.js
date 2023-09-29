@@ -382,17 +382,32 @@ var sendData = function (redisArray, redisArrayIndex, redisKey, url) {
 			console.log(response.data)
 
 			if (removeRecord == true) {
-				//redisSmoveAsync('new', 'archive', _redisKey)
-				redisClient.SMOVE('new', 'archive', _redisKey)
-					.then(function (e) {
-						//				logDir(response.data);
-						log('status ' + response.status + ' and service status: ' + response.data.status);
-						lastResponse = new Date().getTime();
-						latencyPreviousSend = lastResponse - lastSend;
-						log('Transaction duration: ' + latencyPreviousSend + ' msec');
-						//setTimeout(waitBeforeNext, waitTimeBeforeNext);
-						//processDataCycle({repeat:false}); // continue with next measurement if available
-						//console.log('Redis smove(d) from new to old-set success');
+				/*	
+					//redisSmoveAsync('new', 'archive', _redisKey)
+					redisClient.SMOVE('new', 'archive', _redisKey)
+						.then(function (e) {
+							//				logDir(response.data);
+							log('status ' + response.status + ' and service status: ' + response.data.status);
+							lastResponse = new Date().getTime();
+							latencyPreviousSend = lastResponse - lastSend;
+							log('Transaction duration: ' + latencyPreviousSend + ' msec');
+							//setTimeout(waitBeforeNext, waitTimeBeforeNext);
+							//processDataCycle({repeat:false}); // continue with next measurement if available
+							//console.log('Redis smove(d) from new to old-set success');
+						});
+						*/
+				redisClient.DEL(_redisKey)
+					.then(function (res) {
+						redisClient.SREM('new', _redisKey)
+							.then(function (res) {
+								// log('key remove from new set '+_redisKey+ ' ' + res);
+							})
+							.catch((error) => {
+								log(error);
+							});
+					})
+					.catch((error) => {
+						log(error);
 					});
 			} else {
 				//      console.log(response.status + ' / ' + response.headers['content-type'] + ' / ' +response.data);

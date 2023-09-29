@@ -1470,6 +1470,9 @@ var sendData = async function () {
           '"part0_5","part1_0","part2_5","part4_0","part10_0","tps","gpsMode","gpsTime","gpsEpt","gpsLat","gpsLon",' +
           '"gpsAlt","gpsEpx","gpsEpy","gpsEpv","gpsTrack","gpsSpeed","gpsClimb","gpsEps","gpsEpc"'
 
+        writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
+          '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header)
+
         await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
           'foi': 'SCRP' + unit.id
           , 'time': timeStampTime
@@ -1534,6 +1537,9 @@ var sendData = async function () {
       header = '"sensorId","dateObserved","sensorType","pm1","pm25","pm4","pm10",' +
         '"part0_5","part1_0","part2_5","part4_0","part10_0","tps"'
 
+      writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
+        '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header)
+
       await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
         'foi': 'SCRP' + unit.id
         , 'time': timeStampTime
@@ -1589,6 +1595,10 @@ var sendData = async function () {
 
     header = '"sensorId","dateObserved","sensorType","pm01","pm03","pm05","pm1","pm25","pm5","pm10",' +
       '"part0_1","part0_3","part0_5","part1_0","part2_5","part5_0","part10_0","ips7100SerialNr"'
+
+    writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
+      '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header)
+
 
     //			url = openiodUrl + '/ips7100'+ '/v1/m?foi=' + 'SCRP' + unit.id + '&observation='+
     //						'pm01:'+results.ips7100.pm01+',pm03:'+results.ips7100.pm03+',pm05:'+results.ips7100.pm05+', +

@@ -1230,9 +1230,9 @@ var sendData = async function () {
           .then(function (res2) {
             var _res2 = res2;
             //	redisSaddAsync('pmsa003', timeStamp.toISOString()+':pmsa003')
-            logger.info('pmsa003 ', timeStamp.toISOString() + ':' + sensorType + _res2);
+            //logger.info('pmsa003 ', timeStamp.toISOString() + ':' + sensorType + _res2);
           });
-        logger.info(timeStamp.toString() + ':' + sensorType + _res);
+        //logger.info(timeStamp.toString() + ':' + sensorType + _res);
       });
   }
 
@@ -1270,9 +1270,9 @@ var sendData = async function () {
           .then(function (res2) {
             var _res2 = res2;
             //	redisSaddAsync('bme280', timeStamp.toISOString()+':bme280')
-            logger.info('bme280 ', timeStamp.toISOString() + ':' + sensorType + _res2);
+            //logger.info('bme280 ', timeStamp.toISOString() + ':' + sensorType + _res2);
           });
-        logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
+        //logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
       });
   }
 
@@ -1313,9 +1313,9 @@ var sendData = async function () {
           .then(function (res2) {
             var _res2 = res2;
             //	redisSaddAsync('bme680', timeStamp.toISOString()+':bme680')
-            logger.info('bme680 ', timeStamp.toISOString() + ':' + sensorType + _res2);
+            //logger.info('bme680 ', timeStamp.toISOString() + ':' + sensorType + _res2);
           });
-        logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
+        //logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
       });
   }
 
@@ -1345,9 +1345,9 @@ var sendData = async function () {
           .then(function (res2) {
             var _res2 = res2;
             //	redisSaddAsync('ds18b20', timeStamp.toISOString()+':ds18b20')
-            logger.info('ds18b20 ', timeStamp.toISOString() + ':' + sensorType + _res2);
+            //logger.info('ds18b20 ', timeStamp.toISOString() + ':' + sensorType + _res2);
           });
-        logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
+        //logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
       });
   }
 
@@ -1379,9 +1379,9 @@ var sendData = async function () {
           .then(function (res2) {
             var _res2 = res2;
             //	redisSaddAsync('tgs5042', timeStamp.toISOString()+':tgs5042')
-            logger.info('tgs5042 ', timeStamp.toISOString() + ':' + sensorType + _res2);
+           // logger.info('tgs5042 ', timeStamp.toISOString() + ':' + sensorType + _res2);
           });
-        logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
+        //logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
       });
   }
   if (results.sps.nrOfMeas > 0) {
@@ -1446,9 +1446,9 @@ var sendData = async function () {
               .then(function (res2) {
                 var _res2 = res2;
                 //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
-                logger.info('sps30 ', timeStamp.toISOString() + ':' + sensorType + _res2);
+                //logger.info('sps30 ', timeStamp.toISOString() + ':' + sensorType + _res2);
               });
-            logger.info(timeStamp.toString() + ':' + sensorType + _res);
+           // logger.info(timeStamp.toString() + ':' + sensorType + _res);
           })
           .catch(function (err) {
             logger.info('catch mode 2, Redis write')
@@ -1528,9 +1528,9 @@ var sendData = async function () {
               .then(function (res2) {
                 var _res2 = res2;
                 //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
-                logger.info('sps30 ', timeStamp.toISOString() + ':' + sensorType + _res2);
+               // logger.info('sps30 ', timeStamp.toISOString() + ':' + sensorType + _res2);
               });
-            logger.info(timeStamp.toString() + ':sps30' + _res);
+            //logger.info(timeStamp.toString() + ':sps30' + _res);
           })
           .catch(function (err) {
             logger.info('catch mode 3, Redis write')
@@ -1581,9 +1581,9 @@ var sendData = async function () {
             .then(function (res2) {
               var _res2 = res2;
               //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
-              logger.info('sps30 ', timeStamp.toISOString() + ':' + sensorType + _res2);
+             // logger.info('sps30 ', timeStamp.toISOString() + ':' + sensorType + _res2);
             });
-          logger.info(timeStamp.toString() + ':' + sensorType + _res);
+          //logger.info(timeStamp.toString() + ':' + sensorType + _res);
         })
         .catch(function (err) {
           logger.info('catch no gps, Redis write')
@@ -1654,9 +1654,9 @@ var sendData = async function () {
           .then(function (res2) {
             var _res2 = res2;
             //	redisSaddAsync('ips7100', timeStamp.toISOString()+':ips7100')
-            logger.info('ips7100 ', timeStamp.toISOString() + ':' + sensorType + _res2);
+           // logger.info('ips7100 ', timeStamp.toISOString() + ':' + sensorType + _res2);
           });
-        logger.info(timeStamp.toString() + ':' + sensorType + _res);
+       // logger.info(timeStamp.toString() + ':' + sensorType + _res);
       });
   }
 
@@ -1691,9 +1691,9 @@ var sendData = async function () {
         .then(function (res2) {
           var _res2 = res2;
           //	redisSaddAsync('scd30', timeStamp.toISOString()+':scd30')
-          logger.info('scd30 ', timeStamp.toISOString() + ':' + sensorType + _res2);
+         // logger.info('scd30 ', timeStamp.toISOString() + ':' + sensorType + _res2);
         });
-      logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
+      //logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
     });
   }
 
@@ -1735,9 +1735,9 @@ var sendData = async function () {
         .then(function (res2) {
           var _res2 = res2;
           //	redisSaddAsync('nextpm', timeStamp.toISOString()+':nextpm')
-          logger.info('nextpm ', timeStamp.toISOString() + ':' + sensorType + _res2);
+         // logger.info('nextpm ', timeStamp.toISOString() + ':' + sensorType + _res2);
         });
-      logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
+      //logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
     });
   }
 

@@ -1032,13 +1032,13 @@ function writeLocalCsv(rec, folderName, fileName, h) {
 
   // make folder's if path not exists and write the latest results to the file plus header in csv format
   fs.mkdirSync(localLatestResultFolder, { recursive: true })
-  let latestResultFilePath = localLatestResultFolder + fileName + '.csv'
+  let latestResultFilePath = localLatestResultFolder + '/' + fileName + '.csv'
   try {
-        fs.writeFile(latestResultFilePath, h + '\n' + rec +'\n' , (err) => {
-          if (err)
-            console.log(err);
-        })
-  } 
+    fs.writeFile(latestResultFilePath, h + '\n' + rec + '\n', (err) => {
+      if (err)
+        console.log(err);
+    })
+  }
   catch (err) {
     console.log(err);
   }

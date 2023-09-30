@@ -1892,9 +1892,22 @@ const getSensorLatest = async function (req, res) {
         returnError("No data found for sensorType",urlQuery.sensorType);
         return    
       }
+
+      let tmp1 = data.split('\n')
+      let keys = tmp1[0],split(',')
+      let values = tmp1[1],split(',')
+      let result = {}
+      for (let i = 0; i < keys.length; i++) {
+        let key = keys[i].replace(/^"(.*)"$/, '')  // remove quotes at start and end
+        let value = values[i].replace(/^"(.*)"$/, '')  // remove quotes at start and end
+        if (i>2) {
+          value=Number.isNaN(value)?value:Number(value)
+        }
+        result[key] = values[i]
+      }
         
       res.writeHead(200);
-      res.write(JSON.stringify(data));
+      res.write(JSON.stringify(result));
       res.end();
     
     })
@@ -1903,8 +1916,6 @@ const getSensorLatest = async function (req, res) {
     returnError("sensorType not found; read file error");
     return
   }
-
-
 
 }
 

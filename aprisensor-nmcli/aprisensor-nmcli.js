@@ -20,24 +20,15 @@ const execPromise = util.promisify(require('child_process').exec);
 //const execSync			= require('child_process').execSync;
 //const execFile			= require('child_process').execFile;
 
+/*
 var redis = require("redis");
 const redisClient = redis.createClient();
 
 redisClient.on("error", function (err) {
   console.log("Redis client Error " + err);
 });
-
-/*
-var redis = require("redis");
-var redisClient = redis.createClient();
-//const redisHmsetAsync = util.promisify(redisClient.hmset).bind(redisClient);
-//const redisSaddAsync = util.promisify(redisClient.sadd).bind(redisClient);
-const redisSortAsync = util.promisify(redisClient.sort).bind(redisClient);
-//const redisDelAsync = util.promisify(redisClient.del).bind(redisClient);
-//const redisSmoveAsync = util.promisify(redisClient.smove).bind(redisClient);
-const redisHgetallAsync = util.promisify(redisClient.hgetall).bind(redisClient);
-
 */
+
 
 
 const crypto = require('crypto');

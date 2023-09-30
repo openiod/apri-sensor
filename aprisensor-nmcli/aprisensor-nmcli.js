@@ -1905,7 +1905,7 @@ const getSensorLatest = async function (req, res) {
         if (i>2) {
           value=Number.isNaN(value)?value:Number(value)
         }
-        result[key] = values
+        result[key] = value
       }
         
       res.writeHead(200);

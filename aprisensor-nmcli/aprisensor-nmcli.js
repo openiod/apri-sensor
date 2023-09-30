@@ -1894,8 +1894,8 @@ const getSensorLatest = async function (req, res) {
       }
 
       let tmp1 = data.split('\n')
-      let keys = tmp1[0],split(',')
-      let values = tmp1[1],split(',')
+      let keys = tmp1[0].split(',')
+      let values = tmp1[1].split(',')
       let result = {}
       for (let i = 0; i < keys.length; i++) {
         let key = keys[i].replace(/^"(.*)"$/, '')  // remove quotes at start and end

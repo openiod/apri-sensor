@@ -1882,10 +1882,15 @@ const getSensorLatest = async function (req, res) {
   let fileData
   try {
     let latestResultFilePath = localLatestResultFolder + '/' + urlQuery.sensorType + '.csv'
+    console.log(latestResultFilePath)
     fs.readFile(latestResultFilePath, (err, data) => {
       if (err) {
         returnError("sensorType not found");
         return
+      }
+      if (!data) {
+        returnError("No data for sensorType found");
+        return    
       }
       fileData = data
     })
@@ -1894,8 +1899,6 @@ const getSensorLatest = async function (req, res) {
     returnError("sensorType not found; read file error");
     return
   }
-
-
 
 
 

@@ -1897,13 +1897,15 @@ const getSensorLatest = async function (req, res) {
       let keys = tmp1[0].split(',')
       let values = tmp1[1].split(',')
       let result = {}
+      let key
+      let value
       for (let i = 0; i < keys.length; i++) {
-        let key = keys[i].replace(/^"(.*)"$/, '')  // remove quotes at start and end
-        let value = values[i].replace(/^"(.*)"$/, '')  // remove quotes at start and end
+        key = keys[i].replace(/^"(.*)"$/, '$1')  // remove quotes at start and end
+        value = values[i].replace(/^"(.*)"$/, '$1')  // remove quotes at start and end
         if (i>2) {
           value=Number.isNaN(value)?value:Number(value)
         }
-        result[key] = values[i]
+        result[key] = values
       }
         
       res.writeHead(200);

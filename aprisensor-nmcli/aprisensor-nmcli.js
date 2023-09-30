@@ -1897,7 +1897,6 @@ const getSensorLatest = async function (req, res) {
       res.write(JSON.stringify(data));
       res.end();
     
-      fileData = data
     })
   }
   catch (err) {

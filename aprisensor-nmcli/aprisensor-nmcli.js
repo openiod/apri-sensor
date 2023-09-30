@@ -191,10 +191,10 @@ const requestListener = function (req, res) {
     const methodType = req.method.toUpperCase();
     let url = req.url;
     req.urlPath = req.url.split('?')[0]
-    if (req.url.split('?').length>0) {
+    if (req.url.split('?').length > 0) {
       req.urlQuery = req.url.split('?')[1]
     }
-    
+
     switch (methodType) {
       case 'OPTIONS':
         res.end();
@@ -1854,8 +1854,62 @@ const decrypt = function (data) {
 }
 
 let latestSensorData = []
+let localLatestResultFolder = '/var/log/aprisensor/latest-results'
 
 const getSensorLatest = async function (req, res) {
+
+  let urlQuery = {}
+  let urlQueryTmp = req.urlQuery.split('&')
+  //console.log(urlQueryTmp)
+  for (let i = 0; i < urlQueryTmp.length; i++) {
+    let qry = urlQueryTmp[i].split('=')
+    let key = qry[0]
+    let val = qry[1]
+    urlQuery[key] = val
+  }
+
+  const returnError = function (message) {
+    res.writeHead(400);
+    res.write(JSON.stringify({ "error": message }));
+    res.end();
+  }
+
+  if (!urlQuery.sensorType) {
+    returnError("parameter sensorType missing");
+    return
+  }
+
+  let fileData
+  let latestResultFilePath = localLatestResultFolder + '/' + sensorType + '.csv'
+  try {
+    fs.readFile(latestResultFilePath, (err, data) => {
+      if (err) {
+        returnError("sensorType not found");
+        return
+      }
+      fileData = data
+    })
+  }
+  catch (err) {
+    returnError("sensorType not found; read file error");
+    return
+  }
+
+
+
+
+
+  let endResult = fileData
+
+  res.writeHead(200);
+  res.write(JSON.stringify(endResult));
+  res.end();
+
+}
+
+
+/*
+const getSensorLatestOld = async function (req, res) {
 
   latestSensorData = []
 
@@ -2023,3 +2077,5 @@ var getRedisData = async function (redisKey) {
 
   return rec
 }
+*/
+

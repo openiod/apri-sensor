@@ -848,6 +848,9 @@ var initBme680 = function () {
             }
         */
       })
+      .catch((err) => {
+        console.error(`BME680 initialization failed: ${err} `)
+      })
   }
   else {
     indBme280 = false

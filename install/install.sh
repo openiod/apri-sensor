@@ -1,9 +1,17 @@
 # 2.5.0 
 # redis indexing nog niet in gebruik maar als voorbereiding op.
-sudo apt update
-sudo apt -y install redis-redisearch
+# nog niet nodig !!
+#sudo apt update
+#sudo apt -y install redis-redisearch
 
-# Home Assistant api http://192.168.178.76:4000/nmcli/api/v1/sensor/latest?sensorType=pmsa003
+# 2.4.2 
+# journal folder perists (will recreate after delete)
+sudo sed -i 's/^#Storage=auto/Storage=persistent/g' /etc/systemd/journald.conf ;
+sudo sed -i 's/^SystemMaxUse=20M/SystemMaxUse=10M/g' /etc/systemd/journald.conf ;
+
+# 2.4.1
+# Home Assistant api http://<ID>.local:4000/nmcli/api/v1/sensor/latest?sensorType=pmsa003
+# zonder redis archive ; met HA service ; met locale backup /opt/aprisensor_backup/
 
 # 2.4.0
 # nieuwe apri-agent (zonder http & minder logging ; diverse aanpassingen)
@@ -40,6 +48,11 @@ sudo sed -i 's/^# syslog-enabled no/syslog-enabled yes/g' /etc/redis/redis.conf 
 sudo sed -i 's/^# syslog-ident redis/syslog-ident redis/g' /etc/redis/redis.conf ;
 sudo sed -i 's/weekly/daily/g' /etc/logrotate.d/redis-server ;
 sudo sed -i 's/rotate 12/rotate 0/g' /etc/logrotate.d/redis-server ;
+
+# als redis logfolder per ongeluk verwijderd is:
+sudo mkdir /var/log/redis
+sudo chmod u+rwx,g+rs-w,o-rwsx /var/log/redis
+sudo chown redis:adm /var/log/redis
 
 # systemctl restart redis
 sudo systemctl restart redis
@@ -95,6 +108,8 @@ sudo systemctl stop SCAPE604-aprisensor-nmcli
 redis-cli flushdb
 sudo rm /opt/SCAPE604/log/*
 sudo rm /var/log/aprisensor/*
+sudo rm /var/log/aprisensor/latest-results/*
+sudo rm -r /opt/aprisensor_backup/*
 sudo rm /var/log/*
 sudo rm /var/hdd.log/*
 sudo rm /var/hdd.log/aprisensor/*
@@ -110,21 +125,24 @@ sudo shutdown -h now
 # assuming: latest software installed and package.json in place
 # start met sd-kaart op pi zero met directe aansluiting (keyboard/monitor)
  
-sudo systemctl stop SCAPE604-apri-sensor-raspi
-sudo systemctl stop SCAPE604-apri-sensor-connector
-sudo systemctl stop SCAPE604-aprisensor-nmcli
-of
 sudo systemctl stop SCAPE604-apri-sensor-raspi-v2
 sudo systemctl stop SCAPE604-apri-sensor-connector-v2
 sudo systemctl stop SCAPE604-aprisensor-nmcli
+of
+sudo systemctl stop SCAPE604-apri-sensor-raspi
+sudo systemctl stop SCAPE604-apri-sensor-connector
+sudo systemctl stop SCAPE604-aprisensor-nmcli
+
 redis-cli flushdb
 sudo rm /var/log/aprisensor/*
+sudo rm /var/log/aprisensor/latest-results/*
+sudo rm -r /opt/aprisensor_backup/*
 sudo rm /var/log/*
 sudo rm /var/hdd.log/*
 sudo rm /var/hdd.log/aprisensor/*
 nmcli c s
 sudo nmcli c delete .. alle connections deleten, hotspot als laatste
-``````sudo nmcli c delete ap-24 ; sudo shutdown -h now``````
+sudo nmcli c delete ap-24 ; sudo shutdown -h now
 # dan sd-kaart verwijderen en kopie maken met nieuw versienummer
 
 # prepare tested sensorkit for sending to client:
@@ -138,6 +156,8 @@ sudo systemctl stop SCAPE604-apri-sensor-connector
 sudo systemctl stop SCAPE604-aprisensor-nmcli
 
 sudo rm /var/log/aprisensor/*
+sudo rm /var/log/aprisensor/latest-results/*
+sudo rm -r /opt/aprisensor_backup/*
 sudo rm /var/log/*
 sudo rm /var/hdd.log/aprisensor/*
 sudo rm  /var/hdd.log/*
@@ -290,6 +310,7 @@ apt -y install network-manager
 systemctl enable NetworkManager.service
 
 sudo vi /etc/systemd/journald.conf
+Storage=persistent
 SystemMaxUse=10M
 
 # for Raspberry Pi 3: ivm conflict network-manager en nmcli c up 'hotspot'
@@ -324,10 +345,10 @@ sudo apt install log2ram
 sudo apt -y install avahi-utils
 #see install/avahi/avahi-deamon.conf
 sudo apt -y install redis-server
-sudo apt -y install redis-redisearch
-sudo vi /etc/redis/redis.conf
---> loadmodule /usr/lib/redis/modules/redisearch.so
-Controleer in redsi-cli: module list  (of server log)
+##sudo apt -y install redis-redisearch
+##sudo vi /etc/redis/redis.conf
+##--> loadmodule /usr/lib/redis/modules/redisearch.so
+##Controleer in redis-cli: module list  (of server log)
 
 #todo
 ## Edit the Redis configuration file to setup caching.
@@ -443,7 +464,7 @@ sudo crontab -e
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # cleanup redis archive
-*/15 * * * * /opt/SCAPE604/apri-sensor/apri-sensor-redis/apri-sensor-redis.sh
+*/15 * * * * /opt/SCAPE604/apri-sensor/apri-sensor-redis/apri-sensor-redis.sh > /dev/null 2>&1
 <--
 
 sudo cp /opt/SCAPE604/git/apri-sensor/apri-config/SCAPE604-apri-agent.service.org /etc/systemd/system/SCAPE604-apri-agent.service

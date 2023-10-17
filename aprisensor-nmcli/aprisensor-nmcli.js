@@ -20,6 +20,8 @@ const execPromise = util.promisify(require('child_process').exec);
 //const execSync			= require('child_process').execSync;
 //const execFile			= require('child_process').execFile;
 
+let wifiActive = true
+
 /*
 var redis = require("redis");
 const redisClient = redis.createClient();
@@ -1189,6 +1191,7 @@ actions.push(function () {
     if (error) {
       console.error(`exec error: ${error}`);
       unit.ifname = 'wlan0'
+      wifiActive = false  // no wifi device found
     } else {
       unit.ifname = stdout.substr(0, stdout.length - 1)
     }
@@ -1359,8 +1362,10 @@ actions.push(async function () {
 })
 
 actions.push(async function () {
-  statusCheck()
-  setInterval(statusCheck, 10000); //
+  if (wifiActive) {
+    statusCheck()
+    setInterval(statusCheck, 10000);   
+  }
 
   nextAction()
 })

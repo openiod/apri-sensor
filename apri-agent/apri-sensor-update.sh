@@ -29,7 +29,7 @@ echo Start of update process >> /var/log/aprisensor/apri-agent-update.log
 date >> /var/log/aprisensor/apri-agent-update.log
 
 # get software updates from github
-git pull >> /var/log/aprisensor/apri-agent-update.log 2>>/var/log/aprisensor/apri-agent-update2.log
+##git pull >> /var/log/aprisensor/apri-agent-update.log 2>>/var/log/aprisensor/apri-agent-update2.log
 
 #cd /opt/SCAPE604/log
 #mv /var/log/aprisensor/SCAPE604-apri-sensor-connector-old1.log /var/log/aprisensor/SCAPE604-apri-sensor-connector-old2.log

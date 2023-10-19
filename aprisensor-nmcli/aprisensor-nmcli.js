@@ -20,7 +20,6 @@ const execPromise = util.promisify(require('child_process').exec);
 //const execSync			= require('child_process').execSync;
 //const execFile			= require('child_process').execFile;
 
-let wifiActive = true
 
 /*
 var redis = require("redis");
@@ -94,6 +93,7 @@ var unit = {
   , connections: []
   , connectionCount: 0
   , connectionPrev: ''
+  , wifiActive : true
 }
 
 var unitCrypto = {}
@@ -341,6 +341,8 @@ const getGeneral = function (req, res, callback) {
       var resultData = resultJson[0]
       resultData.info = {}
       resultData.info.version = packageFile.version
+      resultData.wifiActive = unit.wifiActive
+
       return returnResultJson(resultData, req, res);
     })
     .catch((error) => {
@@ -1191,7 +1193,7 @@ actions.push(function () {
     if (error) {
       console.error(`exec error: ${error}`);
       unit.ifname = 'wlan0'
-      wifiActive = false  // no wifi device found
+      unit.wifiActive = false  // no wifi device found
     } else {
       unit.ifname = stdout.substr(0, stdout.length - 1)
     }
@@ -1362,7 +1364,7 @@ actions.push(async function () {
 })
 
 actions.push(async function () {
-  if (wifiActive) {
+  if (unit.wifiActive) {
     statusCheck()
     setInterval(statusCheck, 10000);   
   }

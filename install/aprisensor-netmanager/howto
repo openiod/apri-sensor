@@ -2,7 +2,7 @@
 #
 cd /home/awiel/stack/Alfresco/opt/aprisensor-netmanager
 
-# run netmanager for testing on port 5000
+# run netmanager for testing on port 5173 (depending on npm run dev)
 npm run dev
 
 # build runtime and tar
@@ -11,10 +11,10 @@ npm run dev
 
 voor v1:
 - tar cfvz aprisensor-netmanager-runtime.tar.gz ../aprisensor-netmanager/public
-- cp aprisensor-netmanager.tar.gz /home/awiel/opt/apri-sensor/.
+- cp aprisensor-netmanager.tar.gz /home/awiel/nostack/opt/apri-sensor/.
 voor v2:
 - tar cfvz aprisensor-netmanager-runtime-v2.tar.gz ../aprisensor-netmanager-v2/build
-- cp aprisensor-netmanager-runtime-v2.tar.gz /home/awiel/opt/apri-sensor/.
+- cp aprisensor-netmanager-runtime-v2.tar.gz /home/awiel/nostack/opt/apri-sensor/.
 
 #mv aprisensor-netmanager.tar.gz /home/awiel/opt/apri-sensor/.
 
@@ -45,7 +45,8 @@ moet dus service worden met nieuw portnummer
 
 # on sensorkit:
 cd /opt/SCAPE604/git/apri-sensor
-sudo /opt/SCAPE604/apri-sensor/apri-agent/apri-sensor-update.sh  (alleen git update of clone)
+##sudo /opt/SCAPE604/apri-sensor/apri-agent/apri-sensor-update.sh  (alleen git update of clone)
+sudo git pull
 sudo install/git2as.sh  
 
 # when upgrade stable version:
@@ -60,7 +61,7 @@ sudo cp /opt/SCAPE604/runtime-v2-package.json /opt/SCAPE604/aprisensor-netmanage
 - sudo vi /opt/SCAPE604/runtime-v2-package.json
 {
     "name": "apri-sensor",
-  "version": "2.3.0",
+  "version": "2.4.2",
   "description": "",
   "type": "module",
   "main": "index.js",

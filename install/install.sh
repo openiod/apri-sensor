@@ -4,6 +4,8 @@
 #sudo apt update
 #sudo apt -y install redis-redisearch
 
+# 2.4.3 Vernieuwde aprisensor-netmanager-v met actuele meetwaarden en locales en,nl,ja
+
 # 2.4.2 
 # journal folder perists (will recreate after delete)
 sudo sed -i 's/^#Storage=auto/Storage=persistent/g' /etc/systemd/journald.conf ;

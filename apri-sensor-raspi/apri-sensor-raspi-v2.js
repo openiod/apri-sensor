@@ -1382,7 +1382,7 @@ var sendData = async function () {
           .then(function (res2) {
             var _res2 = res2;
             //	redisSaddAsync('tgs5042', timeStamp.toISOString()+':tgs5042')
-           // logger.info('tgs5042 ', timeStamp.toISOString() + ':' + sensorType + _res2);
+            // logger.info('tgs5042 ', timeStamp.toISOString() + ':' + sensorType + _res2);
           });
         //logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
       });
@@ -1451,7 +1451,7 @@ var sendData = async function () {
                 //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
                 //logger.info('sps30 ', timeStamp.toISOString() + ':' + sensorType + _res2);
               });
-           // logger.info(timeStamp.toString() + ':' + sensorType + _res);
+            // logger.info(timeStamp.toString() + ':' + sensorType + _res);
           })
           .catch(function (err) {
             logger.info('catch mode 2, Redis write')
@@ -1531,7 +1531,7 @@ var sendData = async function () {
               .then(function (res2) {
                 var _res2 = res2;
                 //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
-               // logger.info('sps30 ', timeStamp.toISOString() + ':' + sensorType + _res2);
+                // logger.info('sps30 ', timeStamp.toISOString() + ':' + sensorType + _res2);
               });
             //logger.info(timeStamp.toString() + ':sps30' + _res);
           })
@@ -1584,7 +1584,7 @@ var sendData = async function () {
             .then(function (res2) {
               var _res2 = res2;
               //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
-             // logger.info('sps30 ', timeStamp.toISOString() + ':' + sensorType + _res2);
+              // logger.info('sps30 ', timeStamp.toISOString() + ':' + sensorType + _res2);
             });
           //logger.info(timeStamp.toString() + ':' + sensorType + _res);
         })
@@ -1657,9 +1657,9 @@ var sendData = async function () {
           .then(function (res2) {
             var _res2 = res2;
             //	redisSaddAsync('ips7100', timeStamp.toISOString()+':ips7100')
-           // logger.info('ips7100 ', timeStamp.toISOString() + ':' + sensorType + _res2);
+            // logger.info('ips7100 ', timeStamp.toISOString() + ':' + sensorType + _res2);
           });
-       // logger.info(timeStamp.toString() + ':' + sensorType + _res);
+        // logger.info(timeStamp.toString() + ':' + sensorType + _res);
       });
   }
 
@@ -1694,7 +1694,7 @@ var sendData = async function () {
         .then(function (res2) {
           var _res2 = res2;
           //	redisSaddAsync('scd30', timeStamp.toISOString()+':scd30')
-         // logger.info('scd30 ', timeStamp.toISOString() + ':' + sensorType + _res2);
+          // logger.info('scd30 ', timeStamp.toISOString() + ':' + sensorType + _res2);
         });
       //logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
     });
@@ -1738,7 +1738,7 @@ var sendData = async function () {
         .then(function (res2) {
           var _res2 = res2;
           //	redisSaddAsync('nextpm', timeStamp.toISOString()+':nextpm')
-         // logger.info('nextpm ', timeStamp.toISOString() + ':' + sensorType + _res2);
+          // logger.info('nextpm ', timeStamp.toISOString() + ':' + sensorType + _res2);
         });
       //logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
     });
@@ -2806,66 +2806,73 @@ var initSerial = function (serialDeviceIndex) {
       return
     }
     serialDevices[serialDeviceIndex].serial.serialDeviceIndex = serialDeviceIndex
-    serialDevices[serialDeviceIndex].serial.open(() => {
-      //logger.info('serial open')
-      if (serialDevices[serialDeviceIndex].deviceType == 'pmsa003') {
-        logger.info('serial device for pmsa003 opened')
-        serialDevices[serialDeviceIndex].serial.on('data', (data) => {
-          //logger.info('serial on data')
-          //logger.info(data)
-          //printHex(data,'T');
-          for (var i = 0; i < data.length; i++) {
-            processRaspiSerialData(data[i]);
-          }
-        });
-      }
-      if (serialDevices[serialDeviceIndex].deviceType == 'ips7100') {
-        logger.info('serial device for ips7100 opened')
-        console.dir(options)
-        serialDevices[serialDeviceIndex].serial.on('data', (data) => {
-          //logger.info('serial on data')
-          //printHex(data,'T');
-          //process.stdout.write(data);
-          for (var i = 0; i < data.length; i++) {
-            processRaspiSerialData7100(data[i]);
-          }
-        });
-        var command = '$Won=200\r\n'
-        logger.info('write start measurement ips7100: ' + command)
+    try {
+      serialDevices[serialDeviceIndex].serial.open(() => {
+        //logger.info('serial open')
+        if (serialDevices[serialDeviceIndex].deviceType == 'pmsa003') {
+          logger.info('serial device for pmsa003 opened')
+          serialDevices[serialDeviceIndex].serial.on('data', (data) => {
+            //logger.info('serial on data')
+            //logger.info(data)
+            //printHex(data,'T');
+            for (var i = 0; i < data.length; i++) {
+              processRaspiSerialData(data[i]);
+            }
+          });
+        }
+        if (serialDevices[serialDeviceIndex].deviceType == 'ips7100') {
+          logger.info('serial device for ips7100 opened')
+          console.dir(options)
+          serialDevices[serialDeviceIndex].serial.on('data', (data) => {
+            //logger.info('serial on data')
+            //printHex(data,'T');
+            //process.stdout.write(data);
+            for (var i = 0; i < data.length; i++) {
+              processRaspiSerialData7100(data[i]);
+            }
+          });
+          var command = '$Won=200\r\n'
+          logger.info('write start measurement ips7100: ' + command)
 
-        serialDevices[serialDeviceIndex].serial.write(command)
-      }
-      //serial.write('Hello from raspi-serial');
-      if (serialDevices[serialDeviceIndex].deviceType == 'gps') {
-        logger.info('serial device for gps opened')
-        console.dir(options)
-        serialDevices[serialDeviceIndex].serial.on('data', (data) => {
-          logger.info('serial on gps data')
-          //printHex(data,'T');
-          //process.stdout.write(data);
-          //processRaspiSerialData7100(data[i]);
-        });
-      }
-      if (serialDevices[serialDeviceIndex].deviceType == 'atmega') {
-        logger.info('serial device for atmega opened')
-        console.dir(options)
-        serialDevices[serialDeviceIndex].serial.on('data', (data) => {
-          if (counters.pms.nrOfMeasTotal == 0) counters.pms.nrOfMeasTotal = 1 // assuming ok
-          //logger.info('serial on atmega data')
-          //printHex(data,'T');
-          //process.stdout.write(data);
-          atmegaRecordIn = atmegaRecordIn + data.toString()
-          var recordArray = atmegaRecordIn.split("\r");
-          if (recordArray.length > 1) {
-            var record = recordArray[0].substring(1)
-            atmegaRecordIn = atmegaRecordIn.substring(record.length + 2)
-            processRaspiSerialDataAtmega(record);
-          }
+          serialDevices[serialDeviceIndex].serial.write(command)
+        }
+        //serial.write('Hello from raspi-serial');
+        if (serialDevices[serialDeviceIndex].deviceType == 'gps') {
+          logger.info('serial device for gps opened')
+          console.dir(options)
+          serialDevices[serialDeviceIndex].serial.on('data', (data) => {
+            logger.info('serial on gps data')
+            //printHex(data,'T');
+            //process.stdout.write(data);
+            //processRaspiSerialData7100(data[i]);
+          });
+        }
+        if (serialDevices[serialDeviceIndex].deviceType == 'atmega') {
+          logger.info('serial device for atmega opened')
+          console.dir(options)
+          serialDevices[serialDeviceIndex].serial.on('data', (data) => {
+            if (counters.pms.nrOfMeasTotal == 0) counters.pms.nrOfMeasTotal = 1 // assuming ok
+            //logger.info('serial on atmega data')
+            //printHex(data,'T');
+            //process.stdout.write(data);
+            atmegaRecordIn = atmegaRecordIn + data.toString()
+            var recordArray = atmegaRecordIn.split("\r");
+            if (recordArray.length > 1) {
+              var record = recordArray[0].substring(1)
+              atmegaRecordIn = atmegaRecordIn.substring(record.length + 2)
+              processRaspiSerialDataAtmega(record);
+            }
 
-        });
-      }
-    });
-  });
+          });
+        }
+      }); // end of serial open
+    } catch (error) {
+      console.log('Error: create new Serial for:')
+      console.log(options);
+      return
+    }
+
+  });  // end of raspi init
 }
 
 const startScd30 = async function () {

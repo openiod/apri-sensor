@@ -61,7 +61,7 @@ sudo cp /opt/SCAPE604/runtime-v2-package.json /opt/SCAPE604/aprisensor-netmanage
 - sudo vi /opt/SCAPE604/runtime-v2-package.json
 {
     "name": "apri-sensor",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "description": "",
   "type": "module",
   "main": "index.js",

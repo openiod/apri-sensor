@@ -3,6 +3,14 @@
 # nog niet nodig !!
 #sudo apt update
 #sudo apt -y install redis-redisearch
+# raspi-config 1wire uitzetten als ds18b20 niet wordt gebruikt!
+
+# pijuice
+# sudo apt-get install pijuice-base
+# pijuice_cli  (niet sudo !)
+# update firmare via pijuice_cli (laatste 1.6)
+# batery profile pjlipo_12000 (voor 12000mah)
+# apply settings
 
 # 2.4.3 Vernieuwde aprisensor-netmanager-v met actuele meetwaarden en locales en,nl,ja
 

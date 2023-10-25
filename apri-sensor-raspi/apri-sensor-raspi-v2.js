@@ -1804,7 +1804,7 @@ var sendData = async function () {
   if (isEmpty(aprisensorDevices) || aprisensorDevices.pmsa003 || aprisensorDevices.pms7003) {
     if (results.pms.nrOfMeas == 0 && results.pms.nrOfMeasTotal > 0) {
       if (pmsInitCounter < 1) {
-        logger.info('pmsa003 counters zero, looks like error, next time try active mode ')
+        logger.info('pmsa003/pms7003 counters zero, looks like error, next time try active mode ')
         pmsInitCounter++
       } else {
         pmsInitCounter = 0
@@ -1825,7 +1825,7 @@ var sendData = async function () {
         //        } else {
         cmdView8[4] = 0x01 // set to wakeup
         ////          logger.info('set pmsa003 to wakeup')
-        logger.info('set pmsa003 to active')
+        logger.info('set pmsa003/pms7003 to active')
         //          sleepMode=1
         //        }
         cmdCheckSum = cmdView8[0] + cmdView8[1] + cmdView8[2] + cmdView8[3] + cmdView8[4]
@@ -1833,7 +1833,7 @@ var sendData = async function () {
         cmdView8[6] = cmdCheckSum - (cmdView8[5] << 8)
 
         for (var i = 0; i < serialDevices.length; i++) {
-          if (serialDevices[i].deviceType == 'pmsa003') {
+          if (serialDevices[i].deviceType == 'pmsa003' || serialDevices[i].deviceType == 'pms7003') {
             if (serialDevices[i].serial != undefined) {
               serialDevices[i].serial.write(cmdView8);
             }
@@ -2711,7 +2711,7 @@ var processRaspiSerialDataAtmega = function (data) {
 
   if (recSrt[2] == '82') {
     if (items.length != 14) {
-      logger.info('pmsa003 in-recourd not ok, ignored *******************************');
+      logger.info('pmsa003/pms7003 in-recourd not ok, ignored *******************************');
       return;
     }
     //console.log('ATMega PMSA003')
@@ -2772,6 +2772,9 @@ var scanSerialDevices = function () {
     if (serialDevice.deviceType == 'pmsa003' && counters.pms.nrOfMeasTotal > 0) {
       serialDevice.validData = true
     }
+    if (serialDevice.deviceType == 'pms7003' && counters.pms.nrOfMeasTotal > 0) {
+      serialDevice.validData = true
+    }
     if (serialDevice.deviceType == 'gps') {	//&& counters.gps.nrOfMeasTotal>0) {
       serialDevice.validData = true
     }
@@ -2816,8 +2819,8 @@ var initSerial = function (serialDeviceIndex) {
     try {
       serialDevices[serialDeviceIndex].serial.open(() => {
         //logger.info('serial open')
-        if (serialDevices[serialDeviceIndex].deviceType == 'pmsa003') {
-          logger.info('serial device for pmsa003 opened')
+        if (serialDevices[serialDeviceIndex].deviceType == 'pmsa003' || serialDevices[serialDeviceIndex].deviceType == 'pms7003') {
+          logger.info('serial device for pmsa003/pms7003 opened')
           serialDevices[serialDeviceIndex].serial.on('data', (data) => {
             //logger.info('serial on data')
             //logger.info(data)
@@ -2967,6 +2970,18 @@ if (aprisensorDevices.pmsa003) {
     , initiated: false
     , validData: false
     , deviceType: 'pmsa003'
+  }
+  serialDevices.push(newDevice)
+  scanSerialDevices()
+  let timerSerialDevices = setInterval(scanSerialDevices, 10000)
+}
+if (aprisensorDevices.pms7003) {
+  var newDevice = {
+    device: aprisensorDevices.pms7003.device
+    , baudRate: aprisensorDevices.pms7003.baudRate
+    , initiated: false
+    , validData: false
+    , deviceType: 'pms7003'
   }
   serialDevices.push(newDevice)
   scanSerialDevices()

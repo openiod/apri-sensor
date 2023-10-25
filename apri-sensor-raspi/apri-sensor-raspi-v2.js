@@ -652,17 +652,20 @@ var processRaspiSerialRecord = function () {
   counters.pms.part2_5 += (view8[22] << 8) + view8[23];
   counters.pms.part5_0 += (view8[24] << 8) + view8[25];
   counters.pms.part10_0 += (view8[26] << 8) + view8[27];
-  /*
-    if (view8[28] == 0x80) {  //128=PMS7003
+
+  if (view8[28] == 0x80) {  //128=PMS7003
+    counters.pms.sensorType = 'pms7003'
     //  process.stdout.write('einde datarecord PMS7003-128\n');
-    }
-    if (view8[28] == 0x91) {  //145=PMSA003
+  }
+  if (view8[28] == 0x91) {  //145=PMSA003
+    counters.pms.sensorType = 'pmsa003'
     //  process.stdout.write('einde datarecord PMSA003-145\n');
-    }
-    if (view8[28] == 0x97) {  //151=PMSA003
+  }
+  if (view8[28] == 0x97) {  //151=PMSA003
+    counters.pms.sensorType = 'pmsa003'
     //  process.stdout.write('einde datarecord PMSA003-151\n');
-    }
-  */
+  }
+
 }
 
 var resetRaspiSerialArray = function () {
@@ -932,6 +935,7 @@ var processDataCycle = function () {
   results.pms.part5_0 = Math.round((counters.pms.part5_0 / counters.pms.nrOfMeas) * 100) / 100;
   results.pms.part10_0 = Math.round((counters.pms.part10_0 / counters.pms.nrOfMeas) * 100) / 100;
   results.pms.nrOfMeas = counters.pms.nrOfMeas;
+  results.pms.sensorType = counters.pms.sensorType;
 
   results.bme280.temperature = Math.round((counters.bme280.temperature / counters.bme280.nrOfMeas) * 100) / 100;
   results.bme280.pressure = Math.round((counters.bme280.pressure / counters.bme280.nrOfMeas) * 100) / 100;
@@ -1185,8 +1189,11 @@ var sendData = async function () {
       });
     }
 */
-    sensorType = 'pmsa003'
-
+    if (results.pms.sensorType) {
+      sensorType = results.pms.sensorType
+    } else {
+      sensorType = 'pmsa003'
+    }
     csvRec = '"SCRP' + unit.id +
       '","' + timeStamp.toISOString() +
       '","' + sensorType + '"' +

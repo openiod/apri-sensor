@@ -44,8 +44,8 @@ moet dus service worden met nieuw portnummer
 
 
 # on sensorkit:
-cd /opt/SCAPE604/git/apri-sensor
 ##sudo /opt/SCAPE604/apri-sensor/apri-agent/apri-sensor-update.sh  (alleen git update of clone)
+cd /opt/SCAPE604/git/apri-sensor
 sudo git pull
 sudo install/git2as.sh  
 

@@ -206,6 +206,9 @@ var getRedisData = function (redisArray, redisArrayIndex) {
 				case 'pmsa003':
 					url = pmsa003Attributes(res) + '&dateObserved=' + dateObserved;
 					break;
+				case 'pms7003':
+					url = pms7003Attributes(res) + '&dateObserved=' + dateObserved;
+					break;
 				case 'ds18b20':
 					url = ds18b20Attributes(res) + '&dateObserved=' + dateObserved;
 					break;
@@ -253,6 +256,13 @@ var bme680Attributes = function (res) {
 }
 var pmsa003Attributes = function (res) {
 	return openiodUrl + '/pmsa003' + '/v1/m?foi=' + res.foi + '&observation=' +
+		'pm1:' + res.pm1 + ',pm25:' + res.pm25 + ',pm10:' + res.pm10 +
+		',pm1amb:' + res.pm1amb + ',pm25amb:' + res.pm25amb + ',pm10amb:' + res.pm10amb +
+		',raw0_3:' + res.raw0_3 + ',raw0_5:' + res.raw0_5 + ',raw1_0:' + res.raw1_0 +
+		',raw2_5:' + res.raw2_5 + ',raw5_0:' + res.raw5_0 + ',raw10_0:' + res.raw10_0;
+}
+var pms7003Attributes = function (res) {
+	return openiodUrl + '/pms7003' + '/v1/m?foi=' + res.foi + '&observation=' +
 		'pm1:' + res.pm1 + ',pm25:' + res.pm25 + ',pm10:' + res.pm10 +
 		',pm1amb:' + res.pm1amb + ',pm25amb:' + res.pm25amb + ',pm10amb:' + res.pm10amb +
 		',raw0_3:' + res.raw0_3 + ',raw0_5:' + res.raw0_5 + ',raw1_0:' + res.raw1_0 +

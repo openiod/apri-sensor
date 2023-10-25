@@ -205,7 +205,7 @@ if (aprisensorDevices.tgs5042 != undefined) {
     });
   }
 }
-var pmsa003InitCounter = 0
+var pmsInitCounter = 0
 var serial
 var sleepMode = 0
 
@@ -1801,13 +1801,13 @@ var sendData = async function () {
     }
   }
 
-  if (isEmpty(aprisensorDevices) || aprisensorDevices.pmsa003) {
+  if (isEmpty(aprisensorDevices) || aprisensorDevices.pmsa003 || aprisensorDevices.pms7003) {
     if (results.pms.nrOfMeas == 0 && results.pms.nrOfMeasTotal > 0) {
-      if (pmsa003InitCounter < 1) {
+      if (pmsInitCounter < 1) {
         logger.info('pmsa003 counters zero, looks like error, next time try active mode ')
-        pmsa003InitCounter++
+        pmsInitCounter++
       } else {
-        pmsa003InitCounter = 0
+        pmsInitCounter = 0
         // switch active / passive mode
         var cmdByteArray = new ArrayBuffer(7);
         var cmdView8 = new Uint8Array(cmdByteArray);
@@ -1842,7 +1842,7 @@ var sendData = async function () {
       }
     }
   } else {
-    pmsa003InitCounter = 0
+    pmsInitCounter = 0
   }
 
   if (results.sps.nrOfMeas == 0) {

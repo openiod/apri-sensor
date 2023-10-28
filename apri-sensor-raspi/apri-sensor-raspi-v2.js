@@ -1075,7 +1075,6 @@ function writeLocalCsv(rec, folderName, fileName, h, sensorType) {
     })
   } catch (err) {
   }
-
 }
 // send data to service
 var sendData = async function () {
@@ -1467,6 +1466,10 @@ var sendData = async function () {
       }
       if (gpsTpv.mode == 3) { // mode 3
         spsProcessed = true
+
+        if (gpsTpv.time) {
+          console.log('todo set time from gps')
+        }
 
         csvRec = '"SCRP' + unit.id +
           '","' + timeStamp.toISOString() +

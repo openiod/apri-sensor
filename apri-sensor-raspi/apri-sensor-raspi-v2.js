@@ -3125,6 +3125,10 @@ const gpsStart = function () {
     console.log('de gpsd deamon is gestorven')
     gpsStart()
   })
+
+  var monthShortNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
   gpsDaemon.start(function () {
     console.log('Started');
     var listener = new gpsd.Listener({
@@ -3146,6 +3150,20 @@ const gpsStart = function () {
         var diff = _gpsTime - new Date().getTime()
         if (diff > 0) {
           console.log(_gpsTimeIso + ' diff:' + diff)
+
+          // exec
+          // 
+          let tmpDate = "" + _gpsTime.getDate() + " " + monthShortNames[_gpsTime.getMonth()] + " " + _gpsTime.getFullYear() + " " +
+             _gpsTime.getHours() + ":" + _gpsTime.getMinutes() + ":" + _gpsTime.getSeconds()
+//             exec("timedatectl set-ntp off ; date -s '10 JAN 2021 12:00:00' ; timedatectl set-ntp on ;", (error, stdout, stderr) => {
+              exec("timedatectl set-ntp off ; date -s " + tmpDate + " ; timedatectl set-ntp on ;", (error, stdout, stderr) => {
+              if (error) {
+                console.error(`exec error: ${error}`);
+                return;
+              }
+              unit.hardware = stdout.substr(0, stdout.length - 1);
+            });
+
         }
       }
       if (tpv.mode < 2) {

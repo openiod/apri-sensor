@@ -3127,7 +3127,7 @@ const gpsStart = function () {
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   ];
   gpsDaemon.start(function () {
-    console.log('Started');
+    console.log('Start gps');
     var listener = new gpsd.Listener({
       port: 2947,
       hostname: 'localhost',
@@ -3149,7 +3149,7 @@ const gpsStart = function () {
           console.log(_gpsTimeIso + ' diff:' + diff)
 
           // parse gps time
-          let tmpDateGps = new Date(_gpsTime)
+          let tmpDateGps = new Date(_gpsTime+300) // + lag time processing time sync
           let tmpDate = "" + tmpDateGps.getDate() + " " + monthShortNames[tmpDateGps.getMonth()] + " " + tmpDateGps.getFullYear() + " " +
             tmpDateGps.getHours().toString().padStart(2, '0') + ":" + tmpDateGps.getMinutes().toString().padStart(2, '0') + ":" + tmpDateGps.getSeconds().toString().padStart(2, '0')
 
@@ -3177,7 +3177,7 @@ const gpsStart = function () {
 
     });
     listener.connect(function () {
-      console.log('Connected');
+      console.log('Gps connected');
       listener.watch();
     });
   });

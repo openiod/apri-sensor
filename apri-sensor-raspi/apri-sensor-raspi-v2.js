@@ -212,7 +212,6 @@ var sleepMode = 0
 //var ds18b20InitCounter = 0
 var ds18b20InitTime = new Date()
 var gpio
-var gpioGpsLedStatus = 'off'
 var gpioDs18b20, gpioBme, gpioGpsLed
 //, gpioBlueLed
 //, gpioFan
@@ -3018,12 +3017,12 @@ if (aprisensorDevices.atmega) {
 var setGpioGpsLedOn = function () {
   //console.log('set blue LED GPIO on')
   gpioGpsLed.writeSync(1); //set pin state to 1 (power LED on)
-  gpioGpsLedStatus = 'on'
+  aprisensorDevices.gps.ledStatus = 'on'
 }
 var setGpioGpsLedOff = function () {
   //console.log('set blue LED GPIO off')
   gpioGpsLed.writeSync(0); //set pin state to 0 (power LED off)
-  gpioGpsLedStatus = 'off'
+  aprisensorDevices.gps.ledStatus = 'off'
 }
 
 const processGps = function () {
@@ -3105,8 +3104,6 @@ const cleanupCacheGps = function () {
 }
 let timerCleanupCacheGps = setInterval(cleanupCacheGps, 10000)
 
-setGpioGpsLedOff()
-
 const gpsStart = function () {
   gpsDaemon = new gpsd.Daemon({
     program: 'gpsd',
@@ -3148,21 +3145,22 @@ const gpsStart = function () {
         _gpsTime = Date.parse(tpv.time)
         _gpsTimeIso = tpv.time
         var diff = _gpsTime - new Date().getTime()
-        if (diff > 0) {
+        if (diff > 400 || diff < -400) {
           console.log(_gpsTimeIso + ' diff:' + diff)
 
-          // exec
-          // 
-          let tmpDate = "" + _gpsTime.getDate() + " " + monthShortNames[_gpsTime.getMonth()] + " " + _gpsTime.getFullYear() + " " +
-             _gpsTime.getHours() + ":" + _gpsTime.getMinutes() + ":" + _gpsTime.getSeconds()
-//             exec("timedatectl set-ntp off ; date -s '10 JAN 2021 12:00:00' ; timedatectl set-ntp on ;", (error, stdout, stderr) => {
-              exec("timedatectl set-ntp off ; date -s " + tmpDate + " ; timedatectl set-ntp on ;", (error, stdout, stderr) => {
-              if (error) {
-                console.error(`exec error: ${error}`);
-                return;
-              }
-              unit.hardware = stdout.substr(0, stdout.length - 1);
-            });
+          // parse gps time
+          let tmpDateGps = new Date(_gpsTime)
+          let tmpDate = "" + tmpDateGps.getDate() + " " + monthShortNames[tmpDateGps.getMonth()] + " " + tmpDateGps.getFullYear() + " " +
+            tmpDateGps.getHours().toString().padStart(2, '0') + ":" + tmpDateGps.getMinutes().toString().padStart(2, '0') + ":" + tmpDateGps.getSeconds().toString().padStart(2, '0')
+
+          // time synchronisation by gps, ntp already off
+          exec("date -s '" + tmpDate + "' ;", (error, stdout, stderr) => {
+            if (error) {
+              console.error(`exec error synchronize time from gps: ${error}`);
+            } else {
+              aprisensorDevices.gps.timeSynchronized = true
+            }
+          });
 
         }
       }
@@ -3186,8 +3184,15 @@ const gpsStart = function () {
 
 }
 
+setGpioGpsLedOff()
 if (aprisensorDevices.gps) {
   gpsd = require('node-gpsd');
+  // time synchronisation through gps only
+  exec("timedatectl set-ntp off ", (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error timedatectl set-ntp off : ${error}`);
+    }
+  })
   gpsStart()
 }
 

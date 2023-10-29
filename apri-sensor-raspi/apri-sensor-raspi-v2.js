@@ -652,17 +652,20 @@ var processRaspiSerialRecord = function () {
   counters.pms.part5_0 += (view8[24] << 8) + view8[25];
   counters.pms.part10_0 += (view8[26] << 8) + view8[27];
 
-  if (view8[28] == 0x80) {  //128=PMS7003
+  if (view8[28] == 0x80) {  // 128=PMS7003
+    //console.log(view8[28],'pms7003')
     counters.pms.sensorType = 'pms7003'
     //  process.stdout.write('einde datarecord PMS7003-128\n');
   }
-  if (view8[28] == 0x91) {  //145=PMSA003
+  if (view8[28] == 0x91) {  // 145=PMSA003
+    //console.log(view8[28],'pmsa003')
     counters.pms.sensorType = 'pmsa003'
     //  process.stdout.write('einde datarecord PMSA003-145\n');
   }
-  if (view8[28] == 0x97) {  //151=PMSA003
-    counters.pms.sensorType = 'pmsa003'
-    //  process.stdout.write('einde datarecord PMSA003-151\n');
+  if (view8[28] == 0x97) {  // 151=PMS7003  ; aangepast naar pms7003 op 20231030
+    //console.log(view8[28],'pms7003')
+    counters.pms.sensorType = 'pms7003'
+    //  process.stdout.write('einde datarecord PMS7003-151\n');
   }
 
 }
@@ -2967,7 +2970,7 @@ if (aprisensorDevices.pmsa003) {
     , baudRate: aprisensorDevices.pmsa003.baudRate
     , initiated: false
     , validData: false
-    , deviceType: 'pmsa003'
+    , deviceType: aprisensorDevices.pmsa003.deviceType
   }
   serialDevices.push(newDevice)
   scanSerialDevices()
@@ -2979,7 +2982,7 @@ if (aprisensorDevices.pms7003) {
     , baudRate: aprisensorDevices.pms7003.baudRate
     , initiated: false
     , validData: false
-    , deviceType: 'pms7003'
+    , deviceType: aprisensorDevices.pms7003.deviceType
   }
   serialDevices.push(newDevice)
   scanSerialDevices()

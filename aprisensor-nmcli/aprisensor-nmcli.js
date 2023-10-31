@@ -684,7 +684,7 @@ const postDeviceConnect = (url, req, res) => {
     //if (result.key=='name') id=result.NAME
     //if (result.key=='type') id=result.TYPE
     //    exec("LC_ALL=C nmcli device wifi connect '"+id+ "' password '"+result.password+"'", (error, stdout, stderr) => {
-    execPromise("LC_ALL=C nmcli connection up '" + id + "'")
+    execPromise("LC_ALL=C nmcli -w 20 connection up '" + id + "'")
       .then((result) => {
         console.log(`postDeviceConnect then ${id} `)
         unit.connection = id
@@ -833,7 +833,7 @@ const postApConnect = async (url, req, res) => {
 
     /*
         console.log('connection up')
-        await execPromise("LC_ALL=C nmcli connection up '"+ssid+ "'")
+        await execPromise("LC_ALL=C nmcli -w 20 connection up '"+ssid+ "'")
         .then((result)=>{
           console.log('connection up then')
           console.log(result)
@@ -915,7 +915,7 @@ const tryCandidateConnection = function(index) {
   }
   if (unit.connectionStatus[tmpConnection] ==undefined) unit.connectionStatus[tmpConnection]={}
   console.log(`tryCandidateConnection ${index} ${unit.connections[index]}`)
-  execPromise("LC_ALL=C nmcli connection up '"+unit.connections[index]+"'")
+  execPromise("LC_ALL=C nmcli -w 20 connection up '"+unit.connections[index]+"'")
   .then((result)=>{
     console.log(`tryCandidateConnection then ${index} ${unit.connections[index]}`)
     if (unit.connectionStatus[tmpConnection].status!='OK') {
@@ -942,7 +942,7 @@ const tryCandidateConnection2 = function (conIndex) {
   // no (more) connections to try
   if (_conIndex > unit.connections.length - 1) {
     console.log('0. Activate hotspot connection')
-    execPromise("LC_ALL=C nmcli connection up '" + unit.ssid + "'")
+    execPromise("LC_ALL=C nmcli -w 20 connection up '" + unit.ssid + "'")
       .then((result) => {
         setHotspotStatus('OK', 200)
         unit.connection = unit.ssid
@@ -1026,7 +1026,7 @@ const tryCandidateConnection2 = function (conIndex) {
 
   console.log(`tryCandidateConnection2 ${_conIndex} ${unit.connections[_conIndex]}`)
   console.log(unit.connectionStatus[tmpConnection])
-  execPromise("LC_ALL=C nmcli connection up '" + unit.connections[_conIndex] + "'")
+  execPromise("LC_ALL=C nmcli -w 20 connection up '" + unit.connections[_conIndex] + "'")
     .then((result) => {
       unit.connection = unit.connections[_conIndex]
       if (unit.connectionStatus[tmpConnection].status != 'OK') {
@@ -1100,7 +1100,7 @@ const createHotspot = function () {
 
   // done: connection up instead of delete?
   // done:  resolve then: do nothing?
-  execPromise("LC_ALL=C nmcli connection up '" + unit.ssid + "'")
+  execPromise("LC_ALL=C nmcli -w 20 connection up '" + unit.ssid + "'")
     .then((result) => {
       setHotspotStatus('OK', 200)
       unit.connection = unit.ssid
@@ -1145,7 +1145,7 @@ const createHotspotConnection = function () {
 
 const setHotspotUp = function () {
   console.log('3. Activate hotspot connection')
-  execPromise("LC_ALL=C nmcli connection up '" + unit.ssid + "'")
+  execPromise("LC_ALL=C nmcli -w 20 connection up '" + unit.ssid + "'")
     .then((result) => {
       setHotspotStatus('OK', 200)
       unit.connection = unit.ssid

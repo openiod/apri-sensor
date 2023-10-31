@@ -93,7 +93,7 @@ var unit = {
   , connections: []
   , connectionCount: 0
   , connectionPrev: ''
-  , wifiActive : true
+  , wifiActive: true
 }
 
 var unitCrypto = {}
@@ -964,6 +964,26 @@ const tryCandidateConnection2 = function (conIndex) {
     return
   }
 
+  // If connection mode is ap, remove the connection
+  execPromise("LC_ALL=C nmcli --fields 802-11-wireless.mode connection show '" + unit.connections[_conIndex] + "'")
+    .then((result) => {
+      let tmp = result.stdout.split('\n')[0]
+      // console.log('overcomplete accesspoint (mode = ap) delete check',unit.connections[_conIndex],tmp )
+      if (tmp.split(':')[1].trim() == 'ap') {
+        // delete overcomplete hotspot
+        console.log("LC_ALL=C nmcli connection delete '" + unit.connections[_conIndex] + "'")
+        execPromise("LC_ALL=C nmcli connection delete '" + unit.connections[_conIndex] + "'")
+        .then((result) => {
+          console.log('overcomplete accesspoint (mode = ap) deleted',unit.connections[_conIndex] )
+        })
+        .catch((error) => {
+          console.log('overcomplete accesspoint (mode = ap) delete error',unit.connections[_conIndex], error )
+        })
+      }
+    })
+    .catch((error) => {
+    })
+
   var tmpConnection = unit.connections[_conIndex]
   if (unit.connectionStatus[tmpConnection] == undefined) {
     unit.connectionStatus[tmpConnection] = { status: null }
@@ -1045,7 +1065,15 @@ const tryCandidateConnection2 = function (conIndex) {
         var msg = 'Wachtwoord niet juist, connectie opnieuw aanmaken a.u.b.'
         unit.connectionStatus[tmpConnection].message.push(msg)
         unit.connectionStatus[tmpConnection].passwordError = true
-        // todo: delete connection ???
+        // delete connection with password error
+        // console.log("LC_ALL=C nmcli connection delete '" + unit.connections[_conIndex] + "'")
+        execPromise("LC_ALL=C nmcli connection delete '" + unit.connections[_conIndex] + "'")
+        .then((result) => {
+          console.log('password error, connection deleted',unit.connections[_conIndex] )
+        })
+        .catch((error) => {
+          console.log('password error, connection deleted error',unit.connections[_conIndex], error )
+        })
       }
 
       tryCandidateConnection2(_conIndex + 1)
@@ -1366,7 +1394,7 @@ actions.push(async function () {
 actions.push(async function () {
   if (unit.wifiActive) {
     statusCheck()
-    setInterval(statusCheck, 10000);   
+    setInterval(statusCheck, 10000);
   }
 
   nextAction()
@@ -1887,8 +1915,8 @@ const getSensorLatest = async function (req, res) {
       }
 
       if (!data) {
-        returnError("No data found for sensorType",urlQuery.sensorType);
-        return    
+        returnError("No data found for sensorType", urlQuery.sensorType);
+        return
       }
 
       let tmp1 = data.split('\n')
@@ -1900,16 +1928,16 @@ const getSensorLatest = async function (req, res) {
       for (let i = 0; i < keys.length; i++) {
         key = keys[i].replace(/^"(.*)"$/, '$1')  // remove quotes at start and end
         value = values[i].replace(/^"(.*)"$/, '$1')  // remove quotes at start and end
-        if (i>2) {
-          value=Number.isNaN(value)?value:Number(value)
+        if (i > 2) {
+          value = Number.isNaN(value) ? value : Number(value)
         }
         result[key] = value
       }
-        
+
       res.writeHead(200);
       res.write(JSON.stringify(result));
       res.end();
-    
+
     })
   }
   catch (err) {

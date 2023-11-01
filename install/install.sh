@@ -104,7 +104,7 @@ sudo systemctl restart redis
 # 2.1.7 - introduced winston as log manager (not all processes)
 #         depends on available package (not for older images)
 
-# prepare sd-card as replacement SD-card
+################## prepare sd-card as replacement SD-card
 Balena Etcher img-> sdcard
 start Pi zero with sd-card
 ssh pi@<id>.local
@@ -131,7 +131,7 @@ sudo shutdown -h now
 
 # start script onder sudo su -
 
-# preparations for building new image
+################## preparations for building new image
 # assuming: latest software installed and package.json in place
 # start met sd-kaart op pi zero met directe aansluiting (keyboard/monitor)
  
@@ -155,7 +155,7 @@ sudo nmcli c delete .. alle connections deleten, hotspot als laatste
 sudo nmcli c delete ap-24 ; sudo shutdown -h now
 # dan sd-kaart verwijderen en kopie maken met nieuw versienummer
 
-# prepare tested sensorkit for sending to client:
+################## prepare tested sensorkit for sending to client:
 # ssh pi <id>.local
 sudo systemctl stop SCAPE604-apri-sensor-raspi-v2
 sudo systemctl stop SCAPE604-apri-sensor-connector-v2

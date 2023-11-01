@@ -664,7 +664,11 @@ var processRaspiSerialRecord = function () {
   }
   if (view8[28] == 0x97) {  // 151=PMS7003  ; aangepast naar pms7003 op 20231030
     //console.log(view8[28],'pms7003')
-    counters.pms.sensorType = 'pms7003'
+    if (aprisensorDevices.pms7003) {
+      counters.pms.sensorType = 'pms7003'
+    } else {
+      counters.pms.sensorType = 'pmsa003'
+    }
     //  process.stdout.write('einde datarecord PMS7003-151\n');
   }
 

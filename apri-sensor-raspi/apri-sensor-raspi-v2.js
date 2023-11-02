@@ -801,8 +801,8 @@ const readSensorDataBme680 = async function () {
   }
   var data = bme680Data.data;
   if (counters.busy == false) {
-    if (data.pressure < 900) {
-      logger.info('BME680 pressure below 900. Less than 3.3V power? Measure skipped');
+    if (data.pressure < 500) {
+      logger.info('BME680 pressure below 500. Less than 3.3V power? Measure skipped');
     } else {
       counters.bme680.nrOfMeas++;
       counters.bme680.nrOfMeasTotal++;
@@ -840,8 +840,8 @@ var initBme680 = function () {
                   var data = bme680Data.data;
                   //console.dir(data)
                   if (counters.busy == false) {
-                    if (data.pressure<900) {
-                      logger.info('BME680 pressure below 900. Less than 3.3V power? Measure skipped');
+                    if (data.pressure<500) {
+                      logger.info('BME680 pressure below 500. Less than 3.3V power? Measure skipped');
                     } else {
                       counters.bme680.nrOfMeas++;
                       counters.bme680.nrOfMeasTotal++;

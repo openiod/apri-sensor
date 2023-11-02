@@ -233,6 +233,9 @@ var indBme280 = false
 var indBme680 = false
 var bme280SeaLevelPressure = 1013.25; // default
 var bme680SeaLevelPressure = 1013.25; // default
+var bme280AltitudeCorrection = -359.4
+var bme680AltitudeCorrection = -359.4
+ 
 
 var Bme680
 var bme680
@@ -1256,7 +1259,7 @@ var sendData = async function () {
   if (results.bme280.nrOfMeas > 0) {
     sensorType = 'bme280'
 
-    let altitude = 44330 * (1.0 - Math.pow(results.bme280.pressure / bme280SeaLevelPressure, 0.1903))
+    let altitude = 44330 * (1.0 - Math.pow(results.bme280.pressure / bme280SeaLevelPressure, 0.1903)) + bme280AltitudeCorrection
     csvRec = '"SCRP' + unit.id +
       '","' + timeStamp.toISOString() +
       '","' + sensorType + '"' +
@@ -1298,7 +1301,7 @@ var sendData = async function () {
   if (results.bme680.nrOfMeas > 0) {
     sensorType = 'bme680'
 
-    let altitude = 44330 * (1.0 - Math.pow(results.bme680.pressure / bme680SeaLevelPressure, 0.1903))
+    let altitude = 44330 * (1.0 - Math.pow(results.bme680.pressure / bme680SeaLevelPressure, 0.1903)) + bme680AltitudeCorrection
     csvRec = '"SCRP' + unit.id +
       '","' + timeStamp.toISOString() +
       '","' + sensorType + '"' +
@@ -1308,7 +1311,7 @@ var sendData = async function () {
       ',' + results.bme680.gasResistance  +
       ',' + altitude
 
-    header = '"sensorId","dateObserved","sensorType","temperature","pressure","rHum","gasResistance"'
+    header = '"sensorId","dateObserved","sensorType","temperature","pressure","rHum","gasResistance","altitude"'
 
     writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
       '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)

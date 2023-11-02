@@ -231,6 +231,8 @@ if (gpio != undefined) {
 var bmeInitCounter = 0
 var indBme280 = false
 var indBme680 = false
+var bme280SeaLevelPressure = 1013.25; // default
+var bme680SeaLevelPressure = 1013.25; // default
 
 var Bme680
 var bme680
@@ -751,8 +753,8 @@ const readSensorDataBme280 = () => {
       //data.pressure_inHg = BME280.convertHectopascalToInchesOfMercury(data.pressure_hPa);
 
       if (counters.busy == false) {
-        if (data.pressure_hPa < 900) {
-          logger.info('BME280 pressure below 900. Less than 3.3V power? Measure skipped');
+        if (data.pressure_hPa < 500) {
+          logger.info('BME280 pressure below 500. Less than 3.3V power? Measure skipped');
         } else {
           counters.bme280.nrOfMeas++;
           counters.bme280.nrOfMeasTotal++;
@@ -1254,14 +1256,16 @@ var sendData = async function () {
   if (results.bme280.nrOfMeas > 0) {
     sensorType = 'bme280'
 
+    let altitude = 44330 * (1.0 - Math.pow(results.bme280.pressure / bme280SeaLevelPressure, 0.1903))
     csvRec = '"SCRP' + unit.id +
       '","' + timeStamp.toISOString() +
       '","' + sensorType + '"' +
       ',' + results.bme280.temperature +
       ',' + results.bme280.pressure +
-      ',' + results.bme280.rHum
+      ',' + results.bme280.rHum +
+      ',' + altitude
 
-    header = '"sensorId","dateObserved","sensorType","temperature","pressure","rHum"'
+    header = '"sensorId","dateObserved","sensorType","temperature","pressure","rHum","altitude"'
 
     writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
       '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
@@ -1294,13 +1298,15 @@ var sendData = async function () {
   if (results.bme680.nrOfMeas > 0) {
     sensorType = 'bme680'
 
+    let altitude = 44330 * (1.0 - Math.pow(results.bme680.pressure / bme680SeaLevelPressure, 0.1903))
     csvRec = '"SCRP' + unit.id +
       '","' + timeStamp.toISOString() +
       '","' + sensorType + '"' +
       ',' + results.bme680.temperature +
       ',' + results.bme680.pressure +
       ',' + results.bme680.rHum +
-      ',' + results.bme680.gasResistance
+      ',' + results.bme680.gasResistance  +
+      ',' + altitude
 
     header = '"sensorId","dateObserved","sensorType","temperature","pressure","rHum","gasResistance"'
 

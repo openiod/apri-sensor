@@ -221,6 +221,7 @@ const requestListener = function (req, res) {
         //			    getDeviceWifiListCache(req,res)
         //					break
         //				}
+        console.log('invalid api call',methodType,url )
         res.writeHead(400);
         res.write(`{error:400,message: 'Invalid API-call: ${methodType} ${url}'}`);
         res.end();
@@ -250,20 +251,30 @@ const requestListener = function (req, res) {
           postUpGrade(url, req, res)
           break
         }
+        console.log('invalid api call',methodType,url )
         res.writeHead(400);
         res.write(`{error:400,message: 'Invalid API-call: ${methodType} ${url}'}`);
         res.end();
         break;
       case 'PUT':
+        console.log('invalid api call',methodType,url )
+
         res.writeHead(400);
         res.write(`{error:400,message: 'Invalid API-call: ${methodType} ${url}'}`);
         res.end();
+
+        res.writeHead(400);
+        res.write(`{error:400,message: 'Invalid API-call: ${methodType} ${url}'}`);
+        res.end();
+
         break;
       case 'DELETE':
         if (req.url == '/nmcli/api/v1/connection/delete') {
           deleteMethodHandler(url, req, res)
           break
         }
+        console.log('invalid api call',methodType,url )
+
         res.writeHead(400);
         res.write(`{error:400,message: 'Invalid API-call: ${methodType} ${url}'}`);
         res.end();

@@ -216,63 +216,64 @@ sudo nmcli c delete <connected router> ; sudo shutdown -h now
 ! en leegmaken /var/log /var/log/aprisensor 
 # plaats sd-kaart met nieuwe versie in usb-adapter
 #===== e2fsck (controle of fs ok is)
-# df -h  # show devices
-# umount /dev/sda1 /dev/sda2
-# sudo e2fsck /dev/sda2  (rootfs=clean is ok)
-# sudo e2fsck -c /dev/sda2 (duurt 15 minuten voor 32GB)
+df -h  # show devices
+umount /dev/sdb1 /dev/sdb2
+sudo e2fsck /dev/sdb2  (rootfs=clean is ok)
+sudo e2fsck -c /dev/sdb2 (duurt 2 minuten voor 32GB)
 #### ======
-# make truncated img (copy) of sdcard on Debian:
-# df -h  # (partitions: /dev/sda1 /dev/sda2 ; device /dev/sda)
-# sudo umount /dev/sda1 /dev/sda2
+#### make truncated img (copy) of sdcard on Debian:
+# df -h  # (partitions: /dev/sdb1 /dev/sdb2 ; device /dev/sdb)
+# sudo umount /dev/sdb1 /dev/sdb2
 # #eenmalig:sudo apt-get update && sudo apt-get install dcfldd
-# controleer filesystem: sudo e2fsck /dev/sda2
-# cd ~/opt/raspberrypi_image
+# controleer filesystem: sudo e2fsck /dev/sdb2
+cd ~/nostack/raspberrypi_image
 # mv apri* old-images/.
-# sudo dcfldd if=/dev/sda of=aprisensor_v2-3-x.img ; sudo sync
-# sudo sync
-# sudo chown awiel:awiel aprisensor_v2-3-x.img
+sudo dcfldd if=/dev/sdb of=aprisensor_v2-4-x.img ; sudo sync
+sudo sync
+sudo chown awiel:awiel aprisensor_v2-4-x.img
 # shrink img:
 # # eenmalig: sudo apt-get update && sudo apt-get install gparted
-# sudo fdisk -l aprisensor_v2-3-x.img
+sudo fdisk -l aprisensor_v2-4-x.img
 # startsector of partition2 = 532480
 # mount the second partition
 # #sudo losetup /dev/loop10 aprisensor_####.img -o $((<STARTSECTOR>*512))
-# sudo losetup /dev/loop10 aprisensor_v2-2-x.img -o $((532480*512))
-# sudo gparted /dev/loop10
-# # select partion en menu: Partition / Resize/Move
+sudo losetup /dev/loop16 aprisensor_v2-4-x.img -o $((532480*512))
+sudo gparted /dev/loop16
+select partion in menu: Partition / Resize/Move
 # # change New size to 3900 (minimum size + +-20MB) #of 3500 voor standaard voldoende ruimte!!
-# click 'resize'-button
-# Menu: Edit / Apply All Operations
+click 'resize'-button
+Menu: Edit / Apply All Operations
 #  Noteer the new size!
 #   see log details shrink file system / resize2fs -p 3993600K (3584000K of 3072000K of 2488320K of 3584000K)
-# close and quit gparted
+close and quit gparted
 # reset loop device to total img:
-# sudo losetup -d /dev/loop10
-# sudo losetup /dev/loop10 aprisensor_v2-3-x.img
-# sudo fdisk /dev/loop10
-# p<enter> for partion info
-# d<enter>2<enter> delete partition 2
-# create new partion 2 with partion start address
-# do not forget the '+'
+sudo losetup -d /dev/loop16
+sudo losetup /dev/loop16 aprisensor_v2-4-x.img
+sudo fdisk /dev/loop16
+p<enter> for partion info
+d<enter>2<enter> delete partition 2
+#create new partion 2 with partion start address
+#do not forget the '+'
 # ##n<enter>p<enter>2<enter>532480<enter>+2488320K<enter>
-# n<enter>p<enter>2<enter>532480<enter>+3993600K<enter>
-# remove signature? N(o)
-#? w<enter>  write partion tabel
+n<enter>p<enter>2<enter>532480<enter>+3993600K<enter>
+remove signature? N(o)
+w<enter>  write partion tabel
 # show loop device and delete it:
-# sudo fdisk -l /dev/loop10
-# sudo losetup -d /dev/loop10
+sudo fdisk -l /dev/loop16
+sudo losetup -d /dev/loop16
 # truncate file to ENDsector of 2e partition:
 # #truncate -s $(((END+1)*512)) aprisensor_v2-1-5.img
 # ###truncate -s $(((4976640+1)*512)) aprisensor_v2-1-5.img
 # ###truncate -s $(((7700479+1)*512)) aprisensor_v2-2-x.img
-# truncate -s $(((8519679+1)*512)) aprisensor_v2-3-x.img
-# mv aprisensor_v2-3-x.img aprisensor_v2-3-0.img
+truncate -s $(((8519679+1)*512)) aprisensor_v2-4-x.img
+mv aprisensor_v2-4-x.img aprisensor_v2-4-3.img
 #
 # see http://www.aoakley.com/articles/2015-10-09-resizing-sd-images.php
 #-----------------------------------------------
-# verplaats img daarna naar proxy2 (best met netwerkkabel aangesloten)
-# scp aprisensor_v2-2-x.img proxy2:.
-# op proxy2: mv ~/aprisensor_v2-2-x.img /var/www/img.aprisensor.nl/public/img
+# verplaats img daarna naar proxy (best met netwerkkabel aangesloten)
+scp aprisensor_v2-4-3.img proxy:.
+#op proxy: 
+mv ~/aprisensor_v2-4-3.img /var/www/img.aprisensor.nl/public/img
 # wordpress webpagina aanpassen voor nieuwe versie
 
 # after first boot of Raspberry Pi:

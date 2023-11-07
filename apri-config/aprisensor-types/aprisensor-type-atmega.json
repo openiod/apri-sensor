@@ -1,0 +1,13 @@
+{ 
+  "devices":
+  [
+    {"name": "ATMEGA"
+      ,"id":"atmega"
+      ,"device":"/dev/serial0"
+      ,"baudRate":9600
+      ,"installed":"N"
+      ,"protocol":"serial"
+      ,"deviceType":"atmega"
+    }
+  ]
+}

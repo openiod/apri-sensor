@@ -82,6 +82,9 @@ sudo systemctl restart redis
     vi /etc/cron.d/apri-sensor-redis
     PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     */15 * * * * root /opt/SCAPE604/apri-sensor/apri-sensor-redis/apri-sensor-redis.sh > /dev/null 2>&1
+controleer of onderstaande uitgevoerd is op de image aprisensor_v2-2-3-pi3- nog niet raspi-v2!!
+Daarna raspi-v2 (opnieuw) plaatsen ipv raspi (v1). Dit draait al op Pi3 van Richard Snoek maar blijkbaar zijn wijzigingen op nieuwe img verloren gegaan
+- de atmega werkt op /dev/ttyACM0 9600
 - Pi3 nog op oude Redis versie
 - Pi3 nog op oude socketio versie
 - Pi3 remove wpa_supplicant.conf (gedaan op 2-2-3-pi3)

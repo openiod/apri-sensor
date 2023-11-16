@@ -5,7 +5,7 @@
 ** Module: apri-sensor-raspi
 **
 ** Main system module for handling sensor measurement data for:
-**  DS18B20, PMSA003/PMS7003, BME280, BME680, TGS5042, SPS30, IPS7100, SCD30, gps, NextPM
+**  DS18B20, PMSA003/PMS7003, BME280, BME680, TGS5042, SPS30, IPS7100, SCD30, gps, NextPM, atmega
 **
 *** SCD30 only with I2C clock stretching wich is only available in software i2c on Raspberry pi
 *** in /boot/config.txt for /dev/i2c-3
@@ -222,7 +222,7 @@ catch (err) {
   logger.info('GPIO module onoff not installed');
 }
 if (gpio != undefined) {
-  gpioGpsLed = new gpio(20, 'out'); //use GPIO-19 pin .., and specify that it is output
+  gpioGpsLed = new gpio(24, 'out'); //use GPIO-19 pin .., and specify that it is output
   gpioDs18b20 = new gpio(25, 'out'); //use GPIO-25 pin 22, and specify that it is output
   //gpioFan = new gpio(26, 'out'); //use GPIO-26 pin 37, and specify that it is output
   gpioBme = new gpio(27, 'out'); //use GPIO-27 pin 13, and specify that it is output

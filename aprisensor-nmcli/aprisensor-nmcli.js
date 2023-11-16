@@ -61,31 +61,78 @@ var skipStatusCheck = false
 let key
 const algoritm = "AES-GCM"
 
-var gpio
-var gpioBlueLed
-var gpioBlueLedStatus = 'off'
+let gpio
+let gpioBlueLed
+let gpioBlueLedStatus = 'off'
+let gpioWifiButton
 try {
   gpio = require('onoff').Gpio
 }
 catch (err) {
   console.log('GPIO module onoff not installed');
 }
-if (gpio != undefined) {
-  gpioBlueLed = new gpio(19, 'out'); //use GPIO-19 pin .., and specify that it is output
+if (gpio) {
+  gpioBlueLed = new gpio(19, 'out'); //use GPIO-19 pin 35, and specify that it is output
+  gpioWifiButton = new gpio(23, 'in', 'rising', {debounceTimeout: 10}); //use GPIO-23 pin 16, and specify that it is input
+  //gpioGpsLed = new gpio(24, 'out'); //use GPIO-24 pin 18, and specify that it is output
   //gpioDs18b20 = new gpio(25, 'out'); //use GPIO-25 pin 22, and specify that it is output
   //gpioFan = new gpio(26, 'out'); //use GPIO-26 pin 37, and specify that it is output
   //gpioBme = new gpio(27, 'out'); //use GPIO-27 pin 13, and specify that it is output
+  gpioWifiButton.watch((err, value) => {
+    if (err) {
+      throw err;
+    }
+    console.log('gpioWifiButton',value)
+  });
 }
-var setGpioBlueLedOn = function () {
+process.on('SIGINT', _ => {
+  gpioBlueLed.unexport();
+  gpioWifiButton.unexport();
+});
+const setGpioBlueLedOn = function () {
   //console.log('set blue LED GPIO on')
   gpioBlueLed.writeSync(1); //set pin state to 1 (power LED on)
   gpioBlueLedStatus = 'on'
 }
-var setGpioBlueLedOff = function () {
+const setGpioBlueLedOff = function () {
   //console.log('set blue LED GPIO off')
   gpioBlueLed.writeSync(0); //set pin state to 0 (power LED off)
   gpioBlueLedStatus = 'off'
 }
+
+let wifiSwitchStatus = 'on'
+let wifiStatus = 'on'
+const checkWifiSwitchStatus = async function () {
+  await execPromise("LC_ALL=C systemctl status wpa_supplicant | grep running '")
+    .then((result) => {
+      if (result.length > 10) {
+        console.log('Wifi is active/running')
+        wifiStatus = 'on'
+      } else {
+        console.log('Wifi is inactive/stopped')
+        wifiStatus = 'off'
+      }
+    })
+    .catch((error) => {
+      console.log('catch checkWifiSwitch',error)
+    })
+}
+const checkWifiStatus = async function () {
+  await execPromise("LC_ALL=C systemctl status wpa_supplicant | grep running '")
+    .then((result) => {
+      if (result.length > 10) {
+        console.log('Wifi is active/running')
+        wifiStatus = 'on'
+      } else {
+        console.log('Wifi is inactive/stopped')
+        wifiStatus = 'off'
+      }
+    })
+    .catch((error) => {
+      console.log('catch checkWifiSwitch',error)
+    })
+}
+
 
 var unit = {
   'connectionStatus': {}
@@ -221,7 +268,7 @@ const requestListener = function (req, res) {
         //			    getDeviceWifiListCache(req,res)
         //					break
         //				}
-        console.log('invalid api call',methodType,url )
+        console.log('invalid api call', methodType, url)
         res.writeHead(400);
         res.write(`{error:400,message: 'Invalid API-call: ${methodType} ${url}'}`);
         res.end();
@@ -251,13 +298,13 @@ const requestListener = function (req, res) {
           postUpGrade(url, req, res)
           break
         }
-        console.log('invalid api call',methodType,url )
+        console.log('invalid api call', methodType, url)
         res.writeHead(400);
         res.write(`{error:400,message: 'Invalid API-call: ${methodType} ${url}'}`);
         res.end();
         break;
       case 'PUT':
-        console.log('invalid api call',methodType,url )
+        console.log('invalid api call', methodType, url)
 
         res.writeHead(400);
         res.write(`{error:400,message: 'Invalid API-call: ${methodType} ${url}'}`);
@@ -273,7 +320,7 @@ const requestListener = function (req, res) {
           deleteMethodHandler(url, req, res)
           break
         }
-        console.log('invalid api call',methodType,url )
+        console.log('invalid api call', methodType, url)
 
         res.writeHead(400);
         res.write(`{error:400,message: 'Invalid API-call: ${methodType} ${url}'}`);
@@ -984,12 +1031,12 @@ const tryCandidateConnection2 = function (conIndex) {
         // delete overcomplete hotspot
         console.log("LC_ALL=C nmcli connection delete '" + unit.connections[_conIndex] + "'")
         execPromise("LC_ALL=C nmcli connection delete '" + unit.connections[_conIndex] + "'")
-        .then((result) => {
-          console.log('overcomplete accesspoint (mode = ap) deleted',unit.connections[_conIndex] )
-        })
-        .catch((error) => {
-          console.log('overcomplete accesspoint (mode = ap) delete error',unit.connections[_conIndex], error )
-        })
+          .then((result) => {
+            console.log('overcomplete accesspoint (mode = ap) deleted', unit.connections[_conIndex])
+          })
+          .catch((error) => {
+            console.log('overcomplete accesspoint (mode = ap) delete error', unit.connections[_conIndex], error)
+          })
       }
     })
     .catch((error) => {
@@ -1079,12 +1126,12 @@ const tryCandidateConnection2 = function (conIndex) {
         // delete connection with password error
         // console.log("LC_ALL=C nmcli connection delete '" + unit.connections[_conIndex] + "'")
         execPromise("LC_ALL=C nmcli connection delete '" + unit.connections[_conIndex] + "'")
-        .then((result) => {
-          console.log('password error, connection deleted',unit.connections[_conIndex] )
-        })
-        .catch((error) => {
-          console.log('password error, connection deleted error',unit.connections[_conIndex], error )
-        })
+          .then((result) => {
+            console.log('password error, connection deleted', unit.connections[_conIndex])
+          })
+          .catch((error) => {
+            console.log('password error, connection deleted error', unit.connections[_conIndex], error)
+          })
       }
 
       tryCandidateConnection2(_conIndex + 1)
@@ -1712,6 +1759,8 @@ const nginxCheck = function () {
 }
 
 const statusCheck = async function () {
+
+  //checkWifiStatus()
 
   if (processStatus.connectionBusy.status == true ||
     (processStatus.connectionBusy.status == false &&

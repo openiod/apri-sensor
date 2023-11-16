@@ -222,7 +222,9 @@ catch (err) {
   logger.info('GPIO module onoff not installed');
 }
 if (gpio != undefined) {
-  gpioGpsLed = new gpio(24, 'out'); //use GPIO-19 pin .., and specify that it is output
+  //gpioBlueLed = new gpio(19, 'out'); //use GPIO-19 pin 35, and specify that it is output
+  //gpioWifiSwitch = new gpio(23, 'in'); //use GPIO-23 pin 16, and specify that it is input
+  gpioGpsLed = new gpio(24, 'out'); //use GPIO-24 pin 18, and specify that it is output
   gpioDs18b20 = new gpio(25, 'out'); //use GPIO-25 pin 22, and specify that it is output
   //gpioFan = new gpio(26, 'out'); //use GPIO-26 pin 37, and specify that it is output
   gpioBme = new gpio(27, 'out'); //use GPIO-27 pin 13, and specify that it is output

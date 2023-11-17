@@ -2,9 +2,11 @@
 
 # script copies files from git/apri-sensor to apri-sensors
 
+echo "git2as.sh start"
 
 if [ -d /opt/SCAPE604/git/apri-sensor ]
 then
+  echo "git2as.sh then /opt/SCAPE604/git/apri-sensor "
   # apri-agent only once
   # cp -r /opt/SCAPE604/git/apri-sensor/apri-agent /opt/SCAPE604/apri-sensor/.
 

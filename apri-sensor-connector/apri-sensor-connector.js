@@ -164,9 +164,9 @@ var getRedisData = function (redisArray, redisArrayIndex) {
 	var url = '';
 
 	redisHgetallAsync(_redisKey)
-		.then(function (res) {
-			if (!res) {
-				redisDelAsync(_redisKey)
+		.then(async function (res) {
+			if (!res) { 
+				await redisDelAsync(_redisKey)
 					.then(function (res) {
 						log('key deleted ' + _redisKey + ' ' + res);
 						redisSRem('new', _redisKey)

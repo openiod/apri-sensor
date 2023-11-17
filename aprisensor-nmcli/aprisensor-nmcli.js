@@ -36,11 +36,11 @@ let aprisensorDevices = {}
 try {
   let tmpCfg = systemFolderParent + '/config/aprisensor-type.cfg'
   aprisensorType = fs.readFileSync(tmpCfg, { encoding: 'utf8' }).split('\n')[0]
-  logger.info('aprisensor-type: ' + aprisensorType);
+  console.log('aprisensor-type: ' + aprisensorType);
 }
 catch (err) {
   aprisensorType = ''
-  logger.info('aprisensor-type.cfg not found');
+  console.log('aprisensor-type.cfg not found');
 }
 if (aprisensorType != '') {
   try {
@@ -52,7 +52,7 @@ if (aprisensorType != '') {
   }
   catch (err) {
     aprisensorTypeConfig = {}
-    logger.info('aprisensor-type ' + aprisensorType + '.json' + ' not found');
+    console.log('aprisensor-type ' + aprisensorType + '.json' + ' not found');
   }
 }
 

@@ -93,7 +93,7 @@ let gpio
 let gpioBlueLed
 let gpioBlueLedStatus = 'off'
 let gpioWifiButton
-let wifiStatus = 'on'
+let wifiStatus
 let wifiButtonStatus
 
 try {
@@ -1823,7 +1823,13 @@ const nginxCheck = function () {
 
 const statusCheck = async function () {
 
-  //checkWifiStatus()
+  // off only when device connect button and on.
+  if (aprisensorDevices['connectButton']?.connectWhen == "on") {
+    if (wifiStatus == 'off') {
+      setGpioBlueLedOff()
+      return
+    }
+  }
 
   if (processStatus.connectionBusy.status == true ||
     (processStatus.connectionBusy.status == false &&

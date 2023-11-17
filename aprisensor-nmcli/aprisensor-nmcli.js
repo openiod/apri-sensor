@@ -33,6 +33,7 @@ redisClient.on("error", function (err) {
 let aprisensorType = ''  // standard: aprisensorType=='aprisensor-typ-standard'
 let aprisensorTypeConfig = {}
 let aprisensorDevices = {}
+let systemFolderParent = '/opt/SCAPE604'
 try {
   let tmpCfg = systemFolderParent + '/config/aprisensor-type.cfg'
   aprisensorType = fs.readFileSync(tmpCfg, { encoding: 'utf8' }).split('\n')[0]

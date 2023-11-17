@@ -108,7 +108,7 @@ const setWifiButtonStatus = async function (value) {
     if (value == 1) {
       wifiButtonStatus = 'on'
       console.log("Wifi connect button on")
-      await execPromise("LC_ALL=C systemctl start wpa_supplicant '")
+      await execPromise("LC_ALL=C systemctl start wpa_supplicant ")
         .then((result) => {
           console.log('Wifi service started')
           wifiStatus = 'on'
@@ -119,7 +119,7 @@ const setWifiButtonStatus = async function (value) {
     } else {
       wifiButtonStatus = 'off'
       console.log("Wifi connect button off")
-      await execPromise("LC_ALL=C systemctl stop wpa_supplicant '")
+      await execPromise("LC_ALL=C systemctl stop wpa_supplicant ")
         .then((result) => {
           console.log('Wifi service stopped')
           wifiStatus = 'off'

@@ -122,11 +122,11 @@ catch (err) {
   logger.info('modbus-serial module (scd30/NextPM) not found');
 }
 
-var aprisensorType = ''  // standard: aprisensorType=='aprisensor-typ-standard'
-var aprisensorTypeConfig = {}
-var aprisensorDevices = {}
+let aprisensorType = ''  // standard: aprisensorType=='aprisensor-typ-standard'
+let aprisensorTypeConfig = {}
+let aprisensorDevices = {}
 try {
-  var tmpCfg = systemFolderParent + '/config/aprisensor-type.cfg'
+  let tmpCfg = systemFolderParent + '/config/aprisensor-type.cfg'
   aprisensorType = fs.readFileSync(tmpCfg, { encoding: 'utf8' }).split('\n')[0]
   logger.info('aprisensor-type: ' + aprisensorType);
 }
@@ -137,8 +137,8 @@ catch (err) {
 if (aprisensorType != '') {
   try {
     aprisensorTypeConfig = JSON.parse(fs.readFileSync(startFolder + '/../apri-config/aprisensor-types/' + aprisensorType + '.json', { encoding: 'utf8' }))
-    for (var i = 0; i < aprisensorTypeConfig.devices.length; i++) {
-      var _dev = aprisensorTypeConfig.devices[i]
+    for (let i = 0; i < aprisensorTypeConfig.devices.length; i++) {
+      let _dev = aprisensorTypeConfig.devices[i]
       aprisensorDevices[_dev.deviceType] = _dev
     }
   }

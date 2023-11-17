@@ -103,7 +103,7 @@ catch (err) {
   console.log('GPIO module onoff not installed');
 }
 
-const setWifiButtonStatus = function (value) {
+const setWifiButtonStatus = async function (value) {
   if (aprisensorDevices['connectButton']?.connectWhen == "on") {
     if (value == 1) {
       wifiButtonStatus = 'on'
@@ -111,6 +111,7 @@ const setWifiButtonStatus = function (value) {
       await execPromise("LC_ALL=C systemctl start wpa_supplicant '")
         .then((result) => {
           console.log('Wifi service started')
+          wifiStatus = 'on'
         })
         .catch((error) => {
           console.log('catch start WiFi service', error)
@@ -121,6 +122,7 @@ const setWifiButtonStatus = function (value) {
       await execPromise("LC_ALL=C systemctl stop wpa_supplicant '")
         .then((result) => {
           console.log('Wifi service stopped')
+          wifiStatus = 'off'
         })
         .catch((error) => {
           console.log('catch stop WiFi service', error)

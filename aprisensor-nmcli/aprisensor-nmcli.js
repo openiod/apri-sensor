@@ -45,7 +45,7 @@ catch (err) {
 }
 if (aprisensorType != '') {
   try {
-    aprisensorTypeConfig = JSON.parse(fs.readFileSync(startFolder + '/../apri-config/aprisensor-types/' + aprisensorType + '.json', { encoding: 'utf8' }))
+    aprisensorTypeConfig = JSON.parse(fs.readFileSync(systemFolderParent + '/apri-sensor/apri-config/aprisensor-types/' + aprisensorType + '.json', { encoding: 'utf8' }))
     for (let i = 0; i < aprisensorTypeConfig.devices.length; i++) {
       let _dev = aprisensorTypeConfig.devices[i]
       aprisensorDevices[_dev.deviceType] = _dev
@@ -94,7 +94,7 @@ let gpioBlueLed
 let gpioBlueLedStatus = 'off'
 let gpioWifiButton
 let wifiStatus = 'on'
-let wifiButtonStatus = 'off'
+let wifiButtonStatus
 
 try {
   gpio = require('onoff').Gpio
@@ -103,20 +103,34 @@ catch (err) {
   console.log('GPIO module onoff not installed');
 }
 
-const setWifiButtonStatus=function(value) {
-  if (aprisensorDevices['connectButton']?.connectButton == "on" ) {
+const setWifiButtonStatus = function (value) {
+  if (aprisensorDevices['connectButton']?.connectWhen == "on") {
     if (value == 1) {
-      wifiButtonStatus='on'
+      wifiButtonStatus = 'on'
       console.log("Wifi connect button on")
+      await execPromise("LC_ALL=C systemctl start wpa_supplicant '")
+        .then((result) => {
+          console.log('Wifi service started')
+        })
+        .catch((error) => {
+          console.log('catch start WiFi service', error)
+        })
     } else {
-      wifiButtonStatus='off'
+      wifiButtonStatus = 'off'
       console.log("Wifi connect button off")
-    }  
-  } 
+      await execPromise("LC_ALL=C systemctl stop wpa_supplicant '")
+        .then((result) => {
+          console.log('Wifi service stopped')
+        })
+        .catch((error) => {
+          console.log('catch stop WiFi service', error)
+        })
+    }
+  }
 }
 if (gpio) {
   gpioBlueLed = new gpio(19, 'out'); //use GPIO-19 pin 35, and specify that it is output
-  gpioWifiButton = new gpio(23, 'in', 'both', {debounceTimeout: 200}); //use GPIO-23 pin 16, and specify that it is input
+  gpioWifiButton = new gpio(23, 'in', 'both', { debounceTimeout: 200 }); //use GPIO-23 pin 16, and specify that it is input
   //gpioGpsLed = new gpio(24, 'out'); //use GPIO-24 pin 18, and specify that it is output
   //gpioDs18b20 = new gpio(25, 'out'); //use GPIO-25 pin 22, and specify that it is output
   //gpioFan = new gpio(26, 'out'); //use GPIO-26 pin 37, and specify that it is output
@@ -161,7 +175,7 @@ const checkWifiSwitchStatus = async function () {
       }
     })
     .catch((error) => {
-      console.log('catch checkWifiSwitch',error)
+      console.log('catch checkWifiSwitch', error)
     })
 }
 const checkWifiStatus = async function () {
@@ -176,7 +190,7 @@ const checkWifiStatus = async function () {
       }
     })
     .catch((error) => {
-      console.log('catch checkWifiSwitch',error)
+      console.log('catch checkWifiSwitch', error)
     })
 }
 

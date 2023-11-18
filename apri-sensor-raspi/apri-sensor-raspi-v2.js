@@ -237,7 +237,7 @@ var bme280SeaLevelPressure = 1013.25; // default
 var bme680SeaLevelPressure = 1013.25; // default
 var bme280AltitudeCorrection = -359.4
 var bme680AltitudeCorrection = -359.4
- 
+
 
 var Bme680
 var bme680
@@ -1310,7 +1310,7 @@ var sendData = async function () {
       ',' + results.bme680.temperature +
       ',' + results.bme680.pressure +
       ',' + results.bme680.rHum +
-      ',' + results.bme680.gasResistance  +
+      ',' + results.bme680.gasResistance +
       ',' + altitude
 
     header = '"sensorId","dateObserved","sensorType","temperature","pressure","rHum","gasResistance","altitude"'
@@ -1424,6 +1424,8 @@ var sendData = async function () {
 
       if (gpsTpv.mode == 2) {
 
+        spsProcessed = true
+
         csvRec = '"SCRP' + unit.id +
           '","' + timeStamp.toISOString() +
           '","' + sensorType + '"' +
@@ -1447,7 +1449,6 @@ var sendData = async function () {
         writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
           '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
 
-        spsProcessed = true
         await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
           'foi': 'SCRP' + unit.id
           , 'time': timeStampTime
@@ -1480,88 +1481,95 @@ var sendData = async function () {
             logger.info('catch mode 2, Redis write')
             logger.info(err)
           })
-      }
-      if (gpsTpv.mode == 3) { // mode 3
-        spsProcessed = true
+      } else {
+        if (gpsTpv.mode == 3) { // mode 3
 
-        csvRec = '"SCRP' + unit.id +
-          '","' + timeStamp.toISOString() +
-          '","' + sensorType + '"' +
-          ',' + results.sps.pm1 +
-          ',' + results.sps.pm25 +
-          ',' + results.sps.pm4 +
-          ',' + results.sps.pm10 +
-          ',' + results.sps.part0_5 +
-          ',' + results.sps.part1_0 +
-          ',' + results.sps.part2_5 +
-          ',' + results.sps.part4_0 +
-          ',' + results.sps.part10_0 +
-          ',' + results.sps.tps +
-          ',' + gpsTpv.mode +
-          ',' + gpsTpv.time +
-          ',' + gpsTpv.ept +
-          ',' + gpsTpv.lat +
-          ',' + gpsTpv.lon +
-          ',' + gpsTpv.alt +
-          ',' + gpsTpv.epx +
-          ',' + gpsTpv.epy +
-          ',' + gpsTpv.epv +
-          ',' + gpsTpv.track +
-          ',' + gpsTpv.speed +
-          ',' + gpsTpv.climb +
-          ',' + gpsTpv.eps +
-          ',' + gpsTpv.epc
+          spsProcessed = true
 
-        header = '"sensorId","dateObserved","sensorType","pm1","pm25","pm4","pm10",' +
-          '"part0_5","part1_0","part2_5","part4_0","part10_0","tps","gpsMode","gpsTime","gpsEpt","gpsLat","gpsLon",' +
-          '"gpsAlt","gpsEpx","gpsEpy","gpsEpv","gpsTrack","gpsSpeed","gpsClimb","gpsEps","gpsEpc"'
+          csvRec = '"SCRP' + unit.id +
+            '","' + timeStamp.toISOString() +
+            '","' + sensorType + '"' +
+            ',' + results.sps.pm1 +
+            ',' + results.sps.pm25 +
+            ',' + results.sps.pm4 +
+            ',' + results.sps.pm10 +
+            ',' + results.sps.part0_5 +
+            ',' + results.sps.part1_0 +
+            ',' + results.sps.part2_5 +
+            ',' + results.sps.part4_0 +
+            ',' + results.sps.part10_0 +
+            ',' + results.sps.tps +
+            ',' + gpsTpv.mode +
+            ',' + gpsTpv.time +
+            ',' + gpsTpv.ept +
+            ',' + gpsTpv.lat +
+            ',' + gpsTpv.lon +
+            ',' + gpsTpv.alt +
+            ',' + gpsTpv.epx +
+            ',' + gpsTpv.epy +
+            ',' + gpsTpv.epv +
+            ',' + gpsTpv.track +
+            ',' + gpsTpv.speed +
+            ',' + gpsTpv.climb +
+            ',' + gpsTpv.eps +
+            ',' + gpsTpv.epc
 
-        writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
-          '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
+          header = '"sensorId","dateObserved","sensorType","pm1","pm25","pm4","pm10",' +
+            '"part0_5","part1_0","part2_5","part4_0","part10_0","tps","gpsMode","gpsTime","gpsEpt","gpsLat","gpsLon",' +
+            '"gpsAlt","gpsEpx","gpsEpy","gpsEpv","gpsTrack","gpsSpeed","gpsClimb","gpsEps","gpsEpc"'
 
-        await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
-          'foi': 'SCRP' + unit.id
-          , 'time': timeStampTime
-          , 'sensorType': sensorType
-          , 'pm1': results.sps.pm1
-          , 'pm25': results.sps.pm25
-          , 'pm4': results.sps.pm4
-          , 'pm10': results.sps.pm10
-          , 'raw0_5': results.sps.part0_5
-          , 'raw1_0': results.sps.part1_0
-          , 'raw2_5': results.sps.part2_5
-          , 'raw4_0': results.sps.part4_0
-          , 'raw10_0': results.sps.part10_0
-          , 'tps': results.sps.tps
-          , 'gpsMode': gpsTpv.mode
-          , 'gpsTime': gpsTpv.time
-          , 'gpsEpt': gpsTpv.ept
-          , 'gpsLat': gpsTpv.lat
-          , 'gpsLon': gpsTpv.lon
-          , 'gpsAlt': gpsTpv.alt
-          , 'gpsEpx': gpsTpv.epx
-          , 'gpsEpy': gpsTpv.epy
-          , 'gpsEpv': gpsTpv.epv
-          , 'gpsTrack': gpsTpv.track
-          , 'gpsSpeed': gpsTpv.speed
-          , 'gpsClimb': gpsTpv.climb
-          , 'gpsEps': gpsTpv.eps
-          , 'gpsEpc': gpsTpv.epc
-        })
-          .then(function (res) {
-            var _res = res;
-            redisClient.SADD('new', timeStamp.toISOString() + ':' + sensorType)
-              .then(function (res2) {
-                var _res2 = res2;
-                //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
-                // logger.info('sps30 ', timeStamp.toISOString() + ':' + sensorType + _res2);
-              });
-            //logger.info(timeStamp.toString() + ':sps30' + _res);
+          writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
+            '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
+
+          await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
+            'foi': 'SCRP' + unit.id
+            , 'time': timeStampTime
+            , 'sensorType': sensorType
+            , 'pm1': results.sps.pm1
+            , 'pm25': results.sps.pm25
+            , 'pm4': results.sps.pm4
+            , 'pm10': results.sps.pm10
+            , 'raw0_5': results.sps.part0_5
+            , 'raw1_0': results.sps.part1_0
+            , 'raw2_5': results.sps.part2_5
+            , 'raw4_0': results.sps.part4_0
+            , 'raw10_0': results.sps.part10_0
+            , 'tps': results.sps.tps
+            , 'gpsMode': gpsTpv.mode
+            , 'gpsTime': gpsTpv.time
+            , 'gpsEpt': gpsTpv.ept
+            , 'gpsLat': gpsTpv.lat
+            , 'gpsLon': gpsTpv.lon
+            , 'gpsAlt': gpsTpv.alt
+            , 'gpsEpx': gpsTpv.epx
+            , 'gpsEpy': gpsTpv.epy
+            , 'gpsEpv': gpsTpv.epv
+            , 'gpsTrack': gpsTpv.track
+            , 'gpsSpeed': gpsTpv.speed
+            , 'gpsClimb': gpsTpv.climb
+            , 'gpsEps': gpsTpv.eps
+            , 'gpsEpc': gpsTpv.epc
           })
-          .catch(function (err) {
-            logger.info('catch mode 3, Redis write')
-            logger.info(err)
-          })
+            .then(function (res) {
+              var _res = res;
+              redisClient.SADD('new', timeStamp.toISOString() + ':' + sensorType)
+                .then(function (res2) {
+                  var _res2 = res2;
+                  //	redisSaddAsync('sps30', timeStamp.toISOString()+':sps30')
+                  // logger.info('sps30 ', timeStamp.toISOString() + ':' + sensorType + _res2);
+                });
+              //logger.info(timeStamp.toString() + ':sps30' + _res);
+            })
+            .catch(function (err) {
+              logger.info('catch mode 3, Redis write')
+              logger.info(err)
+            })
+        } else {
+          // sps30 with gps but no satellite connection yet, skip measurements          
+          spsProcessed == true
+
+        }
+
       }
     }
     if (spsProcessed == false) {
@@ -3162,7 +3170,7 @@ const gpsStart = function () {
           //console.log(_gpsTimeIso + ' diff:' + diff)
 
           // parse gps time
-          let tmpDateGps = new Date(_gpsTime) 
+          let tmpDateGps = new Date(_gpsTime)
           let tmpDate = "" + tmpDateGps.getDate() + " " + monthShortNames[tmpDateGps.getMonth()] + " " + tmpDateGps.getFullYear() + " " +
             tmpDateGps.getHours().toString().padStart(2, '0') + ":" + tmpDateGps.getMinutes().toString().padStart(2, '0') + ":" + tmpDateGps.getSeconds().toString().padStart(2, '0')
 

@@ -1091,6 +1091,12 @@ function writeLocalCsv(rec, folderName, fileName, h, sensorType) {
 }
 // send data to service
 var sendData = async function () {
+
+  // while time not synchronized with gps, skip measurements
+  if (aprisensorDevices.gps && aprisensorDevices.gps.timeSynchronized == false) {
+    return
+  }
+
   let timeStamp = new Date();
   let timeStampTime = timeStamp.getTime()
   let url = '';
@@ -1418,8 +1424,11 @@ var sendData = async function () {
     //						',raw2_5:'+results.sps.part2_5+',raw4_0:'+results.sps.part4_0+
     //            ',raw10_0:'+results.sps.part10_0 + ',tps:'+results.sps.tps;
     //			logger.info(url);
+
     var spsProcessed = false
+
     if (aprisensorDevices.gps) {
+
       gpsTpv = processGps()
 
       if (gpsTpv.mode == 2) {
@@ -1566,10 +1575,8 @@ var sendData = async function () {
             })
         } else {
           // sps30 with gps but no satellite connection yet, skip measurements          
-          spsProcessed == true
-
+          return
         }
-
       }
     }
     if (spsProcessed == false) {

@@ -3,7 +3,7 @@
   [
     {"name": "PMSA003"
       ,"id":"pmsa003"
-      ,"device":"/dev/ttyS0"
+      ,"device":"/dev/serial0"
       ,"baudRate":9600
       ,"installed":"N"
       ,"protocol":"serial"
@@ -46,7 +46,7 @@
     },
     {"name": "IPS7100"
       ,"id":"ips7100"
-      ,"device":"/dev/ttyS0"
+      ,"device":"/dev/serial0"
       ,"baudRate":115200
       ,"installed":"N"
       ,"protocol":"serial"
@@ -54,7 +54,7 @@
     },
     {"name": "SCD30"
       ,"id":"scd30"
-      ,"device":"/dev/ttyS0"
+      ,"device":"/dev/serial0"
       ,"installed":"Y"
       ,"protocol":"modbus"
       ,"baudRate":19200

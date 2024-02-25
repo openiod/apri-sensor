@@ -2400,12 +2400,10 @@ const nextpmRead10 = function () {
   //logger.info('nextpmRead10')
   nextpmClient.readHoldingRegisters(50, 12)
     .then(async function (data) {
-      //logger.info('then nextpmRead10')
-      //logger.info(data.data)
       var result = {}
-      result.part1 = ((data.data[1] * 65536 + data.data[0]) / 1000) / 10  // per liter divided by 10 -> per 0.1L
-      result.part25 = ((data.data[3] * 65536 + data.data[2]) / 1000) / 10
-      result.part10 = ((data.data[5] * 65536 + data.data[4]) / 1000) / 10
+      result.part1 = (data.data[1] * 65536 + data.data[0]) / 10  // per liter divided by 10 -> per 0.1L
+      result.part25 = (data.data[3] * 65536 + data.data[2]) / 10
+      result.part10 = (data.data[5] * 65536 + data.data[4]) / 10
       result.pm1 = (data.data[7] * 65536 + data.data[6]) / 1000
       result.pm25 = (data.data[9] * 65536 + data.data[8]) / 1000
       result.pm10 = (data.data[11] * 65536 + data.data[10]) / 1000

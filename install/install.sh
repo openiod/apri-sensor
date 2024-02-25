@@ -24,7 +24,7 @@ sudo sed -i 's/^SystemMaxUse=20M/SystemMaxUse=10M/g' /etc/systemd/journald.conf 
 # zonder redis archive ; met HA service ; met locale backup /opt/aprisensor_backup/
 
 # 2.4.0
-# nieuwe apri-agent (zonder http & minder logging ; diverse aanpassingen)
+# nieuwe apri-agent (zonder http-server & minder logging ; diverse aanpassingen)
 # NextPM
 # bij upgrade:
 cd /opt/SCAPE604/git/apri-sensor ; sudo git pull

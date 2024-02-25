@@ -49,7 +49,7 @@ cd /opt/SCAPE604/git/apri-sensor
 sudo git pull
 sudo install/git2as.sh  
 
-# when upgrade stable version:
+# ??? upgrade stable nodejs variant:
 # v2:
 ##sudo cp /opt/SCAPE604/git/apri-sensor/aprisensor-netmanager-runtime-v2.tar.gz  /opt/SCAPE604/.
 cd /opt/SCAPE604

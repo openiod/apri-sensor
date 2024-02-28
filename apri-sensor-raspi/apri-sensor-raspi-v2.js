@@ -2401,11 +2401,25 @@ const nextpmRead10 = function () {
   nextpmClient.readHoldingRegisters(50, 12)
     .then(async function (data) {
       var result = {}
+      /* first update
       result.part1 = (data.data[1] * 65536 + data.data[0]) / 10  // per liter divided by 10 -> per 0.1L
       result.part25 = (data.data[3] * 65536 + data.data[2]) / 10
       result.part10 = (data.data[5] * 65536 + data.data[4]) / 10
       result.part10 -= result.part25  // calculate diff
       result.part25 -= result.part1   // calculate diff
+      */
+      // second update 20240228
+      result.part1 = data.data[1] * 65536 + data.data[0] 
+      result.part25 = data.data[3] * 65536 + data.data[2]
+      result.part10 = data.data[5] * 65536 + data.data[4]
+      // calculate PN-coarse
+      result.part10 -= result.part25  // calculate PN-coarse
+      result.part25 -= result.part1   // calculate PN-coarse
+      // divide PN values by 10 plus extra 10 for value in 0.1L
+      result.part1 = result.part1/100  
+      result.part25 = result.part25/100
+      result.part10 = result.part10/100
+
       result.pm1 = (data.data[7] * 65536 + data.data[6]) / 1000
       result.pm25 = (data.data[9] * 65536 + data.data[8]) / 1000
       result.pm10 = (data.data[11] * 65536 + data.data[10]) / 1000

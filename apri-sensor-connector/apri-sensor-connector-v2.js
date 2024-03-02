@@ -339,7 +339,11 @@ var radiationdAttributes = function (res) {
 var nextpmAttributes = function (res) {
 	return openiodUrl + '/nextpm' + '/v1/m?foi=' + res.foi + '&observation=' +
 		'part1:' + res.part1 + ',' + 'part25:' + res.part25 + ',' + 'part10:' + res.part10 +
-		',' + 'pm1:' + res.pm1 + ',' + 'pm25:' + res.pm25 + ',' + 'pm10:' + res.pm10;
+		',' + 'pm1:' + res.pm1 + ',' + 'pm25:' + res.pm25 + ',' + 'pm10:' + res.pm10 +
+		',part1c:' + res.part1c + ',' + 'part25c:' + res.part25c + ',' + 'part10c:' + res.part10c +
+		',' + 'pm1c:' + res.pm1c + ',' + 'pm25c:' + res.pm25c + ',' + 'pm10c:' + res.pm10c
+
+
 }
 
 // send data to service

@@ -462,6 +462,12 @@ var counters = {
     , pm1: 0
     , pm25: 0
     , pm10: 0
+    , part1c: 0
+    , part25c: 0
+    , part10c: 0
+    , pm1c: 0
+    , pm25c: 0
+    , pm10c: 0
     , temperature: 0
     , rHum: 0
     , nrOfMeas: 0
@@ -547,6 +553,12 @@ var results = {
     , pm1: 0
     , pm25: 0
     , pm10: 0
+    , part1c: 0
+    , part25c: 0
+    , part10c: 0
+    , pm1c: 0
+    , pm25c: 0
+    , pm10c: 0
     , temperature: 0
     , rHum: 0
     , nrOfMeas: 0
@@ -624,6 +636,12 @@ var initCounters = function () {
   counters.nextpm.pm1 = 0;
   counters.nextpm.pm25 = 0;
   counters.nextpm.pm10 = 0;
+  counters.nextpm.part1c = 0;
+  counters.nextpm.part25c = 0;
+  counters.nextpm.part10c = 0;
+  counters.nextpm.pm1c = 0;
+  counters.nextpm.pm25c = 0;
+  counters.nextpm.pm10c = 0;
   counters.nextpm.temperature = 0;
   counters.nextpm.rHum = 0;
   counters.nextpm.nrOfMeas = 0;
@@ -1009,6 +1027,12 @@ var processDataCycle = function () {
   results.nextpm.pm1 = Math.round((counters.nextpm.pm1 / counters.nextpm.nrOfMeas) * 100) / 100;
   results.nextpm.pm25 = Math.round((counters.nextpm.pm25 / counters.nextpm.nrOfMeas) * 100) / 100;
   results.nextpm.pm10 = Math.round((counters.nextpm.pm10 / counters.nextpm.nrOfMeas) * 100) / 100;
+  results.nextpm.part1c = Math.round((counters.nextpm.part1c / counters.nextpm.nrOfMeas) * 100) / 100;
+  results.nextpm.part25c = Math.round((counters.nextpm.part25c / counters.nextpm.nrOfMeas) * 100) / 100;
+  results.nextpm.part10c = Math.round((counters.nextpm.part10c / counters.nextpm.nrOfMeas) * 100) / 100;
+  results.nextpm.pm1c = Math.round((counters.nextpm.pm1c / counters.nextpm.nrOfMeas) * 100) / 100;
+  results.nextpm.pm25c = Math.round((counters.nextpm.pm25c / counters.nextpm.nrOfMeas) * 100) / 100;
+  results.nextpm.pm10c = Math.round((counters.nextpm.pm10c / counters.nextpm.nrOfMeas) * 100) / 100;
   results.nextpm.temperature = Math.round((counters.nextpm.temperature / counters.nextpm.nrOfMeas) * 100) / 100;
   results.nextpm.rHum = Math.round((counters.nextpm.rHum / counters.nextpm.nrOfMeas) * 100) / 100;
   results.nextpm.nrOfMeas = counters.nextpm.nrOfMeas;
@@ -1750,10 +1774,16 @@ var sendData = async function () {
       ',' + results.nextpm.pm1 +
       ',' + results.nextpm.pm25 +
       ',' + results.nextpm.pm10 +
+      ',' + results.nextpm.part1c +
+      ',' + results.nextpm.part25c +
+      ',' + results.nextpm.part10c +
+      ',' + results.nextpm.pm1c +
+      ',' + results.nextpm.pm25c +
+      ',' + results.nextpm.pm10c +
       ',' + results.nextpm.temperature
     ',' + results.nextpm.rHum
 
-    header = '"sensorId","dateObserved","sensorType","part1","part25","part10","pm1","pm25","pm10","temperature","rHum"'
+    header = '"sensorId","dateObserved","sensorType","part1","part25","part10","pm1","pm25","pm10","part1c","part25c","part10c","pm1c","pm25c","pm10c","temperature","rHum"'
 
     writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
       '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
@@ -1768,6 +1798,12 @@ var sendData = async function () {
       , 'pm1': results.nextpm.pm1
       , 'pm25': results.nextpm.pm25
       , 'pm10': results.nextpm.pm10
+      , 'part1c': results.nextpm.part1c
+      , 'part25c': results.nextpm.part25c
+      , 'part10c': results.nextpm.part10c
+      , 'pm1c': results.nextpm.pm1c
+      , 'pm25c': results.nextpm.pm25c
+      , 'pm10c': results.nextpm.pm10c
       , 'temperature': results.nextpm.temperature
       , 'rHum': results.nextpm.rHum
     }).then(function (res) {
@@ -2515,6 +2551,12 @@ var processRaspiNextpmRecord = function (result) {
   counters.nextpm.pm1 += result.pm1
   counters.nextpm.pm25 += result.pm25
   counters.nextpm.pm10 += result.pm10
+  counters.nextpm.part1c += result.part1c
+  counters.nextpm.part25c += result.part25c
+  counters.nextpm.part10c += result.part10c
+  counters.nextpm.pm1c += result.pm1c
+  counters.nextpm.pm25c += result.pm25c
+  counters.nextpm.pm10c += result.pm10c
   counters.nextpm.temperature += result.temperature
   counters.nextpm.rHum += result.rHum
 }

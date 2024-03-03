@@ -308,6 +308,7 @@ var sps30Attributes = function (res) {
 		'pm1:' + res.pm1 + ',pm25:' + res.pm25 + ',pm4:' + res.pm4 + ',pm10:' + res.pm10 +
 		',raw0_5:' + res.raw0_5 + ',raw1_0:' + res.raw1_0 +
 		',raw2_5:' + res.raw2_5 + ',raw4_0:' + res.raw4_0 + ',raw10_0:' + res.raw10_0 +
+		',pn1c:' + res.pn1c + ',' + 'pn25c:' + res.pn25c + ',' + 'pn10c:' + res.pn10c +
 		',tps:' + res.tps +
 		gps
 }
@@ -340,7 +341,7 @@ var nextpmAttributes = function (res) {
 	return openiodUrl + '/nextpm' + '/v1/m?foi=' + res.foi + '&observation=' +
 		'part1:' + res.part1 + ',' + 'part25:' + res.part25 + ',' + 'part10:' + res.part10 +
 		',' + 'pm1:' + res.pm1 + ',' + 'pm25:' + res.pm25 + ',' + 'pm10:' + res.pm10 +
-		',part1c:' + res.part1c + ',' + 'part25c:' + res.part25c + ',' + 'part10c:' + res.part10c +
+		',pn1c:' + res.pn1c + ',' + 'pn25c:' + res.pn25c + ',' + 'pn10c:' + res.pn10c +
 		',' + 'pm1c:' + res.pm1c + ',' + 'pm25c:' + res.pm25c + ',' + 'pm10c:' + res.pm10c
 
 

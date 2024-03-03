@@ -115,10 +115,9 @@ var processDataCycle = function (parm) {
 	//redisClient.SORT('new', {'ALPHA':true,'LIMIT':{'offset': 0,'count': 60},'DIRECTION':'ASC'})
 	redisClient.SORT('new', { 'ALPHA': true, 'LIMIT': { 'offset': 0, 'count': 1000 }, 'DIRECTION': 'ASC' })
 		.then(function (res) {
-			var _res = res;
-			if (_res.length > 0) {
-				log('New record available: ' + _res[0]);
-				processRedisData(_res)
+			if (res.length > 0) {
+				log('New record available: ' + res[0]);
+				processRedisData(res)
 			} else setTimeout(processDataCycle, loopTimeCycle);
 		})
 		.catch(function (error) {
@@ -148,12 +147,7 @@ var processRedisData = function (redisArray) {
 
 	var redisArrayIndex = 0
 	var _redisArray = redisArray
-	// getRedisData(_res[0]);
-	//	for (var j=0;j<_res.length;j++) {
-	// getRedisData(_res[j]);
 	getRedisData(_redisArray, redisArrayIndex)
-	//	}
-	//setTimeout(processDataCycle, loopTimeCycle);
 
 }
 
@@ -172,7 +166,7 @@ var getRedisData = function (redisArray, redisArrayIndex) {
 	//redisHgetallAsync(_redisKey)
 	redisClient.HGETALL(_redisKey)
 		.then(function (res) {
-			if (!res) {
+			if (!res || !res.foi) {
 				redisClient.DEL(_redisKey)
 					.then(function (res) {
 						log('key deleted ' + _redisKey + ' ' + res);
@@ -195,7 +189,6 @@ var getRedisData = function (redisArray, redisArrayIndex) {
 				}
 				return
 			}
-			var _res = res;
 			switch (keySplit[lastEntry]) {
 				case 'bme280':
 					url = bme280Attributes(res) + '&dateObserved=' + dateObserved;

@@ -3,7 +3,8 @@
   [
     {"name": "IPS7100"
       ,"id":"ips7100"
-      ,"device":"/dev/ttyS0"
+      ,"xdevice":"/dev/ttyS0"
+      ,"device":"/dev/serial0"
       ,"baudRate":115200
       ,"installed":"Y"
       ,"protocol":"serial"

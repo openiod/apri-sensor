@@ -3,7 +3,7 @@
   [
     {"name": "PMSA003"
       ,"id":"pmsa003"
-      ,"device":"/dev/ttyS0"
+      ,"device":"/dev/serial0"
       ,"baudRate":9600
       ,"installed":"N"
       ,"protocol":"serial"

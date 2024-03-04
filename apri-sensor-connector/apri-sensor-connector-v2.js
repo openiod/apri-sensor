@@ -252,7 +252,8 @@ var pmsa003Attributes = function (res) {
 		'pm1:' + res.pm1 + ',pm25:' + res.pm25 + ',pm10:' + res.pm10 +
 		',pm1amb:' + res.pm1amb + ',pm25amb:' + res.pm25amb + ',pm10amb:' + res.pm10amb +
 		',raw0_3:' + res.raw0_3 + ',raw0_5:' + res.raw0_5 + ',raw1_0:' + res.raw1_0 +
-		',raw2_5:' + res.raw2_5 + ',raw5_0:' + res.raw5_0 + ',raw10_0:' + res.raw10_0;
+		',raw2_5:' + res.raw2_5 + ',raw5_0:' + res.raw5_0 + ',raw10_0:' + res.raw10_0 +
+		',pn1c:' + res.pn1c + ',' + 'pn25c:' + res.pn25c + ',' + 'pn10c:' + res.pn10c;
 }
 var pms7003Attributes = function (res) {
 	return openiodUrl + '/pms7003' + '/v1/m?foi=' + res.foi + '&observation=' +
@@ -310,6 +311,7 @@ var ips7100Attributes = function (res) {
 		'pm01:' + res.pm01 + ',pm03:' + res.pm03 + ',pm05:' + res.pm05 + ',pm1:' + res.pm1 + ',pm25:' + res.pm25 + ',pm5:' + res.pm5 + ',pm10:' + res.pm10 +
 		',raw0_1:' + res.raw0_1 + ',raw0_3:' + res.raw0_3 + ',raw0_5:' + res.raw0_5 + ',raw1_0:' + res.raw1_0 +
 		',raw2_5:' + res.raw2_5 + ',raw5_0:' + res.raw5_0 + ',raw10_0:' + res.raw10_0 +
+		',pn1c:' + res.pn1c + ',' + 'pn25c:' + res.pn25c + ',' + 'pn10c:' + res.pn10c +
 		',serialNr:' + res.serialNr
 }
 var scd30Attributes = function (res) {

@@ -706,7 +706,7 @@ var processRaspiSerialRecord = function () {
 
   counters.pms.pn1c += ((view8[16] << 8) + view8[17]) - ((view8[20] << 8) + view8[21])
   counters.pms.pn25c += ((view8[20] << 8) + view8[21]) - ((view8[22] << 8) + view8[23])
-  counters.pms.pn10c += ((view8[20] << 8) + view8[21]) - ((view8[26] << 8) + view8[27])
+  counters.pms.pn10c += ((view8[22] << 8) + view8[23]) - ((view8[26] << 8) + view8[27])
 
   if (view8[28] == 0x80) {  // 128=PMS7003
     //console.log(view8[28],'pms7003')

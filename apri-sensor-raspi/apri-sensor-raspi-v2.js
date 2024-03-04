@@ -388,6 +388,9 @@ var counters = {
     , part2_5: 0
     , part5_0: 0
     , part10_0: 0
+    , pn1c: 0
+    , pn25c: 0
+    , pn10c: 0
     , nrOfMeas: 0
     , nrOfMeasTotal: 0
   },
@@ -426,6 +429,9 @@ var counters = {
     , part2_5: 0
     , part4_0: 0
     , part10_0: 0
+    , pn1c: 0
+    , pn25c: 0
+    , pn10c: 0
     , tps: 0
     , nrOfMeas: 0
     , nrOfMeasTotal: 0
@@ -445,6 +451,9 @@ var counters = {
     , part2_5: 0
     , part5_0: 0
     , part10_0: 0
+    , pn1c: 0
+    , pn25c: 0
+    , pn10c: 0
     , nrOfMeas: 0
     , nrOfMeasTotal: 0
   },
@@ -488,6 +497,9 @@ var results = {
     , part2_5: 0
     , part5_0: 0
     , part10_0: 0
+    , pn1c: 0
+    , pn25c: 0
+    , pn10c: 0
     , nrOfMeas: 0
   },
   ds18b20: {
@@ -521,6 +533,9 @@ var results = {
     , part2_5: 0
     , part4_0: 0
     , part10_0: 0
+    , pn1c: 0
+    , pn25c: 0
+    , pn10c: 0
     , nrOfMeas: 0
   },
   ips7100: {
@@ -538,6 +553,9 @@ var results = {
     , part2_5: 0
     , part5_0: 0
     , part10_0: 0
+    , pn1c: 0
+    , pn25c: 0
+    , pn10c: 0
     , nrOfMeas: 0
   },
   scd30: {
@@ -685,6 +703,10 @@ var processRaspiSerialRecord = function () {
   counters.pms.part2_5 += (view8[22] << 8) + view8[23];
   counters.pms.part5_0 += (view8[24] << 8) + view8[25];
   counters.pms.part10_0 += (view8[26] << 8) + view8[27];
+
+  counters.pms.pn1c += ((view8[16] << 8) + view8[17]) - ((view8[20] << 8) + view8[21])
+  counters.pms.pn25c += ((view8[20] << 8) + view8[21]) - ((view8[22] << 8) + view8[23])
+  counters.pms.pn10c += ((view8[20] << 8) + view8[21]) - ((view8[26] << 8) + view8[27])
 
   if (view8[28] == 0x80) {  // 128=PMS7003
     //console.log(view8[28],'pms7003')
@@ -974,6 +996,9 @@ var processDataCycle = function () {
   results.pms.part2_5 = Math.round((counters.pms.part2_5 / counters.pms.nrOfMeas) * 100) / 100;
   results.pms.part5_0 = Math.round((counters.pms.part5_0 / counters.pms.nrOfMeas) * 100) / 100;
   results.pms.part10_0 = Math.round((counters.pms.part10_0 / counters.pms.nrOfMeas) * 100) / 100;
+  results.pms.pn1c = Math.round((counters.pms.pn1c / counters.pms.nrOfMeas) * 100) / 100;
+  results.pms.pn25c = Math.round((counters.pms.pn25c / counters.pms.nrOfMeas) * 100) / 100;
+  results.pms.pn10c = Math.round((counters.pms.pn10c / counters.pms.nrOfMeas) * 100) / 100;
   results.pms.nrOfMeas = counters.pms.nrOfMeas;
   results.pms.sensorType = counters.pms.sensorType;
 
@@ -1025,6 +1050,9 @@ var processDataCycle = function () {
     results.ips7100.part2_5 = Math.round((counters.ips7100.part2_5 / counters.ips7100.nrOfMeas) * 100) / 100;
     results.ips7100.part5_0 = Math.round((counters.ips7100.part5_0 / counters.ips7100.nrOfMeas) * 100) / 100;
     results.ips7100.part10_0 = Math.round((counters.ips7100.part10_0 / counters.ips7100.nrOfMeas) * 100) / 100;
+    results.ips7100.pn1c = Math.round((counters.ips7100.pn1c / counters.ips7100.nrOfMeas) * 100) / 100;
+    results.ips7100.pn25c = Math.round((counters.ips7100.pn25c / counters.ips7100.nrOfMeas) * 100) / 100;
+    results.ips7100.pn10c = Math.round((counters.ips7100.pn10c / counters.ips7100.nrOfMeas) * 100) / 100;  
     results.ips7100.nrOfMeas = counters.ips7100.nrOfMeas;
   }
 
@@ -1262,10 +1290,13 @@ var sendData = async function () {
       ',' + results.pms.part1_0 +
       ',' + results.pms.part2_5 +
       ',' + results.pms.part5_0 +
-      ',' + results.pms.part10_0
+      ',' + results.pms.part10_0 +
+      ',' + results.pms.pn1c +
+      ',' + results.pms.pn25c +
+      ',' + results.pms.pn10c
 
     header = '"sensorId","dateObserved","sensorType","pm1Cf1","pm25Cf1","pm10Cf1","pm1amb","pm25amb","pm10amb"' +
-      ',"part0_3","part0_5","part1_0","part2_5","part5_0","part10_0"'
+      ',"part0_3","part0_5","part1_0","part2_5","part5_0","part10_0","pn1c","pn25c","pn10c"'
 
     writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
       '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
@@ -1286,6 +1317,9 @@ var sendData = async function () {
       , 'raw2_5': results.pms.part2_5
       , 'raw5_0': results.pms.part5_0
       , 'raw10_0': results.pms.part10_0
+      , 'pn1c': results.pms.pn1c
+      , 'pn25c': results.pms.pn25c
+      , 'pn10c': results.pms.pn10c
     })
       .then(function (res) {
         var _res = res;
@@ -1706,10 +1740,13 @@ var sendData = async function () {
       ',' + results.ips7100.part2_5 +
       ',' + results.ips7100.part5_0 +
       ',' + results.ips7100.part10_0 +
+      ',' + results.ips7100.pn1c +
+      ',' + results.ips7100.pn25c +
+      ',' + results.ips7100.pn10c +
       ',' + results.ips7100.ips7100SerialNr
 
     header = '"sensorId","dateObserved","sensorType","pm01","pm03","pm05","pm1","pm25","pm5","pm10",' +
-      '"part0_1","part0_3","part0_5","part1_0","part2_5","part5_0","part10_0","ips7100SerialNr"'
+      '"part0_1","part0_3","part0_5","part1_0","part2_5","part5_0","part10_0","pn1c","pn25c","pn10c","ips7100SerialNr"'
 
     writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
       '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
@@ -1741,6 +1778,9 @@ var sendData = async function () {
       , 'raw2_5': results.ips7100.part2_5
       , 'raw5_0': results.ips7100.part5_0
       , 'raw10_0': results.ips7100.part10_0
+      , 'pn1c': results.ips7100.pn1c
+      , 'pn25c': results.ips7100.pn25c
+      , 'pn10c': results.ips7100.pn10c
       , 'serialNr': ips7100SerialNr
     })
       .then(function (res) {
@@ -2202,6 +2242,7 @@ var processRaspiSpsRecord = function (result) {
   counters.sps.part2_5 += result[6] - result[5]
   counters.sps.part4_0 += result[7] - result[6]
   counters.sps.part10_0 += result[8] - result[7]
+
   counters.sps.pn1c += result[5]
   counters.sps.pn25c += result[6] - result[5]
   counters.sps.pn10c += result[8] - result[6]
@@ -2617,6 +2658,11 @@ var processRaspiIps7100Record = function (result) {
   counters.ips7100.pm25 += parseFloat(result[24])
   counters.ips7100.pm5 += parseFloat(result[26])
   counters.ips7100.pm10 += parseFloat(result[28])
+
+  counters.ips7100.pn1c += parseFloat(result[2]) + parseFloat(result[4]) + parseFloat(result[6]) + parseFloat(result[8])
+  counters.ips7100.pn25c += parseFloat(result[10])
+  counters.ips7100.pn10c += parseFloat(result[12]) + parseFloat(result[14])
+
   ips7100SerialNr = result[29]
   ips7100Hash = result[30]
 }
@@ -2852,6 +2898,11 @@ var processRaspiSerialDataAtmega = function (data) {
     counters.pms.part2_5 += Math.round(parseFloat(items[10]) / 100)
     counters.pms.part5_0 += Math.round(parseFloat(items[11]) / 100)
     counters.pms.part10_0 += Math.round(parseFloat(items[12]) / 100)
+
+    counters.pms.pn1c += Math.round(parseFloat(items[7]) / 100) - Math.round(parseFloat(items[9]) / 100)
+    counters.pms.pn25c += Math.round(parseFloat(items[9]) / 100) - Math.round(parseFloat(items[10]) / 100)
+    counters.pms.pn10c += Math.round(parseFloat(items[10]) / 100) - Math.round(parseFloat(items[12]) / 100)
+  
   }
 }
 

@@ -2605,6 +2605,8 @@ var processRaspiScd30Record = function (result) {
     logger.info('Counters busy, scd30 measurement ignored *******************************');
     return;
   }
+  counters.scd30.nrOfMeas++;
+  counters.scd30.nrOfMeasTotal++;
 
   counters.scd30.co2 += result.co2
   counters.scd30.temperature += result.temperature

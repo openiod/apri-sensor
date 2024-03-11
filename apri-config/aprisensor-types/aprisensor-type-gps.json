@@ -3,7 +3,7 @@
   [
     {"name": "gps"
       ,"id":"gps"
-      ,"device":"/dev/ttyAMA0"
+      ,"device":"/dev/serial0"
       ,"protocol":"serial"
       ,"baudRate":9600
       ,"deviceType":"gps"

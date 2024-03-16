@@ -1863,7 +1863,7 @@ var sendData = async function () {
     writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
       '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
 
-    await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
+    let nextpmRec = {
       'foi': 'SCRP' + unit.id
       , 'time': timeStampTime
       , 'sensorType': sensorType
@@ -1879,11 +1879,15 @@ var sendData = async function () {
       , 'pm1c': results.nextpm.pm1c
       , 'pm25c': results.nextpm.pm25c
       , 'pm10c': results.nextpm.pm10c
-    //  , 'temperature': results.nextpm.temperature
-    //  , 'rHum': results.nextpm.rHum
-    //  , 'fanSpeed': results.nextpm.fanSpeed
-    //  , 'status': results.nextpm.status
-    }).then(function (res) {
+    }
+
+    if (results.nextpm.temperature) nextpmRec.temperature = results.nextpm.temperature
+    if (results.nextpm.rHum) nextpmRec.rHum = results.nextpm.rHum
+    if (results.nextpm.fanSpeed) nextpmRec.fanSpeed = results.nextpm.fanSpeed
+    if (results.nextpm.status) nextpmRec.status = results.nextpm.status    
+
+    await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, nextpmRec )
+    .then(function (res) {
       var _res = res;
       redisClient.SADD('new', timeStamp.toISOString() + ':' + sensorType)
         .then(function (res2) {
@@ -2550,7 +2554,7 @@ const nextpmRead10 = function () {
         //logger.info('scd30 no data found')
       } else {
         processRaspiNextpmRecord(result)
-/*        // add extra data temperature, rHum
+        // add extra data: temperature, rHum
         nextpmClient.readHoldingRegisters(102, 6)
         .then(async function (data) {
           //var result = {}
@@ -2572,14 +2576,14 @@ const nextpmRead10 = function () {
           logger.info('catch nextpmRead10')
           logger.info(err)
         })
-      */
+      
       }
     })
     .catch(function (err) {
       logger.info('catch nextpmRead10')
       logger.info(err)
     })
-/*    nextpmClient.readHoldingRegisters(19, 1)
+    nextpmClient.readHoldingRegisters(19, 2)
     .then(async function (data) {
       counters.nextpm.status = data.data[0]
     })
@@ -2587,7 +2591,7 @@ const nextpmRead10 = function () {
       logger.info('catch nextpmRead10 status')
       logger.info(err)
     })
-*/
+
   /* 
  nextpmClient.writeRegister(0x11, [0x6E])   
    .then(async function (data) {

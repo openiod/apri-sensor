@@ -2583,6 +2583,7 @@ const nextpmRead10 = function () {
       logger.info('catch nextpmRead10')
       logger.info(err)
     })
+/* mag niet gelijk met vorige
     nextpmClient.readHoldingRegisters(19, 2)
     .then(async function (data) {
       counters.nextpm.status = data.data[0]
@@ -2591,7 +2592,7 @@ const nextpmRead10 = function () {
       logger.info('catch nextpmRead10 status')
       logger.info(err)
     })
-
+*/
   /* 
  nextpmClient.writeRegister(0x11, [0x6E])   
    .then(async function (data) {

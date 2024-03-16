@@ -337,8 +337,8 @@ var nextpmAttributes = function (res) {
 		'part1:' + res.part1 + ',' + 'part25:' + res.part25 + ',' + 'part10:' + res.part10 +
 		',' + 'pm1:' + res.pm1 + ',' + 'pm25:' + res.pm25 + ',' + 'pm10:' + res.pm10 +
 		',pn1c:' + res.pn1c + ',' + 'pn25c:' + res.pn25c + ',' + 'pn10c:' + res.pn10c +
-		',' + 'pm1c:' + res.pm1c + ',' + 'pm25c:' + res.pm25c + ',' + 'pm10c:' + res.pm10c
-
+		',' + 'pm1c:' + res.pm1c + ',' + 'pm25c:' + res.pm25c + ',' + 'pm10c:' + res.pm10c +
+		',' + 'temperature:' + res.temperature + ',' + 'rHum:' + res.rHum + ',' + 'status:' + res.status 
 
 }
 

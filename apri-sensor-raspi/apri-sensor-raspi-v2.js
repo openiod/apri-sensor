@@ -1879,10 +1879,10 @@ var sendData = async function () {
       , 'pm1c': results.nextpm.pm1c
       , 'pm25c': results.nextpm.pm25c
       , 'pm10c': results.nextpm.pm10c
-      , 'temperature': results.nextpm.temperature
-      , 'rHum': results.nextpm.rHum
-      , 'fanSpeed': results.nextpm.fanSpeed
-      , 'status': results.nextpm.status
+    //  , 'temperature': results.nextpm.temperature
+    //  , 'rHum': results.nextpm.rHum
+    //  , 'fanSpeed': results.nextpm.fanSpeed
+    //  , 'status': results.nextpm.status
     }).then(function (res) {
       var _res = res;
       redisClient.SADD('new', timeStamp.toISOString() + ':' + sensorType)

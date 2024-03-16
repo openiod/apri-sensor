@@ -114,7 +114,7 @@ ssh pi@<id>.local
 cd /opt/SCAPE604/git/apri-sensor
 sudo git pull
 sudo ./install/git2as.sh
-sudo /opt/SCAPE604/apri-sensor/apri-agent/apri-sensor-update.sh
+#sudo /opt/SCAPE604/apri-sensor/apri-agent/apri-sensor-update.sh
 sudo systemctl stop SCAPE604-apri-sensor-raspi
 sudo systemctl stop SCAPE604-apri-sensor-connector
 sudo systemctl stop SCAPE604-aprisensor-nmcli

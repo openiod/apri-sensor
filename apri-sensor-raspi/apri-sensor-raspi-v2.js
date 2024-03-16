@@ -669,6 +669,7 @@ var initCounters = function () {
   counters.nextpm.pm1c = 0;
   counters.nextpm.pm25c = 0;
   counters.nextpm.pm10c = 0;
+  counters.nextpm.fanSpeed = 0;
   counters.nextpm.temperature = 0;
   counters.nextpm.rHum = 0;
   counters.nextpm.nrOfMeas = 0;
@@ -1073,8 +1074,10 @@ var processDataCycle = function () {
   results.nextpm.pm1c = Math.round((counters.nextpm.pm1c / counters.nextpm.nrOfMeas) * 100) / 100;
   results.nextpm.pm25c = Math.round((counters.nextpm.pm25c / counters.nextpm.nrOfMeas) * 100) / 100;
   results.nextpm.pm10c = Math.round((counters.nextpm.pm10c / counters.nextpm.nrOfMeas) * 100) / 100;
+  results.nextpm.fanSpeed = Math.round((counters.nextpm.fanSpeed / counters.nextpm.nrOfMeas) * 100) / 100;
   results.nextpm.temperature = Math.round((counters.nextpm.temperature / counters.nextpm.nrOfMeas) * 100) / 100;
   results.nextpm.rHum = Math.round((counters.nextpm.rHum / counters.nextpm.nrOfMeas) * 100) / 100;
+  results.nextpm.status = counters.nextpm.status
   results.nextpm.nrOfMeas = counters.nextpm.nrOfMeas;
 
 
@@ -1850,10 +1853,12 @@ var sendData = async function () {
       ',' + results.nextpm.pm1c +
       ',' + results.nextpm.pm25c +
       ',' + results.nextpm.pm10c +
-      ',' + results.nextpm.temperature
-    ',' + results.nextpm.rHum
+      ',' + results.nextpm.temperature +
+      ',' + results.nextpm.rHum +
+      ',' + results.nextpm.fanSpeed +
+      ',' + results.nextpm.status
 
-    header = '"sensorId","dateObserved","sensorType","part1","part25","part10","pm1","pm25","pm10","pn1c","pn25c","pn10c","pm1c","pm25c","pm10c","temperature","rHum"'
+    header = '"sensorId","dateObserved","sensorType","part1","part25","part10","pm1","pm25","pm10","pn1c","pn25c","pn10c","pm1c","pm25c","pm10c","temperature","rHum","fanSpeed","status"'
 
     writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
       '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
@@ -1876,6 +1881,8 @@ var sendData = async function () {
       , 'pm10c': results.nextpm.pm10c
       , 'temperature': results.nextpm.temperature
       , 'rHum': results.nextpm.rHum
+      , 'fanSpeed': results.nextpm.fanSpeed
+      , 'status': results.nextpm.status
     }).then(function (res) {
       var _res = res;
       redisClient.SADD('new', timeStamp.toISOString() + ':' + sensorType)
@@ -2542,14 +2549,44 @@ const nextpmRead10 = function () {
       if (result.part1 == 0) {
         //logger.info('scd30 no data found')
       } else {
-        //logger.info(result)
-        processRaspiNextpmRecord(result)
-      }
+        // add extra data temperature, rHum
+        nextpmClient.readHoldingRegisters(102, 6)
+        .then(async function (data) {
+          //var result = {}
+    
+          // Next procedure is activated on 20240302
+          // extract and calculate PN, PM and coarse values. Particles recalculated for 0.1L
+          // extract number of particles
+          result.fanSpeed = data.data[0]
+          result.rHum = data.data[4]
+          result.temperature = data.data[5]
+          if (result.part1 == 0) {
+            //logger.info('scd30 no data found')
+          } else {
+            //logger.info(result)
+            processRaspiNextpmRecord(result)
+          }
+        })
+        .catch(function (err) {
+          logger.info('catch nextpmRead10')
+          logger.info(err)
+        })
+          }
     })
     .catch(function (err) {
       logger.info('catch nextpmRead10')
       logger.info(err)
     })
+    nextpmClient.readHoldingRegisters(19, 1)
+    .then(async function (data) {
+      counters.nextpm.status = data.data[0]
+    })
+    .catch(function (err) {
+      logger.info('catch nextpmRead10 status')
+      logger.info(err)
+    })
+      }
+
   /* 
  nextpmClient.writeRegister(0x11, [0x6E])   
    .then(async function (data) {
@@ -2612,7 +2649,6 @@ var processRaspiScd30Record = function (result) {
   counters.scd30.temperature += result.temperature
   counters.scd30.rHum += result.rHum
 
-  //console.log(result.part1,result.part25,result.part10,result.pm1,result.pm25,result.pm10)
 }
 
 var processRaspiNextpmRecord = function (result) {
@@ -2634,6 +2670,7 @@ var processRaspiNextpmRecord = function (result) {
   counters.nextpm.pm1c += result.pm1c
   counters.nextpm.pm25c += result.pm25c
   counters.nextpm.pm10c += result.pm10c
+  counters.nextpm.fanSpeed += result.fanSpeed
   counters.nextpm.temperature += result.temperature
   counters.nextpm.rHum += result.rHum
 }

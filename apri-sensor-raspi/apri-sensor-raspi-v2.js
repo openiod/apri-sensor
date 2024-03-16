@@ -2585,7 +2585,6 @@ const nextpmRead10 = function () {
       logger.info('catch nextpmRead10 status')
       logger.info(err)
     })
-      }
 
   /* 
  nextpmClient.writeRegister(0x11, [0x6E])   

@@ -2549,7 +2549,8 @@ const nextpmRead10 = function () {
       if (result.part1 == 0) {
         //logger.info('scd30 no data found')
       } else {
-        // add extra data temperature, rHum
+        processRaspiNextpmRecord(result)
+/*        // add extra data temperature, rHum
         nextpmClient.readHoldingRegisters(102, 6)
         .then(async function (data) {
           //var result = {}
@@ -2571,13 +2572,14 @@ const nextpmRead10 = function () {
           logger.info('catch nextpmRead10')
           logger.info(err)
         })
-          }
+      */
+      }
     })
     .catch(function (err) {
       logger.info('catch nextpmRead10')
       logger.info(err)
     })
-    nextpmClient.readHoldingRegisters(19, 1)
+/*    nextpmClient.readHoldingRegisters(19, 1)
     .then(async function (data) {
       counters.nextpm.status = data.data[0]
     })
@@ -2585,7 +2587,7 @@ const nextpmRead10 = function () {
       logger.info('catch nextpmRead10 status')
       logger.info(err)
     })
-
+*/
   /* 
  nextpmClient.writeRegister(0x11, [0x6E])   
    .then(async function (data) {

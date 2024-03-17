@@ -2557,14 +2557,14 @@ const nextpmRead10 = function () {
         //processRaspiNextpmRecord(result)
         // add extra data: temperature, rHum
         let extra = await nextpmClient.readHoldingRegisters(102, 6)
-        if (extra) {
-          result.fanSpeed = data.data[0]
-          result.rHum = data.data[4]
-          result.temperature = data.data[5]
+        if (extra?.data) {
+          result.fanSpeed = extra.data[0]
+          result.rHum = extra.data[4]
+          result.temperature = extra.data[5]
         }
         let status = await nextpmClient.readHoldingRegisters(19, 2)
-        if (status) {
-          result.status = parseInt(status, 16)
+        if (status?.data) {
+          result.status = parseInt(status.data[0], 16)
         }
         
         processRaspiNextpmRecord(result)

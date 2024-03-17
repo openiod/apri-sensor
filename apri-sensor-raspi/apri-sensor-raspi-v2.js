@@ -2553,7 +2553,7 @@ const nextpmRead10 = function () {
       if (result.part1 == 0) {
         //logger.info('scd30 no data found')
       } else {
-        processRaspiNextpmRecord(result)
+        //processRaspiNextpmRecord(result)
         // add extra data: temperature, rHum
         nextpmClient.readHoldingRegisters(102, 6)
         .then(async function (data) {
@@ -2575,6 +2575,7 @@ const nextpmRead10 = function () {
         .catch(function (err) {
           logger.info('catch nextpmRead10')
           logger.info(err)
+          processRaspiNextpmRecord(result)
         })
       
       }

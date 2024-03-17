@@ -2564,7 +2564,8 @@ const nextpmRead10 = function () {
         }
         let status = await nextpmClient.readHoldingRegisters(18, 2)  // both even register numbers
         if (status?.data) {
-          result.status = parseInt(status.data[1], 16)
+          result.status = status.data[1]
+          //result.status = parseInt(status.data[1], 16)
         }
 
         processRaspiNextpmRecord(result)

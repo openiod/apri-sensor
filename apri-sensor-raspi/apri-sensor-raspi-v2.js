@@ -672,6 +672,7 @@ var initCounters = function () {
   counters.nextpm.fanSpeed = 0;
   counters.nextpm.temperature = 0;
   counters.nextpm.rHum = 0;
+  counters.nextpm.status = 0x00;
   counters.nextpm.nrOfMeas = 0;
 
 }
@@ -2561,6 +2562,11 @@ const nextpmRead10 = function () {
           result.rHum = data.data[4]
           result.temperature = data.data[5]
         }
+        let status = await nextpmClient.readHoldingRegisters(19, 2)
+        if (status) {
+          result.status = parseInt(status, 16)
+        }
+        
         processRaspiNextpmRecord(result)
 /*        .then(async function (data) {
           //var result = {}

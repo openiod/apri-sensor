@@ -2562,9 +2562,9 @@ const nextpmRead10 = function () {
           result.rHum = extra.data[4] / 100
           result.temperature = extra.data[5] / 100
         }
-        let status = await nextpmClient.readHoldingRegisters(19, 2)
+        let status = await nextpmClient.readHoldingRegisters(18, 2)  // both even register numbers
         if (status?.data) {
-          result.status = parseInt(status.data[0], 16)
+          result.status = parseInt(status.data[1], 16)
         }
 
         processRaspiNextpmRecord(result)

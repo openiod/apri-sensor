@@ -1054,7 +1054,7 @@ var processDataCycle = function () {
     results.ips7100.part10_0 = Math.round((counters.ips7100.part10_0 / counters.ips7100.nrOfMeas) * 100) / 100;
     results.ips7100.pn1c = Math.round((counters.ips7100.pn1c / counters.ips7100.nrOfMeas) * 100) / 100;
     results.ips7100.pn25c = Math.round((counters.ips7100.pn25c / counters.ips7100.nrOfMeas) * 100) / 100;
-    results.ips7100.pn10c = Math.round((counters.ips7100.pn10c / counters.ips7100.nrOfMeas) * 100) / 100;  
+    results.ips7100.pn10c = Math.round((counters.ips7100.pn10c / counters.ips7100.nrOfMeas) * 100) / 100;
     results.ips7100.nrOfMeas = counters.ips7100.nrOfMeas;
   }
 
@@ -1885,19 +1885,19 @@ var sendData = async function () {
     if (results.nextpm.temperature) nextpmRec.temperature = results.nextpm.temperature
     if (results.nextpm.rHum) nextpmRec.rHum = results.nextpm.rHum
     if (results.nextpm.fanSpeed) nextpmRec.fanSpeed = results.nextpm.fanSpeed
-    if (results.nextpm.status) nextpmRec.status = results.nextpm.status    
+    if (results.nextpm.status) nextpmRec.status = results.nextpm.status
 
-    await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, nextpmRec )
-    .then(function (res) {
-      var _res = res;
-      redisClient.SADD('new', timeStamp.toISOString() + ':' + sensorType)
-        .then(function (res2) {
-          var _res2 = res2;
-          //	redisSaddAsync('nextpm', timeStamp.toISOString()+':nextpm')
-          // logger.info('nextpm ', timeStamp.toISOString() + ':' + sensorType + _res2);
-        });
-      //logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
-    });
+    await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, nextpmRec)
+      .then(function (res) {
+        var _res = res;
+        redisClient.SADD('new', timeStamp.toISOString() + ':' + sensorType)
+          .then(function (res2) {
+            var _res2 = res2;
+            //	redisSaddAsync('nextpm', timeStamp.toISOString()+':nextpm')
+            // logger.info('nextpm ', timeStamp.toISOString() + ':' + sensorType + _res2);
+          });
+        //logger.info(timeStamp.toISOString() + ':' + sensorType + _res);
+      });
   }
 
   if (aprisensorDevices.bme280) {
@@ -2258,7 +2258,7 @@ var processRaspiSpsRecord = function (result) {
   counters.sps.pn1c += result[5]
   counters.sps.pn25c += result[6] - result[5]
   counters.sps.pn10c += result[8] - result[6]
-  
+
   counters.sps.tps += result[9]
 }
 
@@ -2548,7 +2548,7 @@ const nextpmRead10 = function () {
       result.pm10 = (data.data[11] * 65536 + data.data[10]) / 1000
       // calculate PM-coarse
       result.pm1c = result.pm1
-      result.pm25c = result.pm25 - result.pm1 
+      result.pm25c = result.pm25 - result.pm1
       result.pm10c = result.pm10 - result.pm25
 
       if (result.part1 == 0) {
@@ -2558,38 +2558,38 @@ const nextpmRead10 = function () {
         // add extra data: temperature, rHum
         let extra = await nextpmClient.readHoldingRegisters(102, 6)
         if (extra?.data) {
-          result.fanSpeed = extra.data[0]
-          result.rHum = extra.data[4]
-          result.temperature = extra.data[5]
+          result.fanSpeed = extra.data[0] 
+          result.rHum = extra.data[4] / 100
+          result.temperature = extra.data[5] / 100
         }
         let status = await nextpmClient.readHoldingRegisters(19, 2)
         if (status?.data) {
           result.status = parseInt(status.data[0], 16)
         }
-        
+
         processRaspiNextpmRecord(result)
-/*        .then(async function (data) {
-          //var result = {}
-    
-          // Next procedure is activated on 20240302
-          // extract and calculate PN, PM and coarse values. Particles recalculated for 0.1L
-          // extract number of particles
-          result.fanSpeed = data.data[0]
-          result.rHum = data.data[4]
-          result.temperature = data.data[5]
-          if (result.part1 == 0) {
-            //logger.info('scd30 no data found')
-          } else {
-            //logger.info(result)
-            processRaspiNextpmRecord(result)
-          }
-        })
-        .catch(function (err) {
-          logger.info('catch nextpmRead10')
-          logger.info(err)
-          processRaspiNextpmRecord(result)
-        })
-*/
+        /*        .then(async function (data) {
+                  //var result = {}
+            
+                  // Next procedure is activated on 20240302
+                  // extract and calculate PN, PM and coarse values. Particles recalculated for 0.1L
+                  // extract number of particles
+                  result.fanSpeed = data.data[0]
+                  result.rHum = data.data[4]
+                  result.temperature = data.data[5]
+                  if (result.part1 == 0) {
+                    //logger.info('scd30 no data found')
+                  } else {
+                    //logger.info(result)
+                    processRaspiNextpmRecord(result)
+                  }
+                })
+                .catch(function (err) {
+                  logger.info('catch nextpmRead10')
+                  logger.info(err)
+                  processRaspiNextpmRecord(result)
+                })
+        */
 
       }
     })
@@ -2597,16 +2597,16 @@ const nextpmRead10 = function () {
       logger.info('catch nextpmRead10')
       logger.info(err)
     })
-/* mag niet gelijk met vorige
-    nextpmClient.readHoldingRegisters(19, 2)
-    .then(async function (data) {
-      counters.nextpm.status = data.data[0]
-    })
-    .catch(function (err) {
-      logger.info('catch nextpmRead10 status')
-      logger.info(err)
-    })
-*/
+  /* mag niet gelijk met vorige
+      nextpmClient.readHoldingRegisters(19, 2)
+      .then(async function (data) {
+        counters.nextpm.status = data.data[0]
+      })
+      .catch(function (err) {
+        logger.info('catch nextpmRead10 status')
+        logger.info(err)
+      })
+  */
   /* 
  nextpmClient.writeRegister(0x11, [0x6E])   
    .then(async function (data) {
@@ -2961,7 +2961,7 @@ var processRaspiSerialDataAtmega = function (data) {
     counters.pms.pn1c += Math.round(parseFloat(items[7]) / 100) - Math.round(parseFloat(items[9]) / 100)
     counters.pms.pn25c += Math.round(parseFloat(items[9]) / 100) - Math.round(parseFloat(items[10]) / 100)
     counters.pms.pn10c += Math.round(parseFloat(items[10]) / 100) - Math.round(parseFloat(items[12]) / 100)
-  
+
   }
 }
 

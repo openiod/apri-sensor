@@ -2555,8 +2555,14 @@ const nextpmRead10 = function () {
       } else {
         //processRaspiNextpmRecord(result)
         // add extra data: temperature, rHum
-        nextpmClient.readHoldingRegisters(102, 6)
-        .then(async function (data) {
+        let extra = await nextpmClient.readHoldingRegisters(102, 6)
+        if (extra) {
+          result.fanSpeed = data.data[0]
+          result.rHum = data.data[4]
+          result.temperature = data.data[5]
+        }
+        processRaspiNextpmRecord(result)
+/*        .then(async function (data) {
           //var result = {}
     
           // Next procedure is activated on 20240302
@@ -2577,7 +2583,8 @@ const nextpmRead10 = function () {
           logger.info(err)
           processRaspiNextpmRecord(result)
         })
-      
+*/
+
       }
     })
     .catch(function (err) {

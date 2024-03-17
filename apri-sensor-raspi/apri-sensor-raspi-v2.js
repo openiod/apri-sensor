@@ -672,7 +672,7 @@ var initCounters = function () {
   counters.nextpm.fanSpeed = 0;
   counters.nextpm.temperature = 0;
   counters.nextpm.rHum = 0;
-  counters.nextpm.status = 0x00;
+  counters.nextpm.status = 0;
   counters.nextpm.nrOfMeas = 0;
 
 }
@@ -1078,7 +1078,7 @@ var processDataCycle = function () {
   results.nextpm.fanSpeed = Math.round((counters.nextpm.fanSpeed / counters.nextpm.nrOfMeas) * 100) / 100;
   results.nextpm.temperature = Math.round((counters.nextpm.temperature / counters.nextpm.nrOfMeas) * 100) / 100;
   results.nextpm.rHum = Math.round((counters.nextpm.rHum / counters.nextpm.nrOfMeas) * 100) / 100;
-  results.nextpm.status = counters.nextpm.status
+  results.nextpm.status = counters.nextpm.status // no cumulation for status
   results.nextpm.nrOfMeas = counters.nextpm.nrOfMeas;
 
 
@@ -2564,8 +2564,8 @@ const nextpmRead10 = function () {
         }
         let status = await nextpmClient.readHoldingRegisters(18, 2)  // both even register numbers
         if (status?.data) {
+          // status is static data (without cumulation)
           result.status = status.data[1]
-          //result.status = parseInt(status.data[1], 16)
         }
 
         processRaspiNextpmRecord(result)
@@ -2694,6 +2694,7 @@ var processRaspiNextpmRecord = function (result) {
   counters.nextpm.fanSpeed += result.fanSpeed
   counters.nextpm.temperature += result.temperature
   counters.nextpm.rHum += result.rHum
+  counters.nextpm.status = result.status // no cumulation for status
 }
 
 // ips7100

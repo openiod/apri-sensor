@@ -117,7 +117,6 @@ var atmegaRecordIn = ''
 var ModbusRTU
 var scd30Client
 var nextpmClient
-var sgp41Client
 try {
   ModbusRTU = require("modbus-serial");
 }
@@ -3005,6 +3004,8 @@ var readSgp41Device = function () {
 
 
 const readSgp41Measurement = function () {
+// dit moet i2c variant worden
+  /*
   sgp41Client.readHoldingRegisters(0x28, 6)
     .then(function (data) {
       var result = {}
@@ -3026,6 +3027,7 @@ const readSgp41Measurement = function () {
       logger.info('xx error xxxx')
       logger.info(err)
     })
+    */
 }
 
 var processRaspiSgp41Record = function (result) {
@@ -3482,7 +3484,6 @@ if (aprisensorDevices.nextpm != undefined) {
 
 const startSgp41 = async function () {
   logger.info('sgp41 start')
-  sgp41Client.setID(0x61)
   await sleepFunction(100)
   initSgp41Device()
 }

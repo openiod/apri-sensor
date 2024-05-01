@@ -117,6 +117,7 @@ var atmegaRecordIn = ''
 var ModbusRTU
 var scd30Client
 var nextpmClient
+var sgp41Client
 try {
   ModbusRTU = require("modbus-serial");
 }

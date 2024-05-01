@@ -2,7 +2,9 @@
 ** Module: apri-sensor-raspi
 **
 ** Main system module for handling sensor measurement data for:
-**  DS18B20, PMSA003/PMS7003, BME280, BME680, TGS5042, SPS30, IPS7100, SCD30, gps
+**  DS18B20, PMSA003/PMS7003, BME280, BME680, TGS5042, SPS30, IPS7100, SCD30, gps, sgp41
+**
+** sgp41 combined with bme280/bme680 for temperature and rHum
 **
 *** SCD30 only with I2C clock stretching wich is only available in software i2c on Raspberry pi
 *** in /boot/config.txt for /dev/i2c-3
@@ -21,7 +23,6 @@ if (device === undefined) {
     }
     this._devices[address] = device;
 }
-
 
 */
 
@@ -241,6 +242,9 @@ catch (err) {
   logger.info('module BME680-sensor not installed')
 }
 
+var indSgp41 = false
+var addressI2cSgp41 = 0x59
+
 var indSps30 = false
 var addressI2cSps30 = 0x69
 
@@ -427,6 +431,17 @@ var counters = {
     , co2: 0
     , nrOfMeas: 0
     , nrOfMeasTotal: 0
+  },
+  sgp41: {
+    vocIndex: 0
+    , noxIndex: 0
+    , vocSraw: 0
+    , noxSraw: 0
+    , temperature: 0
+    , pressure: 0
+    , rHum: 0
+    , nrOfMeas: 0
+    , nrOfMeasTotal: 0
   }
 };
 var results = {
@@ -500,6 +515,17 @@ var results = {
     , rHum: 0
     , co2: 0
     , nrOfMeas: 0
+  },
+  sgp41: {
+    vocIndex: 0
+    , noxIndex: 0
+    , vocSraw: 0
+    , noxSraw: 0
+    , temperature: 0
+    , pressure: 0
+    , rHum: 0
+    , nrOfMeas: 0
+    , nrOfMeasTotal: 0
   }
 };
 
@@ -567,6 +593,16 @@ var initCounters = function () {
   counters.scd30.rHum = 0;
   counters.scd30.co2 = 0;
   counters.scd30.nrOfMeas = 0;
+
+  counters.sgp41.vocIndex = 0;
+  counters.sgp41.noxIndex = 0;
+  counters.sgp41.vocSraw = 0;
+  counters.sgp41.noxSraw = 0;
+  counters.sgp41.temperature = 0;
+  counters.sgp41.pressure = 0;
+  counters.sgp41.rHum = 0;
+  counters.sgp41.nrOfMeas = 0;
+
 }
 
 //-------------- raspi-serial
@@ -851,7 +887,8 @@ var processDataCycle = function () {
     '; tgs5042: ' + counters.tgs5042.nrOfMeas +
     '; sps30: ' + counters.sps.nrOfMeas +
     '; ips7100: ' + counters.ips7100.nrOfMeas +
-    '; scd30: ' + counters.scd30.nrOfMeas
+    '; scd30: ' + counters.scd30.nrOfMeas +
+    '; sgp41: ' + counters.sgp41.nrOfMeas
   )
 
   results.pms.pm1CF1 = Math.round((counters.pms.pm1CF1 / counters.pms.nrOfMeas) * 100) / 100;
@@ -868,16 +905,22 @@ var processDataCycle = function () {
   results.pms.part10_0 = Math.round((counters.pms.part10_0 / counters.pms.nrOfMeas) * 100) / 100;
   results.pms.nrOfMeas = counters.pms.nrOfMeas;
 
-  results.bme280.temperature = Math.round((counters.bme280.temperature / counters.bme280.nrOfMeas) * 100) / 100;
-  results.bme280.pressure = Math.round((counters.bme280.pressure / counters.bme280.nrOfMeas) * 100) / 100;
-  results.bme280.rHum = Math.round((counters.bme280.rHum / counters.bme280.nrOfMeas) * 100) / 100;
-  results.bme280.nrOfMeas = counters.bme280.nrOfMeas;
+  // skip first 2 measurements, initialization fase of the bme280
+  if (counters.bme280.nrOfMeasTotal > 2) {
+    results.bme280.temperature = Math.round((counters.bme280.temperature / counters.bme280.nrOfMeas) * 100) / 100;
+    results.bme280.pressure = Math.round((counters.bme280.pressure / counters.bme280.nrOfMeas) * 100) / 100;
+    results.bme280.rHum = Math.round((counters.bme280.rHum / counters.bme280.nrOfMeas) * 100) / 100;
+    results.bme280.nrOfMeas = counters.bme280.nrOfMeas;
+  }
 
-  results.bme680.temperature = Math.round((counters.bme680.temperature / counters.bme680.nrOfMeas) * 100) / 100;
-  results.bme680.pressure = Math.round((counters.bme680.pressure / counters.bme680.nrOfMeas) * 100) / 100;
-  results.bme680.rHum = Math.round((counters.bme680.rHum / counters.bme680.nrOfMeas) * 100) / 100;
-  results.bme680.gasResistance = Math.round((counters.bme680.gasResistance / counters.bme680.nrOfMeas) * 100) / 100;
-  results.bme680.nrOfMeas = counters.bme680.nrOfMeas;
+  // skip first 2 measurements, initialization fase of the bme680
+  if (counters.bme680.nrOfMeasTotal > 2) {
+    results.bme680.temperature = Math.round((counters.bme680.temperature / counters.bme680.nrOfMeas) * 100) / 100;
+    results.bme680.pressure = Math.round((counters.bme680.pressure / counters.bme680.nrOfMeas) * 100) / 100;
+    results.bme680.rHum = Math.round((counters.bme680.rHum / counters.bme680.nrOfMeas) * 100) / 100;
+    results.bme680.gasResistance = Math.round((counters.bme680.gasResistance / counters.bme680.nrOfMeas) * 100) / 100;
+    results.bme680.nrOfMeas = counters.bme680.nrOfMeas;
+  }
 
   results.ds18b20.temperature = Math.round((counters.ds18b20.temperature / counters.ds18b20.nrOfMeas) * 100) / 100;
   results.ds18b20.nrOfMeas = counters.ds18b20.nrOfMeas;
@@ -920,6 +963,18 @@ var processDataCycle = function () {
   results.scd30.rHum = Math.round((counters.scd30.rHum / counters.scd30.nrOfMeas) * 100) / 100;
   results.scd30.co2 = Math.round((counters.scd30.co2 / counters.scd30.nrOfMeas) * 100) / 100;
   results.scd30.nrOfMeas = counters.scd30.nrOfMeas;
+
+  // skip first 2 measurements, initialization fase of the sgp41
+  if (counters.sgp41.nrOfMeasTotal > 2) {
+    results.sgp41.temperature = Math.round((counters.sgp41.vocIndex / counters.sgp41.nrOfMeas) * 100) / 100;
+    results.sgp41.temperature = Math.round((counters.sgp41.noxIndex / counters.sgp41.nrOfMeas) * 100) / 100;
+    results.sgp41.temperature = Math.round((counters.sgp41.vocSraw / counters.sgp41.nrOfMeas) * 100) / 100;
+    results.sgp41.temperature = Math.round((counters.sgp41.noxSraw / counters.sgp41.nrOfMeas) * 100) / 100;
+    results.sgp41.temperature = Math.round((counters.sgp41.temperature / counters.sgp41.nrOfMeas) * 100) / 100;
+    results.sgp41.pressure = Math.round((counters.sgp41.pressure / counters.sgp41.nrOfMeas) * 100) / 100;
+    results.sgp41.rHum = Math.round((counters.sgp41.rHum / counters.sgp41.nrOfMeas) * 100) / 100;
+    results.sgp41.nrOfMeas = counters.sgp41.nrOfMeas;
+  }
 
   initCounters();
   counters.busy = false;
@@ -1248,6 +1303,30 @@ var sendData = function () {
       logger.info(timeStamp.toISOString() + ':scd30' + _res);
     });
   }
+  if (results.sgp41.nrOfMeas > 0) {
+    redisHmsetHashAsync(timeStamp.toISOString() + ':sgp41'
+      , 'foi', 'SCRP' + unit.id
+      , 'time', timeStampTime
+      , 'sensorType', 'sgp41'
+      , 'vocIndex', results.sgp41.vocIndex
+      , 'noxIndex', results.sgp41.noxIndex
+      , 'vocSraw', results.sgp41.vocSraw
+      , 'noxSraw', results.sgp41.noxSraw
+      , 'temperature', results.sgp41.temperature
+      , 'pressure', results.sgp41.pressure
+      , 'rHum', results.sgp41.rHum
+    ).then(function (res) {
+      var _res = res;
+      redisSaddAsync('new', timeStamp.toISOString() + ':sgp41')
+        .then(function (res2) {
+          var _res2 = res2;
+          //	redisSaddAsync('sgp41', timeStamp.toISOString()+':sgp41')
+          logger.info('sgp41 ', timeStamp.toISOString() + ':sgp41' + _res2);
+        });
+      logger.info(timeStamp.toISOString() + ':sgp41' + _res);
+    });
+  }
+
 
   if (aprisensorDevices.bme280) {
     if (results.bme280.nrOfMeas == 0) {
@@ -1352,6 +1431,9 @@ var sendData = function () {
   if (results.scd30.nrOfMeas == 0) {
     // reset scd30 when connected ?
   }
+  if (results.sgp41.nrOfMeas == 0) {
+    // reset sgp41 when connected ?
+  }
 
 };
 
@@ -1396,6 +1478,7 @@ var setGpioFanOff = function() {
 }
 setGpioFanOff() // fan always on but first set gpio to off
 */
+
 var i2cSps30
 var sps30ProductType = ''
 var sps30SerialNr = ''
@@ -1762,6 +1845,216 @@ var processRaspiScd30Record = function (result) {
   counters.scd30.co2 += result.co2
   counters.scd30.temperature += result.temperature
   counters.scd30.rHum += result.rHum
+}
+
+var i2cSgp41
+//var sps30ProductType = ''
+var sgp41SerialNr = ''
+if (isEmpty(aprisensorDevices) || aprisensorDevices.sgp41) {
+  i2cSgp41 = new I2C();
+}
+
+var calcCrcSgp41 = function (data1, data2) {
+  var crc = 0xFF
+  for (var i = 0; i < 2; i++) {
+    if (i == 0) crc ^= data1
+    else crc ^= data2
+    for (var bit = 8; bit > 0; --bit) {
+      if (crc & 0x80) {
+        crc = (crc << 1) ^ 0x31
+      } else {
+        crc = (crc << 1)
+      }
+      if (crc > 255) {
+        var a = crc >> 8
+        var b = a << 8
+        crc = crc - b
+      }
+    }
+  }
+  return crc
+}
+
+var initSgp41Device = function () {
+  raspi.init(() => {
+    var str12
+    try {
+      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([0xD0, 0x02]))
+      str12 = i2cSgp41.readSync(addressI2cSgp41, 12)
+    }
+    catch {
+      logger.info('error initializing sgp41, maybe not available')
+      indSgp41 = false
+      return
+    }
+
+    return
+//    sgp41ProductType = ''
+//    if (Buffer.compare(str12,
+//      Buffer.from([0x30, 0x30, 0xf6, 0x30, 0x38, 0x4f, 0x30, 0x30, 0xf6, 0x30, 0x30, 0xf6])) == 0) {
+//     sgp41ProductType = '00080000'
+//      logger.info('sgp41 producttype found: ' + sgp41ProductType)
+//      indSgp41 = true
+//    } else {
+//      logger.info('sgp41 producttype not found')
+//      indSgp41 = false
+//      return
+//    }
+//    var buf48
+//    try {
+//      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([0xD0, 0x33]))
+//      buf48 = i2cSgp41.readSync(addressI2cSgp41, 48)
+//    }
+//    catch {
+//      logger.info('error initializing sgp41, maybe not available')
+//      indSgp41 = false
+//      return
+//    }
+    sgp41SerialNr = ''
+    for (var i = 0; i < 48; i = i + 3) {
+      if (buf48[i] == 0) break
+      sgp41SerialNr += String.fromCharCode(buf48[i])
+      if (buf48[i + 1] == 0) break
+      sgp41SerialNr += String.fromCharCode(buf48[i + 1])
+    }
+    logger.info(`sgp41 producttype: ${sgp41ProductType}`)
+    logger.info(`sgp41 serialnr: ${sgp41SerialNr}`)
+    // start measuring
+    try {
+      // set sensor to produce floating point values
+      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([0x00, 0x10, 0x03, 0x00, calcCrcSgp41(0x03, 0x00)]))
+      //      // integer
+      //    i2cSgp41.writeSync(addressI2cSgp41,Buffer.from([ 0x00,0x10,0x05,0x00,0xF6]))
+    }
+    catch {
+      logger.info('error initializing sgp41, maybe not available')
+      indSgp41 = false
+      return
+    }
+  });
+}
+var readSgp41Device = function () {
+
+  return
+  
+  if (indSgp41 == true) {
+    var buf60
+    var result = []
+    try {
+      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([0x03, 0x00]))
+      buf60 = i2cSgp41.readSync(addressI2cSgp41, 60)
+    }
+    catch {
+      logger.info('ERROR readSgp41Device writeSync ')
+      return
+    }
+    // floats
+    for (var i = 0; i < 60; i = i + 6) {
+      //      logger.info(i)
+      if (buf60[i + 2] != calcCrcSgp41(buf60[i], buf60[i + 1])) {
+        logger.info('checksum error')
+        break
+      }
+      if (buf60[i + 5] != calcCrcSgp41(buf60[i + 3], buf60[i + 4])) {
+        logger.info('checksum error')
+        break
+      }
+      var data = [buf60[i], buf60[i + 1], buf60[i + 3], buf60[i + 4]]
+      //      console.dir(data)
+      //      logger.info(buf30[i])
+      //      logger.info(buf30[i+1])
+      // Create a buffer
+      var buf = new ArrayBuffer(4);
+      // Create a data view of it
+      //var view = new DataView(buf);
+      var view = new Float32Array(buf);
+      var view8 = new Uint8Array(buf);
+      var view16 = new Uint16Array(buf);
+
+      //      function bytesToFloat(bytes) {
+      // JavaScript bitwise operators yield a 32 bits integer, not a float.
+      // Assume LSB (least significant byte first).
+      var bits = buf60[i] << 24 | buf60[i + 1] << 16 | buf60[i + 3] << 8 | buf60[i + 4]
+      var sign = (bits >>> 31 === 0) ? 1.0 : -1.0;
+      var e = bits >>> 23 & 0xff;
+      var m = (e === 0) ? (bits & 0x7fffff) << 1 : (bits & 0x7fffff) | 0x800000;
+      var value = sign * m * Math.pow(2, e - 150);
+
+      // the nodejs procedure to convert float (4 bytes) into double
+
+      // const bufTest = Buffer.from([buf60[i], buf60[i+1], buf60[i+3], buf60[i+4]]);
+      // logger.info('test: '+i)
+      // logger.info(value);
+      // dit geeft dezelfde resultaat als de bovenstaande float omrekening: logger.info(bufTest.readFloatBE(0));
+      // deze geeft foutieve waarden: logger.info(bufTest.readFloatLE(0));
+      //        return f;
+      //      }
+
+      // Read the bits as a float; note that by doing this, we're implicitly
+      // converting it from a 32-bit float into JavaScript's native 64-bit double
+      //      var value = view.getFloat32(0);
+      // Done
+      //      logger.info(value);
+
+      //      var buffer = new ArrayBuffer(4);
+      //      var intView = new Int32Array(buffer);
+      //      var floatView = new Float32Array(buffer);
+
+      //      floatView[0] = Math.PI
+      //      logger.info(intView[0].toString(2)); //bits of the 32 bit float
+      //      logger.info(floatView[0])
+
+      // convert number of particles from cm3 into 0.1L (multiply by 100)
+      if (result.length >= 4 && result.length <= 8) {
+        value = value * 100
+      }
+      result.push(value)
+    }
+    if (result.length == 10) {
+      processRaspiSgp41Record(result)
+    }
+  }
+}
+
+
+const readSgp41Measurement = function () {
+  sgp41Client.readHoldingRegisters(0x28, 6)
+    .then(function (data) {
+      var result = {}
+//      result.temperature = data.buffer.readFloatBE(4)  // get latest from bme
+//      result.rHum = data.buffer.readFloatBE(8)  // get latest from bme
+//      result.pressure = data.buffer.readFloatBE(8)  // get latest from bme
+      result.vocSraw = data.buffer.readFloatBE(0)
+      result.noxSraw = data.buffer.readFloatBE(4)
+//      result.vocIndex = data.buffer.readFloatBE(0)  // todo: calculate index with bme data
+//      result.noxIndex = data.buffer.readFloatBE(0)  // todo: calculate index with bme data
+      if (result.vocSraw == 0) {
+        logger.info('sgp41 no data found')
+      } else {
+        logger.info(result)
+        processRaspiSgp41Record(result)
+      }
+    })
+    .catch(function (err) {
+      logger.info('xx error xxxx')
+      logger.info(err)
+    })
+}
+
+var processRaspiSgp41Record = function (result) {
+  if (counters.busy == true) {
+    logger.info('Counters busy, sgp41 measurement ignored *******************************');
+    return;
+  }
+  counters.sgp41.nrOfMeas++;
+  counters.sgp41.nrOfMeasTotal++;
+  counters.sgp41.vocIndex += result.vocIndex
+  counters.sgp41.noxIndex += result.noxIndex
+  counters.sgp41.vocSraw += result.vocSraw
+  counters.sgp41.noxSraw += result.noxSraw
+  counters.sgp41.temperature += result.temperature
+  counters.sgp41.rHum += result.rHum
+  counters.sgp41.pressure += result.pressure
 }
 
 // ips7100
@@ -2184,6 +2477,16 @@ if (aprisensorDevices.scd30 != undefined) {
   startScd30()
 }
 
+const startSgp41 = async function () {
+  logger.info('sgp41 start')
+  sgp41Client.setID(0x61)
+  await sleepFunction(100)
+  initSgp41Device()
+}
+if (aprisensorDevices.sgp41 != undefined) {
+  startSgp41()
+}
+
 
 if (isEmpty(aprisensorDevices) || aprisensorDevices.bme280) {
   let timerIdBme280 = setInterval(readSensorDataBme280, 2000)
@@ -2206,6 +2509,9 @@ if (aprisensorDevices.tgs5042) {
 }
 if (aprisensorDevices.scd30) {
   let timerIdScd30 = setInterval(readScd30Device, 1000)  // CO2,temperature,rHum
+}
+if (aprisensorDevices.sgp41) {
+  let timerIdSgp41 = setInterval(readSgp41Device, 1000)
 }
 
 let timerDataCycle = setInterval(processDataCycle, loopTimeCycle)

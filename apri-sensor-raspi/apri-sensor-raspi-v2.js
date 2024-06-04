@@ -2862,11 +2862,18 @@ var calcCrcSgp41 = function (data1, data2) {
 }
 
 var initSgp41Device = function () {
-  raspi.init(() => {
+  let crc
+  let d1,d2
+  raspi.init(async () => {
     var str12
     try {
-      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([0xD0, 0x02]))
-      str12 = i2cSgp41.readSync(addressI2cSgp41, 12)
+      d1 = 0x36
+      d2 = 0x82
+      crc = calcCrcSgp41 (d1,d2)
+      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, crc]))
+      await sleepFunction(1)
+      str9 = i2cSgp41.readSync(addressI2cSgp41, 9)
+      console.log('sgp41 serialnr: ',str9)
     }
     catch {
       logger.info('error initializing sgp41, maybe not available')

@@ -2902,7 +2902,33 @@ var initSgp41Device = function () {
       return
     }
 
-    //for (i=0;i<)
+    // start conditioning max 10 seconds
+    let startTime = new Date()
+    for (let i=0;i<4;i++) {
+
+      let duration = (new Date().getTime()-startTime.getTime())/1000
+      console.log('sgp41 conditioning fase (max 10 seconds)',duration)
+      if (duration>=5) {
+        break
+      }
+      try {
+        d1 = 0x26
+        d2 = 0x12
+        crc = calcCrcSgp41(d1, d2)
+        i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2,0x80,0x00,0xA2,0x66,0x66,0x93]))
+        await sleepFunction(50)
+        str3 = i2cSgp41.readSync(addressI2cSgp41, 3)
+        result = str9[0] << 8 | str9[1]
+        console.log('sgp41 conditioning. raw VOC: ', result)
+        await sleepFunction(1)
+      }
+      catch {
+        logger.info('error initializing sgp41, maybe not available')
+        indSgp41 = false
+        return
+      }
+
+    }
 
     return
     //    sgp41ProductType = ''

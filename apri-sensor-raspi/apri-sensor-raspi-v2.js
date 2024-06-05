@@ -2878,7 +2878,7 @@ var initSgp41Device = function () {
       await sleepFunction(1)
       str9 = i2cSgp41.readSync(addressI2cSgp41, 9)
       result = str9[0] << 36 | str9[1] << 30 | str9[3] << 24 | str9[4] << 16 | str9[6] << 8 | str9[7]
-      console.log('sgp41 serialnr: ', result)
+      logger.info('sgp41 serialnr: ' + result)
     }
     catch {
       logger.info('error initializing sgp41, maybe not available')
@@ -2895,7 +2895,7 @@ var initSgp41Device = function () {
       await sleepFunction(320)
       str3 = i2cSgp41.readSync(addressI2cSgp41, 3)
       result = str3[0] << 8 | str3[1]
-      console.log('sgp41 self test: ', result)
+      logger.info('sgp41 self test: '+ result)
     }
     catch {
       logger.info('error initializing sgp41, maybe not available')
@@ -2905,7 +2905,7 @@ var initSgp41Device = function () {
 
     // start conditioning max 10 seconds
     let startTime = new Date()
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 200; i++) {
 
       let duration = (new Date().getTime() - startTime.getTime()) / 1000
       //      console.log('sgp41 conditioning fase (max 10 seconds)',duration)
@@ -2920,15 +2920,14 @@ var initSgp41Device = function () {
         await sleepFunction(50)
         str3 = i2cSgp41.readSync(addressI2cSgp41, 3)
         result = str3[0] << 8 | str3[1]
-        console.log('sgp41 conditioning. raw VOC: ', result, ' Duration:', duration)
-        await sleepFunction(1)
+        logger.info('sgp41 conditioning. raw VOC: '+ result+ ' Duration:'+ duration)
+        await sleepFunction(100)
       }
       catch {
         logger.info('error initializing sgp41, maybe not available')
         indSgp41 = false
         return
       }
-
     }
 
     // first measurement
@@ -2941,7 +2940,7 @@ var initSgp41Device = function () {
       str6 = i2cSgp41.readSync(addressI2cSgp41, 6)
       let resultVoc = str6[0] << 8 | str6[1]
       let resultNox = str6[3] << 8 | str6[4]
-      console.log('sgp41 raw VOC: ', resultVoc, ' raw NOx:', resultNox)
+      logger.info('sgp41 raw VOC: '+ resultVoc, ' raw NOx:'+ resultNox)
       await sleepFunction(1)
     }
     catch {
@@ -2952,12 +2951,14 @@ var initSgp41Device = function () {
   })
 
   indSgp41 = true
+  logger.info('sgp41 init OK')
   return
 }
 
 var readSgp41Device = async function () {
 
   let result = {}
+
 
   if (indSgp41 == true) {
 

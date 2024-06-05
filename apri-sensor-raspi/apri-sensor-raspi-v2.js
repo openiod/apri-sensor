@@ -2882,7 +2882,7 @@ var initSgp41Device = function () {
     }
     catch {
       logger.info('error get serialnr sgp41, maybe not available')
-      indSgp41 = false
+      //indSgp41 = false
       return
     }
 
@@ -2899,7 +2899,7 @@ var initSgp41Device = function () {
     }
     catch {
       logger.info('error self test sgp41, maybe not available')
-      indSgp41 = false
+      //indSgp41 = false
       return
     }
 
@@ -2925,7 +2925,7 @@ var initSgp41Device = function () {
       }
       catch {
         logger.info('error conditioning sgp41, maybe not available')
-        indSgp41 = false
+        //indSgp41 = false
         return
       }
     }
@@ -2960,18 +2960,17 @@ var readSgp41Device = async function () {
 
   let result = {}
 
-  logger.info('read sgp41')
 
   if (indSgp41 == true) {
 
     // read measurement
     try {
-      d1 = 0x26
-      d2 = 0x19
-      crc = calcCrcSgp41(d1, d2)
+      let d1 = 0x26
+      let d2 = 0x19
+      let crc = calcCrcSgp41(d1, d2)
       i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, 0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]))
       await sleepFunction(50)
-      str6 = i2cSgp41.readSync(addressI2cSgp41, 6)
+      let str6 = i2cSgp41.readSync(addressI2cSgp41, 6)
       result.vocIndex = str6[0] << 8 | str6[1]
       result.noxIndex = str6[3] << 8 | str6[4]
       console.log('sgp41 raw VOC: ', result.vocIndex, ' raw NOx:', result.noxIndex)
@@ -2983,6 +2982,8 @@ var readSgp41Device = async function () {
 //      indSgp41 = false
       return
     }
+  } else {
+    logger.info('read sgp41 but waiting on end init fase?')
   }
 
   return result

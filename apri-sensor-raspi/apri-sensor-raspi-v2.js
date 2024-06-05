@@ -2863,17 +2863,21 @@ var calcCrcSgp41 = function (data1, data2) {
 
 var initSgp41Device = function () {
   let crc
-  let d1,d2
+  let d1, d2
   raspi.init(async () => {
-    var str12
+    let str9
+    let str3
+    let result
+    // get serialnr
     try {
       d1 = 0x36
       d2 = 0x82
-      crc = calcCrcSgp41 (d1,d2)
+      crc = calcCrcSgp41(d1, d2)
       i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, crc]))
       await sleepFunction(1)
       str9 = i2cSgp41.readSync(addressI2cSgp41, 9)
-      console.log('sgp41 serialnr: ',str9)
+      result = str9[0] << 36 | str9[1] << 30 | str9[3] << 24 | str9[4] << 16 | str9[6] << 8 | str9[7]
+      console.log('sgp41 serialnr: ', result)
     }
     catch {
       logger.info('error initializing sgp41, maybe not available')
@@ -2881,28 +2885,47 @@ var initSgp41Device = function () {
       return
     }
 
+    // self test
+    try {
+      d1 = 0x28
+      d2 = 0x0E
+      crc = calcCrcSgp41(d1, d2)
+      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, crc]))
+      await sleepFunction(320)
+      str3 = i2cSgp41.readSync(addressI2cSgp41, 3)
+      result = str9[0] << 8 | str9[1]
+      console.log('sgp41 self test: ', result)
+    }
+    catch {
+      logger.info('error initializing sgp41, maybe not available')
+      indSgp41 = false
+      return
+    }
+
+    //for (i=0;i<)
+
     return
-//    sgp41ProductType = ''
-//    if (Buffer.compare(str12,
-//      Buffer.from([0x30, 0x30, 0xf6, 0x30, 0x38, 0x4f, 0x30, 0x30, 0xf6, 0x30, 0x30, 0xf6])) == 0) {
-//     sgp41ProductType = '00080000'
-//      logger.info('sgp41 producttype found: ' + sgp41ProductType)
-//      indSgp41 = true
-//    } else {
-//      logger.info('sgp41 producttype not found')
-//      indSgp41 = false
-//      return
-//    }
-//    var buf48
-//    try {
-//      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([0xD0, 0x33]))
-//      buf48 = i2cSgp41.readSync(addressI2cSgp41, 48)
-//    }
-//    catch {
-//      logger.info('error initializing sgp41, maybe not available')
-//      indSgp41 = false
-//      return
-//    }
+    //    sgp41ProductType = ''
+    //    if (Buffer.compare(str12,
+    //      Buffer.from([0x30, 0x30, 0xf6, 0x30, 0x38, 0x4f, 0x30, 0x30, 0xf6, 0x30, 0x30, 0xf6])) == 0) {
+    //     sgp41ProductType = '00080000'
+    //      logger.info('sgp41 producttype found: ' + sgp41ProductType)
+    //      indSgp41 = true
+    //    } else {
+    //      logger.info('sgp41 producttype not found')
+    //      indSgp41 = false
+    //      return
+    //    }
+    //    var buf48
+    //    try {
+    //      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([0xD0, 0x33]))
+    //      buf48 = i2cSgp41.readSync(addressI2cSgp41, 48)
+    //    }
+    //    catch {
+    //      logger.info('error initializing sgp41, maybe not available')
+    //      indSgp41 = false
+    //      return
+    //    }
     sgp41SerialNr = ''
     for (var i = 0; i < 48; i = i + 3) {
       if (buf48[i] == 0) break
@@ -2929,7 +2952,7 @@ var initSgp41Device = function () {
 var readSgp41Device = function () {
 
   return
-  
+
   if (indSgp41 == true) {
     var buf60
     var result = []
@@ -3011,7 +3034,7 @@ var readSgp41Device = function () {
 
 
 const readSgp41Measurement = function () {
-// dit moet i2c variant worden
+  // dit moet i2c variant worden
   /*
   sgp41Client.readHoldingRegisters(0x28, 6)
     .then(function (data) {

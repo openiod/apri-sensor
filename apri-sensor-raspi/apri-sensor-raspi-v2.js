@@ -2905,22 +2905,22 @@ var initSgp41Device = function () {
 
     // start conditioning max 10 seconds
     let startTime = new Date()
-    for (let i=0;i<4;i++) {
+    for (let i = 0; i < 20; i++) {
 
-      let duration = (new Date().getTime()-startTime.getTime())/1000
-//      console.log('sgp41 conditioning fase (max 10 seconds)',duration)
-      if (duration>=9) {
+      let duration = (new Date().getTime() - startTime.getTime()) / 1000
+      //      console.log('sgp41 conditioning fase (max 10 seconds)',duration)
+      if (duration >= 9) { // max 10 seconds
         break
       }
       try {
         d1 = 0x26
         d2 = 0x12
         crc = calcCrcSgp41(d1, d2)
-        i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2,0x80,0x00,0xA2,0x66,0x66,0x93]))
+        i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, 0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]))
         await sleepFunction(50)
         str3 = i2cSgp41.readSync(addressI2cSgp41, 3)
         result = str3[0] << 8 | str3[1]
-        console.log('sgp41 conditioning. raw VOC: ', result,' Duration:',duration)
+        console.log('sgp41 conditioning. raw VOC: ', result, ' Duration:', duration)
         await sleepFunction(1)
       }
       catch {
@@ -2936,12 +2936,12 @@ var initSgp41Device = function () {
       d1 = 0x26
       d2 = 0x19
       crc = calcCrcSgp41(d1, d2)
-      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2,0x80,0x00,0xA2,0x66,0x66,0x93]))
+      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, 0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]))
       await sleepFunction(50)
       str6 = i2cSgp41.readSync(addressI2cSgp41, 6)
       let resultVoc = str6[0] << 8 | str6[1]
       let resultNox = str6[3] << 8 | str6[4]
-      console.log('sgp41 raw VOC: ', resultVoc,' raw NOx:',resultNox)
+      console.log('sgp41 raw VOC: ', resultVoc, ' raw NOx:', resultNox)
       await sleepFunction(1)
     }
     catch {
@@ -2949,134 +2949,41 @@ var initSgp41Device = function () {
       indSgp41 = false
       return
     }
+  })
 
+  indSgp41 = true
+  return
+}
 
-    return
-    //    sgp41ProductType = ''
-    //    if (Buffer.compare(str12,
-    //      Buffer.from([0x30, 0x30, 0xf6, 0x30, 0x38, 0x4f, 0x30, 0x30, 0xf6, 0x30, 0x30, 0xf6])) == 0) {
-    //     sgp41ProductType = '00080000'
-    //      logger.info('sgp41 producttype found: ' + sgp41ProductType)
-    //      indSgp41 = true
-    //    } else {
-    //      logger.info('sgp41 producttype not found')
-    //      indSgp41 = false
-    //      return
-    //    }
-    //    var buf48
-    //    try {
-    //      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([0xD0, 0x33]))
-    //      buf48 = i2cSgp41.readSync(addressI2cSgp41, 48)
-    //    }
-    //    catch {
-    //      logger.info('error initializing sgp41, maybe not available')
-    //      indSgp41 = false
-    //      return
-    //    }
-    sgp41SerialNr = ''
-    for (var i = 0; i < 48; i = i + 3) {
-      if (buf48[i] == 0) break
-      sgp41SerialNr += String.fromCharCode(buf48[i])
-      if (buf48[i + 1] == 0) break
-      sgp41SerialNr += String.fromCharCode(buf48[i + 1])
-    }
-    logger.info(`sgp41 producttype: ${sgp41ProductType}`)
-    logger.info(`sgp41 serialnr: ${sgp41SerialNr}`)
-    // start measuring
+var readSgp41Device = function () {
+
+  let result = {}
+
+  if (indSgp41 == true) {
+
+    // read measurement
     try {
-      // set sensor to produce floating point values
-      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([0x00, 0x10, 0x03, 0x00, calcCrcSgp41(0x03, 0x00)]))
-      //      // integer
-      //    i2cSgp41.writeSync(addressI2cSgp41,Buffer.from([ 0x00,0x10,0x05,0x00,0xF6]))
+      d1 = 0x26
+      d2 = 0x19
+      crc = calcCrcSgp41(d1, d2)
+      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, 0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]))
+      await sleepFunction(50)
+      str6 = i2cSgp41.readSync(addressI2cSgp41, 6)
+      result.vocIndex = str6[0] << 8 | str6[1]
+      result.noxIndex = str6[3] << 8 | str6[4]
+      console.log('sgp41 raw VOC: ', result.vocIndex, ' raw NOx:', result.noxIndex)
+      processRaspiSgp41Record(result)
+      await sleepFunction(1)
     }
     catch {
       logger.info('error initializing sgp41, maybe not available')
       indSgp41 = false
       return
     }
-  });
-}
-var readSgp41Device = function () {
-
-  return
-
-  if (indSgp41 == true) {
-    var buf60
-    var result = []
-    try {
-      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([0x03, 0x00]))
-      buf60 = i2cSgp41.readSync(addressI2cSgp41, 60)
-    }
-    catch {
-      logger.info('ERROR readSgp41Device writeSync ')
-      return
-    }
-    // floats
-    for (var i = 0; i < 60; i = i + 6) {
-      //      logger.info(i)
-      if (buf60[i + 2] != calcCrcSgp41(buf60[i], buf60[i + 1])) {
-        logger.info('checksum error')
-        break
-      }
-      if (buf60[i + 5] != calcCrcSgp41(buf60[i + 3], buf60[i + 4])) {
-        logger.info('checksum error')
-        break
-      }
-      var data = [buf60[i], buf60[i + 1], buf60[i + 3], buf60[i + 4]]
-      //      console.dir(data)
-      //      logger.info(buf30[i])
-      //      logger.info(buf30[i+1])
-      // Create a buffer
-      var buf = new ArrayBuffer(4);
-      // Create a data view of it
-      //var view = new DataView(buf);
-      var view = new Float32Array(buf);
-      var view8 = new Uint8Array(buf);
-      var view16 = new Uint16Array(buf);
-
-      //      function bytesToFloat(bytes) {
-      // JavaScript bitwise operators yield a 32 bits integer, not a float.
-      // Assume LSB (least significant byte first).
-      var bits = buf60[i] << 24 | buf60[i + 1] << 16 | buf60[i + 3] << 8 | buf60[i + 4]
-      var sign = (bits >>> 31 === 0) ? 1.0 : -1.0;
-      var e = bits >>> 23 & 0xff;
-      var m = (e === 0) ? (bits & 0x7fffff) << 1 : (bits & 0x7fffff) | 0x800000;
-      var value = sign * m * Math.pow(2, e - 150);
-
-      // the nodejs procedure to convert float (4 bytes) into double
-
-      // const bufTest = Buffer.from([buf60[i], buf60[i+1], buf60[i+3], buf60[i+4]]);
-      // logger.info('test: '+i)
-      // logger.info(value);
-      // dit geeft dezelfde resultaat als de bovenstaande float omrekening: logger.info(bufTest.readFloatBE(0));
-      // deze geeft foutieve waarden: logger.info(bufTest.readFloatLE(0));
-      //        return f;
-      //      }
-
-      // Read the bits as a float; note that by doing this, we're implicitly
-      // converting it from a 32-bit float into JavaScript's native 64-bit double
-      //      var value = view.getFloat32(0);
-      // Done
-      //      logger.info(value);
-
-      //      var buffer = new ArrayBuffer(4);
-      //      var intView = new Int32Array(buffer);
-      //      var floatView = new Float32Array(buffer);
-
-      //      floatView[0] = Math.PI
-      //      logger.info(intView[0].toString(2)); //bits of the 32 bit float
-      //      logger.info(floatView[0])
-
-      // convert number of particles from cm3 into 0.1L (multiply by 100)
-      if (result.length >= 4 && result.length <= 8) {
-        value = value * 100
-      }
-      result.push(value)
-    }
-    if (result.length == 10) {
-      processRaspiSgp41Record(result)
-    }
   }
+
+  return result
+
 }
 
 
@@ -3122,8 +3029,6 @@ var processRaspiSgp41Record = function (result) {
   counters.sgp41.rHum += result.rHum
   counters.sgp41.pressure += result.pressure
 }
-
-
 
 var initBmeDevice = function () {
   logger.info('initBmeDevice')
@@ -3232,16 +3137,16 @@ if (isEmpty(aprisensorDevices) || aprisensorDevices.bme280 || aprisensorDevices.
 
 /*
 var socket = io(socketUrl, {path:socketPath});
-
+ 
 socket.on('connection', function (socket) {
   var currTime = new Date();
   logger.info(currTime +': connect from '+ socket.request.connection.remoteAddress + ' / '+ socket.handshake.headers['x-forwarded-for'] || socket.handshake.address.address);
 });
-
+ 
 socket.on('disconnect', function() {
   logger.info('Disconnected from web-socket ');
 });
-
+ 
 socket.on('info', function(data) {
   logger.info('websocket info: ');
   console.dir(data);

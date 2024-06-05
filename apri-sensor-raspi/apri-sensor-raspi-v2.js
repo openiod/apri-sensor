@@ -493,7 +493,6 @@ var counters = {
     , vocSraw: 0
     , noxSraw: 0
     , temperature: 0
-    , pressure: 0
     , rHum: 0
     , nrOfMeas: 0
     , nrOfMeasTotal: 0
@@ -603,12 +602,14 @@ var results = {
     , vocSraw: 0
     , noxSraw: 0
     , temperature: 0
-    , pressure: 0
     , rHum: 0
     , nrOfMeas: 0
     , nrOfMeasTotal: 0
   }
 };
+
+// cache latest temperature and rHum from bme sensors for pmsa003 MLR calibration and sgp41 indexes
+let latest = {}
 
 var initCounters = function () {
   counters.pms.pm1CF1 = 0;
@@ -707,7 +708,6 @@ var initCounters = function () {
   counters.sgp41.vocSraw = 0;
   counters.sgp41.noxSraw = 0;
   counters.sgp41.temperature = 0;
-  counters.sgp41.pressure = 0;
   counters.sgp41.rHum = 0;
   counters.sgp41.nrOfMeas = 0;
 
@@ -1041,22 +1041,28 @@ var processDataCycle = function () {
   results.pms.nrOfMeas = counters.pms.nrOfMeas;
   results.pms.sensorType = counters.pms.sensorType;
 
-  // skip first 2 measurements, initialization fase of the bme280
-  if (counters.bme280.nrOfMeasTotal > 2) {
+  // skip first 3 measurements, initialization fase of the bme280
+  if (counters.bme280.nrOfMeasTotal > 3) {
     results.bme280.temperature = Math.round((counters.bme280.temperature / counters.bme280.nrOfMeas) * 100) / 100;
     results.bme280.pressure = Math.round((counters.bme280.pressure / counters.bme280.nrOfMeas) * 100) / 100;
     results.bme280.rHum = Math.round((counters.bme280.rHum / counters.bme280.nrOfMeas) * 100) / 100;
     results.bme280.nrOfMeas = counters.bme280.nrOfMeas;
+
+    latest.bmeTemperature = results.bme280.temperature
+    latest.bmeRHum = results.bme280.rHum
+
   }
 
-  // skip first 2 measurements, initialization fase of the bme680
-  if (counters.bme680.nrOfMeasTotal > 2) {
-
+  // skip first 3 measurements, initialization fase of the bme680
+  if (counters.bme680.nrOfMeasTotal > 3) {
     results.bme680.temperature = Math.round((counters.bme680.temperature / counters.bme680.nrOfMeas) * 100) / 100;
     results.bme680.pressure = Math.round((counters.bme680.pressure / counters.bme680.nrOfMeas) * 100) / 100;
     results.bme680.rHum = Math.round((counters.bme680.rHum / counters.bme680.nrOfMeas) * 100) / 100;
     results.bme680.gasResistance = Math.round((counters.bme680.gasResistance / counters.bme680.nrOfMeas) * 100) / 100;
     results.bme680.nrOfMeas = counters.bme680.nrOfMeas;
+
+    latest.bmeTemperature = results.bme680.temperature
+    latest.bmeRHum = results.bme680.rHum
   }
 
   results.ds18b20.temperature = Math.round((counters.ds18b20.temperature / counters.ds18b20.nrOfMeas) * 100) / 100;
@@ -1132,7 +1138,6 @@ var processDataCycle = function () {
     results.sgp41.vocSraw = Math.round((counters.sgp41.vocSraw / counters.sgp41.nrOfMeas) * 100) / 100;
     results.sgp41.noxSraw = Math.round((counters.sgp41.noxSraw / counters.sgp41.nrOfMeas) * 100) / 100;
     results.sgp41.temperature = Math.round((counters.sgp41.temperature / counters.sgp41.nrOfMeas) * 100) / 100;
-    results.sgp41.pressure = Math.round((counters.sgp41.pressure / counters.sgp41.nrOfMeas) * 100) / 100;
     results.sgp41.rHum = Math.round((counters.sgp41.rHum / counters.sgp41.nrOfMeas) * 100) / 100;
     results.sgp41.nrOfMeas = counters.sgp41.nrOfMeas;
   }
@@ -1968,8 +1973,7 @@ var sendData = async function () {
       ',' + results.sgp41.vocSraw +
       ',' + results.sgp41.noxSraw +
       ',' + results.sgp41.temperature +
-      ',' + results.sgp41.rHum +
-      ',' + results.sgp41.pressure
+      ',' + results.sgp41.rHum
 
     header = '"sensorId","dateObserved","sensorType","vocIndex","noxIndex","voxSraw","noxSraw","temperature","rHum","pressure"'
 
@@ -1985,7 +1989,6 @@ var sendData = async function () {
       , 'vocSraw': results.sgp41.vocSraw
       , 'noxSraw': results.sgp41.noxSraw
       , 'temperature': results.sgp41.temperature
-      , 'pressure': results.sgp41.pressure
       , 'rHum': results.sgp41.rHum
     }
 
@@ -2997,13 +3000,21 @@ var processRaspiSgp41Record = function (result) {
   }
   counters.sgp41.nrOfMeas++;
   counters.sgp41.nrOfMeasTotal++;
-  counters.sgp41.vocIndex += result.vocIndex
-  counters.sgp41.noxIndex += result.noxIndex
   counters.sgp41.vocSraw += result.vocSraw
   counters.sgp41.noxSraw += result.noxSraw
-  counters.sgp41.temperature += result.temperature
-  counters.sgp41.rHum += result.rHum
-  counters.sgp41.pressure += result.pressure
+
+//  let temperatureCompensation = 0x6666
+//  let rHumCompensation = 0x8000
+//  if (latest.bmeTemperature) {
+//    temperatureCompensation = (latest.bmeTemperature + 45) * 65535 / 175
+//    rHumCompensation = latest.bmeRhum * 65535 / 100
+//  }
+
+  counters.sgp41.temperature += latest.bmeTemperature
+  counters.sgp41.rHum += latest.bmeRHum
+  counters.sgp41.vocIndex += result.vocIndex
+  counters.sgp41.noxIndex += result.noxIndex
+
 }
 
 var initBmeDevice = function () {

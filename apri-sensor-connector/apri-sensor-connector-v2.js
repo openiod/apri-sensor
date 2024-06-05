@@ -348,7 +348,7 @@ var sgp41Attributes = function (res) {
 	return openiodUrl + '/sgp41' + '/v1/m?foi=' + res.foi + '&observation=' +
 		'vocIndex:' + res.vocIndex + ',' + 'noxIndex:' + res.noxIndex + 
 		',' + 'vocSraw:' + res.vocSraw + ',' + 'noxSraw:' + res.noxSraw + 
-		',' + 'temperature:' + res.temperature + ',' + 'pressure:' + res.pressure + ',' + 'rHum:' + res.rHum;
+		',' + 'temperature:' + res.temperature + ',' + 'rHum:' + res.rHum;
 }
 
 // send data to service

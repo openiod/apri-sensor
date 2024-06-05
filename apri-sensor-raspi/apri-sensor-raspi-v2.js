@@ -2955,7 +2955,7 @@ var initSgp41Device = function () {
   return
 }
 
-var readSgp41Device = function () {
+var readSgp41Device = async function () {
 
   let result = {}
 

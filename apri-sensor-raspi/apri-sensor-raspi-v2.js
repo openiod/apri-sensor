@@ -1127,10 +1127,10 @@ var processDataCycle = function () {
 
   // skip first 2 measurements, initialization fase of the sgp41
   if (counters.sgp41.nrOfMeasTotal > 2) {
-    results.sgp41.temperature = Math.round((counters.sgp41.vocIndex / counters.sgp41.nrOfMeas) * 100) / 100;
-    results.sgp41.temperature = Math.round((counters.sgp41.noxIndex / counters.sgp41.nrOfMeas) * 100) / 100;
-    results.sgp41.temperature = Math.round((counters.sgp41.vocSraw / counters.sgp41.nrOfMeas) * 100) / 100;
-    results.sgp41.temperature = Math.round((counters.sgp41.noxSraw / counters.sgp41.nrOfMeas) * 100) / 100;
+    results.sgp41.vocIndex = Math.round((counters.sgp41.vocIndex / counters.sgp41.nrOfMeas) * 100) / 100;
+    results.sgp41.noxIndex = Math.round((counters.sgp41.noxIndex / counters.sgp41.nrOfMeas) * 100) / 100;
+    results.sgp41.vocSraw = Math.round((counters.sgp41.vocSraw / counters.sgp41.nrOfMeas) * 100) / 100;
+    results.sgp41.noxSraw = Math.round((counters.sgp41.noxSraw / counters.sgp41.nrOfMeas) * 100) / 100;
     results.sgp41.temperature = Math.round((counters.sgp41.temperature / counters.sgp41.nrOfMeas) * 100) / 100;
     results.sgp41.pressure = Math.round((counters.sgp41.pressure / counters.sgp41.nrOfMeas) * 100) / 100;
     results.sgp41.rHum = Math.round((counters.sgp41.rHum / counters.sgp41.nrOfMeas) * 100) / 100;
@@ -2920,7 +2920,7 @@ var initSgp41Device = function () {
         await sleepFunction(50)
         str3 = i2cSgp41.readSync(addressI2cSgp41, 3)
         result = str3[0] << 8 | str3[1]
-        logger.info('sgp41 conditioning. raw VOC: ' + result + ' Duration:' + duration)
+        //logger.info('sgp41 conditioning. raw VOC: ' + result + ' Duration:' + duration)
         await sleepFunction(100)
       }
       catch {
@@ -2950,7 +2950,7 @@ var initSgp41Device = function () {
     }
     indSgp41 = true
     logger.info('sgp41 init OK')
-  
+
   })
 
   return
@@ -2971,15 +2971,15 @@ var readSgp41Device = async function () {
       i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, 0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]))
       await sleepFunction(50)
       let str6 = i2cSgp41.readSync(addressI2cSgp41, 6)
-      result.vocIndex = str6[0] << 8 | str6[1]
-      result.noxIndex = str6[3] << 8 | str6[4]
-      console.log('sgp41 raw VOC: ', result.vocIndex, ' raw NOx:', result.noxIndex)
+      result.vocSraw = str6[0] << 8 | str6[1]
+      result.noxSraw = str6[3] << 8 | str6[4]
+      logger.info('sgp41 raw VOC: ' + result.vocSraw + ' raw NOx:' + result.noxSraw)
       processRaspiSgp41Record(result)
       await sleepFunction(1)
     }
     catch {
       logger.info('error reading measurement sgp41')
-//      indSgp41 = false
+      //      indSgp41 = false
       return
     }
   } else {
@@ -2988,34 +2988,6 @@ var readSgp41Device = async function () {
 
   return result
 
-}
-
-
-const readSgp41Measurement = function () {
-  // dit moet i2c variant worden
-  /*
-  sgp41Client.readHoldingRegisters(0x28, 6)
-    .then(function (data) {
-      var result = {}
-//      result.temperature = data.buffer.readFloatBE(4)  // get latest from bme
-//      result.rHum = data.buffer.readFloatBE(8)  // get latest from bme
-//      result.pressure = data.buffer.readFloatBE(8)  // get latest from bme
-      result.vocSraw = data.buffer.readFloatBE(0)
-      result.noxSraw = data.buffer.readFloatBE(4)
-//      result.vocIndex = data.buffer.readFloatBE(0)  // todo: calculate index with bme data
-//      result.noxIndex = data.buffer.readFloatBE(0)  // todo: calculate index with bme data
-      if (result.vocSraw == 0) {
-        logger.info('sgp41 no data found')
-      } else {
-        logger.info(result)
-        processRaspiSgp41Record(result)
-      }
-    })
-    .catch(function (err) {
-      logger.info('xx error xxxx')
-      logger.info(err)
-    })
-    */
 }
 
 var processRaspiSgp41Record = function (result) {

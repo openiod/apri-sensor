@@ -2881,7 +2881,7 @@ var initSgp41Device = function () {
       logger.info('sgp41 serialnr: ' + result)
     }
     catch {
-      logger.info('error initializing sgp41, maybe not available')
+      logger.info('error get serialnr sgp41, maybe not available')
       indSgp41 = false
       return
     }
@@ -2895,10 +2895,10 @@ var initSgp41Device = function () {
       await sleepFunction(320)
       str3 = i2cSgp41.readSync(addressI2cSgp41, 3)
       result = str3[0] << 8 | str3[1]
-      logger.info('sgp41 self test: '+ result)
+      logger.info('sgp41 self test: ' + result)
     }
     catch {
-      logger.info('error initializing sgp41, maybe not available')
+      logger.info('error self test sgp41, maybe not available')
       indSgp41 = false
       return
     }
@@ -2920,11 +2920,11 @@ var initSgp41Device = function () {
         await sleepFunction(50)
         str3 = i2cSgp41.readSync(addressI2cSgp41, 3)
         result = str3[0] << 8 | str3[1]
-        logger.info('sgp41 conditioning. raw VOC: '+ result+ ' Duration:'+ duration)
+        logger.info('sgp41 conditioning. raw VOC: ' + result + ' Duration:' + duration)
         await sleepFunction(100)
       }
       catch {
-        logger.info('error initializing sgp41, maybe not available')
+        logger.info('error conditioning sgp41, maybe not available')
         indSgp41 = false
         return
       }
@@ -2940,18 +2940,19 @@ var initSgp41Device = function () {
       str6 = i2cSgp41.readSync(addressI2cSgp41, 6)
       let resultVoc = str6[0] << 8 | str6[1]
       let resultNox = str6[3] << 8 | str6[4]
-      logger.info('sgp41 raw VOC: '+ resultVoc, ' raw NOx:'+ resultNox)
+      logger.info('sgp41 raw VOC: ' + resultVoc + ' raw NOx:' + resultNox)
       await sleepFunction(1)
     }
     catch {
-      logger.info('error initializing sgp41, maybe not available')
+      logger.info('error first measurement sgp41, maybe not available')
       indSgp41 = false
       return
     }
+    indSgp41 = true
+    logger.info('sgp41 init OK')
+  
   })
 
-  indSgp41 = true
-  logger.info('sgp41 init OK')
   return
 }
 
@@ -2959,6 +2960,7 @@ var readSgp41Device = async function () {
 
   let result = {}
 
+  logger.info('read sgp41')
 
   if (indSgp41 == true) {
 
@@ -2977,8 +2979,8 @@ var readSgp41Device = async function () {
       await sleepFunction(1)
     }
     catch {
-      logger.info('error initializing sgp41, maybe not available')
-      indSgp41 = false
+      logger.info('error reading measurement sgp41')
+//      indSgp41 = false
       return
     }
   }

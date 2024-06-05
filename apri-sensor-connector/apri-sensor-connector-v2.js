@@ -2,7 +2,7 @@
 ** Module: apri-sensor-connector
 **
 ** Main system module for handling sensor measurement data for DS18B20,
-**  PMSA003/PMS7003, BME280, BME680, tsi3007, tgs5042, sps30, solar, bam1020, radiationd, NextPM
+**  PMSA003/PMS7003, BME280, BME680, tsi3007, tgs5042, sps30, solar, bam1020, radiationd, NextPM, sgp41
 **  in Redis to send to cloud service OpenIoD
 **
 */
@@ -232,7 +232,10 @@ var getRedisData = function (redisArray, redisArrayIndex) {
 				case 'nextpm':
 					url = nextpmAttributes(res) + '&dateObserved=' + dateObserved;
 					break;
-				default:
+					case 'sgp41':
+						url = sgp41Attributes(res) + '&dateObserved=' + dateObserved;
+						break;
+					default:
 					console.log('ERROR: redis entry unknown: ' + redisKey);
 			};
 			sendData(_redisArray, _redisArrayIndex, _redisKey, url);
@@ -340,6 +343,12 @@ var nextpmAttributes = function (res) {
 		',' + 'pm1c:' + res.pm1c + ',' + 'pm25c:' + res.pm25c + ',' + 'pm10c:' + res.pm10c +
 		',' + 'temperature:' + res.temperature + ',' + 'rHum:' + res.rHum + ',' + 'fanSpeed:' + res.fanSpeed + ',' + 'status:' + res.status 
 
+}
+var sgp41Attributes = function (res) {
+	return openiodUrl + '/sgp41' + '/v1/m?foi=' + res.foi + '&observation=' +
+		'vocIndex:' + res.vocIndex + ',' + 'noxIndex:' + res.noxIndex + 
+		',' + 'vocSraw:' + res.vocSraw + ',' + 'noxSraw:' + res.noxSraw + 
+		',' + 'temperature:' + res.temperature + ',' + 'pressure:' + res.pressure + ',' + 'rHum:' + res.rHum;
 }
 
 // send data to service

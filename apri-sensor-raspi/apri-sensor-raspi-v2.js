@@ -2874,11 +2874,13 @@ var calcCrcSgp41 = function (data1, data2) {
 var initSgp41Device = function () {
   let crc
   let d1, d2
+
   raspi.init(async () => {
     let str9
     let str3
     let str6
     let result
+    let params
     // get serialnr
     try {
       d1 = 0x36
@@ -2926,7 +2928,12 @@ var initSgp41Device = function () {
         d1 = 0x26
         d2 = 0x12
         crc = calcCrcSgp41(d1, d2)
-        i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, 0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]))
+        params = calcSgp41Compensation()
+
+        //      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, 0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]))
+        i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, params[0], params[1], params[2], params[3], params[4], params[5]]))
+  
+        //i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, 0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]))
         await sleepFunction(50)
         str3 = i2cSgp41.readSync(addressI2cSgp41, 3)
         result = str3[0] << 8 | str3[1]
@@ -2945,7 +2952,12 @@ var initSgp41Device = function () {
       d1 = 0x26
       d2 = 0x19
       crc = calcCrcSgp41(d1, d2)
-      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, 0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]))
+      params = calcSgp41Compensation()
+
+      //      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, 0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]))
+      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, params[0], params[1], params[2], params[3], params[4], params[5]]))
+    
+//      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, 0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]))
       await sleepFunction(50)
       str6 = i2cSgp41.readSync(addressI2cSgp41, 6)
       let resultVoc = str6[0] << 8 | str6[1]
@@ -2981,8 +2993,8 @@ const longToByteArray = function (/*long*/long) {
 
 
 const calcSgp41Compensation = function () {
-  let rHumCompensation = 0x8000
-  let temperatureCompensation = 0x6666
+  //let rHumCompensation = 0x8000
+  //let temperatureCompensation = 0x6666
 
   // for testing
   //latest.bmeRHum = 50
@@ -2992,9 +3004,9 @@ const calcSgp41Compensation = function () {
   if (latest.bmeTemperature) {
     let _rHumCompensation = Math.ceil(latest.bmeRHum * 65535 / 100)
     let res = longToByteArray(_rHumCompensation)
-    console.log(
-      String.fromCharCode(res[1]),
-      String.fromCharCode(res[0]))
+    //console.log(
+    //  String.fromCharCode(res[1]),
+    //  String.fromCharCode(res[0]))
     let r1 = String.fromCharCode(res[1])
     let r2 = String.fromCharCode(res[0])
     //    let r1 = _rHumCompensation >> 8
@@ -3005,7 +3017,7 @@ const calcSgp41Compensation = function () {
     result.push(rCrc)
     //console.log('RV', r1, r2, rCrc)
     let _temperatureCompensation = Math.ceil((latest.bmeTemperature + 45) * 65535 / 175)
-    console.log(longToByteArray(_temperatureCompensation))
+    //console.log(longToByteArray(_temperatureCompensation))
     let resR = longToByteArray(_rHumCompensation)
     let t1 = String.fromCharCode(resR[1])
     let t2 = String.fromCharCode(resR[0])

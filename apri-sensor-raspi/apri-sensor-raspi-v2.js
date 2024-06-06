@@ -839,9 +839,10 @@ const readSensorDataBme280 = () => {
 
   // init sgp41 when bme280 ready and sgp41 not yet initiated 
   if (aprisensorDevices.sgp41 != undefined && indSgp41 == false) {
+    indSgp41 = 'init'
     startSgp41()
   }
-  
+
   bme280.readSensorData()
     .then((data) => {
       // temperature_C, pressure_hPa, and humidity are returned by default.
@@ -2891,7 +2892,7 @@ var initSgp41Device = function () {
     }
     catch {
       logger.info('error get serialnr sgp41, maybe not available')
-      //indSgp41 = false
+      indSgp41 = false
       return
     }
 
@@ -2908,7 +2909,7 @@ var initSgp41Device = function () {
     }
     catch {
       logger.info('error self test sgp41, maybe not available')
-      //indSgp41 = false
+      indSgp41 = false
       return
     }
 
@@ -2934,7 +2935,7 @@ var initSgp41Device = function () {
       }
       catch {
         logger.info('error conditioning sgp41, maybe not available')
-        //indSgp41 = false
+        indSgp41 = false
         return
       }
     }
@@ -3009,12 +3010,12 @@ var processRaspiSgp41Record = function (result) {
   counters.sgp41.vocSraw += result.vocSraw
   counters.sgp41.noxSraw += result.noxSraw
 
-//  let temperatureCompensation = 0x6666
-//  let rHumCompensation = 0x8000
-//  if (latest.bmeTemperature) {
-//    temperatureCompensation = (latest.bmeTemperature + 45) * 65535 / 175
-//    rHumCompensation = latest.bmeRhum * 65535 / 100
-//  }
+  //  let temperatureCompensation = 0x6666
+  //  let rHumCompensation = 0x8000
+  //  if (latest.bmeTemperature) {
+  //    temperatureCompensation = (latest.bmeTemperature + 45) * 65535 / 175
+  //    rHumCompensation = latest.bmeRhum * 65535 / 100
+  //  }
 
   counters.sgp41.temperature += latest.bmeTemperature
   counters.sgp41.rHum += latest.bmeRHum

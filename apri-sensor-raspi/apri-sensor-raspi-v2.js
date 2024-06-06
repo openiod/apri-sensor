@@ -836,6 +836,12 @@ if (isEmpty(aprisensorDevices) || aprisensorDevices.bme280) {
 // Read BME280 sensor data, repeat
 const readSensorDataBme280 = () => {
   if (indBme280 == false) return
+
+  // init sgp41 when bme280 ready and sgp41 not yet initiated 
+  if (aprisensorDevices.sgp41 != undefined && indSgp41 == false) {
+    startSgp41()
+  }
+  
   bme280.readSensorData()
     .then((data) => {
       // temperature_C, pressure_hPa, and humidity are returned by default.

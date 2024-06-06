@@ -2966,6 +2966,86 @@ var initSgp41Device = function () {
   return
 }
 
+const longToByteArray = function (/*long*/long) {
+  // we want to represent the input as a 8-bytes array
+  var byteArray = [0, 0, 0, 0, 0, 0, 0, 0];
+
+  for (var index = 0; index < byteArray.length; index++) {
+    var byte = long & 0xff;
+    byteArray[index] = byte;
+    long = (long - byte) / 256;
+  }
+
+  return byteArray;
+};
+
+
+const calcSgp41Compensation = function () {
+  let rHumCompensation = 0x8000
+  let temperatureCompensation = 0x6666
+
+  // for testing
+  //latest.bmeRHum = 50
+  //latest.bmeTemperature = 25
+  let result = []
+
+  if (latest.bmeTemperature) {
+    let _rHumCompensation = Math.ceil(latest.bmeRHum * 65535 / 100)
+    let res = longToByteArray(_rHumCompensation)
+    console.log(
+      String.fromCharCode(res[1]),
+      String.fromCharCode(res[0]))
+    let r1 = String.fromCharCode(res[1])
+    let r2 = String.fromCharCode(res[0])
+    //    let r1 = _rHumCompensation >> 8
+    //    let r2 = _rHumCompensation - (r1 << 8)
+    let rCrc = calcCrcSgp41(r1, r2)
+    result.push(r1)
+    result.push(r2)
+    result.push(rCrc)
+    //console.log('RV', r1, r2, rCrc)
+    let _temperatureCompensation = Math.ceil((latest.bmeTemperature + 45) * 65535 / 175)
+    console.log(longToByteArray(_temperatureCompensation))
+    let resR = longToByteArray(_rHumCompensation)
+    let t1 = String.fromCharCode(resR[1])
+    let t2 = String.fromCharCode(resR[0])
+    //    let t1 = _temperatureCompensation >> 8
+    //    let t2 = _temperatureCompensation - (t1 << 8)
+    let tCrc = calcCrcSgp41(t1, t2)
+    result.push(t1)
+    result.push(t2)
+    result.push(rCrc)
+    //console.log('T', t1, t2, tCrc)
+    return result
+  } else {
+    return [0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]
+  }
+
+/*
+  if (latest.bmeTemperature) {
+    let _rHumCompensation = Math.ceil(latest.bmeRHum * 65535 / 100)
+    let r1 = _rHumCompensation >> 8
+    let r2 = _rHumCompensation - (r1 << 8)
+    let rCrc = calcCrcSgp41(r1, r2)
+    result.push(r1)
+    result.push(r2)
+    result.push(rCrc)
+    //console.log('RV', r1, r2, rCrc)
+    let _temperatureCompensation = Math.ceil((latest.bmeTemperature + 45) * 65535 / 175)
+    let t1 = _temperatureCompensation >> 8
+    let t2 = _temperatureCompensation - (t1 << 8)
+    let tCrc = calcCrcSgp41(t1, t2)
+    result.push(t1)
+    result.push(t2)
+    result.push(rCrc)
+    //console.log('T', t1, t2, tCrc)
+    return result
+  } else {
+    return [0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]
+  }
+*/
+}
+
 var readSgp41Device = async function () {
 
   let result = {}
@@ -2978,7 +3058,11 @@ var readSgp41Device = async function () {
       let d1 = 0x26
       let d2 = 0x19
       let crc = calcCrcSgp41(d1, d2)
-      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, 0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]))
+
+      let params = calcSgp41Compensation()
+
+      //      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, 0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]))
+      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, params[0], params[1], params[2], params[3], params[4], params[5]]))
       await sleepFunction(50)
       let str6 = i2cSgp41.readSync(addressI2cSgp41, 6)
       result.vocSraw = str6[0] << 8 | str6[1]
@@ -3009,13 +3093,6 @@ var processRaspiSgp41Record = function (result) {
   counters.sgp41.nrOfMeasTotal++;
   counters.sgp41.vocSraw += result.vocSraw
   counters.sgp41.noxSraw += result.noxSraw
-
-  //  let temperatureCompensation = 0x6666
-  //  let rHumCompensation = 0x8000
-  //  if (latest.bmeTemperature) {
-  //    temperatureCompensation = (latest.bmeTemperature + 45) * 65535 / 175
-  //    rHumCompensation = latest.bmeRhum * 65535 / 100
-  //  }
 
   counters.sgp41.temperature += latest.bmeTemperature
   counters.sgp41.rHum += latest.bmeRHum

@@ -1437,9 +1437,6 @@ var sendData = async function () {
       , 'pn1c': results.pms.pn1c
       , 'pn25c': results.pms.pn25c
       , 'pn10c': results.pms.pn10c
-      , 'pm25mlr': results.pms.pm25mlr
-      , 'temperature': results.pms.temperature
-      , 'rHum': results.pms.rHum
     }
     if (results.pms.pm25mlr != null) {
       newRec.pm25mlr = results.pms.pm25mlr

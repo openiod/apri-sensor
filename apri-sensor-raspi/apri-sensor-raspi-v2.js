@@ -1401,10 +1401,12 @@ var sendData = async function () {
       ',' + results.pms.pn1c +
       ',' + results.pms.pn25c +
       ',' + results.pms.pn10c +
-      ',' + results.pms.pm25mlr 
+      ',' + results.pms.pm25mlr +
+      ',' + results.pms.temperature +
+      ',' + results.pms.rHum 
 
     header = '"sensorId","dateObserved","sensorType","pm1Cf1","pm25Cf1","pm10Cf1","pm1amb","pm25amb","pm10amb"' +
-      ',"part0_3","part0_5","part1_0","part2_5","part5_0","part10_0","pn1c","pn25c","pn10c","pm25mlr"'
+      ',"part0_3","part0_5","part1_0","part2_5","part5_0","part10_0","pn1c","pn25c","pn10c","pm25mlr","temperature","rHum"'
 
     writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
       '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
@@ -1429,6 +1431,8 @@ var sendData = async function () {
       , 'pn25c': results.pms.pn25c
       , 'pn10c': results.pms.pn10c
       , 'pm25mlr': results.pms.pm25mlr
+      , 'temperature': results.pms.temperature
+      , 'rHum': results.pms.rHum
     })
       .then(function (res) {
         var _res = res;

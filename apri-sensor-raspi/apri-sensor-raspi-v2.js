@@ -1441,6 +1441,16 @@ var sendData = async function () {
       , 'temperature': results.pms.temperature
       , 'rHum': results.pms.rHum
     }
+    if (results.pms.pm25mlr != null) {
+      newRec.pm25mlr = results.pms.pm25mlr
+    }
+    if (results.pms.temperature != undefined) {
+      newRec.temperature = results.pms.temperature
+    }
+    if (results.pms.rHum != undefined) {
+      newRec.rHum = results.pms.rHum
+    }
+
     console.log(newKey,newRec)
     await redisClient.HSET(newKey,newRec)
       .then(function (res) {

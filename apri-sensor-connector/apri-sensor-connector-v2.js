@@ -251,20 +251,31 @@ var bme680Attributes = function (res) {
 		'temperature:' + res.temperature + ',' + 'pressure:' + res.pressure + ',' + 'rHum:' + res.rHum + ',' + 'gasResistance:' + res.gasResistance;
 }
 var pmsa003Attributes = function (res) {
-	return openiodUrl + '/pmsa003' + '/v1/m?foi=' + res.foi + '&observation=' +
+	let rec = openiodUrl + '/pmsa003' + '/v1/m?foi=' + res.foi + '&observation=' +
 		'pm1:' + res.pm1 + ',pm25:' + res.pm25 + ',pm10:' + res.pm10 +
 		',pm1amb:' + res.pm1amb + ',pm25amb:' + res.pm25amb + ',pm10amb:' + res.pm10amb +
 		',raw0_3:' + res.raw0_3 + ',raw0_5:' + res.raw0_5 + ',raw1_0:' + res.raw1_0 +
 		',raw2_5:' + res.raw2_5 + ',raw5_0:' + res.raw5_0 + ',raw10_0:' + res.raw10_0 +
-		',pn1c:' + res.pn1c + ',' + 'pn25c:' + res.pn25c + ',' + 'pn10c:' + res.pn10c + ',' + 'pm25mlr:' + res.pm25mlr + ',' + 'temperature:' + res.temperature + ',' + 'rHum:' + res.rHum
+		',pn1c:' + res.pn1c + ',' + 'pn25c:' + res.pn25c + ',' + 'pn10c:' + res.pn10c
+	if (res.pm25mlr != undefined) {
+		rec += ',' + 'pm25mlr:' + res.pm25mlr + ',' + 'temperature:' + res.temperature + ',' + 'rHum:' + res.rHum
+	}
+
+	return rec
 }
 var pms7003Attributes = function (res) {
-	return openiodUrl + '/pms7003' + '/v1/m?foi=' + res.foi + '&observation=' +
+	let rec = openiodUrl + '/pms7003' + '/v1/m?foi=' + res.foi + '&observation=' +
 		'pm1:' + res.pm1 + ',pm25:' + res.pm25 + ',pm10:' + res.pm10 +
 		',pm1amb:' + res.pm1amb + ',pm25amb:' + res.pm25amb + ',pm10amb:' + res.pm10amb +
 		',raw0_3:' + res.raw0_3 + ',raw0_5:' + res.raw0_5 + ',raw1_0:' + res.raw1_0 +
 		',raw2_5:' + res.raw2_5 + ',raw5_0:' + res.raw5_0 + ',raw10_0:' + res.raw10_0 +
-		',pn1c:' + res.pn1c + ',' + 'pn25c:' + res.pn25c + ',' + 'pn10c:' + res.pn10c + ',' + 'pm25mlr:' + res.pm25mlr + ',' + 'temperature:' + res.temperature + ',' + 'rHum:' + res.rHum
+		',pn1c:' + res.pn1c + ',' + 'pn25c:' + res.pn25c + ',' + 'pn10c:' + res.pn10c
+
+	if (res.pm25mlr != undefined) {
+		rec += ',' + 'pm25mlr:' + res.pm25mlr + ',' + 'temperature:' + res.temperature + ',' + 'rHum:' + res.rHum
+	}
+
+	return rec
 }
 
 var ds18b20Attributes = function (res) {

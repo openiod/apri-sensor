@@ -868,8 +868,8 @@ const readSensorDataBme280 = () => {
       //data.pressure_inHg = BME280.convertHectopascalToInchesOfMercury(data.pressure_hPa);
 
       if (counters.busy == false) {
-        if (data.pressure_hPa < 500) {
-          logger.info('BME280 pressure below 500. Less than 3.3V power? Measure skipped');
+        if (data.pressure_hPa < 700) {  // bme280 slaat soms op tilt en geeft op I2C protocol dan x80x00x00x80x00x00 --> pressure 669.63 rHum 69.93 T 23.6
+          logger.info('BME280 pressure below 700 (669.3?). Less than 3.3V power? Measure skipped');
         } else {
           counters.bme280.nrOfMeas++;
           counters.bme280.nrOfMeasTotal++;
@@ -913,8 +913,8 @@ const readSensorDataBme680 = async function () {
   }
   var data = bme680Data.data;
   if (counters.busy == false) {
-    if (data.pressure < 500) {
-      logger.info('BME680 pressure below 500. Less than 3.3V power? Measure skipped');
+    if (data.pressure < 700) {  
+      logger.info('BME680 pressure below 700 (669,63?). Less than 3.3V power? Measure skipped');
     } else {
       counters.bme680.nrOfMeas++;
       counters.bme680.nrOfMeasTotal++;

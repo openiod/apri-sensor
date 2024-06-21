@@ -1071,13 +1071,13 @@ var processDataCycle = function () {
   results.pms.temperature = Math.round((counters.pms.temperature / counters.pms.nrOfMeas) * 100) / 100;
   results.pms.rHum = Math.round((counters.pms.rHum / counters.pms.nrOfMeas) * 100) / 100;
   // calculate pm25mlr
-  if (counters.pms.temperature == 0 && counters.pms.rHum == 0) {
+  if (results.pms.temperature == 0 && results.pms.rHum == 0) {
+    results.pms.pm25mlr = 0
+  } else {
     results.pms.pm25mlr = 14.8 + (0.3834 * results.pms.pm25CF1) + (-0.1498 * results.pms.rHum) + (-0.1905 * results.pms.temperature)
     if (results.pms.pm25mlr > results.pms.pm25) {
       results.pms.pm25mlr = results.pms.pm25
     }
-  } else {
-    results.pms.pm25mlr = 0
   }
   results.pms.nrOfMeas = counters.pms.nrOfMeas;
   results.pms.sensorType = counters.pms.sensorType;
@@ -1403,7 +1403,7 @@ var sendData = async function () {
       ',' + results.pms.pn10c +
       ',' + results.pms.pm25mlr +
       ',' + results.pms.temperature +
-      ',' + results.pms.rHum 
+      ',' + results.pms.rHum
 
     header = '"sensorId","dateObserved","sensorType","pm1Cf1","pm25Cf1","pm10Cf1","pm1amb","pm25amb","pm10amb"' +
       ',"part0_3","part0_5","part1_0","part2_5","part5_0","part10_0","pn1c","pn25c","pn10c","pm25mlr","temperature","rHum"'

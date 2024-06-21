@@ -1100,8 +1100,8 @@ var processDataCycle = function () {
       results.pms.pm25mlr = null
     } else {
       results.pms.pm25mlr = 14.8 + (0.3834 * results.pms.pm25CF1) + (-0.1498 * results.pms.rHum) + (-0.1905 * results.pms.temperature)
-      if (results.pms.pm25mlr > results.pms.pm25) {
-        results.pms.pm25mlr = results.pms.pm25
+      if (results.pms.pm25mlr > results.pms.pm25CF1) {
+        results.pms.pm25mlr = results.pms.pm25CF1
       }
     }
   } else {

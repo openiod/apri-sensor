@@ -1417,7 +1417,8 @@ var sendData = async function () {
     writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
       '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
 
-    await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, {
+    let newKey = timeStamp.toISOString() + ':' + sensorType
+    let newRec = {
       'foi': 'SCRP' + unit.id
       , 'time': timeStampTime
       , 'sensorType': sensorType
@@ -1439,7 +1440,9 @@ var sendData = async function () {
       , 'pm25mlr': results.pms.pm25mlr
       , 'temperature': results.pms.temperature
       , 'rHum': results.pms.rHum
-    })
+    }
+    console.log(newKey,newRec)
+    await redisClient.HSET(newKey,newRec)
       .then(function (res) {
         var _res = res;
         //redisSaddAsync('new', timeStamp.toISOString() + ':pmsa003')

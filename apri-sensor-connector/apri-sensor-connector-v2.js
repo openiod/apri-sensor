@@ -232,10 +232,10 @@ var getRedisData = function (redisArray, redisArrayIndex) {
 				case 'nextpm':
 					url = nextpmAttributes(res) + '&dateObserved=' + dateObserved;
 					break;
-					case 'sgp41':
-						url = sgp41Attributes(res) + '&dateObserved=' + dateObserved;
-						break;
-					default:
+				case 'sgp41':
+					url = sgp41Attributes(res) + '&dateObserved=' + dateObserved;
+					break;
+				default:
 					console.log('ERROR: redis entry unknown: ' + redisKey);
 			};
 			sendData(_redisArray, _redisArrayIndex, _redisKey, url);
@@ -256,15 +256,17 @@ var pmsa003Attributes = function (res) {
 		',pm1amb:' + res.pm1amb + ',pm25amb:' + res.pm25amb + ',pm10amb:' + res.pm10amb +
 		',raw0_3:' + res.raw0_3 + ',raw0_5:' + res.raw0_5 + ',raw1_0:' + res.raw1_0 +
 		',raw2_5:' + res.raw2_5 + ',raw5_0:' + res.raw5_0 + ',raw10_0:' + res.raw10_0 +
-		',pn1c:' + res.pn1c + ',' + 'pn25c:' + res.pn25c + ',' + 'pn10c:' + res.pn10c;
+		',pn1c:' + res.pn1c + ',' + 'pn25c:' + res.pn25c + ',' + 'pn10c:' + res.pn10c + ',' + 'pm25mlr:' + res.pm25mlr;
 }
 var pms7003Attributes = function (res) {
 	return openiodUrl + '/pms7003' + '/v1/m?foi=' + res.foi + '&observation=' +
 		'pm1:' + res.pm1 + ',pm25:' + res.pm25 + ',pm10:' + res.pm10 +
 		',pm1amb:' + res.pm1amb + ',pm25amb:' + res.pm25amb + ',pm10amb:' + res.pm10amb +
 		',raw0_3:' + res.raw0_3 + ',raw0_5:' + res.raw0_5 + ',raw1_0:' + res.raw1_0 +
-		',raw2_5:' + res.raw2_5 + ',raw5_0:' + res.raw5_0 + ',raw10_0:' + res.raw10_0;
+		',raw2_5:' + res.raw2_5 + ',raw5_0:' + res.raw5_0 + ',raw10_0:' + res.raw10_0 +
+		',pn1c:' + res.pn1c + ',' + 'pn25c:' + res.pn25c + ',' + 'pn10c:' + res.pn10c + ',' + 'pm25mlr:' + res.pm25mlr;
 }
+
 var ds18b20Attributes = function (res) {
 	return openiodUrl + '/ds18b20' + '/v1/m?foi=' + res.foi + '&observation=' +
 		'temperature:' + res.temperature;
@@ -341,13 +343,13 @@ var nextpmAttributes = function (res) {
 		',' + 'pm1:' + res.pm1 + ',' + 'pm25:' + res.pm25 + ',' + 'pm10:' + res.pm10 +
 		',pn1c:' + res.pn1c + ',' + 'pn25c:' + res.pn25c + ',' + 'pn10c:' + res.pn10c +
 		',' + 'pm1c:' + res.pm1c + ',' + 'pm25c:' + res.pm25c + ',' + 'pm10c:' + res.pm10c +
-		',' + 'temperature:' + res.temperature + ',' + 'rHum:' + res.rHum + ',' + 'fanSpeed:' + res.fanSpeed + ',' + 'status:' + res.status 
+		',' + 'temperature:' + res.temperature + ',' + 'rHum:' + res.rHum + ',' + 'fanSpeed:' + res.fanSpeed + ',' + 'status:' + res.status
 
 }
 var sgp41Attributes = function (res) {
 	return openiodUrl + '/sgp41' + '/v1/m?foi=' + res.foi + '&observation=' +
-		'vocIndex:' + res.vocIndex + ',' + 'noxIndex:' + res.noxIndex + 
-		',' + 'vocSraw:' + res.vocSraw + ',' + 'noxSraw:' + res.noxSraw + 
+		'vocIndex:' + res.vocIndex + ',' + 'noxIndex:' + res.noxIndex +
+		',' + 'vocSraw:' + res.vocSraw + ',' + 'noxSraw:' + res.noxSraw +
 		',' + 'temperature:' + res.temperature + ',' + 'rHum:' + res.rHum;
 }
 

@@ -396,6 +396,8 @@ var counters = {
     , pn1c: 0
     , pn25c: 0
     , pn10c: 0
+    , temperature: 0
+    , rHum: 0
     , nrOfMeas: 0
     , nrOfMeasTotal: 0
   },
@@ -515,6 +517,9 @@ var results = {
     , pn1c: 0
     , pn25c: 0
     , pn10c: 0
+    , temperature: 0
+    , rHum: 0
+    , pm25mlr: 0
     , nrOfMeas: 0
   },
   ds18b20: {
@@ -627,6 +632,8 @@ var initCounters = function () {
   counters.pms.pn1c = 0;
   counters.pms.pn25c = 0;
   counters.pms.pn10c = 0;
+  counters.pms.temperature = 0;
+  counters.pms.rHum = 0;
   counters.pms.nrOfMeas = 0;
 
   counters.ds18b20.temperature = 0;
@@ -745,6 +752,15 @@ var processRaspiSerialRecord = function () {
   counters.pms.pn1c += ((view8[16] << 8) + view8[17]) - ((view8[20] << 8) + view8[21])
   counters.pms.pn25c += ((view8[20] << 8) + view8[21]) - ((view8[22] << 8) + view8[23])
   counters.pms.pn10c += ((view8[22] << 8) + view8[23]) - ((view8[26] << 8) + view8[27])
+
+  if (latest.temperature) {
+    counters.pms.temperature = latest.temperature
+    counters.pms.rHum = latest.rHum
+  } else {
+    counters.pms.temperature = 0
+    counters.pms.rHum = 0
+  }
+
 
   if (view8[28] == 0x80) {  // 128=PMS7003
     //console.log(view8[28],'pms7003')
@@ -1015,20 +1031,27 @@ const readSensorDataDs18b20 = () => {
   }
 };
 
+let prevLog = ''
 var processDataCycle = function () {
   //	setTimeout(processDataCycle, loopTimeCycle);
   counters.busy = true;
-  logger.info('Counters pms: ' + counters.pms.nrOfMeas +
-    '; bme280: ' + counters.bme280.nrOfMeas +
-    '; bme680: ' + counters.bme680.nrOfMeas +
-    '; ds18b20: ' + counters.ds18b20.nrOfMeas +
-    '; tgs5042: ' + counters.tgs5042.nrOfMeas +
-    '; sps30: ' + counters.sps.nrOfMeas +
-    '; ips7100: ' + counters.ips7100.nrOfMeas +
-    '; scd30: ' + counters.scd30.nrOfMeas +
-    '; nextpm: ' + counters.nextpm.nrOfMeas +
-    '; sgp41: ' + counters.sgp41.nrOfMeas
-  )
+  let log = 'Counters '
+  if (counters.pms.nrOfMeas) log += 'pms:' + counters.pms.nrOfMeas
+  if (counters.bme280.nrOfMeas) log += ';bme280:' + counters.bme280.nrOfMeas
+  if (counters.bme680.nrOfMeas) log += ';bme680:' + counters.bme680.nrOfMeas
+  if (counters.ds18b20.nrOfMeas) log += ';ds18b20:' + counters.ds18b20.nrOfMeas
+  if (counters.tgs5042.nrOfMeas) log += ';tgs5042:' + counters.tgs5042.nrOfMeas
+  if (counters.sps.nrOfMeas) log += ';sps30:' + counters.sps.nrOfMeas
+  if (counters.ips7100.nrOfMeas) log += ';ips7100:' + counters.ips7100.nrOfMeas
+  if (counters.scd30.nrOfMeas) log += ';scd30:' + counters.scd30.nrOfMeas
+  if (counters.nextpm.nrOfMeas) log += ';nextpm:' + counters.nextpm.nrOfMeas
+  if (counters.sgp41.nrOfMeas) log += ';sgp41:' + counters.sgp41.nrOfMeas
+  if (log == prevLog) {
+    logger.info('idem')
+  } else {
+    logger.info(log)
+    prevLog = log
+  }
 
   results.pms.pm1CF1 = Math.round((counters.pms.pm1CF1 / counters.pms.nrOfMeas) * 100) / 100;
   results.pms.pm25CF1 = Math.round((counters.pms.pm25CF1 / counters.pms.nrOfMeas) * 100) / 100;
@@ -1045,6 +1068,17 @@ var processDataCycle = function () {
   results.pms.pn1c = Math.round((counters.pms.pn1c / counters.pms.nrOfMeas) * 100) / 100;
   results.pms.pn25c = Math.round((counters.pms.pn25c / counters.pms.nrOfMeas) * 100) / 100;
   results.pms.pn10c = Math.round((counters.pms.pn10c / counters.pms.nrOfMeas) * 100) / 100;
+  results.pms.temperature = Math.round((counters.pms.temperature / counters.pms.nrOfMeas) * 100) / 100;
+  results.pms.rHum = Math.round((counters.pms.rHum / counters.pms.nrOfMeas) * 100) / 100;
+  // calculate pm25mlr
+  if (counters.pms.temperature == 0 && counters.pms.rHum == 0) {
+    results.pms.pm25mlr = 14.8 + (0.3834 * results.pms.pm25CF1) + (-0.1498 * results.pms.rHum) + (-0.1905 * results.pms.temperature)
+    if (results.pms.pm25mlr > results.pms.pm25) {
+      results.pms.pm25mlr = results.pms.pm25
+    }
+  } else {
+    results.pms.pm25mlr = 0
+  }
   results.pms.nrOfMeas = counters.pms.nrOfMeas;
   results.pms.sensorType = counters.pms.sensorType;
 
@@ -1366,10 +1400,11 @@ var sendData = async function () {
       ',' + results.pms.part10_0 +
       ',' + results.pms.pn1c +
       ',' + results.pms.pn25c +
-      ',' + results.pms.pn10c
+      ',' + results.pms.pn10c +
+      ',' + results.pms.pm25mlr 
 
     header = '"sensorId","dateObserved","sensorType","pm1Cf1","pm25Cf1","pm10Cf1","pm1amb","pm25amb","pm10amb"' +
-      ',"part0_3","part0_5","part1_0","part2_5","part5_0","part10_0","pn1c","pn25c","pn10c"'
+      ',"part0_3","part0_5","part1_0","part2_5","part5_0","part10_0","pn1c","pn25c","pn10c","pm25mlr"'
 
     writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
       '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
@@ -1393,6 +1428,7 @@ var sendData = async function () {
       , 'pn1c': results.pms.pn1c
       , 'pn25c': results.pms.pn25c
       , 'pn10c': results.pms.pn10c
+      , 'pm25mlr': results.pms.pm25mlr
     })
       .then(function (res) {
         var _res = res;
@@ -2932,7 +2968,7 @@ var initSgp41Device = function () {
 
         //      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, 0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]))
         i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, params[0], params[1], params[2], params[3], params[4], params[5]]))
-  
+
         //i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, 0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]))
         await sleepFunction(50)
         str3 = i2cSgp41.readSync(addressI2cSgp41, 3)
@@ -2956,8 +2992,8 @@ var initSgp41Device = function () {
 
       //      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, 0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]))
       i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, params[0], params[1], params[2], params[3], params[4], params[5]]))
-    
-//      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, 0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]))
+
+      //      i2cSgp41.writeSync(addressI2cSgp41, Buffer.from([d1, d2, 0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]))
       await sleepFunction(50)
       str6 = i2cSgp41.readSync(addressI2cSgp41, 6)
       let resultVoc = str6[0] << 8 | str6[1]
@@ -3033,29 +3069,29 @@ const calcSgp41Compensation = function () {
     return [0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]
   }
 
-/*
-  if (latest.bmeTemperature) {
-    let _rHumCompensation = Math.ceil(latest.bmeRHum * 65535 / 100)
-    let r1 = _rHumCompensation >> 8
-    let r2 = _rHumCompensation - (r1 << 8)
-    let rCrc = calcCrcSgp41(r1, r2)
-    result.push(r1)
-    result.push(r2)
-    result.push(rCrc)
-    //console.log('RV', r1, r2, rCrc)
-    let _temperatureCompensation = Math.ceil((latest.bmeTemperature + 45) * 65535 / 175)
-    let t1 = _temperatureCompensation >> 8
-    let t2 = _temperatureCompensation - (t1 << 8)
-    let tCrc = calcCrcSgp41(t1, t2)
-    result.push(t1)
-    result.push(t2)
-    result.push(rCrc)
-    //console.log('T', t1, t2, tCrc)
-    return result
-  } else {
-    return [0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]
-  }
-*/
+  /*
+    if (latest.bmeTemperature) {
+      let _rHumCompensation = Math.ceil(latest.bmeRHum * 65535 / 100)
+      let r1 = _rHumCompensation >> 8
+      let r2 = _rHumCompensation - (r1 << 8)
+      let rCrc = calcCrcSgp41(r1, r2)
+      result.push(r1)
+      result.push(r2)
+      result.push(rCrc)
+      //console.log('RV', r1, r2, rCrc)
+      let _temperatureCompensation = Math.ceil((latest.bmeTemperature + 45) * 65535 / 175)
+      let t1 = _temperatureCompensation >> 8
+      let t2 = _temperatureCompensation - (t1 << 8)
+      let tCrc = calcCrcSgp41(t1, t2)
+      result.push(t1)
+      result.push(t2)
+      result.push(rCrc)
+      //console.log('T', t1, t2, tCrc)
+      return result
+    } else {
+      return [0x80, 0x00, 0xA2, 0x66, 0x66, 0x93]
+    }
+  */
 }
 
 var readSgp41Device = async function () {
@@ -3079,7 +3115,7 @@ var readSgp41Device = async function () {
       let str6 = i2cSgp41.readSync(addressI2cSgp41, 6)
       result.vocSraw = str6[0] << 8 | str6[1]
       result.noxSraw = str6[3] << 8 | str6[4]
-      logger.info('sgp41 raw VOC: ' + result.vocSraw + ' raw NOx:' + result.noxSraw)
+      // logger.info('sgp41 raw VOC: ' + result.vocSraw + ' raw NOx:' + result.noxSraw)
       processRaspiSgp41Record(result)
       await sleepFunction(1)
     }
@@ -3348,6 +3384,15 @@ var processRaspiSerialDataAtmega = function (data) {
     counters.pms.pn1c += Math.round(parseFloat(items[7]) / 100) - Math.round(parseFloat(items[9]) / 100)
     counters.pms.pn25c += Math.round(parseFloat(items[9]) / 100) - Math.round(parseFloat(items[10]) / 100)
     counters.pms.pn10c += Math.round(parseFloat(items[10]) / 100) - Math.round(parseFloat(items[12]) / 100)
+
+    if (latest.bmeTemperature) {
+      counters.pms.temperature += latest.bmeTemperature
+      counters.pms.rHum += latest.bmeRHum
+    } else {
+      counters.pms.temperature += 0
+      counters.pms.rHum += 0
+    }
+
 
   }
 }

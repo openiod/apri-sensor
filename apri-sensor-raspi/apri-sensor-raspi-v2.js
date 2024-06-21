@@ -1053,6 +1053,29 @@ var processDataCycle = function () {
     prevLog = log
   }
 
+  // skip first 3 measurements, initialization fase of the bme280
+  if (counters.bme280.nrOfMeasTotal > 3) {
+    results.bme280.temperature = Math.round((counters.bme280.temperature / counters.bme280.nrOfMeas) * 100) / 100;
+    results.bme280.pressure = Math.round((counters.bme280.pressure / counters.bme280.nrOfMeas) * 100) / 100;
+    results.bme280.rHum = Math.round((counters.bme280.rHum / counters.bme280.nrOfMeas) * 100) / 100;
+    results.bme280.nrOfMeas = counters.bme280.nrOfMeas;
+
+    latest.bmeTemperature = results.bme280.temperature
+    latest.bmeRHum = results.bme280.rHum
+  }
+
+  // skip first 3 measurements, initialization fase of the bme680
+  if (counters.bme680.nrOfMeasTotal > 3) {
+    results.bme680.temperature = Math.round((counters.bme680.temperature / counters.bme680.nrOfMeas) * 100) / 100;
+    results.bme680.pressure = Math.round((counters.bme680.pressure / counters.bme680.nrOfMeas) * 100) / 100;
+    results.bme680.rHum = Math.round((counters.bme680.rHum / counters.bme680.nrOfMeas) * 100) / 100;
+    results.bme680.gasResistance = Math.round((counters.bme680.gasResistance / counters.bme680.nrOfMeas) * 100) / 100;
+    results.bme680.nrOfMeas = counters.bme680.nrOfMeas;
+
+    latest.bmeTemperature = results.bme680.temperature
+    latest.bmeRHum = results.bme680.rHum
+  }
+
   results.pms.pm1CF1 = Math.round((counters.pms.pm1CF1 / counters.pms.nrOfMeas) * 100) / 100;
   results.pms.pm25CF1 = Math.round((counters.pms.pm25CF1 / counters.pms.nrOfMeas) * 100) / 100;
   results.pms.pm10CF1 = Math.round((counters.pms.pm10CF1 / counters.pms.nrOfMeas) * 100) / 100;
@@ -1068,43 +1091,26 @@ var processDataCycle = function () {
   results.pms.pn1c = Math.round((counters.pms.pn1c / counters.pms.nrOfMeas) * 100) / 100;
   results.pms.pn25c = Math.round((counters.pms.pn25c / counters.pms.nrOfMeas) * 100) / 100;
   results.pms.pn10c = Math.round((counters.pms.pn10c / counters.pms.nrOfMeas) * 100) / 100;
-  results.pms.temperature = Math.round((counters.pms.temperature / counters.pms.nrOfMeas) * 100) / 100;
-  results.pms.rHum = Math.round((counters.pms.rHum / counters.pms.nrOfMeas) * 100) / 100;
+  results.pms.temperature = latest.bmeTemperature
+  results.pms.rHum = latest.bmeRHum
+
   // calculate pm25mlr
-  if (results.pms.temperature == 0 && results.pms.rHum == 0) {
-    results.pms.pm25mlr = 0
-  } else {
-    results.pms.pm25mlr = 14.8 + (0.3834 * results.pms.pm25CF1) + (-0.1498 * results.pms.rHum) + (-0.1905 * results.pms.temperature)
-    if (results.pms.pm25mlr > results.pms.pm25) {
-      results.pms.pm25mlr = results.pms.pm25
+  if (latest.bmeTemperature) {
+    if (latest.temperature == 0 && latest.rHum == 0) {
+      results.pms.pm25mlr = null
+    } else {
+      results.pms.pm25mlr = 14.8 + (0.3834 * results.pms.pm25CF1) + (-0.1498 * results.pms.rHum) + (-0.1905 * results.pms.temperature)
+      if (results.pms.pm25mlr > results.pms.pm25) {
+        results.pms.pm25mlr = results.pms.pm25
+      }
     }
+  } else {
+    results.pms.pm25mlr = null
   }
+
   results.pms.nrOfMeas = counters.pms.nrOfMeas;
   results.pms.sensorType = counters.pms.sensorType;
 
-  // skip first 3 measurements, initialization fase of the bme280
-  if (counters.bme280.nrOfMeasTotal > 3) {
-    results.bme280.temperature = Math.round((counters.bme280.temperature / counters.bme280.nrOfMeas) * 100) / 100;
-    results.bme280.pressure = Math.round((counters.bme280.pressure / counters.bme280.nrOfMeas) * 100) / 100;
-    results.bme280.rHum = Math.round((counters.bme280.rHum / counters.bme280.nrOfMeas) * 100) / 100;
-    results.bme280.nrOfMeas = counters.bme280.nrOfMeas;
-
-    latest.bmeTemperature = results.bme280.temperature
-    latest.bmeRHum = results.bme280.rHum
-
-  }
-
-  // skip first 3 measurements, initialization fase of the bme680
-  if (counters.bme680.nrOfMeasTotal > 3) {
-    results.bme680.temperature = Math.round((counters.bme680.temperature / counters.bme680.nrOfMeas) * 100) / 100;
-    results.bme680.pressure = Math.round((counters.bme680.pressure / counters.bme680.nrOfMeas) * 100) / 100;
-    results.bme680.rHum = Math.round((counters.bme680.rHum / counters.bme680.nrOfMeas) * 100) / 100;
-    results.bme680.gasResistance = Math.round((counters.bme680.gasResistance / counters.bme680.nrOfMeas) * 100) / 100;
-    results.bme680.nrOfMeas = counters.bme680.nrOfMeas;
-
-    latest.bmeTemperature = results.bme680.temperature
-    latest.bmeRHum = results.bme680.rHum
-  }
 
   results.ds18b20.temperature = Math.round((counters.ds18b20.temperature / counters.ds18b20.nrOfMeas) * 100) / 100;
   results.ds18b20.nrOfMeas = counters.ds18b20.nrOfMeas;
@@ -3393,8 +3399,8 @@ var processRaspiSerialDataAtmega = function (data) {
       counters.pms.temperature += latest.bmeTemperature
       counters.pms.rHum += latest.bmeRHum
     } else {
-      counters.pms.temperature += 0
-      counters.pms.rHum += 0
+      counters.pms.temperature = 0
+      counters.pms.rHum = 0
     }
 
 

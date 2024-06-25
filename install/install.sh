@@ -12,6 +12,8 @@
 # batery profile pjlipo_12000 (voor 12000mah)
 # apply settings
 
+# 2.4.4 pm25mlr mlr calibration toegevoegd
+
 # 2.4.3 Vernieuwde aprisensor-netmanager-v met actuele meetwaarden en locales en,nl,ja
 
 # 2.4.2 

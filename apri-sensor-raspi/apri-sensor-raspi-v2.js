@@ -1448,7 +1448,7 @@ var sendData = async function () {
       newRec.rHum = results.pms.rHum
     }
 
-    console.log(newKey,newRec)
+    //console.log(newKey,newRec)
     await redisClient.HSET(newKey,newRec)
       .then(function (res) {
         var _res = res;

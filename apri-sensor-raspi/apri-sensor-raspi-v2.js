@@ -3250,6 +3250,7 @@ const sgp41Constants = {
   MEAN_VARIANCE_ESTIMATOR__ADDITIONAL_GAMMA_MEAN_SCALING: 8,
   MEAN_VARIANCE_ESTIMATOR__FIX16_MAX: 32767
 }
+let x = 0
 let sgp41VocParams = {
   mAlgorithm_Type: 0,
   mSamplingInterval: 1,
@@ -3311,7 +3312,32 @@ let sgp41NoxParams = {
   mUptime: 0,
   mSraw: 0,
   mGas_Index: 0,
-  // aanvullen
+  m_Mean_Variance_Estimator___Initialized: x,
+  m_Mean_Variance_Estimator___Mean: x,
+  m_Mean_Variance_Estimator___Sraw_Offset: x,
+  m_Mean_Variance_Estimator___Std: x,
+  m_Mean_Variance_Estimator___Gamma_Mean: x,
+  m_Mean_Variance_Estimator___Gamma_Variance: x,
+  m_Mean_Variance_Estimator___Gamma_Initial_Mean: x,
+  m_Mean_Variance_Estimator___Gamma_Initial_Variance: x,
+  m_Mean_Variance_Estimator__Gamma_Mean: x,
+  m_Mean_Variance_Estimator__Gamma_Variance: x,
+  m_Mean_Variance_Estimator___Uptime_Gamma: x,
+  m_Mean_Variance_Estimator___Uptime_Gating: x,
+  m_Mean_Variance_Estimator___Gating_Duration_Minutes: x,
+  m_Mean_Variance_Estimator___Sigmoid__K: x,
+  m_Mean_Variance_Estimator___Sigmoid__X0: x,
+  m_Mox_Model__Sraw_Std: x,
+  m_Mox_Model__Sraw_Mean: x,
+  m_Sigmoid_Scaled__K: x,
+  m_Sigmoid_Scaled__X0: x,
+  m_Sigmoid_Scaled__Offset_Default: x,
+  m_Adaptive_Lowpass__A1: x,
+  m_Adaptive_Lowpass__A2: x,
+  m_Adaptive_Lowpass___Initialized: x,
+  m_Adaptive_Lowpass___X1: x,
+  m_Adaptive_Lowpass___X2: x,
+  m_Adaptive_Lowpass___X3: x
 }
 
 const GasIndexAlgorithm_reset = function (params) {

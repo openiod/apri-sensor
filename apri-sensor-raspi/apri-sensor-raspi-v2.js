@@ -3221,6 +3221,16 @@ const sgp41Constants = {
   INIT_DURATION_MEAN_NOX: 3600 * 4.75,
   INIT_TRANSITION_MEAN: 0.01,
   TAU_INITIAL_VARIANCE: 2500,
+  INIT_DURATION_VARIANCE_VOC: 3600 * 1.45,
+  INIT_DURATION_VARIANCE_NOX: 3600 * 5.70,
+  INIT_TRANSITION_VARIANCE: 0.01,
+  GATING_THRESHOLD_VOC: 340,
+  GATING_THRESHOLD_NOX: 30,
+  GATING_THRESHOLD_INITIAL: 510,
+  GATING_THRESHOLD_TRANSITION: 0.09,
+  GATING_VOC_MAX_DURATION_MINUTES: 60 * 3,
+  GATING_NOX_MAX_DURATION_MINUTES: 60 * 12,
+  GATING_MAX_RATIO: 0.3,
   SIGMOID_L: 500,
   SIGMOID_K_VOC: -0.0065,
   SIGMOID_X0_VOC: 213,
@@ -3442,7 +3452,7 @@ const GasIndexAlgorithm__adaptive_lowpass__set_parameters = function (params) {
 }
 
 const GasIndexAlgorithm_process = function (params, sraw) {
-  if ((params.mUptime <= GasIndexAlgorithm_INITIAL_BLACKOUT)) {
+  if ((params.mUptime <= sgp41Constants.INITIAL_BLACKOUT)) {
     params.mUptime = (params.mUptime + params.mSamplingInterval);
   } else {
     if (((sraw > 0) && (sraw < 65000))) {
@@ -3454,7 +3464,7 @@ const GasIndexAlgorithm_process = function (params, sraw) {
       params.mSraw = ((float)((sraw - params.mSraw_Minimum)));
     }
     if (((params.mAlgorithm_Type ==
-      GasIndexAlgorithm_ALGORITHM_TYPE_VOC) ||
+      sgp41Constants.ALGORITHM_TYPE_VOC) ||
       GasIndexAlgorithm__mean_variance_estimator__is_initialized(
         params))) {
       params.mGas_Index =

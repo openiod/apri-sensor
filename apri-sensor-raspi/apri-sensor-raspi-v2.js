@@ -3531,12 +3531,12 @@ const GasIndexAlgorithm__sigmoid_scaled__process = function (params, sample) {
           (5 * params.mIndex_Offset)) /
           4);
       }
-      return (((sgp41Constants.SIGMOID_L + shift) / (1 + expf(x))) -
+      return (((sgp41Constants.SIGMOID_L + shift) / (1 + Math.exp(x))) -
         shift);
     } else {
       return ((params.mIndex_Offset /
         params.m_Sigmoid_Scaled__Offset_Default) *
-        (sgp41Constants.SIGMOID_L / (1 + expf(x))));
+        (sgp41Constants.SIGMOID_L / (1 + Math.exp(x))));
     }
   }
 }
@@ -3565,7 +3565,7 @@ const GasIndexAlgorithm__adaptive_lowpass__process = function (params, sample) {
   if ((abs_delta < 0)) {
     abs_delta = (-1 * abs_delta);
   }
-  F1 = expf((sgp41Constants.LP_ALPHA * abs_delta));
+  F1 = Math.exp((sgp41Constants.LP_ALPHA * abs_delta));
   tau_a = (((sgp41Constants.LP_TAU_SLOW - sgp41Constants.LP_TAU_FAST) *
     F1) +
     sgp41Constants.LP_TAU_FAST);
@@ -3592,7 +3592,7 @@ const GasIndexAlgorithm__mean_variance_estimator__process = function (params, sr
       params.m_Mean_Variance_Estimator___Mean = 0;
     }
     sraw = (sraw - params.m_Mean_Variance_Estimator___Sraw_Offset);
-    params.GasIndexAlgorithm__mean_variance_estimator___calculate_gamma(params);
+    GasIndexAlgorithm__mean_variance_estimator___calculate_gamma(params);
     delta_sgp = ((sraw - params.m_Mean_Variance_Estimator___Mean) /
       sgp41Constants.MEAN_VARIANCE_ESTIMATOR__GAMMA_SCALING);
     if ((delta_sgp < 0)) {
@@ -3605,10 +3605,10 @@ const GasIndexAlgorithm__mean_variance_estimator__process = function (params, sr
       additional_scaling = ((c / 1440) * (c / 1440));
     }
     params.m_Mean_Variance_Estimator___Std =
-      (sqrtf((additional_scaling *
+      (Math.sqrt((additional_scaling *
         (sgp41Constants.MEAN_VARIANCE_ESTIMATOR__GAMMA_SCALING -
           params.m_Mean_Variance_Estimator__Gamma_Variance))) *
-        sqrtf(
+        Math.sqrt(
           ((params.m_Mean_Variance_Estimator___Std *
             (params.m_Mean_Variance_Estimator___Std /
               (sgp41Constants.MEAN_VARIANCE_ESTIMATOR__GAMMA_SCALING *
@@ -3726,7 +3726,7 @@ const GasIndexAlgorithm__mean_variance_estimator___sigmoid__process = function (
   } else if ((x > 50)) {
     return 0;
   } else {
-    return (1 / (1 + expf(x)));
+    return (1 / (1 + Math.exp(x)));
   }
 }
 

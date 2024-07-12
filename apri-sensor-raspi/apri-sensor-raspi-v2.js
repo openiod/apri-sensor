@@ -3387,10 +3387,10 @@ const GasIndexAlgorithm__mean_variance_estimator__set_parameters = function (par
 
   return params
 }
-const GasIndexAlgorithm__mean_variance_estimator__get_std(params) {
+const GasIndexAlgorithm__mean_variance_estimator__get_std= function(params) {
   return params.m_Mean_Variance_Estimator___Std;
 }
-const GasIndexAlgorithm__mean_variance_estimator__get_mean(params) {
+const GasIndexAlgorithm__mean_variance_estimator__get_mean= function(params) {
   return (params.m_Mean_Variance_Estimator___Mean + params.m_Mean_Variance_Estimator___Sraw_Offset);
 }
 const GasIndexAlgorithm__mox_model__set_parameters(params, SRAW_STD, SRAW_MEAN) {

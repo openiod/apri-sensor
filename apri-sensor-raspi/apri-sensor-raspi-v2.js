@@ -913,7 +913,7 @@ const readSensorDataBme680 = async function () {
   }
   var data = bme680Data.data;
   if (counters.busy == false) {
-    if (data.pressure < 700) {  
+    if (data.pressure < 700) {
       logger.info('BME680 pressure below 700 (669,63?). Less than 3.3V power? Measure skipped');
     } else {
       counters.bme680.nrOfMeas++;
@@ -1099,7 +1099,7 @@ var processDataCycle = function () {
     if (latest.temperature == 0 && latest.rHum == 0) {
       results.pms.pm25mlr = null
     } else {
-      results.pms.pm25mlr = Math.round(( 14.8 + (0.3834 * results.pms.pm25CF1) + (-0.1498 * results.pms.rHum) + (-0.1905 * results.pms.temperature) ) *100)/100
+      results.pms.pm25mlr = Math.round((14.8 + (0.3834 * results.pms.pm25CF1) + (-0.1498 * results.pms.rHum) + (-0.1905 * results.pms.temperature)) * 100) / 100
       if (results.pms.pm25mlr > results.pms.pm25CF1) {
         results.pms.pm25mlr = results.pms.pm25CF1
       } else {
@@ -1451,7 +1451,7 @@ var sendData = async function () {
     }
 
     //console.log(newKey,newRec)
-    await redisClient.HSET(newKey,newRec)
+    await redisClient.HSET(newKey, newRec)
       .then(function (res) {
         var _res = res;
         //redisSaddAsync('new', timeStamp.toISOString() + ':pmsa003')
@@ -3154,6 +3154,313 @@ var readSgp41Device = async function () {
 
 }
 
+/*
+#define GasIndexAlgorithm_DEFAULT_SAMPLING_INTERVAL(1.f)
+#define GasIndexAlgorithm_INITIAL_BLACKOUT(45.f)
+#define GasIndexAlgorithm_INDEX_GAIN(230.f)
+#define GasIndexAlgorithm_SRAW_STD_INITIAL(50.f)
+#define GasIndexAlgorithm_SRAW_STD_BONUS_VOC(220.f)
+#define GasIndexAlgorithm_SRAW_STD_NOX(2000.f)
+#define GasIndexAlgorithm_TAU_MEAN_HOURS(12.f)
+#define GasIndexAlgorithm_TAU_VARIANCE_HOURS(12.f)
+#define GasIndexAlgorithm_TAU_INITIAL_MEAN_VOC(20.f)
+#define GasIndexAlgorithm_TAU_INITIAL_MEAN_NOX(1200.f)
+#define GasIndexAlgorithm_INIT_DURATION_MEAN_VOC((3600.f * 0.75f))
+#define GasIndexAlgorithm_INIT_DURATION_MEAN_NOX((3600.f * 4.75f))
+#define GasIndexAlgorithm_INIT_TRANSITION_MEAN(0.01f)
+#define GasIndexAlgorithm_TAU_INITIAL_VARIANCE(2500.f)
+#define GasIndexAlgorithm_INIT_DURATION_VARIANCE_VOC((3600.f * 1.45f))
+#define GasIndexAlgorithm_INIT_DURATION_VARIANCE_NOX((3600.f * 5.70f))
+#define GasIndexAlgorithm_INIT_TRANSITION_VARIANCE(0.01f)
+#define GasIndexAlgorithm_GATING_THRESHOLD_VOC(340.f)
+#define GasIndexAlgorithm_GATING_THRESHOLD_NOX(30.f)
+#define GasIndexAlgorithm_GATING_THRESHOLD_INITIAL(510.f)
+#define GasIndexAlgorithm_GATING_THRESHOLD_TRANSITION(0.09f)
+#define GasIndexAlgorithm_GATING_VOC_MAX_DURATION_MINUTES((60.f * 3.f))
+#define GasIndexAlgorithm_GATING_NOX_MAX_DURATION_MINUTES((60.f * 12.f))
+#define GasIndexAlgorithm_GATING_MAX_RATIO(0.3f)
+#define GasIndexAlgorithm_SIGMOID_L(500.f)
+#define GasIndexAlgorithm_SIGMOID_K_VOC(-0.0065f)
+#define GasIndexAlgorithm_SIGMOID_X0_VOC(213.f)
+#define GasIndexAlgorithm_SIGMOID_K_NOX(-0.0101f)
+#define GasIndexAlgorithm_SIGMOID_X0_NOX(614.f)
+#define GasIndexAlgorithm_VOC_INDEX_OFFSET_DEFAULT(100.f)
+#define GasIndexAlgorithm_NOX_INDEX_OFFSET_DEFAULT(1.f)
+#define GasIndexAlgorithm_LP_TAU_FAST(20.0f)
+#define GasIndexAlgorithm_LP_TAU_SLOW(500.0f)
+#define GasIndexAlgorithm_LP_ALPHA(-0.2f)
+#define GasIndexAlgorithm_VOC_SRAW_MINIMUM(20000)
+#define GasIndexAlgorithm_NOX_SRAW_MINIMUM(10000)
+#define GasIndexAlgorithm_PERSISTENCE_UPTIME_GAMMA((3.f * 3600.f))
+#define GasIndexAlgorithm_TUNING_INDEX_OFFSET_MIN(1)
+#define GasIndexAlgorithm_TUNING_INDEX_OFFSET_MAX(250)
+#define GasIndexAlgorithm_TUNING_LEARNING_TIME_OFFSET_HOURS_MIN(1)
+#define GasIndexAlgorithm_TUNING_LEARNING_TIME_OFFSET_HOURS_MAX(1000)
+#define GasIndexAlgorithm_TUNING_LEARNING_TIME_GAIN_HOURS_MIN(1)
+#define GasIndexAlgorithm_TUNING_LEARNING_TIME_GAIN_HOURS_MAX(1000)
+#define GasIndexAlgorithm_TUNING_GATING_MAX_DURATION_MINUTES_MIN(0)
+#define GasIndexAlgorithm_TUNING_GATING_MAX_DURATION_MINUTES_MAX(3000)
+#define GasIndexAlgorithm_TUNING_STD_INITIAL_MIN(10)
+#define GasIndexAlgorithm_TUNING_STD_INITIAL_MAX(5000)
+#define GasIndexAlgorithm_TUNING_GAIN_FACTOR_MIN(1)
+#define GasIndexAlgorithm_TUNING_GAIN_FACTOR_MAX(1000)
+#define GasIndexAlgorithm_MEAN_VARIANCE_ESTIMATOR__GAMMA_SCALING(64.f)
+#define GasIndexAlgorithm_MEAN_VARIANCE_ESTIMATOR__ADDITIONAL_GAMMA_MEAN_SCALING \
+(8.f)
+#define GasIndexAlgorithm_MEAN_VARIANCE_ESTIMATOR__FIX16_MAX(32767.f)
+*/
+
+const sgp41Constants = {
+  ALGORITHM_TYPE_VOC: 0,
+  ALGORITHM_TYPE_NOX: 1,
+  TAU_MEAN_HOURS: 12,
+  TAU_VARIANCE_HOURS: 12,
+  TAU_INITIAL_MEAN_VOC: 20,
+  TAU_INITIAL_MEAN_NOX: 1200,
+  INIT_DURATION_MEAN_VOC: 3600 * 0.75,
+  INIT_DURATION_MEAN_NOX: 3600 * 4.75,
+  INIT_TRANSITION_MEAN: 0.01,
+  TAU_INITIAL_VARIANCE: 2500,
+  SIGMOID_L: 500,
+  SIGMOID_K_VOC: -0.0065,
+  SIGMOID_X0_VOC: 213,
+  SIGMOID_K_NOX: -0.0101,
+  SIGMOID_X0_NOX: 614,
+  VOC_INDEX_OFFSET_DEFAULT: 100,
+  NOX_INDEX_OFFSET_DEFAULT: 1,
+  LP_TAU_FAST: 20.0,
+  LP_TAU_SLOW: 500.0,
+  LP_ALPHA: -0.2,
+  VOC_SRAW_MINIMUM: 20000,
+  NOX_SRAW_MINIMUM: 10000,
+  PERSISTENCE_UPTIME_GAMMA: 3 * 3600,
+  TUNING_INDEX_OFFSET_MIN: 1,
+  TUNING_INDEX_OFFSET_MAX: 250,
+  TUNING_LEARNING_TIME_OFFSET_HOURS_MIN: 1,
+  TUNING_LEARNING_TIME_OFFSET_HOURS_MAX: 1000,
+  TUNING_LEARNING_TIME_GAIN_HOURS_MIN: 1,
+  TUNING_LEARNING_TIME_GAIN_HOURS_MAX: 1000,
+  TUNING_GATING_MAX_DURATION_MINUTES_MIN: 0,
+  TUNING_GATING_MAX_DURATION_MINUTES_MAX: 3000,
+  TUNING_STD_INITIAL_MIN: 10,
+  TUNING_STD_INITIAL_MAX: 5000,
+  TUNING_GAIN_FACTOR_MIN: 1,
+  TUNING_GAIN_FACTOR_MAX: 1000,
+  MEAN_VARIANCE_ESTIMATOR__GAMMA_SCALING: 64,
+  MEAN_VARIANCE_ESTIMATOR__ADDITIONAL_GAMMA_MEAN_SCALING: 8,
+  MEAN_VARIANCE_ESTIMATOR__FIX16_MAX: 32767
+}
+let sgp41VocParams = {
+  mAlgorithm_Type: 0,
+  mSamplingInterval: 1,
+  mIndex_Offset: 100,
+  mSraw_Minimum: 20000,
+  mGating_Max_Duration_Minutes: 60 * 3,
+  mInit_Duration_Mean: 3600 * 0.75,
+  mInit_Duration_Variance: 3600 * 1.45,
+  mGating_Threshold: 340,
+  mIndex_Gain: 230,
+  mTau_Mean_Hours: 12,
+  mTau_Variance_Hours: 12,
+  mSraw_Std_Initial: 50,
+  mUptime: 0,
+  mSraw: 0,
+  mGas_Index: 0,
+  m_Mean_Variance_Estimator___Initialized: x,
+  m_Mean_Variance_Estimator___Mean: x,
+  m_Mean_Variance_Estimator___Sraw_Offset: x,
+  m_Mean_Variance_Estimator___Std: x,
+  m_Mean_Variance_Estimator___Gamma_Mean: x,
+  m_Mean_Variance_Estimator___Gamma_Variance: x,
+  m_Mean_Variance_Estimator___Gamma_Initial_Mean: x,
+  m_Mean_Variance_Estimator___Gamma_Initial_Variance: x,
+  m_Mean_Variance_Estimator__Gamma_Mean: x,
+  m_Mean_Variance_Estimator__Gamma_Variance: x,
+  m_Mean_Variance_Estimator___Uptime_Gamma: x,
+  m_Mean_Variance_Estimator___Uptime_Gating: x,
+  m_Mean_Variance_Estimator___Gating_Duration_Minutes: x,
+  m_Mean_Variance_Estimator___Sigmoid__K: x,
+  m_Mean_Variance_Estimator___Sigmoid__X0: x,
+  m_Mox_Model__Sraw_Std: x,
+  m_Mox_Model__Sraw_Mean: x,
+  m_Sigmoid_Scaled__K: x,
+  m_Sigmoid_Scaled__X0: x,
+  m_Sigmoid_Scaled__Offset_Default: x,
+  m_Adaptive_Lowpass__A1: x,
+  m_Adaptive_Lowpass__A2: x,
+  m_Adaptive_Lowpass___Initialized: x,
+  m_Adaptive_Lowpass___X1: x,
+  m_Adaptive_Lowpass___X2: x,
+  m_Adaptive_Lowpass___X3: x
+}
+
+
+let sgp41NoxParams = {
+  mAlgorithm_Type: 1,
+  mSamplingInterval: 1,
+  mIndex_Offset: 1,
+  mSraw_Minimum: 10000,
+  mGating_Max_Duration_Minutes: 60 * 12,
+  mInit_Duration_Mean: 3600 * 4.75,
+  mInit_Duration_Variance: 3600 * 5.70,
+  mGating_Threshold: 30,
+  mIndex_Gain: 230,
+  mTau_Mean_Hours: 12,
+  mTau_Variance_Hours: 12,
+  mSraw_Std_Initial: 50,
+  mUptime: 0,
+  mSraw: 0,
+  mGas_Index: 0,
+  // aanvullen
+}
+
+const GasIndexAlgorithm_reset = function (params) {
+  params.mUptime = 0
+  params.mSraw = 0
+  params.mGas_Index = 0
+  params = GasIndexAlgorithm__init_instances(params)
+  return params
+}
+const GasIndexAlgorithm__init_instances = function (params) {
+  let _params = params
+  _params = GasIndexAlgorithm__mean_variance_estimator__set_parameters(_params);
+  _params = GasIndexAlgorithm__mox_model__set_parameters(
+    _params,
+    GasIndexAlgorithm__mean_variance_estimator__get_std(_params),
+    GasIndexAlgorithm__mean_variance_estimator__get_mean(_params));
+
+  if ((_params.mAlgorithm_Type == sgp41Constants.ALGORITHM_TYPE_NOX)) {
+    _params = GasIndexAlgorithm__sigmoid_scaled__set_parameters(
+      _params,
+      sgp41Constants.SIGMOID_X0_NOX,
+      sgp41Constants.SIGMOID_K_NOX,
+      sgp41Constants.NOX_INDEX_OFFSET_DEFAULT);
+  } else {
+    _params = GasIndexAlgorithm__sigmoid_scaled__set_parameters(
+      _params,
+      sgp41Constants.SIGMOID_X0_VOC,
+      sgp41Constants.SIGMOID_K_VOC,
+      sgp41Constants.VOC_INDEX_OFFSET_DEFAULT);
+  }
+  _params = GasIndexAlgorithm__adaptive_lowpass__set_parameters(_params);
+  return _params
+
+}
+const GasIndexAlgorithm__mean_variance_estimator__set_parameters = function (params) {
+  params.m_Mean_Variance_Estimator___Initialized = false;
+  params.m_Mean_Variance_Estimator___Mean = 0;
+  params.m_Mean_Variance_Estimator___Sraw_Offset = 0;
+  params.m_Mean_Variance_Estimator___Std = params.mSraw_Std_Initial;
+  params.m_Mean_Variance_Estimator___Gamma_Mean =
+    (((sgp41Constants.MEAN_VARIANCE_ESTIMATOR__ADDITIONAL_GAMMA_MEAN_SCALING *
+      sgp41Constants.MEAN_VARIANCE_ESTIMATOR__GAMMA_SCALING) *
+      (params.mSamplingInterval / 3600)) /
+      (params.mTau_Mean_Hours + (params.mSamplingInterval / 3600)));
+  params.m_Mean_Variance_Estimator___Gamma_Variance =
+    ((sgp41Constants.MEAN_VARIANCE_ESTIMATOR__GAMMA_SCALING *
+      (params.mSamplingInterval / 3600)) /
+      (params.mTau_Variance_Hours + (params.mSamplingInterval / 3600)));
+  if ((params.mAlgorithm_Type == sgp41Constants.ALGORITHM_TYPE_NOX)) {
+    params.m_Mean_Variance_Estimator___Gamma_Initial_Mean =
+      (((sgp41Constants.MEAN_VARIANCE_ESTIMATOR__ADDITIONAL_GAMMA_MEAN_SCALING *
+        sgp41Constants.MEAN_VARIANCE_ESTIMATOR__GAMMA_SCALING) *
+        params.mSamplingInterval) /
+        (sgp41Constants.TAU_INITIAL_MEAN_NOX +
+          params.mSamplingInterval));
+  } else {
+    params.m_Mean_Variance_Estimator___Gamma_Initial_Mean =
+      (((sgp41Constants.MEAN_VARIANCE_ESTIMATOR__ADDITIONAL_GAMMA_MEAN_SCALING *
+        sgp41Constants.MEAN_VARIANCE_ESTIMATOR__GAMMA_SCALING) *
+        params.mSamplingInterval) /
+        (sgp41Constants.TAU_INITIAL_MEAN_VOC +
+          params.mSamplingInterval));
+  }
+  params.m_Mean_Variance_Estimator___Gamma_Initial_Variance =
+    ((sgp41Constants.MEAN_VARIANCE_ESTIMATOR__GAMMA_SCALING *
+      params.mSamplingInterval) /
+      (sgp41Constants.TAU_INITIAL_VARIANCE + params.mSamplingInterval));
+  params.m_Mean_Variance_Estimator__Gamma_Mean = 0;
+  params.m_Mean_Variance_Estimator__Gamma_Variance = 0;
+  params.m_Mean_Variance_Estimator___Uptime_Gamma = 0;
+  params.m_Mean_Variance_Estimator___Uptime_Gating = 0;
+  params.m_Mean_Variance_Estimator___Gating_Duration_Minutes = 0;
+
+  return params
+}
+const GasIndexAlgorithm__mean_variance_estimator__get_std(params) {
+  return params.m_Mean_Variance_Estimator___Std;
+}
+const GasIndexAlgorithm__mean_variance_estimator__get_mean(params) {
+  return (params.m_Mean_Variance_Estimator___Mean + params.m_Mean_Variance_Estimator___Sraw_Offset);
+}
+const GasIndexAlgorithm__mox_model__set_parameters(params, SRAW_STD, SRAW_MEAN) {
+  params.m_Mox_Model__Sraw_Std = SRAW_STD;
+  params.m_Mox_Model__Sraw_Mean = SRAW_MEAN;
+  return params
+}
+const GasIndexAlgorithm__sigmoid_scaled__set_parameters = function (params, X0, K, offset_default) {
+  params.m_Sigmoid_Scaled__K = K;
+  params.m_Sigmoid_Scaled__X0 = X0;
+  params.m_Sigmoid_Scaled__Offset_Default = offset_default;
+  return params
+}
+const GasIndexAlgorithm__adaptive_lowpass__set_parameters = function (params) {
+  params.m_Adaptive_Lowpass__A1 =
+    (params.mSamplingInterval /
+      (sgp41Constants.LP_TAU_FAST + params.mSamplingInterval));
+  params.m_Adaptive_Lowpass__A2 =
+    (params.mSamplingInterval /
+      (sgp41Constants.LP_TAU_SLOW + params.mSamplingInterval));
+  params.m_Adaptive_Lowpass___Initialized = false;
+  return params
+}
+
+const GasIndexAlgorithm_process = function(params, sraw) {
+if ((params.mUptime <= GasIndexAlgorithm_INITIAL_BLACKOUT)) {
+params.mUptime = (params.mUptime + params.mSamplingInterval);
+} else {
+if (((sraw > 0) && (sraw < 65000))) {
+if ((sraw < (params.mSraw_Minimum + 1))) {
+sraw = (params.mSraw_Minimum + 1);
+} else if ((sraw > (params.mSraw_Minimum + 32767))) {
+sraw = (params.mSraw_Minimum + 32767);
+}
+params.mSraw = ((float)((sraw - params.mSraw_Minimum)));
+}
+if (((params.mAlgorithm_Type ==
+GasIndexAlgorithm_ALGORITHM_TYPE_VOC) ||
+GasIndexAlgorithm__mean_variance_estimator__is_initialized(
+params))) {
+params.mGas_Index =
+GasIndexAlgorithm__mox_model__process(params, params.mSraw);
+params.mGas_Index = GasIndexAlgorithm__sigmoid_scaled__process(
+params, params.mGas_Index);
+} else {
+params.mGas_Index = params.mIndex_Offset;
+}
+params.mGas_Index = GasIndexAlgorithm__adaptive_lowpass__process(
+params, params.mGas_Index);
+if ((params.mGas_Index < 0.5)) {
+params.mGas_Index = 0.5;
+}
+if (params.mSraw > 0) {
+GasIndexAlgorithm__mean_variance_estimator__process(params,
+                                   params.mSraw);
+GasIndexAlgorithm__mox_model__set_parameters(
+params,
+GasIndexAlgorithm__mean_variance_estimator__get_std(params),
+GasIndexAlgorithm__mean_variance_estimator__get_mean(params));
+}
+}
+params.gasIndex = params.mGas_Index + 0.5;
+return params
+}
+
+
+sgp41VocParams = GasIndexAlgorithm_reset(sgp41VocParams)
+sgp41NoxParams = GasIndexAlgorithm_reset(sgp41NoxParams)
+
+
 var processRaspiSgp41Record = function (result) {
   if (counters.busy == true) {
     logger.info('Counters busy, sgp41 measurement ignored *******************************');
@@ -3166,6 +3473,13 @@ var processRaspiSgp41Record = function (result) {
 
   counters.sgp41.temperature += latest.bmeTemperature
   counters.sgp41.rHum += latest.bmeRHum
+
+  sgp41VocParams = GasIndexAlgorithm_process(sgp41VocParams, result.vocSraw);
+  sgp41NoxParams = GasIndexAlgorithm_process(sgp41NoxParams, result.noxSraw);
+
+  result.vocIndex = sgp41VocParams.gasIndex
+  result.noxIndex = sgp41NoxParams.gasIndex
+
   counters.sgp41.vocIndex += result.vocIndex
   counters.sgp41.noxIndex += result.noxIndex
 

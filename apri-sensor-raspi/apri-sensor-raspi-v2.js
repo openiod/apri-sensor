@@ -3387,13 +3387,13 @@ const GasIndexAlgorithm__mean_variance_estimator__set_parameters = function (par
 
   return params
 }
-const GasIndexAlgorithm__mean_variance_estimator__get_std= function(params) {
+const GasIndexAlgorithm__mean_variance_estimator__get_std = function (params) {
   return params.m_Mean_Variance_Estimator___Std;
 }
-const GasIndexAlgorithm__mean_variance_estimator__get_mean= function(params) {
+const GasIndexAlgorithm__mean_variance_estimator__get_mean = function (params) {
   return (params.m_Mean_Variance_Estimator___Mean + params.m_Mean_Variance_Estimator___Sraw_Offset);
 }
-const GasIndexAlgorithm__mox_model__set_parameters(params, SRAW_STD, SRAW_MEAN) {
+const GasIndexAlgorithm__mox_model__set_parameters = function (params, SRAW_STD, SRAW_MEAN) {
   params.m_Mox_Model__Sraw_Std = SRAW_STD;
   params.m_Mox_Model__Sraw_Mean = SRAW_MEAN;
   return params
@@ -3415,45 +3415,45 @@ const GasIndexAlgorithm__adaptive_lowpass__set_parameters = function (params) {
   return params
 }
 
-const GasIndexAlgorithm_process = function(params, sraw) {
-if ((params.mUptime <= GasIndexAlgorithm_INITIAL_BLACKOUT)) {
-params.mUptime = (params.mUptime + params.mSamplingInterval);
-} else {
-if (((sraw > 0) && (sraw < 65000))) {
-if ((sraw < (params.mSraw_Minimum + 1))) {
-sraw = (params.mSraw_Minimum + 1);
-} else if ((sraw > (params.mSraw_Minimum + 32767))) {
-sraw = (params.mSraw_Minimum + 32767);
-}
-params.mSraw = ((float)((sraw - params.mSraw_Minimum)));
-}
-if (((params.mAlgorithm_Type ==
-GasIndexAlgorithm_ALGORITHM_TYPE_VOC) ||
-GasIndexAlgorithm__mean_variance_estimator__is_initialized(
-params))) {
-params.mGas_Index =
-GasIndexAlgorithm__mox_model__process(params, params.mSraw);
-params.mGas_Index = GasIndexAlgorithm__sigmoid_scaled__process(
-params, params.mGas_Index);
-} else {
-params.mGas_Index = params.mIndex_Offset;
-}
-params.mGas_Index = GasIndexAlgorithm__adaptive_lowpass__process(
-params, params.mGas_Index);
-if ((params.mGas_Index < 0.5)) {
-params.mGas_Index = 0.5;
-}
-if (params.mSraw > 0) {
-GasIndexAlgorithm__mean_variance_estimator__process(params,
-                                   params.mSraw);
-GasIndexAlgorithm__mox_model__set_parameters(
-params,
-GasIndexAlgorithm__mean_variance_estimator__get_std(params),
-GasIndexAlgorithm__mean_variance_estimator__get_mean(params));
-}
-}
-params.gasIndex = params.mGas_Index + 0.5;
-return params
+const GasIndexAlgorithm_process = function (params, sraw) {
+  if ((params.mUptime <= GasIndexAlgorithm_INITIAL_BLACKOUT)) {
+    params.mUptime = (params.mUptime + params.mSamplingInterval);
+  } else {
+    if (((sraw > 0) && (sraw < 65000))) {
+      if ((sraw < (params.mSraw_Minimum + 1))) {
+        sraw = (params.mSraw_Minimum + 1);
+      } else if ((sraw > (params.mSraw_Minimum + 32767))) {
+        sraw = (params.mSraw_Minimum + 32767);
+      }
+      params.mSraw = ((float)((sraw - params.mSraw_Minimum)));
+    }
+    if (((params.mAlgorithm_Type ==
+      GasIndexAlgorithm_ALGORITHM_TYPE_VOC) ||
+      GasIndexAlgorithm__mean_variance_estimator__is_initialized(
+        params))) {
+      params.mGas_Index =
+        GasIndexAlgorithm__mox_model__process(params, params.mSraw);
+      params.mGas_Index = GasIndexAlgorithm__sigmoid_scaled__process(
+        params, params.mGas_Index);
+    } else {
+      params.mGas_Index = params.mIndex_Offset;
+    }
+    params.mGas_Index = GasIndexAlgorithm__adaptive_lowpass__process(
+      params, params.mGas_Index);
+    if ((params.mGas_Index < 0.5)) {
+      params.mGas_Index = 0.5;
+    }
+    if (params.mSraw > 0) {
+      GasIndexAlgorithm__mean_variance_estimator__process(params,
+        params.mSraw);
+      GasIndexAlgorithm__mox_model__set_parameters(
+        params,
+        GasIndexAlgorithm__mean_variance_estimator__get_std(params),
+        GasIndexAlgorithm__mean_variance_estimator__get_mean(params));
+    }
+  }
+  params.gasIndex = params.mGas_Index + 0.5;
+  return params
 }
 
 

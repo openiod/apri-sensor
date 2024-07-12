@@ -3467,7 +3467,7 @@ const GasIndexAlgorithm_process = function (params, sraw) {
       } else if ((sraw > (params.mSraw_Minimum + 32767))) {
         sraw = (params.mSraw_Minimum + 32767);
       }
-      params.mSraw = ((float)((sraw - params.mSraw_Minimum)));
+      params.mSraw = sraw - params.mSraw_Minimum;
     }
     if (((params.mAlgorithm_Type ==
       sgp41Constants.ALGORITHM_TYPE_VOC) ||
@@ -3480,13 +3480,14 @@ const GasIndexAlgorithm_process = function (params, sraw) {
     } else {
       params.mGas_Index = params.mIndex_Offset;
     }
-    params.mGas_Index = GasIndexAlgorithm__adaptive_lowpass__process(
+    params = GasIndexAlgorithm__adaptive_lowpass__process(
       params, params.mGas_Index);
+      params.mGas_Index=  params.m_Adaptive_Lowpass___X3
     if ((params.mGas_Index < 0.5)) {
       params.mGas_Index = 0.5;
     }
     if (params.mSraw > 0) {
-      GasIndexAlgorithm__mean_variance_estimator__process(params,
+      params=GasIndexAlgorithm__mean_variance_estimator__process(params,
         params.mSraw);
       GasIndexAlgorithm__mox_model__set_parameters(
         params,
@@ -3497,6 +3498,238 @@ const GasIndexAlgorithm_process = function (params, sraw) {
   params.gasIndex = params.mGas_Index + 0.5;
   return params
 }
+const GasIndexAlgorithm__mean_variance_estimator__is_initialized = function (params) {
+  return params.m_Mean_Variance_Estimator___Initialized;
+}
+const GasIndexAlgorithm__mox_model__process = function (params, sraw) {
+  if ((params.mAlgorithm_Type == sgp41Constants.ALGORITHM_TYPE_NOX)) {
+    return (((sraw - params.m_Mox_Model__Sraw_Mean) /
+      sgp41Constants.SRAW_STD_NOX) *
+      params.mIndex_Gain);
+  } else {
+    return ((sraw - params.m_Mox_Model__Sraw_Mean) /
+      (-1 * (params.m_Mox_Model__Sraw_Std +
+        sgp41Constants.SRAW_STD_BONUS_VOC))) *
+      params.mIndex_Gain;
+  }
+}
+const GasIndexAlgorithm__sigmoid_scaled__process = function (params, sample) {
+  let x;
+  let shift;
+
+  x = (params.m_Sigmoid_Scaled__K * (sample - params.m_Sigmoid_Scaled__X0));
+  if (x < -50) {
+    return sgp41Constants.SIGMOID_L;
+  } else if (x > 50) {
+    return 0;
+  } else {
+    if (sample >= 0) {
+      if (params.m_Sigmoid_Scaled__Offset_Default == 1) {
+        shift = ((500 / 499) * (1 - params.mIndex_Offset));
+      } else {
+        shift = ((sgp41Constants.SIGMOID_L -
+          (5 * params.mIndex_Offset)) /
+          4);
+      }
+      return (((sgp41Constants.SIGMOID_L + shift) / (1 + expf(x))) -
+        shift);
+    } else {
+      return ((params.mIndex_Offset /
+        params.m_Sigmoid_Scaled__Offset_Default) *
+        (sgp41Constants.SIGMOID_L / (1 + expf(x))));
+    }
+  }
+}
+const GasIndexAlgorithm__adaptive_lowpass__process = function (params, sample) {
+  let abs_delta;
+  let F1;
+  let tau_a;
+  let a3;
+
+  if ((params.m_Adaptive_Lowpass___Initialized == false)) {
+    params.m_Adaptive_Lowpass___X1 = sample;
+    params.m_Adaptive_Lowpass___X2 = sample;
+    params.m_Adaptive_Lowpass___X3 = sample;
+    params.m_Adaptive_Lowpass___Initialized = true;
+  }
+  params.m_Adaptive_Lowpass___X1 =
+    (((1 - params.m_Adaptive_Lowpass__A1) *
+      params.m_Adaptive_Lowpass___X1) +
+      (params.m_Adaptive_Lowpass__A1 * sample));
+  params.m_Adaptive_Lowpass___X2 =
+    (((1 - params.m_Adaptive_Lowpass__A2) *
+      params.m_Adaptive_Lowpass___X2) +
+      (params.m_Adaptive_Lowpass__A2 * sample));
+  abs_delta =
+    (params.m_Adaptive_Lowpass___X1 - params.m_Adaptive_Lowpass___X2);
+  if ((abs_delta < 0)) {
+    abs_delta = (-1 * abs_delta);
+  }
+  F1 = expf((sgp41Constants.LP_ALPHA * abs_delta));
+  tau_a = (((sgp41Constants.LP_TAU_SLOW - sgp41Constants.LP_TAU_FAST) *
+    F1) +
+    sgp41Constants.LP_TAU_FAST);
+  a3 = (params.mSamplingInterval / (params.mSamplingInterval + tau_a));
+  params.m_Adaptive_Lowpass___X3 =
+    (((1 - a3) * params.m_Adaptive_Lowpass___X3) + (a3 * sample));
+  return params //.m_Adaptive_Lowpass___X3;
+}
+const GasIndexAlgorithm__mean_variance_estimator__process = function (params, sraw) {
+  let delta_sgp;
+  let c;
+  let additional_scaling;
+
+  if ((params.m_Mean_Variance_Estimator___Initialized == false)) {
+    params.m_Mean_Variance_Estimator___Initialized = true;
+    params.m_Mean_Variance_Estimator___Sraw_Offset = sraw;
+    params.m_Mean_Variance_Estimator___Mean = 0;
+  } else {
+    if (((params.m_Mean_Variance_Estimator___Mean >= 100) ||
+      (params.m_Mean_Variance_Estimator___Mean <= -100))) {
+      params.m_Mean_Variance_Estimator___Sraw_Offset =
+        (params.m_Mean_Variance_Estimator___Sraw_Offset +
+          params.m_Mean_Variance_Estimator___Mean);
+      params.m_Mean_Variance_Estimator___Mean = 0;
+    }
+    sraw = (sraw - params.m_Mean_Variance_Estimator___Sraw_Offset);
+    params.GasIndexAlgorithm__mean_variance_estimator___calculate_gamma(params);
+    delta_sgp = ((sraw - params.m_Mean_Variance_Estimator___Mean) /
+      sgp41Constants.MEAN_VARIANCE_ESTIMATOR__GAMMA_SCALING);
+    if ((delta_sgp < 0)) {
+      c = (params.m_Mean_Variance_Estimator___Std - delta_sgp);
+    } else {
+      c = (params.m_Mean_Variance_Estimator___Std + delta_sgp);
+    }
+    additional_scaling = 1;
+    if ((c > 1440)) {
+      additional_scaling = ((c / 1440) * (c / 1440));
+    }
+    params.m_Mean_Variance_Estimator___Std =
+      (sqrtf((additional_scaling *
+        (sgp41Constants.MEAN_VARIANCE_ESTIMATOR__GAMMA_SCALING -
+          params.m_Mean_Variance_Estimator__Gamma_Variance))) *
+        sqrtf(
+          ((params.m_Mean_Variance_Estimator___Std *
+            (params.m_Mean_Variance_Estimator___Std /
+              (sgp41Constants.MEAN_VARIANCE_ESTIMATOR__GAMMA_SCALING *
+                additional_scaling))) +
+            (((params.m_Mean_Variance_Estimator__Gamma_Variance *
+              delta_sgp) /
+              additional_scaling) *
+              delta_sgp))));
+    params.m_Mean_Variance_Estimator___Mean =
+      (params.m_Mean_Variance_Estimator___Mean +
+        ((params.m_Mean_Variance_Estimator__Gamma_Mean * delta_sgp) /
+          sgp41Constants.MEAN_VARIANCE_ESTIMATOR__ADDITIONAL_GAMMA_MEAN_SCALING));
+  }
+  return params
+}
+const GasIndexAlgorithm__mean_variance_estimator___calculate_gamma = function (params) {
+
+  let uptime_limit;
+  let sigmoid_gamma_mean;
+  let gamma_mean;
+  let gating_threshold_mean;
+  let sigmoid_gating_mean;
+  let sigmoid_gamma_variance;
+  let gamma_variance;
+  let gating_threshold_variance;
+  let sigmoid_gating_variance;
+
+  uptime_limit = (sgp41Constants.MEAN_VARIANCE_ESTIMATOR__FIX16_MAX -
+    params.mSamplingInterval);
+  if ((params.m_Mean_Variance_Estimator___Uptime_Gamma < uptime_limit)) {
+    params.m_Mean_Variance_Estimator___Uptime_Gamma =
+      (params.m_Mean_Variance_Estimator___Uptime_Gamma +
+        params.mSamplingInterval);
+  }
+  if ((params.m_Mean_Variance_Estimator___Uptime_Gating < uptime_limit)) {
+    params.m_Mean_Variance_Estimator___Uptime_Gating =
+      (params.m_Mean_Variance_Estimator___Uptime_Gating +
+        params.mSamplingInterval);
+  }
+  params = GasIndexAlgorithm__mean_variance_estimator___sigmoid__set_parameters(
+    params, params.mInit_Duration_Mean,
+    sgp41Constants.INIT_TRANSITION_MEAN);
+  sigmoid_gamma_mean =
+    GasIndexAlgorithm__mean_variance_estimator___sigmoid__process(
+      params, params.m_Mean_Variance_Estimator___Uptime_Gamma);
+  gamma_mean = (params.m_Mean_Variance_Estimator___Gamma_Mean +
+    ((params.m_Mean_Variance_Estimator___Gamma_Initial_Mean -
+      params.m_Mean_Variance_Estimator___Gamma_Mean) *
+      sigmoid_gamma_mean));
+  gating_threshold_mean =
+    (params.mGating_Threshold +
+      ((sgp41Constants.GATING_THRESHOLD_INITIAL -
+        params.mGating_Threshold) *
+        GasIndexAlgorithm__mean_variance_estimator___sigmoid__process(
+          params, params.m_Mean_Variance_Estimator___Uptime_Gating)));
+  params = GasIndexAlgorithm__mean_variance_estimator___sigmoid__set_parameters(
+    params, gating_threshold_mean,
+    sgp41Constants.GATING_THRESHOLD_TRANSITION);
+  sigmoid_gating_mean =
+    GasIndexAlgorithm__mean_variance_estimator___sigmoid__process(
+      params, params.mGas_Index);
+  params.m_Mean_Variance_Estimator__Gamma_Mean =
+    (sigmoid_gating_mean * gamma_mean);
+  params = GasIndexAlgorithm__mean_variance_estimator___sigmoid__set_parameters(
+    params, params.mInit_Duration_Variance,
+    sgp41Constants.INIT_TRANSITION_VARIANCE);
+  sigmoid_gamma_variance =
+    GasIndexAlgorithm__mean_variance_estimator___sigmoid__process(
+      params, params.m_Mean_Variance_Estimator___Uptime_Gamma);
+  gamma_variance =
+    (params.m_Mean_Variance_Estimator___Gamma_Variance +
+      ((params.m_Mean_Variance_Estimator___Gamma_Initial_Variance -
+        params.m_Mean_Variance_Estimator___Gamma_Variance) *
+        (sigmoid_gamma_variance - sigmoid_gamma_mean)));
+  gating_threshold_variance =
+    (params.mGating_Threshold +
+      ((sgp41Constants.GATING_THRESHOLD_INITIAL -
+        params.mGating_Threshold) *
+        GasIndexAlgorithm__mean_variance_estimator___sigmoid__process(
+          params, params.m_Mean_Variance_Estimator___Uptime_Gating)));
+  params = GasIndexAlgorithm__mean_variance_estimator___sigmoid__set_parameters(
+    params, gating_threshold_variance,
+    sgp41Constants.GATING_THRESHOLD_TRANSITION);
+  sigmoid_gating_variance =
+    GasIndexAlgorithm__mean_variance_estimator___sigmoid__process(
+      params, params.mGas_Index);
+  params.m_Mean_Variance_Estimator__Gamma_Variance =
+    (sigmoid_gating_variance * gamma_variance);
+  params.m_Mean_Variance_Estimator___Gating_Duration_Minutes =
+    (params.m_Mean_Variance_Estimator___Gating_Duration_Minutes +
+      ((params.mSamplingInterval / 60) *
+        (((1 - sigmoid_gating_mean) *
+          (1 + sgp41Constants.GATING_MAX_RATIO)) -
+          sgp41Constants.GATING_MAX_RATIO)));
+  if ((params.m_Mean_Variance_Estimator___Gating_Duration_Minutes < 0)) {
+    params.m_Mean_Variance_Estimator___Gating_Duration_Minutes = 0;
+  }
+  if ((params.m_Mean_Variance_Estimator___Gating_Duration_Minutes >
+    params.mGating_Max_Duration_Minutes)) {
+    params.m_Mean_Variance_Estimator___Uptime_Gating = 0;
+  }
+  return params
+}
+const GasIndexAlgorithm__mean_variance_estimator___sigmoid__set_parameters = function (params, X0, K) {
+  params.m_Mean_Variance_Estimator___Sigmoid__K = K;
+  params.m_Mean_Variance_Estimator___Sigmoid__X0 = X0;
+  return params
+}
+const GasIndexAlgorithm__mean_variance_estimator___sigmoid__process = function (params, sample) {
+  let x;
+  x = (params.m_Mean_Variance_Estimator___Sigmoid__K *
+    (sample - params.m_Mean_Variance_Estimator___Sigmoid__X0));
+  if (x < -50) {
+    return 1;
+  } else if ((x > 50)) {
+    return 0;
+  } else {
+    return (1 / (1 + expf(x)));
+  }
+}
+
 
 
 sgp41VocParams = GasIndexAlgorithm_reset(sgp41VocParams)

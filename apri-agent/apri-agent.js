@@ -411,7 +411,7 @@ var updateSoftware = function () {
 
 var checkVarLogSize = function () {
 
-	const child = execFile("df | grep /var/log | awk '{print $5}' ", [], (error, stdout, stderr) => {
+	const child = exec("df | grep /var/log | awk '{print $5}' ", [], (error, stdout, stderr) => {
 		let cleanUp = false
 		let size = 0
 		if (error) {
@@ -420,16 +420,16 @@ var checkVarLogSize = function () {
 		let logDate = "" + new Date().toISOString();
 		let p = stdout.split('%')
 		if (p.length == 2) {
-			let size = Number(p[0])
-			if (size > 75) {
+			size = Number(p[0])
+			if (size > 80) {
 				cleanUp = true
 			}
 		} else cleanUp = true
 		if (cleanUp == true) {
-			unit.idShort= unit.id.substring(str.length - 4).toUpperCase()
+			unit.idShort = unit.id.substring(unit.id.length - 4).toUpperCase()
 			console.log(logDate + ': cleanUp activated for ' + unit.idShort + ' with /var/log at ' + size + '%');
-			//const child = execFile("rm /var/log/* ; rm /var/log/aprisensor/* ; rm /etc/NetworkManager/system-connections/" + idShort+'-* ', [], (error, stdout, stderr) => {
-			//});
+			const child = exec("rm /var/log/* ; rm /var/log/aprisensor/* ; rm /var/hdd.log/* ; rm /var/hdd.log/aprisensor/* ; rm /etc/NetworkManager/system-connections/" + unit.idShort + '-* ', [], (error, stdout, stderr) => {
+			});
 		}
 	});
 }
@@ -604,6 +604,11 @@ var startConnection = function () {
 		}
 	);
 }
+
+// executed when exec functions are ready (for unit.id)
+setTimeout(checkVarLogSize, 5000)
+
+
 
 /*
 console.log('Start web-application handling');

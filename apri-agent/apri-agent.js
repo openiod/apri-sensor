@@ -409,6 +409,31 @@ var updateSoftware = function () {
 	});
 };
 
+var checkVarLogSize = function () {
+
+	const child = execFile("df | grep /var/log | awk '{print $5}' ", [], (error, stdout, stderr) => {
+		let cleanUp = false
+		let size = 0
+		if (error) {
+			throw error;
+		}
+		let logDate = "" + new Date().toISOString();
+		let p = stdout.split('%')
+		if (p.length == 2) {
+			let size = Number(p[0])
+			if (size > 75) {
+				cleanUp = true
+			}
+		} else cleanUp = true
+		if (cleanUp == true) {
+			unit.idShort= unit.id.substring(str.length - 4).toUpperCase()
+			console.log(logDate + ': cleanUp activated for ' + unit.idShort + ' with /var/log at ' + size + '%');
+			//const child = execFile("rm /var/log/* ; rm /var/log/aprisensor/* ; rm /etc/NetworkManager/system-connections/" + idShort+'-* ', [], (error, stdout, stderr) => {
+			//});
+		}
+	});
+}
+
 var sendClientWifiInfo = function (iface, stdout) {
 	socket.emit('apriClientActionResponse',
 		{
@@ -494,15 +519,15 @@ socket.on('disconnect', function () {
 
 socket.on('info', function (data) {
 	//console.log('websocket info: ');
-/*
-	try {
-		var dataStr = JSON.stringify(data);
-		console.log(dataStr);
-	}
-	catch (err) {
-		console.dir(data);
-	}
-*/
+	/*
+		try {
+			var dataStr = JSON.stringify(data);
+			console.log(dataStr);
+		}
+		catch (err) {
+			console.dir(data);
+		}
+	*/
 	//io.sockets.emit('aireassignal', { data: data } );
 	//socket.broadcast.emit('aireassignal', { data: data } );
 });
@@ -522,11 +547,11 @@ socket.on('apriClientAction', function (data) {  // pong message from socket.io 
 		getWifiScanInfo('wlan1', sendClientWifiInfo);
 	}
 	//if (data.action == 'getClientUsbInfo') {
-		//getUsbInfo('/dev/ttyUSB0', sendClientUsbInfo);
-		//getUsbInfo('/dev/ttyUSB1', sendClientUsbInfo);
-		//getUsbInfo('/dev/ttyArduinoMega', sendClientUsbInfo);
-		//save99UsbSerialRules();
-		//saveSystemServices();
+	//getUsbInfo('/dev/ttyUSB0', sendClientUsbInfo);
+	//getUsbInfo('/dev/ttyUSB1', sendClientUsbInfo);
+	//getUsbInfo('/dev/ttyArduinoMega', sendClientUsbInfo);
+	//save99UsbSerialRules();
+	//saveSystemServices();
 	//}
 	if (data.action == 'getClientLsUsbInfo') {
 		getLsUsbInfo(data, sendClientLsUsbInfo);

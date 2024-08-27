@@ -1,0 +1,20 @@
+{ 
+  "devices":
+  [
+    {"name": "PMS7003"
+      ,"id":"pms7003"
+      ,"device":"/dev/serial0"
+      ,"baudRate":9600
+      ,"installed":"N"
+      ,"protocol":"serial"
+      ,"deviceType":"pms7003"
+    },
+    {"name": "BME280"
+      ,"id":"bme280"
+      ,"device":"0x??"
+      ,"installed":"N"
+      ,"protocol":"I2C"
+      ,"deviceType":"bme280"
+    }
+  ]
+}

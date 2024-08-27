@@ -1,3 +1,12 @@
+Pi3 image te doen:
+- journal.conf aanpassingen
+- /etc/logrotate.d/rsyslog --> weekly--> daily
+- crontab --> > /dev/null 2>&1  (...redis.sh)
+- crontab :
+# schakel wifi uit indien op lan aangesloten
+@reboot sleep 10; ifconfig wlan0 down
+
+
 # 2.5.0 
 # redis indexing nog niet in gebruik maar als voorbereiding op.
 # nog niet nodig !!

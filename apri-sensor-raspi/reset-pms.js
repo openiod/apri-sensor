@@ -5,12 +5,13 @@
 
 "use strict"; // This is for your code to comply with the ECMAScript 5 standard.
 
+var gpio
 var gpioPmsReset
 try {
     gpio = require('onoff').Gpio
 }
 catch (err) {
-    logger.info('GPIO module onoff not installed');
+    console.log('GPIO module onoff not installed');
 }
 if (gpio != undefined) {
     gpioPmsReset = new gpio(22, 'out'); //use GPIO-22 as output
@@ -115,6 +116,18 @@ var setGpioPmsResetInactive = function () {
 }
 
 
+console.log('reset pms')
 setGpioPmsResetActive()
-sleepFunction(500)
-setGpioPmsResetInactive()
+console.log('sleep')
+sleepFunction(30000)
+    .then(function (res) {
+        console.log('activate pms')
+        setGpioPmsResetInactive()
+        console.log('end of reset')
+    })
+    .catch(function (error) {
+        console.log('catch in sleep')
+        console.log(error)
+    });
+console.log('end of application')
+

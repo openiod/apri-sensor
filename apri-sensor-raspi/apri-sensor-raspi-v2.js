@@ -519,7 +519,8 @@ var results = {
     , pn10c: 0
     , temperature: 0
     , rHum: 0
-    , pm25mlr: 0
+    , pm25mlrM: 0
+    , pm25mlrN: 0
     , nrOfMeas: 0
   },
   ds18b20: {
@@ -556,6 +557,8 @@ var results = {
     , pn1c: 0
     , pn25c: 0
     , pn10c: 0
+    , pm25mlrM: 0
+    , pm25mlrN: 0
     , nrOfMeas: 0
   },
   ips7100: {
@@ -576,6 +579,8 @@ var results = {
     , pn1c: 0
     , pn25c: 0
     , pn10c: 0
+    , pm25mlrM: 0
+    , pm25mlrN: 0
     , nrOfMeas: 0
   },
   scd30: {
@@ -599,6 +604,8 @@ var results = {
     , pm10c: 0
     , temperature: 0
     , rHum: 0
+    , pm25mlrM: 0
+    , pm25mlrN: 0
     , nrOfMeas: 0
   },
   sgp41: {
@@ -613,7 +620,7 @@ var results = {
   }
 };
 
-// cache latest temperature and rHum from bme sensors for pmsa003 MLR calibration and sgp41 indexes
+// cache latest temperature and rHum from bme sensors for pmsa003/nextpm/ips7100/sps30 MLRM/MLRN calibration and sgp41 indexes
 let latest = {}
 
 var initCounters = function () {
@@ -1076,64 +1083,127 @@ var processDataCycle = function () {
     latest.bmeRHum = results.bme680.rHum
   }
 
-  results.pms.pm1CF1 = Math.round((counters.pms.pm1CF1 / counters.pms.nrOfMeas) * 100) / 100;
-  results.pms.pm25CF1 = Math.round((counters.pms.pm25CF1 / counters.pms.nrOfMeas) * 100) / 100;
-  results.pms.pm10CF1 = Math.round((counters.pms.pm10CF1 / counters.pms.nrOfMeas) * 100) / 100;
-  results.pms.pm1amb = Math.round((counters.pms.pm1amb / counters.pms.nrOfMeas) * 100) / 100;
-  results.pms.pm25amb = Math.round((counters.pms.pm25amb / counters.pms.nrOfMeas) * 100) / 100;
-  results.pms.pm10amb = Math.round((counters.pms.pm10amb / counters.pms.nrOfMeas) * 100) / 100;
-  results.pms.part0_3 = Math.round((counters.pms.part0_3 / counters.pms.nrOfMeas) * 100) / 100;
-  results.pms.part0_5 = Math.round((counters.pms.part0_5 / counters.pms.nrOfMeas) * 100) / 100;
-  results.pms.part1_0 = Math.round((counters.pms.part1_0 / counters.pms.nrOfMeas) * 100) / 100;
-  results.pms.part2_5 = Math.round((counters.pms.part2_5 / counters.pms.nrOfMeas) * 100) / 100;
-  results.pms.part5_0 = Math.round((counters.pms.part5_0 / counters.pms.nrOfMeas) * 100) / 100;
-  results.pms.part10_0 = Math.round((counters.pms.part10_0 / counters.pms.nrOfMeas) * 100) / 100;
-  results.pms.pn1c = Math.round((counters.pms.pn1c / counters.pms.nrOfMeas) * 100) / 100;
-  results.pms.pn25c = Math.round((counters.pms.pn25c / counters.pms.nrOfMeas) * 100) / 100;
-  results.pms.pn10c = Math.round((counters.pms.pn10c / counters.pms.nrOfMeas) * 100) / 100;
-  results.pms.temperature = latest.bmeTemperature
-  results.pms.rHum = latest.bmeRHum
+  if (counters.pms.nrOfMeasTotal > 0) {
 
-  // calculate pm25mlr
-  if (latest.bmeTemperature) {
-    if (latest.temperature == 0 && latest.rHum == 0) {
-      results.pms.pm25mlr = null
-    } else {
-      results.pms.pm25mlr = Math.round((14.8 + (0.3834 * results.pms.pm25CF1) + (-0.1498 * results.pms.rHum) + (-0.1905 * results.pms.temperature)) * 100) / 100
-      if (results.pms.pm25mlr > results.pms.pm25CF1) {
-        results.pms.pm25mlr = results.pms.pm25CF1
+    results.pms.pm1CF1 = Math.round((counters.pms.pm1CF1 / counters.pms.nrOfMeas) * 100) / 100;
+    results.pms.pm25CF1 = Math.round((counters.pms.pm25CF1 / counters.pms.nrOfMeas) * 100) / 100;
+    results.pms.pm10CF1 = Math.round((counters.pms.pm10CF1 / counters.pms.nrOfMeas) * 100) / 100;
+    results.pms.pm1amb = Math.round((counters.pms.pm1amb / counters.pms.nrOfMeas) * 100) / 100;
+    results.pms.pm25amb = Math.round((counters.pms.pm25amb / counters.pms.nrOfMeas) * 100) / 100;
+    results.pms.pm10amb = Math.round((counters.pms.pm10amb / counters.pms.nrOfMeas) * 100) / 100;
+    results.pms.part0_3 = Math.round((counters.pms.part0_3 / counters.pms.nrOfMeas) * 100) / 100;
+    results.pms.part0_5 = Math.round((counters.pms.part0_5 / counters.pms.nrOfMeas) * 100) / 100;
+    results.pms.part1_0 = Math.round((counters.pms.part1_0 / counters.pms.nrOfMeas) * 100) / 100;
+    results.pms.part2_5 = Math.round((counters.pms.part2_5 / counters.pms.nrOfMeas) * 100) / 100;
+    results.pms.part5_0 = Math.round((counters.pms.part5_0 / counters.pms.nrOfMeas) * 100) / 100;
+    results.pms.part10_0 = Math.round((counters.pms.part10_0 / counters.pms.nrOfMeas) * 100) / 100;
+    results.pms.pn1c = Math.round((counters.pms.pn1c / counters.pms.nrOfMeas) * 100) / 100;
+    results.pms.pn25c = Math.round((counters.pms.pn25c / counters.pms.nrOfMeas) * 100) / 100;
+    results.pms.pn10c = Math.round((counters.pms.pn10c / counters.pms.nrOfMeas) * 100) / 100;
+    results.pms.temperature = latest.bmeTemperature
+    results.pms.rHum = latest.bmeRHum
+
+    // calculate pm25mlrM
+    if (latest.bmeTemperature) {
+      if (latest.temperature == 0 && latest.rHum == 0) {
+        results.pms.pm25mlrM = null
       } else {
+        results.pms.pm25mlrM = Math.round((14.8 + (0.3834 * results.pms.pm25CF1) + (-0.1498 * results.pms.rHum) + (-0.1905 * results.pms.temperature)) * 100) / 100
+        if (results.pms.pm25mlrM > results.pms.pm25CF1) {
+          results.pms.pm25mlrM = results.pms.pm25CF1
+        } else {
 
+        }
       }
+    } else {
+      results.pms.pm25mlrM = null
     }
-  } else {
-    results.pms.pm25mlr = null
+
+    // calculate pm25mlrN
+    // MLR_PMS = 0,1327*PN0.3-0,4298*PN0.5+0,0792*PN1-0,0143*PN2.5+1,2229*PN5-1,4686*PN10-0,1759*RH-0,2070*T+12,8
+    if (latest.bmeTemperature) {
+      if (latest.temperature == 0 && latest.rHum == 0) {
+        results.pms.pm25mlrN = null
+      } else {
+        results.pms.pm25mlrN = Math.round((12.8 + (0.1327 * results.pms.part0_3) + (-0.4298 * results.pms.part0_5) + (0.0792 * results.pms.part1_0) + (-0.0143 * results.pms.part2_5) + (1.2229 * results.pms.part5_0) + (-1.4686 * results.pms.part10_0) + (-0.1759 * results.pms.rHum) + (-0.2070 * results.pms.temperature)) * 100) / 100
+        if (results.pms.pm25mlrN > results.pms.pm25CF1) {
+          results.pms.pm25mlrN = results.pms.pm25CF1
+        } else {
+
+        }
+      }
+    } else {
+      results.pms.pm25mlrN = null
+    }
+
+    results.pms.nrOfMeas = counters.pms.nrOfMeas;
+    results.pms.sensorType = counters.pms.sensorType;
   }
 
-  results.pms.nrOfMeas = counters.pms.nrOfMeas;
-  results.pms.sensorType = counters.pms.sensorType;
+  if (counters.ds18b20.nrOfMeasTotal > 0) {
 
+    results.ds18b20.temperature = Math.round((counters.ds18b20.temperature / counters.ds18b20.nrOfMeas) * 100) / 100;
+    results.ds18b20.nrOfMeas = counters.ds18b20.nrOfMeas;
+  }
 
-  results.ds18b20.temperature = Math.round((counters.ds18b20.temperature / counters.ds18b20.nrOfMeas) * 100) / 100;
-  results.ds18b20.nrOfMeas = counters.ds18b20.nrOfMeas;
+  if (counters.tgs5042.nrOfMeasTotal > 0) {
+    results.tgs5042.co = Math.round((counters.tgs5042.co / counters.tgs5042.nrOfMeas) * 100) / 100;
+    results.tgs5042.nrOfMeas = counters.tgs5042.nrOfMeas;
+  }
 
-  results.tgs5042.co = Math.round((counters.tgs5042.co / counters.tgs5042.nrOfMeas) * 100) / 100;
-  results.tgs5042.nrOfMeas = counters.tgs5042.nrOfMeas;
+  if (counters.sps.nrOfMeasTotal > 0) {
 
-  results.sps.pm1 = Math.round((counters.sps.pm1 / counters.sps.nrOfMeas) * 100) / 100;
-  results.sps.pm25 = Math.round((counters.sps.pm25 / counters.sps.nrOfMeas) * 100) / 100;
-  results.sps.pm4 = Math.round((counters.sps.pm4 / counters.sps.nrOfMeas) * 100) / 100;
-  results.sps.pm10 = Math.round((counters.sps.pm10 / counters.sps.nrOfMeas) * 100) / 100;
-  results.sps.part0_5 = Math.round((counters.sps.part0_5 / counters.sps.nrOfMeas) * 100) / 100;
-  results.sps.part1_0 = Math.round((counters.sps.part1_0 / counters.sps.nrOfMeas) * 100) / 100;
-  results.sps.part2_5 = Math.round((counters.sps.part2_5 / counters.sps.nrOfMeas) * 100) / 100;
-  results.sps.part4_0 = Math.round((counters.sps.part4_0 / counters.sps.nrOfMeas) * 100) / 100;
-  results.sps.part10_0 = Math.round((counters.sps.part10_0 / counters.sps.nrOfMeas) * 100) / 100;
-  results.sps.pn1c = Math.round((counters.sps.pn1c / counters.sps.nrOfMeas) * 100) / 100;
-  results.sps.pn25c = Math.round((counters.sps.pn25c / counters.sps.nrOfMeas) * 100) / 100;
-  results.sps.pn10c = Math.round((counters.sps.pn10c / counters.sps.nrOfMeas) * 100) / 100;
-  results.sps.tps = Math.round((counters.sps.tps / counters.sps.nrOfMeas) * 100) / 100;
-  results.sps.nrOfMeas = counters.sps.nrOfMeas;
+    results.sps.pm1 = Math.round((counters.sps.pm1 / counters.sps.nrOfMeas) * 100) / 100;
+    results.sps.pm25 = Math.round((counters.sps.pm25 / counters.sps.nrOfMeas) * 100) / 100;
+    results.sps.pm4 = Math.round((counters.sps.pm4 / counters.sps.nrOfMeas) * 100) / 100;
+    results.sps.pm10 = Math.round((counters.sps.pm10 / counters.sps.nrOfMeas) * 100) / 100;
+    results.sps.part0_5 = Math.round((counters.sps.part0_5 / counters.sps.nrOfMeas) * 100) / 100;
+    results.sps.part1_0 = Math.round((counters.sps.part1_0 / counters.sps.nrOfMeas) * 100) / 100;
+    results.sps.part2_5 = Math.round((counters.sps.part2_5 / counters.sps.nrOfMeas) * 100) / 100;
+    results.sps.part4_0 = Math.round((counters.sps.part4_0 / counters.sps.nrOfMeas) * 100) / 100;
+    results.sps.part10_0 = Math.round((counters.sps.part10_0 / counters.sps.nrOfMeas) * 100) / 100;
+    results.sps.pn1c = Math.round((counters.sps.pn1c / counters.sps.nrOfMeas) * 100) / 100;
+    results.sps.pn25c = Math.round((counters.sps.pn25c / counters.sps.nrOfMeas) * 100) / 100;
+    results.sps.pn10c = Math.round((counters.sps.pn10c / counters.sps.nrOfMeas) * 100) / 100;
+    results.sps.tps = Math.round((counters.sps.tps / counters.sps.nrOfMeas) * 100) / 100;
+    results.sps.temperature = latest.bmeTemperature
+    results.sps.rHum = latest.bmeRHum
+
+    /*
+        // calculate pm25mlrM
+        if (latest.bmeTemperature) {
+          if (latest.temperature == 0 && latest.rHum == 0) {
+            results.sps.pm25mlrM = null
+          } else {
+            results.sps.pm25mlrM = Math.round((14.8 + (0.3834 * results.sps.pm25) + (-0.1498 * results.sps.rHum) + (-0.1905 * results.sps.temperature)) * 100) / 100
+            if (results.sps.pm25mlrM > results.sps.pm25CF1) {
+              results.sps.pm25mlrM = results.sps.pm25CF1
+            } else {
+    
+            }
+          }
+        } else {
+          results.sps.pm25mlrM = null
+        }
+    
+        // calculate pm25mlrN
+        if (latest.bmeTemperature) {
+          if (latest.temperature == 0 && latest.rHum == 0) {
+            results.sps.pm25mlrN = null
+          } else {
+            results.sps.pm25mlrN = Math.round((14.8 + (0.3834 * results.sps.pm25CF1) + (-0.1498 * results.sps.rHum) + (-0.1905 * results.sps.temperature)) * 100) / 100
+            if (results.sps.pm25mlrN > results.sps.pm25CF1) {
+              results.sps.pm25mlrN = results.sps.pm25CF1
+            } else {
+    
+            }
+          }
+        } else {
+          results.sps.pm25mlrN = null
+        }
+    */
+    results.sps.nrOfMeas = counters.sps.nrOfMeas;
+  }
 
   // skip first 30 measurements, initialization fase of the ips7100
   if (counters.ips7100.nrOfMeasTotal > 30) {
@@ -1154,31 +1224,107 @@ var processDataCycle = function () {
     results.ips7100.pn1c = Math.round((counters.ips7100.pn1c / counters.ips7100.nrOfMeas) * 100) / 100;
     results.ips7100.pn25c = Math.round((counters.ips7100.pn25c / counters.ips7100.nrOfMeas) * 100) / 100;
     results.ips7100.pn10c = Math.round((counters.ips7100.pn10c / counters.ips7100.nrOfMeas) * 100) / 100;
+    results.ips7100.temperature = latest.bmeTemperature
+    results.ips7100.rHum = latest.bmeRHum
+
+    /*
+    // calculate pm25mlrM
+    if (latest.bmeTemperature) {
+      if (latest.temperature == 0 && latest.rHum == 0) {
+        results.ips7100.pm25mlrM = null
+      } else {
+        results.ips7100.pm25mlrM = Math.round((14.8 + (0.3834 * results.ips7100.pm25CF1) + (-0.1498 * results.ips7100.rHum) + (-0.1905 * results.ips7100.temperature)) * 100) / 100
+        if (results.ips7100.pm25mlrM > results.ips7100.pm25CF1) {
+          results.ips7100.pm25mlrM = results.ips7100.pm25CF1
+        } else {
+
+        }
+      }
+    } else {
+      results.ips7100.pm25mlrM = null
+    }
+
+    // calculate pm25mlrN
+    if (latest.bmeTemperature) {
+      if (latest.temperature == 0 && latest.rHum == 0) {
+        results.ips7100.pm25mlrN = null
+      } else {
+        results.ips7100.pm25mlrN = Math.round((14.8 + (0.3834 * results.ips7100.pm25CF1) + (-0.1498 * results.ips7100.rHum) + (-0.1905 * results.ips7100.temperature)) * 100) / 100
+        if (results.ips7100.pm25mlrN > results.ips7100.pm25CF1) {
+          results.ips7100.pm25mlrN = results.ips7100.pm25CF1
+        } else {
+
+        }
+      }
+    } else {
+      results.ips7100.pm25mlrN = null
+    }
+*/
     results.ips7100.nrOfMeas = counters.ips7100.nrOfMeas;
   }
 
-  results.scd30.temperature = Math.round((counters.scd30.temperature / counters.scd30.nrOfMeas) * 100) / 100;
-  results.scd30.rHum = Math.round((counters.scd30.rHum / counters.scd30.nrOfMeas) * 100) / 100;
-  results.scd30.co2 = Math.round((counters.scd30.co2 / counters.scd30.nrOfMeas) * 100) / 100;
-  results.scd30.nrOfMeas = counters.scd30.nrOfMeas;
+  if (counters.scd30.nrOfMeasTotal > 0) {
+    results.scd30.temperature = Math.round((counters.scd30.temperature / counters.scd30.nrOfMeas) * 100) / 100;
+    results.scd30.rHum = Math.round((counters.scd30.rHum / counters.scd30.nrOfMeas) * 100) / 100;
+    results.scd30.co2 = Math.round((counters.scd30.co2 / counters.scd30.nrOfMeas) * 100) / 100;
+    results.scd30.nrOfMeas = counters.scd30.nrOfMeas;
+  }
 
-  results.nextpm.part1 = Math.round((counters.nextpm.part1 / counters.nextpm.nrOfMeas) * 100) / 100;
-  results.nextpm.part25 = Math.round((counters.nextpm.part25 / counters.nextpm.nrOfMeas) * 100) / 100;
-  results.nextpm.part10 = Math.round((counters.nextpm.part10 / counters.nextpm.nrOfMeas) * 100) / 100;
-  results.nextpm.pm1 = Math.round((counters.nextpm.pm1 / counters.nextpm.nrOfMeas) * 100) / 100;
-  results.nextpm.pm25 = Math.round((counters.nextpm.pm25 / counters.nextpm.nrOfMeas) * 100) / 100;
-  results.nextpm.pm10 = Math.round((counters.nextpm.pm10 / counters.nextpm.nrOfMeas) * 100) / 100;
-  results.nextpm.pn1c = Math.round((counters.nextpm.pn1c / counters.nextpm.nrOfMeas) * 100) / 100;
-  results.nextpm.pn25c = Math.round((counters.nextpm.pn25c / counters.nextpm.nrOfMeas) * 100) / 100;
-  results.nextpm.pn10c = Math.round((counters.nextpm.pn10c / counters.nextpm.nrOfMeas) * 100) / 100;
-  results.nextpm.pm1c = Math.round((counters.nextpm.pm1c / counters.nextpm.nrOfMeas) * 100) / 100;
-  results.nextpm.pm25c = Math.round((counters.nextpm.pm25c / counters.nextpm.nrOfMeas) * 100) / 100;
-  results.nextpm.pm10c = Math.round((counters.nextpm.pm10c / counters.nextpm.nrOfMeas) * 100) / 100;
-  results.nextpm.fanSpeed = Math.round((counters.nextpm.fanSpeed / counters.nextpm.nrOfMeas) * 100) / 100;
-  results.nextpm.temperature = Math.round((counters.nextpm.temperature / counters.nextpm.nrOfMeas) * 100) / 100;
-  results.nextpm.rHum = Math.round((counters.nextpm.rHum / counters.nextpm.nrOfMeas) * 100) / 100;
-  results.nextpm.status = counters.nextpm.status // no cumulation for status
-  results.nextpm.nrOfMeas = counters.nextpm.nrOfMeas;
+  if (counters.nextpm.nrOfMeasTotal > 0) {
+
+    results.nextpm.part1 = Math.round((counters.nextpm.part1 / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.part25 = Math.round((counters.nextpm.part25 / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.part10 = Math.round((counters.nextpm.part10 / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.pm1 = Math.round((counters.nextpm.pm1 / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.pm25 = Math.round((counters.nextpm.pm25 / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.pm10 = Math.round((counters.nextpm.pm10 / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.pn1c = Math.round((counters.nextpm.pn1c / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.pn25c = Math.round((counters.nextpm.pn25c / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.pn10c = Math.round((counters.nextpm.pn10c / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.pm1c = Math.round((counters.nextpm.pm1c / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.pm25c = Math.round((counters.nextpm.pm25c / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.pm10c = Math.round((counters.nextpm.pm10c / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.fanSpeed = Math.round((counters.nextpm.fanSpeed / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.temperature = Math.round((counters.nextpm.temperature / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.rHum = Math.round((counters.nextpm.rHum / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.status = counters.nextpm.status // no cumulation for status
+
+    // calculate pm25mlrM
+    // MLRM = 0,8009644*PM2.5-0,1283819*T-0,313096*RH+27,7
+    if (latest.bmeTemperature) {
+      if (latest.temperature == 0 && latest.rHum == 0) {
+        results.nextpm.pm25mlrM = null
+      } else {
+        results.nextpm.pm25mlrM = Math.round((27.7 + (0.8009644 * results.nextpm.pm25) + (-0.313096 * results.nextpm.rHum) + (-0.1283819 * results.nextpm.temperature)) * 100) / 100
+        if (results.nextpm.pm25mlrM > results.nextpm.pm25) {
+          results.nextpm.pm25mlrM = results.nextpm.pm25
+        } else {
+
+        }
+      }
+    } else {
+      results.nextpm.pm25mlrM = null
+    }
+
+    // calculate pm25mlrN
+    //BAM1020_predicted (in µg/m3)  = 0,3354533*PN1 -1,156439*PN25 + 0,822436*PN10 + 0,4153694*T -0,1185348*RH +6.8
+    if (latest.bmeTemperature) {
+      if (latest.temperature == 0 && latest.rHum == 0) {
+        results.nextpm.pm25mlrN = null
+      } else {
+        results.nextpm.pm25mlrN = Math.round((6.8 + (0.3354533 * results.nextpm.part1) + (-1.156439 * results.nextpm.part25) + (0.822436 * results.nextpm.part10) + (-0.1185348 * results.nextpm.rHum) + (0.4153694 * results.nextpm.temperature)) * 100) / 100
+        if (results.nextpm.pm25mlrN > results.nextpm.pm25CF1) {
+          results.nextpm.pm25mlrN = results.nextpm.pm25CF1
+        } else {
+
+        }
+      }
+    } else {
+      results.nextpm.pm25mlrN = null
+    }
+
+    results.nextpm.nrOfMeas = counters.nextpm.nrOfMeas;
+  }
 
   // skip first 2 measurements, initialization fase of the sgp41
   if (counters.sgp41.nrOfMeasTotal > 2) {
@@ -1190,8 +1336,6 @@ var processDataCycle = function () {
     results.sgp41.rHum = Math.round((counters.sgp41.rHum / counters.sgp41.nrOfMeas) * 100) / 100;
     results.sgp41.nrOfMeas = counters.sgp41.nrOfMeas;
   }
-
-
 
   initCounters();
   counters.busy = false;
@@ -1409,12 +1553,13 @@ var sendData = async function () {
       ',' + results.pms.pn1c +
       ',' + results.pms.pn25c +
       ',' + results.pms.pn10c +
-      ',' + results.pms.pm25mlr +
+      ',' + results.pms.pm25mlrM +
+      ',' + results.pms.pm25mlrN +
       ',' + results.pms.temperature +
       ',' + results.pms.rHum
 
     header = '"sensorId","dateObserved","sensorType","pm1Cf1","pm25Cf1","pm10Cf1","pm1amb","pm25amb","pm10amb"' +
-      ',"part0_3","part0_5","part1_0","part2_5","part5_0","part10_0","pn1c","pn25c","pn10c","pm25mlr","temperature","rHum"'
+      ',"part0_3","part0_5","part1_0","part2_5","part5_0","part10_0","pn1c","pn25c","pn10c","pm25mlrM","pm25mlrN","temperature","rHum"'
 
     writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
       '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
@@ -1440,8 +1585,11 @@ var sendData = async function () {
       , 'pn25c': results.pms.pn25c
       , 'pn10c': results.pms.pn10c
     }
-    if (results.pms.pm25mlr != null) {
-      newRec.pm25mlr = results.pms.pm25mlr
+    if (results.pms.pm25mlrM != null) {
+      newRec.pm25mlrM = results.pms.pm25mlrM
+    }
+    if (results.pms.pm25mlrN != null) {
+      newRec.pm25mlrN = results.pms.pm25mlrN
     }
     if (results.pms.temperature != undefined) {
       newRec.temperature = results.pms.temperature
@@ -3482,12 +3630,12 @@ const GasIndexAlgorithm_process = function (params, sraw) {
     }
     params = GasIndexAlgorithm__adaptive_lowpass__process(
       params, params.mGas_Index);
-      params.mGas_Index=  params.m_Adaptive_Lowpass___X3
+    params.mGas_Index = params.m_Adaptive_Lowpass___X3
     if ((params.mGas_Index < 0.5)) {
       params.mGas_Index = 0.5;
     }
     if (params.mSraw > 0) {
-      params=GasIndexAlgorithm__mean_variance_estimator__process(params,
+      params = GasIndexAlgorithm__mean_variance_estimator__process(params,
         params.mSraw);
       GasIndexAlgorithm__mox_model__set_parameters(
         params,

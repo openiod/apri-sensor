@@ -1,0 +1,27 @@
+{ 
+  "devices":
+  [
+    {"name": "PMSA003"
+      ,"id":"pmsa003"
+      ,"device":"/dev/serial0"
+      ,"baudRate":9600
+      ,"installed":"N"
+      ,"protocol":"serial"
+      ,"deviceType":"pmsa003"
+    },
+    {"name": "BME280"
+      ,"id":"bme280"
+      ,"device":"0x??"
+      ,"installed":"N"
+      ,"protocol":"I2C"
+      ,"deviceType":"bme280"
+    },
+    {"name": "DS18B20"
+      ,"id":"ds18b20"
+      ,"device":"0x??"
+      ,"installed":"N"
+      ,"protocol":"onewire"
+      ,"deviceType":"ds18b20"
+    }
+  ]
+}

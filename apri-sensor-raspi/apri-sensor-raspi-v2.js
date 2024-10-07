@@ -472,7 +472,9 @@ var counters = {
     , nrOfMeasTotal: 0
   },
   nextpm: {
-    part1: 0
+    firmwareVersion: ''
+    , status: 0x00
+    , part1: 0
     , part25: 0
     , part10: 0
     , pm1: 0
@@ -484,8 +486,19 @@ var counters = {
     , pm1c: 0
     , pm25c: 0
     , pm10c: 0
-    , temperature: 0
-    , rHum: 0
+    , fanRatio: 0
+    , heaterRatio: 0
+    , fanSpeed: 0
+    , laserStatus: 0
+    , rHumInt: 0
+    , temperatureInt: 0
+    , pn02pn05: 0
+    , pn05pn1: 0
+    , pn1pn25: 0
+    , pn25pn5: 0
+    , pn5pn10: 0
+    , temperatureExt: 0
+    , rHumExt: 0
     , nrOfMeas: 0
     , nrOfMeasTotal: 0
   },
@@ -590,7 +603,9 @@ var results = {
     , nrOfMeas: 0
   },
   nextpm: {
-    part1: 0
+    firmwareVersion: ''
+    , status: 0x00
+    , part1: 0
     , part25: 0
     , part10: 0
     , pm1: 0
@@ -602,10 +617,19 @@ var results = {
     , pm1c: 0
     , pm25c: 0
     , pm10c: 0
-    , temperature: 0
-    , rHum: 0
-    , pm25mlrM: 0
-    , pm25mlrN: 0
+    , fanRatio: 0
+    , heaterRatio: 0
+    , fanSpeed: 0
+    , laserStatus: 0
+    , rHumInt: 0
+    , temperatureInt: 0
+    , pn02pn05: 0
+    , pn05pn1: 0
+    , pn1pn25: 0
+    , pn25pn5: 0
+    , pn5pn10: 0
+    , temperatureExt: 0
+    , rHumExt: 0
     , nrOfMeas: 0
   },
   sgp41: {
@@ -616,7 +640,6 @@ var results = {
     , temperature: 0
     , rHum: 0
     , nrOfMeas: 0
-    , nrOfMeasTotal: 0
   }
 };
 
@@ -699,6 +722,8 @@ var initCounters = function () {
   counters.scd30.co2 = 0;
   counters.scd30.nrOfMeas = 0;
 
+  counters.nextpm.firmwareVersion = ''
+  counters.nextpm.status = 0x00
   counters.nextpm.part1 = 0;
   counters.nextpm.part25 = 0;
   counters.nextpm.part10 = 0;
@@ -711,10 +736,20 @@ var initCounters = function () {
   counters.nextpm.pm1c = 0;
   counters.nextpm.pm25c = 0;
   counters.nextpm.pm10c = 0;
-  counters.nextpm.fanSpeed = 0;
-  counters.nextpm.temperature = 0;
-  counters.nextpm.rHum = 0;
-  counters.nextpm.status = 0;
+  counters.nextpm.fanRatio = 0
+  counters.nextpm.heaterRatio = 0
+  counters.nextpm.fanSpeed = 0
+  counters.nextpm.laserStatus = 0
+  counters.nextpm.rHumInt = 0
+  counters.nextpm.temperatureInt = 0
+  // new PN
+  counters.nextpm.pn02pn05 = 0
+  counters.nextpm.pn05pn1 = 0
+  counters.nextpm.pn1pn25 = 0
+  counters.nextpm.pn25pn5 = 0
+  counters.nextpm.pn5pn10 = 0
+  counters.nextpm.temperatureExt = 0
+  counters.nextpm.rHumExt = 0
   counters.nextpm.nrOfMeas = 0;
 
   counters.sgp41.vocIndex = 0;
@@ -1272,6 +1307,8 @@ var processDataCycle = function () {
 
   if (counters.nextpm.nrOfMeasTotal > 0) {
 
+    results.nextpm.firmwareVersion = counters.nextpm.firmwareVersion;
+    results.nextpm.status = counters.nextpm.status;
     results.nextpm.part1 = Math.round((counters.nextpm.part1 / counters.nextpm.nrOfMeas) * 100) / 100;
     results.nextpm.part25 = Math.round((counters.nextpm.part25 / counters.nextpm.nrOfMeas) * 100) / 100;
     results.nextpm.part10 = Math.round((counters.nextpm.part10 / counters.nextpm.nrOfMeas) * 100) / 100;
@@ -1284,14 +1321,23 @@ var processDataCycle = function () {
     results.nextpm.pm1c = Math.round((counters.nextpm.pm1c / counters.nextpm.nrOfMeas) * 100) / 100;
     results.nextpm.pm25c = Math.round((counters.nextpm.pm25c / counters.nextpm.nrOfMeas) * 100) / 100;
     results.nextpm.pm10c = Math.round((counters.nextpm.pm10c / counters.nextpm.nrOfMeas) * 100) / 100;
-    results.nextpm.fanSpeed = Math.round((counters.nextpm.fanSpeed / counters.nextpm.nrOfMeas) * 100) / 100;
-    results.nextpm.temperature = Math.round((counters.nextpm.temperature / counters.nextpm.nrOfMeas) * 100) / 100;
-    results.nextpm.rHum = Math.round((counters.nextpm.rHum / counters.nextpm.nrOfMeas) * 100) / 100;
-    results.nextpm.status = counters.nextpm.status // no cumulation for status
+    results.nextpm.fanRatio = counters.nextpm.fanRatio
+    results.nextpm.heaterRatio = counters.nextpm.heaterRatio
+    results.nextpm.fanSpeed = counters.nextpm.fanSpeed
+    results.nextpm.laserStatus = counters.nextpm.laserStatus
+    results.nextpm.rHumInt = Math.round((counters.nextpm.rHumInt / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.temperatureInt = Math.round((counters.nextpm.temperatureInt / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.pn02pn05 = Math.round((counters.nextpm.pn02pn05 / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.pn05pn1 = Math.round((counters.nextpm.pn05pn1 / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.pn1pn25 = Math.round((counters.nextpm.pn1pn25 / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.pn25pn5 = Math.round((counters.nextpm.pn25pn5 / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.pn5pn10 = Math.round((counters.nextpm.pn5pn10 / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.temperatureExt = Math.round((counters.nextpm.temperatureExt / counters.nextpm.nrOfMeas) * 100) / 100;
+    results.nextpm.rHumExt = Math.round((counters.nextpm.rHumExt / counters.nextpm.nrOfMeas) * 100) / 100;
 
     // calculate pm25mlrM
     // MLRM = 0,8009644*PM2.5-0,1283819*T-0,313096*RH+27,7
-    if (latest.bmeTemperature) {
+    if (latest.bmeTemperature) { // ???? is dit ook met de interne temperatuur/rHum te berekenen ??
       if (latest.temperature == 0 && latest.rHum == 0) {
         results.nextpm.pm25mlrM = null
       } else {
@@ -1308,16 +1354,16 @@ var processDataCycle = function () {
 
     // calculate pm25mlrN
     //BAM1020_predicted (in µg/m3)  = 0,3354533*PN1 -1,156439*PN25 + 0,822436*PN10 + 0,4153694*T -0,1185348*RH +6.8
-    if (latest.bmeTemperature) {
+    if (latest.bmeTemperature) {  // ???? is dit ook met de interne temperatuur/rHum te berekenen ??
       if (latest.temperature == 0 && latest.rHum == 0) {
         results.nextpm.pm25mlrN = null
       } else {
-        results.nextpm.pm25mlrN = Math.round((6.8 + (0.3354533 * results.nextpm.part1) + (-1.156439 * results.nextpm.part25) + (0.822436 * results.nextpm.part10) + (-0.1185348 * results.nextpm.rHum) + (0.4153694 * results.nextpm.temperature)) * 100) / 100
-        if (results.nextpm.pm25mlrN > results.nextpm.pm25CF1) {
-          results.nextpm.pm25mlrN = results.nextpm.pm25CF1
-        } else {
-
-        }
+        results.nextpm.pm25mlrN = Math.round((6.8 + (0.3354533 * results.nextpm.part1) + (-1.156439 * results.nextpm.part25) + (0.822436 * results.nextpm.part10) + (-0.1185348 * results.nextpm.rHumInt) + (0.4153694 * results.nextpm.temperatureInt)) * 100) / 100
+        //if (results.nextpm.pm25mlrN > results.nextpm.pm25CF1) {
+        //  results.nextpm.pm25mlrN = results.nextpm.pm25CF1
+        //} else {
+        //
+        //      }
       }
     } else {
       results.nextpm.pm25mlrN = null
@@ -2129,12 +2175,24 @@ var sendData = async function () {
       ',' + results.nextpm.pm1c +
       ',' + results.nextpm.pm25c +
       ',' + results.nextpm.pm10c +
-      ',' + results.nextpm.temperature +
-      ',' + results.nextpm.rHum +
+      ',' + results.nextpm.firmwareVersion +
+      ',' + results.nextpm.status +
+      ',' + results.nextpm.fanRatio +
+      ',' + results.nextpm.heaterRatio +
       ',' + results.nextpm.fanSpeed +
-      ',' + results.nextpm.status
+      ',' + results.nextpm.laserStatus +
+      ',' + results.nextpm.rHumInt +
+      ',' + results.nextpm.temperatureInt +
+      ',' + results.nextpm.pn02pn05 +
+      ',' + results.nextpm.pn05pn1 +
+      ',' + results.nextpm.pn1pn25 +
+      ',' + results.nextpm.pn25pn5 +
+      ',' + results.nextpm.pn5pn10 +
+      ',' + results.nextpm.temperatureExt +
+      ',' + results.nextpm.rHumExt
 
-    header = '"sensorId","dateObserved","sensorType","part1","part25","part10","pm1","pm25","pm10","pn1c","pn25c","pn10c","pm1c","pm25c","pm10c","temperature","rHum","fanSpeed","status"'
+    header = '"sensorId","dateObserved","sensorType","part1","part25","part10","pm1","pm25","pm10","pn1c","pn25c","pn10c","pm1c","pm25c","pm10c"' +
+      ',"firmwareVersion","status","fanRatio","heaterRatio","fanSpeed","laserStatus","rHumInt","temperatureInt","pn02pn05","pn05pn1","pn1pn25","pn25pn5","pn5pn10","temperatureExt","rHumExt"'
 
     writeLocalCsv(csvRec, timeStamp.toISOString().substring(0, 7), 'SCRP' + unit.id +
       '_' + sensorType + '_' + timeStamp.toISOString().substring(0, 10), header, sensorType)
@@ -2155,12 +2213,27 @@ var sendData = async function () {
       , 'pm1c': results.nextpm.pm1c
       , 'pm25c': results.nextpm.pm25c
       , 'pm10c': results.nextpm.pm10c
+      , 'firmwareVersion': results.nextpm.firmwareVersion
+      , 'status': results.nextpm.status
+      , 'fanRatio': results.nextpm.fanRatio
+      , 'heaterRatio': results.nextpm.heaterRatio
+      , 'fanSpeed': results.nextpm.fanSpeed
+      , 'laserStatus': results.nextpm.laserStatus
+      , 'rHumInt': results.nextpm.rHumInt
+      , 'temperatureInt': results.nextpm.temperatureInt
+      , 'pn02pn05': results.nextpm.pn02pn05
+      , 'pn05pn1': results.nextpm.pn05pn1
+      , 'pn1pn25': results.nextpm.pn1pn25
+      , 'pn25pn5': results.nextpm.pn25pn5
+      , 'pn5pn10': results.nextpm.pn5pn10
+      , 'temperatureExt': results.nextpm.temperatureExt
+      , 'rHumExt': results.nextpm.rHumExt
     }
 
-    if (results.nextpm.temperature) nextpmRec.temperature = results.nextpm.temperature
-    if (results.nextpm.rHum) nextpmRec.rHum = results.nextpm.rHum
-    if (results.nextpm.fanSpeed) nextpmRec.fanSpeed = results.nextpm.fanSpeed
-    if (results.nextpm.status) nextpmRec.status = results.nextpm.status
+//    if (results.nextpm.temperature) nextpmRec.temperature = results.nextpm.temperature
+//    if (results.nextpm.rHum) nextpmRec.rHum = results.nextpm.rHum
+//    if (results.nextpm.fanSpeed) nextpmRec.fanSpeed = results.nextpm.fanSpeed
+//    if (results.nextpm.status) nextpmRec.status = results.nextpm.status
 
     await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, nextpmRec)
       .then(function (res) {
@@ -2840,11 +2913,24 @@ const nextpmWriteToRead10 = function () {
       logger.info(err)
     })
 }
-const nextpmRead10 = function () {
+const nextpmRead10 = async function () {
   //logger.info('nextpmRead10')
-  nextpmClient.readHoldingRegisters(50, 12)
+  var result = {}
+  await nextpmClient.readHoldingRegisters(1, 19) // firmware version and status
     .then(async function (data) {
-      var result = {}
+
+      // Next procedure is activated on 20241009
+      // extract new registers 
+      result.firmwareVersion = data.data[0]
+      result.status = data.data[18]
+    })
+    .catch(function (err) {
+      logger.info('catch nextpmRead10 part 1')
+      logger.info(err)
+      return
+    })
+  await nextpmClient.readHoldingRegisters(50, 12) // first part data (old firmware)
+    .then(async function (data) {
 
       // Next procedure is activated on 20240302
       // extract and calculate PN, PM and coarse values. Particles recalculated for 0.1L
@@ -2871,78 +2957,65 @@ const nextpmRead10 = function () {
       result.pm1c = result.pm1
       result.pm25c = result.pm25 - result.pm1
       result.pm10c = result.pm10 - result.pm25
-
-      if (result.part1 == 0) {
-        //logger.info('scd30 no data found')
-      } else {
-        //processRaspiNextpmRecord(result)
-        // add extra data: temperature, rHum
-        let extra = await nextpmClient.readHoldingRegisters(102, 6)
-        if (extra?.data) {
-          result.fanSpeed = extra.data[0]
-          result.rHum = extra.data[4] / 100
-          result.temperature = extra.data[5] / 100
-        }
-        let status = await nextpmClient.readHoldingRegisters(18, 2)  // both even register numbers
-        if (status?.data) {
-          // status is static data (without cumulation)
-          result.status = status.data[1]
-        }
-
-        processRaspiNextpmRecord(result)
-        /*        .then(async function (data) {
-                  //var result = {}
-            
-                  // Next procedure is activated on 20240302
-                  // extract and calculate PN, PM and coarse values. Particles recalculated for 0.1L
-                  // extract number of particles
-                  result.fanSpeed = data.data[0]
-                  result.rHum = data.data[4]
-                  result.temperature = data.data[5]
-                  if (result.part1 == 0) {
-                    //logger.info('scd30 no data found')
-                  } else {
-                    //logger.info(result)
-                    processRaspiNextpmRecord(result)
-                  }
-                })
-                .catch(function (err) {
-                  logger.info('catch nextpmRead10')
-                  logger.info(err)
-                  processRaspiNextpmRecord(result)
-                })
-        */
-
-      }
+      // pn-values from new firmware (2024-09) 
+      result.pn1 = (data.data[1] * 65536 + data.data[0])
+      result.pn25 = (data.data[3] * 65536 + data.data[2])
+      result.pn10 = (data.data[5] * 65536 + data.data[4])
     })
     .catch(function (err) {
-      logger.info('catch nextpmRead10')
+      logger.info('catch nextpm part 2')
       logger.info(err)
+      return
     })
-  /* mag niet gelijk met vorige
-      nextpmClient.readHoldingRegisters(19, 2)
-      .then(async function (data) {
-        counters.nextpm.status = data.data[0]
-      })
-      .catch(function (err) {
-        logger.info('catch nextpmRead10 status')
-        logger.info(err)
-      })
-  */
-  /* 
- nextpmClient.writeRegister(0x11, [0x6E])   
-   .then(async function (data) {
-     logger.info('then nextpmRead10')
-     logger.info(data)
-     await sleepFunction(100)
-     nextpmClient.clientReady = true
-   })
-   .catch(function (err) {
-     logger.info('catch nextpmRead10')
-     logger.info(err)
-   })
-   */
+  await nextpmClient.readHoldingRegisters(100, 47) // second part data (new firmware 2024-09)
+    .then(async function (data) {
+
+      // Next procedure is activated on 20241009
+      // extract new registers 
+      result.fanRatio = data.data[0]
+      result.heaterRatio = data.data[1]
+      result.fanSpeed = data.data[2]
+      result.laserStatus = data.data[3]
+      result.rHumInt = data.data[6]
+      result.temperatureInt = data.data[7]
+      // new PN
+      result.pn02pn05 = (data.data[29] * 65536 + data.data[28])
+      result.pn05pn1 = (data.data[31] * 65536 + data.data[30])
+      result.pn1pn25 = (data.data[33] * 65536 + data.data[32])
+      result.pn25pn5 = (data.data[35] * 65536 + data.data[34])
+      result.pn5pn10 = (data.data[37] * 65536 + data.data[36])
+      result.temperatureExt = (data.data[45] * 100)
+      result.rHumExt = (data.data[46] * 100)
+    })
+    .catch(function (err) {
+      logger.info('catch nextpm part 3')
+      logger.info(err)
+      return
+    })
+
+  if (result.part1 == 0) {
+    //logger.info('nextpm no data found')
+  } else {
+
+    processRaspiNextpmRecord(result)
+
+  }
 }
+
+/* 
+nextpmClient.writeRegister(0x11, [0x6E])   
+ .then(async function (data) {
+   logger.info('then nextpmRead10')
+   logger.info(data)
+   await sleepFunction(100)
+   nextpmClient.clientReady = true
+ })
+ .catch(function (err) {
+   logger.info('catch nextpmRead10')
+   logger.info(err)
+ })
+ */
+
 
 /*
 const readScd30Device = function () {
@@ -3000,6 +3073,8 @@ var processRaspiNextpmRecord = function (result) {
   }
   counters.nextpm.nrOfMeas++;
   counters.nextpm.nrOfMeasTotal++;
+  counters.nextpm.firmwareVersion = result.firmwareVersion
+  counters.nextpm.status = result.status
   counters.nextpm.part1 += result.part1
   counters.nextpm.part25 += result.part25
   counters.nextpm.part10 += result.part10
@@ -3012,10 +3087,22 @@ var processRaspiNextpmRecord = function (result) {
   counters.nextpm.pm1c += result.pm1c
   counters.nextpm.pm25c += result.pm25c
   counters.nextpm.pm10c += result.pm10c
-  counters.nextpm.fanSpeed += result.fanSpeed
-  counters.nextpm.temperature += result.temperature
-  counters.nextpm.rHum += result.rHum
-  counters.nextpm.status = result.status // no cumulation for status
+
+  counters.nextpm.fanRatio = result.fanRatio
+  counters.nextpm.heaterRatio = result.heaterRatio
+  counters.nextpm.fanSpeed = result.fanSpeed
+  counters.nextpm.laserStatus = result.laserStatus
+  counters.nextpm.rHumInt += result.rHumInt
+  counters.nextpm.temperatureInt += result.temperatureInt
+  // new PN
+  counters.nextpm.pn02pn05 += result.pn02pn05
+  counters.nextpm.pn05pn1 += result.pn05pn1
+  counters.nextpm.pn1pn25 += result.pn1pn25
+  counters.nextpm.pn25pn5 += result.pn25pn5
+  counters.nextpm.pn5pn10 += result.pn5pn10
+  counters.nextpm.temperatureExt += result.temperatureExt
+  counters.nextpm.rHumExt += result.rHumExt
+
 }
 
 // ips7100

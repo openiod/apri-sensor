@@ -354,8 +354,21 @@ var nextpmAttributes = function (res) {
 		',' + 'pm1:' + res.pm1 + ',' + 'pm25:' + res.pm25 + ',' + 'pm10:' + res.pm10 +
 		',pn1c:' + res.pn1c + ',' + 'pn25c:' + res.pn25c + ',' + 'pn10c:' + res.pn10c +
 		',' + 'pm1c:' + res.pm1c + ',' + 'pm25c:' + res.pm25c + ',' + 'pm10c:' + res.pm10c +
-		',' + 'temperature:' + res.temperature + ',' + 'rHum:' + res.rHum + ',' + 'fanSpeed:' + res.fanSpeed + ',' + 'status:' + res.status
-
+		',' + 'firmwareVersion:' + res.firmwareVersion +
+		',' + 'status:' + res.status +
+		',' + 'fanRatio:' + res.fanRatio +
+		',' + 'heaterRatio:' + res.heaterRatio +
+		',' + 'fanSpeed:' + res.fanSpeed +
+		',' + 'laserStatus:' + res.laserStatus +
+		',' + 'rHumInt:' + res.rHumInt +
+		',' + 'temperatureInt:' + res.temperatureInt +
+		',' + 'pn02pn05:' + res.pn02pn05 +
+		',' + 'pn05pn1:' + res.pn05pn1 +
+		',' + 'pn1pn25:' + res.pn1pn25 +
+		',' + 'pn25pn5:' + res.pn25pn5 +
+		',' + 'pn5pn10:' + res.pn5pn10 +
+		',' + 'temperatureExt:' + res.temperatureExt +
+		',' + 'rHumExt:' + res.rHumExt 
 }
 var sgp41Attributes = function (res) {
 	return openiodUrl + '/sgp41' + '/v1/m?foi=' + res.foi + '&observation=' +

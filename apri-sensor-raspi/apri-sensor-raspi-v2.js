@@ -1337,37 +1337,39 @@ var processDataCycle = function () {
 
     // calculate pm25mlrM
     // MLRM = 0,8009644*PM2.5-0,1283819*T-0,313096*RH+27,7
-    if (latest.bmeTemperature) { // ???? is dit ook met de interne temperatuur/rHum te berekenen ??
-      if (latest.temperature == 0 && latest.rHum == 0) {
-        results.nextpm.pm25mlrM = null
-      } else {
-        results.nextpm.pm25mlrM = Math.round((27.7 + (0.8009644 * results.nextpm.pm25) + (-0.313096 * results.nextpm.rHum) + (-0.1283819 * results.nextpm.temperature)) * 100) / 100
-        if (results.nextpm.pm25mlrM > results.nextpm.pm25) {
-          results.nextpm.pm25mlrM = results.nextpm.pm25
-        } else {
-
-        }
-      }
-    } else {
+    //if (latest.bmeTemperature) { // ???? is dit ook met de interne temperatuur/rHum te berekenen ??
+    //  if (latest.temperature == 0 && latest.rHum == 0) {
+    if (results.nextpm.temperatureInt && results.nextpm.temperatureInt == 0 && results.nextpm.rHumInt == 0) {
       results.nextpm.pm25mlrM = null
+    } else {
+      results.nextpm.pm25mlrM = Math.round((27.7 + (0.8009644 * results.nextpm.pm25) + (-0.313096 * results.nextpm.rHumInt) + (-0.1283819 * results.nextpm.temperatureInt)) * 100) / 100
+      //        if (results.nextpm.pm25mlrM > results.nextpm.pm25) {
+      //          results.nextpm.pm25mlrM = results.nextpm.pm25
+      //        } else {
+      //
+      //        }
     }
+    //    } else {
+    //      results.nextpm.pm25mlrM = null
+    //    }
 
     // calculate pm25mlrN
     //BAM1020_predicted (in µg/m3)  = 0,3354533*PN1 -1,156439*PN25 + 0,822436*PN10 + 0,4153694*T -0,1185348*RH +6.8
-    if (latest.bmeTemperature) {  // ???? is dit ook met de interne temperatuur/rHum te berekenen ??
-      if (latest.temperature == 0 && latest.rHum == 0) {
-        results.nextpm.pm25mlrN = null
-      } else {
-        results.nextpm.pm25mlrN = Math.round((6.8 + (0.3354533 * results.nextpm.part1) + (-1.156439 * results.nextpm.part25) + (0.822436 * results.nextpm.part10) + (-0.1185348 * results.nextpm.rHumInt) + (0.4153694 * results.nextpm.temperatureInt)) * 100) / 100
-        //if (results.nextpm.pm25mlrN > results.nextpm.pm25CF1) {
-        //  results.nextpm.pm25mlrN = results.nextpm.pm25CF1
-        //} else {
-        //
-        //      }
-      }
-    } else {
+    //if (latest.bmeTemperature) {  // ???? is dit ook met de interne temperatuur/rHum te berekenen ??
+    //  if (latest.temperature == 0 && latest.rHum == 0) {
+    if (results.nextpm.temperatureInt && results.nextpm.temperatureInt == 0 && results.nextpm.rHumInt == 0) {
       results.nextpm.pm25mlrN = null
+    } else {
+      results.nextpm.pm25mlrN = Math.round((6.8 + (0.3354533 * results.nextpm.part1) + (-1.156439 * results.nextpm.part25) + (0.822436 * results.nextpm.part10) + (-0.1185348 * results.nextpm.rHumInt) + (0.4153694 * results.nextpm.temperatureInt)) * 100) / 100
+      //if (results.nextpm.pm25mlrN > results.nextpm.pm25CF1) {
+      //  results.nextpm.pm25mlrN = results.nextpm.pm25CF1
+      //} else {
+      //
+      //      }
     }
+    //} else {
+    //  results.nextpm.pm25mlrN = null
+    //}
 
     results.nextpm.nrOfMeas = counters.nextpm.nrOfMeas;
   }
@@ -2230,10 +2232,10 @@ var sendData = async function () {
       , 'rHumExt': results.nextpm.rHumExt
     }
 
-//    if (results.nextpm.temperature) nextpmRec.temperature = results.nextpm.temperature
-//    if (results.nextpm.rHum) nextpmRec.rHum = results.nextpm.rHum
-//    if (results.nextpm.fanSpeed) nextpmRec.fanSpeed = results.nextpm.fanSpeed
-//    if (results.nextpm.status) nextpmRec.status = results.nextpm.status
+    //    if (results.nextpm.temperature) nextpmRec.temperature = results.nextpm.temperature
+    //    if (results.nextpm.rHum) nextpmRec.rHum = results.nextpm.rHum
+    //    if (results.nextpm.fanSpeed) nextpmRec.fanSpeed = results.nextpm.fanSpeed
+    //    if (results.nextpm.status) nextpmRec.status = results.nextpm.status
 
     await redisClient.HSET(timeStamp.toISOString() + ':' + sensorType, nextpmRec)
       .then(function (res) {
@@ -2916,7 +2918,7 @@ const nextpmWriteToRead10 = function () {
 const nextpmRead10 = async function () {
   //logger.info('nextpmRead10')
   var result = {}
-  await nextpmClient.readHoldingRegisters(1, 19) // firmware version and status
+  await nextpmClient.readHoldingRegisters(1, 20) // firmware version and status
     .then(async function (data) {
 
       // Next procedure is activated on 20241009
@@ -2967,7 +2969,7 @@ const nextpmRead10 = async function () {
       logger.info(err)
       return
     })
-  await nextpmClient.readHoldingRegisters(100, 47) // second part data (new firmware 2024-09)
+  await nextpmClient.readHoldingRegisters(100, 48) // second part data (new firmware 2024-09)
     .then(async function (data) {
 
       // Next procedure is activated on 20241009

@@ -2974,20 +2974,20 @@ const nextpmRead10 = async function () {
 
       // Next procedure is activated on 20241009
       // extract new registers 
-      result.fanRatio = data.data[0]
-      result.heaterRatio = data.data[1]
+      result.fanRatio = (data.data[0]) / 100
+      result.heaterRatio = (data.data[1]) / 100
       result.fanSpeed = data.data[2]
       result.laserStatus = data.data[3]
-      result.rHumInt = data.data[6]
-      result.temperatureInt = data.data[7]
+      result.rHumInt = (data.data[6]) / 100
+      result.temperatureInt = (data.data[7]) / 100
       // new PN
-      result.pn02pn05 = (data.data[29] * 65536 + data.data[28])
-      result.pn05pn1 = (data.data[31] * 65536 + data.data[30])
-      result.pn1pn25 = (data.data[33] * 65536 + data.data[32])
-      result.pn25pn5 = (data.data[35] * 65536 + data.data[34])
-      result.pn5pn10 = (data.data[37] * 65536 + data.data[36])
-      result.temperatureExt = (data.data[45] * 100)
-      result.rHumExt = (data.data[46] * 100)
+      result.pn02pn05 = (data.data[29] * 65536 + data.data[28]) / 10
+      result.pn05pn1 = (data.data[31] * 65536 + data.data[30]) / 10
+      result.pn1pn25 = (data.data[33] * 65536 + data.data[32]) / 10
+      result.pn25pn5 = (data.data[35] * 65536 + data.data[34]) / 10
+      result.pn5pn10 = (data.data[37] * 65536 + data.data[36]) / 10
+      result.temperatureExt = (data.data[45] / 100)
+      result.rHumExt = (data.data[46] / 100)
     })
     .catch(function (err) {
       logger.info('catch nextpm part 3')

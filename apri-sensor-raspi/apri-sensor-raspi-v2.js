@@ -63,6 +63,7 @@ const exec = require('child_process').exec;
 const execFile = require('child_process').execFile;
 const BME280 = require('./BME280.js');
 
+
 var logConfiguration = {}
 var winston
 var logger = {
@@ -240,6 +241,12 @@ var bme680SeaLevelPressure = 1013.25; // default
 var bme280AltitudeCorrection = -359.4
 var bme680AltitudeCorrection = -359.4
 
+let bmePrev = {
+  pressure: 0,
+  rHum: 0,
+  temperature: 0,
+  count: 0
+}
 
 var Bme680
 var bme680
@@ -910,15 +917,38 @@ const readSensorDataBme280 = () => {
       //data.pressure_inHg = BME280.convertHectopascalToInchesOfMercury(data.pressure_hPa);
 
       if (counters.busy == false) {
-        if (data.pressure_hPa < 700) {  // bme280 slaat soms op tilt en geeft op I2C protocol dan x80x00x00x80x00x00 --> pressure 669.63 rHum 69.93 T 23.6
-          logger.info('BME280 pressure below 700 (669.3?). Less than 3.3V power? Measure skipped');
+        //       if (data.pressure_hPa < 700) {  // bme280 slaat soms op tilt en geeft op I2C protocol dan x80x00x00x80x00x00 --> 
+        //         // pressure 669.63 rHum 69.93 T 23.6 ander voorbeeld: p:746.92 rHum:84.32 T23.14
+        //         logger.info('BME280 pressure below 700 (669.3?). Less than 3.3V power? Measure skipped');
+
+
+        //       } else {
+        if (
+          //bmePrev.temperature == data.temperature_C &&
+          //bmePrev.rHum == data.humidity &&
+          //bmePrev.pressure == data.pressure_hPa &&
+          (bmePrev.pressure - data.pressure_hPa) > 100  // drop in hPa too much, may be reset the sensor  
+        ) {
+          bmePrev.count++
         } else {
-          counters.bme280.nrOfMeas++;
-          counters.bme280.nrOfMeasTotal++;
-          counters.bme280.temperature += data.temperature_C;
-          counters.bme280.pressure += data.pressure_hPa;
-          counters.bme280.rHum += data.humidity;
+          if (
+            bmePrev.temperature == data.temperature_C &&
+            bmePrev.rHum == data.humidity &&
+            bmePrev.pressure == data.pressure_hPa) {
+            // do nothing, skip measurement
+          } else {
+            bmePrev.count = 1
+            bmePrev.temperature = data.temperature_C
+            bmePrev.rHum = data.humidity
+            bmePrev.pressure = data.pressure_hPa
+            counters.bme280.nrOfMeas++;
+            counters.bme280.nrOfMeasTotal++;
+            counters.bme280.temperature += data.temperature_C;
+            counters.bme280.pressure += data.pressure_hPa;
+            counters.bme280.rHum += data.humidity;
+          }
           //logger.info(' ' + data.temperature_C+ ' ' + data.pressure_hPa + ' ' + data.humidity + ' ' + counters.bme280.nrOfMeas);
+          //}
         }
       } else {
         logger.info('Raspi-i2c processing is busy, measurement BME280 skipped');

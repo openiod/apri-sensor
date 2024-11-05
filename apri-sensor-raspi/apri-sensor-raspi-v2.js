@@ -2927,8 +2927,26 @@ const readScd30Measurement = function () {
 var nextpmFunctions = async function () {
   nextpmClient.setID(0x01)
   await sleepFunction(100)
+  nextpmHeaterOff()
+  await sleepFunction(100)
 
   //await nextpmRead10()
+}
+
+const nextpmHeaterOff = async function() {
+ // 0x81 0x41 0x3E
+  logger.info('nextpm heater off')
+  nextpmClient.writeRegisters(101, [0x00,0x00]) // heater off = 0
+    .then(async function (data) {
+      logger.info('then nextHeaterOff')
+      logger.info(data)
+      await sleepFunction(100)
+      nextpmClient.clientReady = true
+    })
+    .catch(function (err) {
+      logger.info('catch nextHeaterOff')
+      logger.info(err)
+    })
 }
 
 const nextpmWriteToRead10 = function () {

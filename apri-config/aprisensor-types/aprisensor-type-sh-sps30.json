@@ -1,0 +1,12 @@
+{ 
+  "devices":
+  [
+    {"name": "SPS30"
+      ,"id":"sps30"
+      ,"device":"0x69"
+      ,"installed":"Y"
+      ,"protocol":"I2C"
+      ,"deviceType":"sps30"
+    }
+  ]
+}

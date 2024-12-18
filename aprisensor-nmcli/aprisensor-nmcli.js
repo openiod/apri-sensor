@@ -104,29 +104,31 @@ catch (err) {
 }
 
 const setWifiButtonStatus = async function (value) {
-  if (aprisensorDevices['connectButton']?.connectWhen == "on") {
-    if (value == 1) {
-      wifiButtonStatus = 'on'
-      console.log("Wifi connect button on")
-      await execPromise("LC_ALL=C nmcli radio wifi on ")
-        .then((result) => {
-          console.log('Wifi service started')
-          wifiStatus = 'on'
-        })
-        .catch((error) => {
-          console.log('catch start WiFi service', error)
-        })
-    } else {
-      wifiButtonStatus = 'off'
-      console.log("Wifi connect button off")
-      await execPromise("LC_ALL=C nmcli radio wifi off ")
-        .then((result) => {
-          console.log('Wifi service stopped')
-          wifiStatus = 'off'
-        })
-        .catch((error) => {
-          console.log('catch stop WiFi service', error)
-        })
+  if (aprisensorDevices) {
+    if (aprisensorDevices['connectButton'].connectWhen == "on") {
+      if (value == 1) {
+        wifiButtonStatus = 'on'
+        console.log("Wifi connect button on")
+        await execPromise("LC_ALL=C nmcli radio wifi on ")
+          .then((result) => {
+            console.log('Wifi service started')
+            wifiStatus = 'on'
+          })
+          .catch((error) => {
+            console.log('catch start WiFi service', error)
+          })
+      } else {
+        wifiButtonStatus = 'off'
+        console.log("Wifi connect button off")
+        await execPromise("LC_ALL=C nmcli radio wifi off ")
+          .then((result) => {
+            console.log('Wifi service stopped')
+            wifiStatus = 'off'
+          })
+          .catch((error) => {
+            console.log('catch stop WiFi service', error)
+          })
+      }
     }
   }
 }
@@ -1824,10 +1826,12 @@ const nginxCheck = function () {
 const statusCheck = async function () {
 
   // off only when device connect button and on.
-  if (aprisensorDevices['connectButton']?.connectWhen == "on") {
-    if (wifiStatus == 'off') {
-      setGpioBlueLedOff()
-      return
+  if (aprisensorDevices) {
+    if (aprisensorDevices['connectButton'].connectWhen == "on") {
+      if (wifiStatus == 'off') {
+        setGpioBlueLedOff()
+        return
+      }
     }
   }
 

@@ -104,7 +104,7 @@ catch (err) {
 }
 
 const setWifiButtonStatus = async function (value) {
-    if (aprisensorDevices?connectButton?.connectWhen == "on") {
+    if (aprisensorDevices?.connectButton?.connectWhen == 'on') {
       if (value == 1) {
         wifiButtonStatus = 'on'
         //console.log("Wifi connect button on")

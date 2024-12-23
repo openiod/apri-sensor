@@ -104,14 +104,13 @@ catch (err) {
 }
 
 const setWifiButtonStatus = async function (value) {
-  if (aprisensorDevices) {
-    if (aprisensorDevices['connectButton'].connectWhen == "on") {
+    if (aprisensorDevices?connectButton?.connectWhen == "on") {
       if (value == 1) {
         wifiButtonStatus = 'on'
-        console.log("Wifi connect button on")
+        //console.log("Wifi connect button on")
         await execPromise("LC_ALL=C nmcli radio wifi on ")
           .then((result) => {
-            console.log('Wifi service started')
+            //console.log('Wifi service started')
             wifiStatus = 'on'
           })
           .catch((error) => {
@@ -119,10 +118,10 @@ const setWifiButtonStatus = async function (value) {
           })
       } else {
         wifiButtonStatus = 'off'
-        console.log("Wifi connect button off")
+        //console.log("Wifi connect button off")
         await execPromise("LC_ALL=C nmcli radio wifi off ")
           .then((result) => {
-            console.log('Wifi service stopped')
+            //console.log('Wifi service stopped')
             wifiStatus = 'off'
           })
           .catch((error) => {
@@ -130,7 +129,6 @@ const setWifiButtonStatus = async function (value) {
           })
       }
     }
-  }
 }
 if (gpio) {
   gpioBlueLed = new gpio(19, 'out'); //use GPIO-19 pin 35, and specify that it is output
@@ -1826,12 +1824,10 @@ const nginxCheck = function () {
 const statusCheck = async function () {
 
   // off only when device connect button and on.
-  if (aprisensorDevices) {
-    if (aprisensorDevices['connectButton'].connectWhen == "on") {
-      if (wifiStatus == 'off') {
-        setGpioBlueLedOff()
-        return
-      }
+  if (aprisensorDevices?.connectButton?.connectWhen == "on") {
+    if (wifiStatus == 'off') {
+      setGpioBlueLedOff()
+      return
     }
   }
 

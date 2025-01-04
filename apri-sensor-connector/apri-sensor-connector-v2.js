@@ -166,7 +166,7 @@ var getRedisData = function (redisArray, redisArrayIndex) {
 	//redisHgetallAsync(_redisKey)
 	redisClient.HGETALL(_redisKey)
 		.then(function (res) {
-			if (!res || !res.foi) {
+			if (!res || !res.foi || res.foi == undefined || res.foi == "undefined") {
 				redisClient.DEL(_redisKey)
 					.then(function (res) {
 						log('key deleted ' + _redisKey + ' ' + res);

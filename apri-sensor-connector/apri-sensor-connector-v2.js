@@ -258,10 +258,7 @@ var pmsa003Attributes = function (res) {
 		',raw2_5:' + res.raw2_5 + ',raw5_0:' + res.raw5_0 + ',raw10_0:' + res.raw10_0 +
 		',pn1c:' + res.pn1c + ',' + 'pn25c:' + res.pn25c + ',' + 'pn10c:' + res.pn10c
 	if (res.pm25mlrM != undefined) {
-		rec += ',' + 'pm25mlrM:' + res.pm25mlrM + ',' + 'temperature:' + res.temperature + ',' + 'rHum:' + res.rHum
-	}
-	if (res.pm25mlrN != undefined) {
-		rec += ',' + 'pm25mlrN:' + res.pm25mlrN + ',' + 'temperature:' + res.temperature + ',' + 'rHum:' + res.rHum
+		rec += ',' + 'pm25mlrM:' + res.pm25mlrM + ',' + 'pm25mlrN:' + res.pm25mlrN + ',' + 'temperature:' + res.temperature + ',' + 'rHum:' + res.rHum
 	}
 
 	return rec
@@ -275,10 +272,7 @@ var pms7003Attributes = function (res) {
 		',pn1c:' + res.pn1c + ',' + 'pn25c:' + res.pn25c + ',' + 'pn10c:' + res.pn10c
 
 	if (res.pm25mlrM != undefined) {
-		rec += ',' + 'pm25mlrM:' + res.pm25mlrM + ',' + 'temperature:' + res.temperature + ',' + 'rHum:' + res.rHum
-	}
-	if (res.pm25mlrN != undefined) {
-		rec += ',' + 'pm25mlrN:' + res.pm25mlrN + ',' + 'temperature:' + res.temperature + ',' + 'rHum:' + res.rHum
+		rec += ',' + 'pm25mlrM:' + res.pm25mlrM + ',' + 'pm25mlrN:' + res.pm25mlrN + ',' + 'temperature:' + res.temperature + ',' + 'rHum:' + res.rHum
 	}
 
 	return rec

@@ -104,31 +104,31 @@ catch (err) {
 }
 
 const setWifiButtonStatus = async function (value) {
-    if (aprisensorDevices?.connectButton?.connectWhen == 'on') {
-      if (value == 1) {
-        wifiButtonStatus = 'on'
-        //console.log("Wifi connect button on")
-        await execPromise("LC_ALL=C nmcli radio wifi on ")
-          .then((result) => {
-            //console.log('Wifi service started')
-            wifiStatus = 'on'
-          })
-          .catch((error) => {
-            console.log('catch start WiFi service', error)
-          })
-      } else {
-        wifiButtonStatus = 'off'
-        //console.log("Wifi connect button off")
-        await execPromise("LC_ALL=C nmcli radio wifi off ")
-          .then((result) => {
-            //console.log('Wifi service stopped')
-            wifiStatus = 'off'
-          })
-          .catch((error) => {
-            console.log('catch stop WiFi service', error)
-          })
-      }
+  if (aprisensorDevices?.connectButton?.connectWhen == 'on') {
+    if (value == 1) {
+      wifiButtonStatus = 'on'
+      //console.log("Wifi connect button on")
+      await execPromise("LC_ALL=C nmcli radio wifi on ")
+        .then((result) => {
+          //console.log('Wifi service started')
+          wifiStatus = 'on'
+        })
+        .catch((error) => {
+          console.log('catch start WiFi service', error)
+        })
+    } else {
+      wifiButtonStatus = 'off'
+      //console.log("Wifi connect button off")
+      await execPromise("LC_ALL=C nmcli radio wifi off ")
+        .then((result) => {
+          //console.log('Wifi service stopped')
+          wifiStatus = 'off'
+        })
+        .catch((error) => {
+          console.log('catch stop WiFi service', error)
+        })
     }
+  }
 }
 if (gpio) {
   gpioBlueLed = new gpio(19, 'out'); //use GPIO-19 pin 35, and specify that it is output
@@ -914,6 +914,7 @@ const postApConnect = async (url, req, res) => {
     if (result.passwd.substr(0, 3) == 'SCP') {
       passwd = result.passwd.substr(3)
     }
+    let passphrase
     console.log('connection down')
     await execPromise("LC_ALL=C nmcli connection down '" + ssid + "'")
       .then((result) => { console.log('then connection down') })
@@ -922,10 +923,25 @@ const postApConnect = async (url, req, res) => {
     await execPromise("LC_ALL=C nmcli connection delete '" + ssid + "'")
       .then((result) => { console.log('then connection delete') })
       .catch((error) => { console.log('catch connection delete') })
-    //console.log('connection create')
-    await execPromise("LC_ALL=C wpa_passphrase '" + ssid + "' '" + passwd  + "'")
-      .then((result) => { console.log('then wpa_passphrase', result) })
-      .catch((error) => { console.log('catch wpa_passphrase', error ) })
+    // get passphrase
+    await execPromise("LC_ALL=C wpa_passphrase '" + ssid + "' '" + passwd + "'")
+      .then((result) => {
+        try {
+          let stdout = result.stdout
+          let t1 = stdout.split('\n')
+          let t2 = t1[3].split('=')
+          passphrase = t2[1]
+        } catch (error) {
+          console.log('error passphrase', error)
+        }
+      })
+      .catch((error) => { console.log('catch wpa_passphrase', error) })
+    if (!passphrase) {
+      res.writeHead(200);
+      res.write('error while creating passphrase');
+      res.end(`The accesspoint is not connected to the device`);
+      return
+    }
     console.log('connection create')
     //    var createCommand= "LC_ALL=C nmcli connection  type wifi ifname '"+unit.ifname+"' con-name '"+ssid+"' autoconnect yes  \
     //ipv4.method shared 802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk '"+passwd+"' \

@@ -937,9 +937,10 @@ const postApConnect = async (url, req, res) => {
       })
       .catch((error) => { console.log('catch wpa_passphrase', error) })
     if (!passphrase) {
-      res.writeHead(200);
-      res.write('error while creating passphrase');
-      res.end(`The accesspoint is not connected to the device`);
+      res.writeHead(400);
+      let msgBody = { error: 400, message: 'error while creating passphrase' }
+      res.write(JSON.stringify(msgBody));
+      res.end()
       return
     }
     console.log('connection create')
@@ -949,8 +950,8 @@ const postApConnect = async (url, req, res) => {
     //ipv4.method shared ipv6.method shared \
     var createCommand = "LC_ALL=C nmcli connection add type wifi ifname '" + unit.ifname + "' con-name '" + ssid + "' autoconnect yes  \
       ssid '"+ ssid + "' 802-11-wireless.powersave 2 \
-      802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk '"+ passwd + "' \
-      wifi-sec.key-mgmt wpa-psk wifi-sec.psk '"+ passwd + "' "
+      802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk '"+ passphrase + "' \
+      wifi-sec.key-mgmt wpa-psk wifi-sec.psk '"+ passphrase + "' "
     //console.log(createCommand)
     execPromise(createCommand)
       .then((result) => {

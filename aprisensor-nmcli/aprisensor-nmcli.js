@@ -922,6 +922,10 @@ const postApConnect = async (url, req, res) => {
     await execPromise("LC_ALL=C nmcli connection delete '" + ssid + "'")
       .then((result) => { console.log('then connection delete') })
       .catch((error) => { console.log('catch connection delete') })
+    //console.log('connection create')
+    await execPromise("LC_ALL=C wpa_passphrase '" + ssid + "' '" + passwd  + "'")
+      .then((result) => { console.log('then wpa_passphrase', result) })
+      .catch((error) => { console.log('catch wpa_passphrase', error ) })
     console.log('connection create')
     //    var createCommand= "LC_ALL=C nmcli connection  type wifi ifname '"+unit.ifname+"' con-name '"+ssid+"' autoconnect yes  \
     //ipv4.method shared 802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk '"+passwd+"' \

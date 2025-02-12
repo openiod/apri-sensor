@@ -1844,6 +1844,19 @@ const nginxCheck = function () {
 
 const statusCheck = async function () {
 
+  // internet connected also when ethernet cable connected and not wifi configured
+  // try ping to test if connection to internet is active
+  await execPromise("LC_ALL=C ping -q -w 1 -c 1 8.8.8.8 > /dev/null")
+    .then((result) => {
+      console.log('ping ok, unit connected')
+
+      // blink three times showing process is active and gateway OK
+      blinkLed(8)
+      return
+    }).catch((error) => {
+      // not connected to internet
+    })
+
   // off only when device connect button and on.
   if (aprisensorDevices?.connectButton?.connectWhen == "on") {
     if (wifiStatus == 'off') {

@@ -1858,7 +1858,7 @@ const statusCheck = async function () {
       if (stdoutArray[2] == '100') {
         eth0Ok = true
         // blink 3 times showing process is active for eth0
-        blinkLed(3)
+        blinkLed(7)
         //console.log('eth0 connected')
         await hotspotDelete()
           .then(async (result) => {

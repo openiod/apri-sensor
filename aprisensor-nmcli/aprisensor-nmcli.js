@@ -1021,7 +1021,7 @@ const hotspotDown = function () {
 }
 const hotspotDelete = function () {
   // delete hotspot
-  console.log(`delete hotspot`)
+  //console.log(`delete hotspot`)
   return execPromise("LC_ALL=C nmcli connection delete '" + unit.ssid + "'")
 }
 
@@ -1744,6 +1744,11 @@ const getActiveConnection = function () {
   //  var result = await execPromise('LC_ALL=C nmcli c show --active ')
   return execPromise('LC_ALL=C nmcli d show ' + unit.ifname + ' |grep GENERAL.CONNECTION')
 }
+const getActiveConnectionEth0 = function () {
+  //  var result = await execPromise('LC_ALL=C nmcli c show --active ')
+  return execPromise('LC_ALL=C nmcli d show eth0 | grep GENERAL.STATE | grep 100')
+}
+
 
 const initiateConnectionOrHotspot = function () {
   console.log('initiateConnectionOrHotspot')
@@ -1844,18 +1849,37 @@ const nginxCheck = function () {
 
 const statusCheck = async function () {
 
-  // internet connected also when ethernet cable connected and not wifi configured
-  // try ping to test if connection to internet is active
-  await execPromise("LC_ALL=C ping -q -w 1 -c 1 8.8.8.8 > /dev/null")
-    .then((result) => {
-      console.log('ping ok, unit connected')
-
-      // blink three times showing process is active and gateway OK
-      blinkLed(8)
-      return
-    }).catch((error) => {
-      // not connected to internet
+  // internet connected via eth0 ? (wired) 
+  let eth0Ok = false
+  await getActiveConnectionEth0()
+    .then((result) async => {
+      //console.log("getActiveConnectionEth0 then")
+      var stdoutArray = result.stdout.split(/(\s+)/);
+      if (stdoutArray[2] == '100') {
+        eth0Ok = true
+        // blink 3 times showing process is active for eth0
+        blinkLed(3)
+        //console.log('eth0 connected')
+        await hotspotDelete()
+          .then(async (result) => {
+            //              console.log("hotspot delete then")
+            return
+          })
+          .catch(async (error) => {
+            //              console.log("hotspot delete catch")
+            return
+          })
+        return
+      }
     })
+    .catch((error) => {
+      //console.log("getActiveConnectionEth0 catch")
+    })
+
+  if (eth0Ok == true) {
+    console.log('eth0 ok, break')
+    return
+  }
 
   // off only when device connect button and on.
   if (aprisensorDevices?.connectButton?.connectWhen == "on") {

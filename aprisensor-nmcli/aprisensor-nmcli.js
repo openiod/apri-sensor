@@ -1852,7 +1852,7 @@ const statusCheck = async function () {
   // internet connected via eth0 ? (wired) 
   let eth0Ok = false
   await getActiveConnectionEth0()
-    .then((result) async => {
+    .then(async (result) => {
       //console.log("getActiveConnectionEth0 then")
       var stdoutArray = result.stdout.split(/(\s+)/);
       if (stdoutArray[2] == '100') {

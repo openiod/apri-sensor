@@ -1877,7 +1877,7 @@ const statusCheck = async function () {
     })
 
   if (eth0Ok == true) {
-    console.log('eth0 ok, break')
+    //console.log('eth0 ok, break')
     return
   }
 

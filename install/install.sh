@@ -4,8 +4,10 @@ Pi3 image te doen:
 - crontab --> > /dev/null 2>&1  (...redis.sh)
 - crontab :
 # schakel wifi uit indien op lan aangesloten
+# dit werkt niet, in ieder geval niet voor de Pi zero
 @reboot sleep 10; ifconfig wlan0 down
-
+# een rfkill block wifi / rfkill unblock wifi werkt wel maar daar moet nog iets automatisch voor bedacht worden
+# pas op! na block blijft ook block na reboot!!!
 
 # 2.5.0 
 # redis indexing nog niet in gebruik maar als voorbereiding op.
@@ -189,6 +191,8 @@ sudo rm  /var/hdd.log/*
 #sudo mkdir /var/log/redis /var/hdd.log/redis
 #sudo chown -R redis:redis /var/log/redis /var/hdd.log/redis
 #sudo systemctl start SCAPE604-aprisensor-nmcli
+sudo systemctl stop sshd
+sudo systemctl disable sshd
 sudo nmcli c s
 sudo nmcli c delete <hier alles wat nog aanwezig is behalve connected router>
 sudo nmcli c delete ap-24 ; sudo shutdown -h now
@@ -525,6 +529,7 @@ sudo systemctl enable SCAPE604-apri-sensor-raspi.service
 # for o.a. ATMega gekoppeld aan Pi3 (PMSA003/BME280) werkt via raspi!!
 
 # when installed via eth0 this file will block nmcli from connecting to wifi
+# !!!! werkt niet
 rm /etc/wpa_supplicant/wpa_supplicant.conf
 cp /opt/SCAPE604/git/apri-sensor/install/interfaces.org /etc/network/interfaces
 

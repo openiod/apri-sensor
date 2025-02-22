@@ -130,13 +130,57 @@ const setWifiButtonStatus = async function (value) {
     }
   }
 }
+
+let gpioNumbers = {}
+var getGpioInfo = async function () {
+  await execPromise("LC_ALL=C cat /sys/kernel/debug/gpio | grep '(GPIO' ")  // for internal gpio numbers
+    .then((result) => {
+      let tmp1 = result.stdout.split('\n')
+      for (let i = 0; i < tmp1.lenght; i++) {
+        let tmp2 = tmp1[i].split(' ')
+        if (tmp2.length > 3) {
+          let key = tmp2[2].substring(1) // '(GPIO##' -> 'GPIO##'
+          let value = Number(tmp2[1].split('-')[1])
+          gpioNumbers[key] = value
+        }
+      }
+      //console.log(result, gpioNumbers)
+    })
+    .catch((error) => {
+      console.log('catch GPIO info', error)
+    })
+
+};
+getGpioInfo()
+
+
+/**
+ * cat /sys/kernel/debug/gpio for io-nr's per gpio
+ *  dependend of OS-version:
+ * gpio19 = 531
+ * gpio23 = 535
+ * gpio24 = 536
+ * gpio25 = 537
+ * gpio26 = 538
+ * gpio27 = 539
+ *  
+ **/
+
 if (gpio) {
-  gpioBlueLed = new gpio(19, 'out'); //use GPIO-19 pin 35, and specify that it is output
-  gpioWifiButton = new gpio(23, 'in', 'both', { debounceTimeout: 200 }); //use GPIO-23 pin 16, and specify that it is input
-  //gpioGpsLed = new gpio(24, 'out'); //use GPIO-24 pin 18, and specify that it is output
-  //gpioDs18b20 = new gpio(25, 'out'); //use GPIO-25 pin 22, and specify that it is output
-  //gpioFan = new gpio(26, 'out'); //use GPIO-26 pin 37, and specify that it is output
-  //gpioBme = new gpio(27, 'out'); //use GPIO-27 pin 13, and specify that it is output
+  /* oud:
+    gpioBlueLed = new gpio(19, 'out'); //use GPIO-19 pin 35, and specify that it is output
+    gpioWifiButton = new gpio(23, 'in', 'both', { debounceTimeout: 200 }); //use GPIO-23 pin 16, and specify that it is input
+    //gpioGpsLed = new gpio(24, 'out'); //use GPIO-24 pin 18, and specify that it is output
+    //gpioDs18b20 = new gpio(25, 'out'); //use GPIO-25 pin 22, and specify that it is output
+    //gpioFan = new gpio(26, 'out'); //use GPIO-26 pin 37, and specify that it is output
+    //gpioBme = new gpio(27, 'out'); //use GPIO-27 pin 13, and specify that it is output
+  */
+  gpioBlueLed = new gpio(gpioNumbers.GPIO19, 'out'); //use GPIO-19 pin 35, and specify that it is output
+  gpioWifiButton = new gpio(gpioNumbers.GPIO23, 'in'); //use GPIO-23 pin 16, and specify that it is input
+  //  gpioGpsLed = new gpio(536, 'out'); //use GPIO-24 pin 18, and specify that it is output
+  //  gpioDs18b20 = new gpio(537, 'out'); //use GPIO-25 pin 22, and specify that it is output
+  //  //gpioFan = new gpio(538, 'out'); //use GPIO-26 pin 37, and specify that it is output
+  //  gpioBme = new gpio(539, 'out'); //use GPIO-27 pin 13, and specify that it is output
   gpioWifiButton.read()
     .then(value => {
       setWifiButtonStatus(value)

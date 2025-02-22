@@ -61,6 +61,8 @@ const Serial = require('raspi-serial').Serial;
 //var io	 										= require('socket.io-client');
 const exec = require('child_process').exec;
 const execFile = require('child_process').execFile;
+const util = require('util');
+const execPromise = util.promisify(require('child_process').exec);
 const BME280 = require('./BME280.js');
 
 
@@ -224,13 +226,49 @@ try {
 catch (err) {
   logger.info('GPIO module onoff not installed');
 }
+
+let gpioNumbers = {}
+var getGpioInfo = async function () {
+  await execPromise("LC_ALL=C cat /sys/kernel/debug/gpio | grep '(GPIO' ")  // for internal gpio numbers
+    .then((result) => {
+      let tmp1 = result.stdout.split('\n')
+      for (let i = 0; i < tmp1.lenght; i++) {
+        let tmp2 = tmp1[i].split(' ')
+        if (tmp2.length > 3) {
+          let key = tmp2[2].substring(1) // '(GPIO##' -> 'GPIO##'
+          let value = Number(tmp2[1].split('-')[1])
+          gpioNumbers[key] = value
+        }
+      }
+      //console.log(result, gpioNumbers)
+    })
+    .catch((error) => {
+      console.log('catch GPIO info', error)
+    })
+
+};
+getGpioInfo()
+
+
+/**
+ * cat /sys/kernel/debug/gpio for io-nr's per gpio
+ * dependend of OS-version:
+ * gpio19 = 531
+ * gpio23 = 535
+ * gpio24 = 536
+ * gpio25 = 537
+ * gpio26 = 538
+ * gpio27 = 539
+ *  
+ **/
+
 if (gpio != undefined) {
-  //gpioBlueLed = new gpio(19, 'out'); //use GPIO-19 pin 35, and specify that it is output
-  //gpioWifiSwitch = new gpio(23, 'in'); //use GPIO-23 pin 16, and specify that it is input
-  gpioGpsLed = new gpio(24, 'out'); //use GPIO-24 pin 18, and specify that it is output
-  gpioDs18b20 = new gpio(25, 'out'); //use GPIO-25 pin 22, and specify that it is output
-  //gpioFan = new gpio(26, 'out'); //use GPIO-26 pin 37, and specify that it is output
-  gpioBme = new gpio(27, 'out'); //use GPIO-27 pin 13, and specify that it is output
+  //gpioBlueLed = new gpio(531, 'out'); //use GPIO-19 pin 35, and specify that it is output
+  //gpioWifiSwitch = new gpio(535, 'in'); //use GPIO-23 pin 16, and specify that it is input
+  gpioGpsLed = new gpio(gpioNumbers.GPIO24, 'out'); //use GPIO-24 pin 18, and specify that it is output
+  gpioDs18b20 = new gpio(gpioNumbers.GPIO25, 'out'); //use GPIO-25 pin 22, and specify that it is output
+  //gpioFan = new gpio(538, 'out'); //use GPIO-26 pin 37, and specify that it is output
+  gpioBme = new gpio(539, 'out'); //use GPIO-27 pin 13, and specify that it is output
 }
 
 var bmeInitCounter = 0
@@ -1176,8 +1214,9 @@ var processDataCycle = function () {
         results.pms.pm25mlrM = Math.round((14.8 + (0.3834 * results.pms.pm25CF1) + (-0.1498 * results.pms.rHum) + (-0.1905 * results.pms.temperature)) * 100) / 100
         if (results.pms.pm25mlrM > results.pms.pm25CF1) {
           results.pms.pm25mlrM = results.pms.pm25CF1
-        } else {
-
+        }
+        if (results.pms.pm25mlrM < 0) {
+          results.pms.pm25mlrM = 0
         }
       }
     } else {
@@ -2435,7 +2474,6 @@ var sendData = async function () {
 
 };
 
-
 var getCpuInfo = function () {
   //hostname --all-ip-address
   exec("cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2", (error, stdout, stderr) => {
@@ -2460,7 +2498,6 @@ var getCpuInfo = function () {
     unit.revision = stdout.substr(0, stdout.length - 1);
   });
 };
-
 
 getCpuInfo();
 
@@ -2933,11 +2970,11 @@ var nextpmFunctions = async function () {
   //await nextpmRead10()
 }
 
-const nextpmHeaterOff = async function() {
- // 0x81 0x41 0x3E
+const nextpmHeaterOff = async function () {
+  // 0x81 0x41 0x3E
   logger.info('nextpm heater off')
   nextpmClient.writeRegisters(0x65, [0x0000]) // heater off = 0
-//  nextpmClient.writeRegister(0x65, 0x0000) // heater off = 0
+    //  nextpmClient.writeRegister(0x65, 0x0000) // heater off = 0
     .then(async function (data) {
       logger.info('then nextHeaterOff')
       logger.info(data)

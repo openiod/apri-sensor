@@ -3,7 +3,7 @@
 - sveltekit 1
 - new aprisensor-netmanager(-runtime-v2). Now node service (not html webservice via nginx)
 - new apri-sensor-raspi-v2, apri-sensor-connector-v2, apri-sensor-redis-v2 with Redis v6
-- nginx removed, no more webservices (aprisensor-netmanager-runtime-v2=node service)
+- nginx used again  netmanager-runtime 8080 trough nginx port 80 // nginx removed, no more webservices (aprisensor-netmanager-runtime-v2=node service)
 
 
 bij storing img:
@@ -23,6 +23,7 @@ sudo apt install apt-listchanges
 download lite version from https://www.raspberrypi.com/software/operating-systems/
 #check checksum:
 # openssl dgst -sha256 2022-09-22-raspios-bullseye-armhf.img.xz
+# openssl dgst -sha256 2024-11-19-raspios-bookworm-armhf-lite.img.xz
 
 Kopieer met Balena naar een sdkaart
 
@@ -55,10 +56,11 @@ network={
 ###sudo touch /media/awiel/rootfs/boot/ssh
 
 touch /media/awiel/boot/ssh
+of activeer ssh via raspi-config ná opstarten Pi Zero met sd-kaart
 
 Plaats sd-card in raspberry-Pi Zero W met monitor via hdmi en keyboard en usb netwerk
 start pi
-mbv monitor/keyboard kies keyboard US-international with dead keys
+#mbv monitor/keyboard kies keyboard US-international with dead keys
 user / password (zie keepass)
 
 op pc (aangesloten op hetzeldfde netwerk)
@@ -83,15 +85,17 @@ sudo apt update -y
 sudo apt upgrade -y
 sudo apt autoremove -y
 
-#increase swap:
-sudo dphys-swapfile swapoff
-sudo vi /etc/dphys-swapfile
---> CONF_SWAPSIZE=256
-sudo dphys-swapfile setup
-sudo dphys-swapfile swapon
+### voor raspios-bookworm staat dit default al aan
+##increase swap:
+#sudo dphys-swapfile swapoff
+#sudo vi /etc/dphys-swapfile
+#--> CONF_SWAPSIZE=256
+#sudo dphys-swapfile setup
+#sudo dphys-swapfile swapon
 
 # /boot/config.txt --> dtoverlay=i2c-gpio,bus=3  (software i2c on gpio 23 sda 24 scl)
-sudo vi /boot/config.txt --> dtoverlay=disable-bt (serial wordt dan ttyAMA0 ipv ttyS0, is beter)
+## dit is veranderd in bookworm: sudo vi /boot/config.txt --> dtoverlay=disable-bt (serial wordt dan ttyAMA0 ipv ttyS0, is beter)
+sudo vi /boot/firmware/config.txt --> dtoverlay=disable-bt (serial wordt dan ttyAMA0 ipv ttyS0, is beter)
 ook ttyAMA0 voor gps op -v2
 
 #sudo raspi-config --expand-rootfs
@@ -100,8 +104,8 @@ ook ttyAMA0 voor gps op -v2
 
 ## sudo apt -y install network-manager  # already newest version
 #systemctl start NetworkManager.service
-# Deze moet nog wel
-sudo systemctl enable NetworkManager.service
+# Deze moet nog wel, niet meer voor bookworm
+### sudo systemctl enable NetworkManager.service
 
 sudo vi /etc/systemd/journald.conf
 SystemMaxUse=20M
@@ -110,7 +114,8 @@ SystemMaxUse=20M
 apt purge openresolv dhcpcd5
 
 log2ram:
-echo "deb [signed-by=/usr/share/keyrings/azlux-archive-keyring.gpg] http://packages.azlux.fr/debian/ bullseye main" | sudo tee /etc/apt/sources.list.d/azlux.list
+##echo "deb [signed-by=/usr/share/keyrings/azlux-archive-keyring.gpg] http://packages.azlux.fr/debian/ bullseye main" | sudo tee /etc/apt/sources.list.d/azlux.list
+echo "deb [signed-by=/usr/share/keyrings/azlux-archive-keyring.gpg] http://packages.azlux.fr/debian/ bookworm main" | sudo tee /etc/apt/sources.list.d/azlux.list
 sudo wget -O /usr/share/keyrings/azlux-archive-keyring.gpg  https://azlux.fr/repo.gpg
 sudo apt update
 sudo apt install log2ram
@@ -130,7 +135,7 @@ sudo vi /etc/log2ram.conf
 #avahi, redis
 sudo apt -y install avahi-utils
 sudo apt install git -y
-# deze niet meer sudo apt -y install nginx
+sudo apt -y install nginx
 Voor gps module:
 sudo apt-get install gpsd gpsd-clients
 sudo systemctl stop gpsd.socket
@@ -138,19 +143,20 @@ sudo systemctl disable gpsd.socket
 
 Install nodejs for Raspberry pi Zero armv6 !! dus niet de Zero 2 welke armv7 is 
 aansluiten van de pi mbv de usb - ethernet adapter !!
-Install mbv nvm:
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
-logout;login
-NVM_NODEJS_ORG_MIRROR=https://unofficial-builds.nodejs.org/download/release nvm install 16
-sudo vi /root/.profile
--->
-# set PATH so it includes nvm bin for node/npm if it exists
-if [ -d "/home/scapeler/.nvm/versions/node/v16.19.0/bin" ] ; then
-    PATH="/home/scapeler/.nvm/versions/node/v16.19.0/bin:$PATH"
-fi
-<--
-sudo ln -s  /home/scapeler/.nvm/versions/node/v16.19.0/bin/node /usr/bin/node
-sudo ln -s  /home/scapeler/.nvm/versions/node/v16.19.0/bin/npm /usr/bin/npm
+###Install mbv nvm:
+#### see https://github.com/nvm-sh/nvm/releases
+###curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+###logout;login
+###NVM_NODEJS_ORG_MIRROR=https://unofficial-builds.nodejs.org/download/release nvm install 16
+###sudo vi /root/.profile
+###-->
+#### set PATH so it includes nvm bin for node/npm if it exists
+###if [ -d "/home/scapeler/.nvm/versions/node/v16.19.0/bin" ] ; then
+###    PATH="/home/scapeler/.nvm/versions/node/v16.19.0/bin:$PATH"
+###fi
+###<--
+###sudo ln -s  /home/scapeler/.nvm/versions/node/v16.19.0/bin/node /usr/bin/node
+###sudo ln -s  /home/scapeler/.nvm/versions/node/v16.19.0/bin/npm /usr/bin/npm
 
 
 ### for Raspberry Pi Zero :
@@ -167,6 +173,12 @@ sudo apt install nodejs
 ##cd /opt/nodejs
 ##wget https://nodejs.org/dist/v10.24.1/node-v10.24.1-linux-armv6l.tar.gz
 ##tar -C /usr/local --strip-components 1 -xzf node-v10.24.1-linux-armv6l.tar.gz
+
+# for Raspberry Pi Zero W:
+sudo mkdir /opt/nodejs
+cd /opt/nodejs
+wget https://unofficial-builds.nodejs.org/download/release/v16.20.2/node-v16.20.2-linux-armv6l.tar.gz
+tar -C /usr/local --strip-components 1 -xzf node-v16.20.2-linux-armv6l.tar.gz
 
 #see install/avahi/avahi-deamon.conf
 
@@ -208,8 +220,6 @@ npm -v
 sudo systemctl stop hciuart
 sudo systemctl disable hciuart
 sudo systemctl status hciuart
-sudo usermod -a -G dialout pi 
-of
 sudo usermod -a -G dialout scapeler
 
 sudo mkdir -p /var/log/aprisensor
@@ -222,6 +232,9 @@ sudo git clone --depth 1 https://github.com/openiod/apri-sensor.git
 cd /opt/SCAPE604/git/apri-sensor
 sudo git config pull.rebase false (eenmalige 'default' actie, nog uitzoek waarvoor)
 # voor Pi Zero:
+sudo cp /opt/SCAPE604/git/apri-sensor/install/avahi/avahi-daemon.conf /etc/avahi/avahi-daemon.conf
+sudo cp -r /opt/SCAPE604/git/apri-sensor/apri-agent /opt/SCAPE604/apri-sensor/.
+sudo cp -r /opt/SCAPE604/git/apri-sensor/apri-config /opt/SCAPE604/apri-sensor/.
 sudo /opt/SCAPE604/git/apri-sensor/install/git2as.sh
 #bij upgrade kan deze rm nog wel eens een blockade voorkomen
 #rm package-lock.json
@@ -242,9 +255,6 @@ printf '[logging]\ndomains=ALL:WARN\n' > /etc/NetworkManager/conf.d/aprisensor.c
 
 exit  # exit root
 
-sudo cp /opt/SCAPE604/git/apri-sensor/install/avahi/avahi-daemon.conf /etc/avahi/avahi-daemon.conf
-sudo cp -r /opt/SCAPE604/git/apri-sensor/apri-agent /opt/SCAPE604/apri-sensor/.
-sudo cp -r /opt/SCAPE604/git/apri-sensor/apri-config /opt/SCAPE604/apri-sensor/.
 
 deze niet meer:
 ## eenmalig, als runtime stable is
@@ -256,6 +266,23 @@ deze niet meer:
 # ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 # sudo vi /etc/nginx/sites-available/default
 # sudo nginx -t
+
+sudo rm /etc/nginx/sites-enabled/default
+sudo vi /etc/nginx/conf.d/aprisensor.conf
+-->
+server {
+  listen 80 ;
+  listen [::]:80 ;
+  location / {
+    proxy_set_header X-Real-IP  $remote_addr;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_set_header Host $host;
+    proxy_pass http://127.0.0.1:8080;
+  }
+}
+<--
+sudo systemctl reload nginx
+sudo nginx -t
 
 cd /opt/SCAPE604
 sudo tar zxvf /opt/SCAPE604/git/apri-sensor/aprisensor-netmanager-runtime-v2.tar.gz
@@ -349,7 +376,7 @@ sudo systemctl enable SCAPE604-apri-sensor-raspi-v2.service
 #sudo rm /etc/wpa_supplicant/wpa_supplicant.conf
 #sudo cp /opt/SCAPE604/git/apri-sensor/install/interfaces.org /etc/network/interfaces
 
-# make alias for usb devices:
+????# make alias for usb devices:
 !! Reconnect the usb-device to activate the alias of 
 !! sudo udevadm trigger
 !! voeg dialout toe aan /etc/group -> dialout:x:20:<username>  (usermod -a -G dialout <username>)

@@ -107,6 +107,68 @@ catch (err) {
 }
 logger.info("Start of Config Main ", configServerModulePath);
 
+var pmsInitCounter = 0
+var serial
+var sleepMode = 0
+
+//var ds18b20InitCounter = 0
+var ds18b20InitTime = new Date()
+
+
+
+var gpio
+var gpioDs18b20, gpioBme, gpioGpsLed
+//, gpioBlueLed
+//, gpioFan
+try {
+  gpio = require('onoff').Gpio
+}
+catch (err) {
+  logger.info('GPIO module onoff not installed');
+}
+
+let gpioNumbers = {}
+var getGpioInfo = async function () {
+  await execPromise("LC_ALL=C cat /sys/kernel/debug/gpio | grep '(GPIO' ")  // for internal gpio numbers
+    .then((result) => {
+      let tmp1 = result.stdout.split('\n')
+      for (let i = 0; i < tmp1.lenght; i++) {
+        let tmp2 = tmp1[i].split(' ')
+        if (tmp2.length > 3) {
+          let key = tmp2[2].substring(1) // '(GPIO##' -> 'GPIO##'
+          let value = Number(tmp2[1].split('-')[1])
+          gpioNumbers[key] = value
+        }
+      }
+      //console.log(result, gpioNumbers)
+      //gpioBlueLed = new gpio(531, 'out'); //use GPIO-19 pin 35, and specify that it is output
+      //gpioWifiSwitch = new gpio(535, 'in'); //use GPIO-23 pin 16, and specify that it is input
+      gpioGpsLed = new gpio(gpioNumbers.GPIO24, 'out'); //use GPIO-24 pin 18, and specify that it is output
+      gpioDs18b20 = new gpio(gpioNumbers.GPIO25, 'out'); //use GPIO-25 pin 22, and specify that it is output
+      //gpioFan = new gpio(538, 'out'); //use GPIO-26 pin 37, and specify that it is output
+      gpioBme = new gpio(539, 'out'); //use GPIO-27 pin 13, and specify that it is output
+    })
+    .catch((error) => {
+      console.log('catch GPIO info', error)
+    })
+
+};
+if (gpio) getGpioInfo()
+
+/**
+ * cat /sys/kernel/debug/gpio for io-nr's per gpio
+ * dependend of OS-version:
+ * gpio19 = 531
+ * gpio23 = 535
+ * gpio24 = 536
+ * gpio25 = 537
+ * gpio26 = 538
+ * gpio27 = 539
+ *  
+ **/
+
+
+
 // gps:
 var gpsd
 var gpsDaemon
@@ -209,66 +271,6 @@ if (aprisensorDevices.tgs5042 != undefined) {
       });
     });
   }
-}
-var pmsInitCounter = 0
-var serial
-var sleepMode = 0
-
-//var ds18b20InitCounter = 0
-var ds18b20InitTime = new Date()
-var gpio
-var gpioDs18b20, gpioBme, gpioGpsLed
-//, gpioBlueLed
-//, gpioFan
-try {
-  gpio = require('onoff').Gpio
-}
-catch (err) {
-  logger.info('GPIO module onoff not installed');
-}
-
-let gpioNumbers = {}
-var getGpioInfo = async function () {
-  await execPromise("LC_ALL=C cat /sys/kernel/debug/gpio | grep '(GPIO' ")  // for internal gpio numbers
-    .then((result) => {
-      let tmp1 = result.stdout.split('\n')
-      for (let i = 0; i < tmp1.lenght; i++) {
-        let tmp2 = tmp1[i].split(' ')
-        if (tmp2.length > 3) {
-          let key = tmp2[2].substring(1) // '(GPIO##' -> 'GPIO##'
-          let value = Number(tmp2[1].split('-')[1])
-          gpioNumbers[key] = value
-        }
-      }
-      //console.log(result, gpioNumbers)
-    })
-    .catch((error) => {
-      console.log('catch GPIO info', error)
-    })
-
-};
-getGpioInfo()
-
-
-/**
- * cat /sys/kernel/debug/gpio for io-nr's per gpio
- * dependend of OS-version:
- * gpio19 = 531
- * gpio23 = 535
- * gpio24 = 536
- * gpio25 = 537
- * gpio26 = 538
- * gpio27 = 539
- *  
- **/
-
-if (gpio != undefined) {
-  //gpioBlueLed = new gpio(531, 'out'); //use GPIO-19 pin 35, and specify that it is output
-  //gpioWifiSwitch = new gpio(535, 'in'); //use GPIO-23 pin 16, and specify that it is input
-  gpioGpsLed = new gpio(gpioNumbers.GPIO24, 'out'); //use GPIO-24 pin 18, and specify that it is output
-  gpioDs18b20 = new gpio(gpioNumbers.GPIO25, 'out'); //use GPIO-25 pin 22, and specify that it is output
-  //gpioFan = new gpio(538, 'out'); //use GPIO-26 pin 37, and specify that it is output
-  gpioBme = new gpio(539, 'out'); //use GPIO-27 pin 13, and specify that it is output
 }
 
 var bmeInitCounter = 0

@@ -132,7 +132,7 @@ var getGpioInfo = async function () {
   await execPromise("LC_ALL=C cat /sys/kernel/debug/gpio | grep '(GPIO' ")  // for internal gpio numbers
     .then((result) => {
       let tmp1 = result.stdout.split('\n')
-      for (let i = 0; i < tmp1.lenght; i++) {
+      for (let i = 0; i < tmp1.length; i++) {
         let tmp2 = tmp1[i].split(' ')
         if (tmp2.length > 3) {
           let key = tmp2[2].substring(1) // '(GPIO##' -> 'GPIO##'
@@ -147,6 +147,9 @@ var getGpioInfo = async function () {
       gpioDs18b20 = new gpio(gpioNumbers.GPIO25, 'out'); //use GPIO-25 pin 22, and specify that it is output
       //gpioFan = new gpio(538, 'out'); //use GPIO-26 pin 37, and specify that it is output
       gpioBme = new gpio(539, 'out'); //use GPIO-27 pin 13, and specify that it is output
+
+      setGpioGpsLedOff()
+
     })
     .catch((error) => {
       console.log('catch GPIO info', error)
@@ -4795,7 +4798,6 @@ const gpsStart = function () {
 
 }
 
-setGpioGpsLedOff()
 if (aprisensorDevices.gps) {
   aprisensorDevices.gps.ledStatus = 'off'
   gpsd = require('node-gpsd');

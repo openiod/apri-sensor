@@ -133,7 +133,7 @@ var getGpioInfo = async function () {
     .then((result) => {
       let tmp1 = result.stdout.split('\n')
       for (let i = 0; i < tmp1.length; i++) {
-        let tmp2 = tmp1[i].split(' ')
+        let tmp2 = tmp1[i].split(/\s+/)
         if (tmp2.length > 3) {
           let key = tmp2[2].substring(1) // '(GPIO##' -> 'GPIO##'
           let value = Number(tmp2[1].split('-')[1])

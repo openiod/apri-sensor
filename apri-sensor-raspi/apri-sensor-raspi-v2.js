@@ -146,7 +146,7 @@ var getGpioInfo = async function () {
       gpioGpsLed = new gpio(gpioNumbers.GPIO24, 'out'); //use GPIO-24 pin 18, and specify that it is output
       gpioDs18b20 = new gpio(gpioNumbers.GPIO25, 'out'); //use GPIO-25 pin 22, and specify that it is output
       //gpioFan = new gpio(538, 'out'); //use GPIO-26 pin 37, and specify that it is output
-      gpioBme = new gpio(539, 'out'); //use GPIO-27 pin 13, and specify that it is output
+      gpioBme = new gpio(gpioNumbers.GPIO27, 'out'); //use GPIO-27 pin 13, and specify that it is output
 
       setGpioGpsLedOff()
 
